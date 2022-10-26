@@ -20,25 +20,34 @@ export function Header(): ReactElement {
         <nav className='nav'>
           <ul className='gnb'>
             <li className={`gnb_item ${pathname == '/' ? 'is_active' : ''}`}>
-              <Link href='/' className='link'>Products</Link>
+              <Link href='/' className='link'>
+                Products
+              </Link>
             </li>
             <li className={`gnb_item ${pathname == '/docs' ? 'is_active' : ''}`}>
-              <Link href='/docs' className='link'>Documentation</Link>
+              <Link href='/docs' className='link'>
+                Documentation
+              </Link>
             </li>
             <li className={`gnb_item ${pathname == '/examples' ? 'is_active' : ''}`}>
-              <Link href='/examples' className='link'>Examples</Link>
+              <Link href='/examples' className='link'>
+                Examples
+              </Link>
             </li>
             <li className={`gnb_item ${pathname == '/community' ? 'is_active' : ''}`}>
-              <Link href='/community' className='link'>Community</Link>
+              <Link href='/community' className='link'>
+                Community
+              </Link>
             </li>
           </ul>
         </nav>
         <div className='header_util'>
-          <Link href="#" className="btn btn_line gray50"> Login</Link>
-          <Link href="#" className="btn orange_0">
-            <span className="icon">
-            </span>
-            <span className="text">Start for free</span>
+          <Link href='#' className='btn btn_line gray50'>
+            Login
+          </Link>
+          <Link href='#' className='btn orange_0'>
+            <span className='icon'></span>
+            <span className='text'>Start for free</span>
           </Link>
         </div>
       </div>

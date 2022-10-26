@@ -1,7 +1,7 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
-import { Layout } from '@/src/components';
+import { Layout } from '@/components';
 
 const Custom404: NextPage = () => {
   return (
