@@ -8,7 +8,6 @@ export function Header(): ReactElement {
   const { pathname } = useRouter();
 
   // TODO(hackerwins): Deploy whole pages to GitHub Pages.
-  // TODO(hackerwins): Introduce MDX.
   return (
     <header className='header_service'>
       <div className='header_inner'>
@@ -25,7 +24,7 @@ export function Header(): ReactElement {
                 Products
               </Link>
             </li>
-            <li className={`gnb_item ${pathname == '/docs' ? 'is_active' : ''}`}>
+            <li className={`gnb_item ${pathname == '/docs/[[...slug]]' ? 'is_active' : ''}`}>
               <Link href='/docs' className='link'>
                 Documentation
               </Link>

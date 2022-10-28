@@ -1,0 +1,19 @@
+.docs_page .wrapper {
+  padding: 40px;
+  line-height: 2;
+}
+
+.docs_page .wrapper code {
+  background: #f5f5f5;
+  border: 1px solid #e5e5e5;
+  border-radius: 3px;
+  padding: 2px 4px;
+}
+
+.docs_header {
+  margin: 30px 0;
+}
+
+.docs_link {
+  color: red;
+}

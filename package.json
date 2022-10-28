@@ -11,11 +11,15 @@
   },
   "dependencies": {
     "@svgr/webpack": "^6.5.0",
+    "gray-matter": "^4.0.3",
     "next": "13.0.0",
+    "next-mdx-remote": "^4.1.0",
+    "next-remote-watch": "^2.0.0",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   },
   "devDependencies": {
+    "@mdx-js/loader": "^2.1.5",
     "@types/node": "18.11.5",
     "@types/react": "18.0.23",
     "@types/react-dom": "18.0.7",
