@@ -1,12 +1,12 @@
 import { ReactElement } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import LogoSVG from '@/public/assets/icons/logo_horizontal_xs.svg';
+import StarsSVG from '@/public/assets/icons/icon_stars.svg';
 
 export function Header(): ReactElement {
   const { pathname } = useRouter();
 
-  // TODO(hackerwins): Revise file structure considering Next.js 13.
-  // TODO(hackerwins): Find a way to include SVG in Turbo Pack.
   // TODO(hackerwins): Deploy whole pages to GitHub Pages.
   // TODO(hackerwins): Introduce MDX.
   return (
@@ -14,6 +14,7 @@ export function Header(): ReactElement {
       <div className='header_inner'>
         <h1 className='logo'>
           <Link href='/'>
+            <LogoSVG />
             <span className='blind'>Yorkie</span>
           </Link>
         </h1>
@@ -46,7 +47,9 @@ export function Header(): ReactElement {
             Login
           </Link>
           <Link href='#' className='btn orange_0'>
-            <span className='icon'></span>
+            <span className='icon'>
+              <StarsSVG />
+            </span>
             <span className='text'>Start for free</span>
           </Link>
         </div>

@@ -1800,7 +1800,7 @@ legend {
   -webkit-box-shadow: 0 20px 24px -12px rgba(0, 0, 0, 0.2);
   box-shadow: 0 20px 24px -12px rgba(0, 0, 0, 0.2);
 }
-#root {
+#__next {
   height: 100%;
 }
 .wrap {
