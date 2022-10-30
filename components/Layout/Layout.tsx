@@ -1,5 +1,6 @@
 import { ReactElement, ReactNode } from 'react';
-import { Header, Footer } from '@/src/components';
+import { Header } from './Header';
+import { Footer } from './Footer';
 
 export function Layout({
   className,

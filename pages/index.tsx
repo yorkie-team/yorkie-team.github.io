@@ -1,8 +1,9 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
-
-import { Layout } from '@/src/components';
+import { Layout } from '@/components';
+import StarsSVG from '@/public/assets/icons/icon_stars.svg';
+import CopySVG from '@/public/assets/icons/icon_copy.svg';
 
 const Home: NextPage = () => {
   return (
@@ -27,16 +28,19 @@ const Home: NextPage = () => {
                 <label htmlFor='npm' className='blind'>
                   Npm Install
                 </label>
-                <span className='input' id='npm'>
-                  $ npm install yorkie-js-sdk
-                </span>
+                <input className='input' id='npm' type='text' value='$ npm install yorkie-js-sdk' readOnly />
                 <button type='button' className='btn gray800'>
+                  <span className='icon'>
+                    <CopySVG />
+                  </span>
                   <span className='blind'>copy</span>
                 </button>
               </div>
               <Link href='#' className='btn orange_0 btn_start'>
                 <span className='bg'></span>
-                <span className='icon'></span>
+                <span className='icon'>
+                  <StarsSVG />
+                </span>
                 <span className='text'>Start for free</span>
               </Link>
             </div>

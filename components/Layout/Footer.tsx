@@ -1,4 +1,6 @@
 import { ReactElement } from 'react';
+import Link from 'next/link';
+import LogoSVG from '@/public/assets/icons/logo_horizontal_s.svg';
 
 export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement {
   if (shortFooter) {
@@ -13,7 +15,11 @@ export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement
     <footer className='footer_service'>
       <div className='footer_inner'>
         <div className='box_info'>
-          <strong className='logo'></strong>
+          <strong className='logo'>
+            <Link href='/' className='link'>
+              <LogoSVG />
+            </Link>
+          </strong>
           <p className='copyright'>Copyright © 2022 Yorkie</p>
         </div>
         <div className='box_site'>
