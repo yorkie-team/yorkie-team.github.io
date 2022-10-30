@@ -5,7 +5,7 @@ import { Layout } from '@/components';
 import Error404SVG from '@/public/assets/icons/error_404.svg';
 import BackHomeSVG from '@/public/assets/icons/icon_back_home.svg';
 import SlackSVG from '@/public/assets/icons/icon_slack.svg';
-import GithubSVG from '@/public/assets/icons/icon_github.svg';
+import GitHubSVG from '@/public/assets/icons/icon_github.svg';
 
 const Custom404: NextPage = () => {
   return (
@@ -49,7 +49,7 @@ const Custom404: NextPage = () => {
               rel='noreferrer'
             >
               <span className='icon'>
-                <GithubSVG />
+                <GitHubSVG />
               </span>
               <span className='text'>GitHub</span>
             </Link>
