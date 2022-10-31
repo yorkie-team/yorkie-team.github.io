@@ -6,8 +6,6 @@ import StarsSVG from '@/public/assets/icons/icon_stars.svg';
 
 export function Header(): ReactElement {
   const { pathname } = useRouter();
-
-  // TODO(hackerwins): Deploy whole pages to GitHub Pages.
   return (
     <header className='header_service'>
       <div className='header_inner'>
