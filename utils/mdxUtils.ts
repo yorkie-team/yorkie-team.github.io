@@ -4,13 +4,26 @@ import matter from 'gray-matter';
 
 const DOCS_PATH = path.join(process.cwd(), 'docs');
 
-// docsFilePaths is the list of all mdx files inside the DOCS_PATH directory
-const docsFilePaths = fs
-  .readdirSync(DOCS_PATH) //
-  .filter((path) => /\.mdx?$/.test(path));
+const getAllFiles = (dirPath: string) => {
+  const files: Array<string> = [];
+  fs.readdirSync(dirPath, { withFileTypes: true }) //
+    .forEach((file) => {
+      const path = `${dirPath}/${file.name}`;
+
+      if (file.isDirectory()) {
+        const nestFiles = getAllFiles(path);
+        files.push(...nestFiles);
+      } else {
+        files.push(path);
+      }
+    });
+
+  return files;
+};
 
 export const getSlugs = () => {
-  return docsFilePaths.map((path) => path.replace(/\.mdx?$/, ''));
+  const docsFilePaths = getAllFiles(DOCS_PATH).filter((path) => /\.mdx?$/.test(path));
+  return docsFilePaths.map((path) => path.replace(`${DOCS_PATH}/`, '').replace(/\.mdx?$/, ''));
 };
 
 export type DocsMeta = {
