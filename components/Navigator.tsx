@@ -2,15 +2,10 @@ import React from 'react';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import { type DocsOrderList } from '@/utils/mdxUtils';
 import ArrowSVG from '@/public/assets/icons/icon_arrow.svg';
 
-type NavMenu = {
-  title: string;
-  href: string;
-  subMenu?: Array<NavMenu>;
-};
-
-export function Navigator({ navList }: { navList: Array<NavMenu> }) {
+export function Navigator({ navList }: { navList: DocsOrderList }) {
   return (
     <nav className='navigator'>
       <NavList navList={navList} />
@@ -18,22 +13,22 @@ export function Navigator({ navList }: { navList: Array<NavMenu> }) {
   );
 }
 
-function NavList({ navList }: { navList: Array<NavMenu> }) {
+function NavList({ navList }: { navList: DocsOrderList }) {
   const { asPath } = useRouter();
 
   return (
     <ul className='navigator_list'>
       {navList.map(({ title, href, subMenu }) => {
-        const isActive = new RegExp(`^${href}`).test(asPath);
+        const isActive = href === '/docs' ? asPath === href : new RegExp(`^${href}`).test(asPath);
         return (
           <NavGroup key={href} isActive={isActive}>
-            {subMenu ? (
+            {subMenu.length === 0 ? (
+              <NavItem title={title} href={href} isActive={asPath === href} />
+            ) : (
               <>
                 <NavMenu title={title} href={href} hasSubMenu />
                 {isActive && <NavList navList={subMenu} />}
               </>
-            ) : (
-              <NavItem title={title} href={href} isActive={asPath === href} />
             )}
           </NavGroup>
         );

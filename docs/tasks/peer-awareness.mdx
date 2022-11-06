@@ -1,0 +1,59 @@
+---
+title: 'Peer Awareness'
+order: 53
+---
+
+## Peer Awareness
+
+Peer Awareness is a feature often required in collaborative applications. With Peer Awareness, we can display information such as names and colors of peers who are editing a Document together in the application. Example of Peer Awareness in [CodePair](https://codepair.yorkie.dev/):
+
+<img src='/assets/images/peer-awareness.png' alt='peer awareness' width='100%' style={{ maxWidth: '400px' }} />
+
+This page shows how to implement Peer Awareness in your application.
+
+### How to implement
+
+When creating a Client, we can pass information of the Client to other peers attaching the same Document with presence.
+
+```javascript
+const clientA = new yorkie.Client('localhost:8080', {
+  presence: {
+    username: 'alice',
+    color: 'blue',
+  },
+});
+await client.activate();
+
+const docA = new yorkie.Document('doc-1');
+await clientA.attach(docA);
+```
+
+Then, another Client is created and attaches a Document with the same name as before.
+
+```javascript
+const clientB = new yorkie.Client('localhost:8080', {
+  presence: {
+    username: 'bob',
+    color: 'red',
+  },
+});
+await clientB.activate();
+
+const docB = new yorkie.Document('doc-1');
+await clientB.attach(docB);
+```
+
+When a new peer registers or leaves, the `peers-changed` event is fired, and the other peer's clientID and presence can be obtained from the event.
+
+```javascript
+const unsubscribe = clientA.subscribe((event) => {
+  if (event.type === 'peers-changed') {
+    const peers = event.value[doc.getKey()];
+    for (const [clientID, presence] of Object.entries(peers)) {
+      console.log(clientID, presence); // e.g.) presence: {username: 'bob', color: 'red'}
+    }
+  }
+});
+```
+
+In the example above, `clientA` will receive information from `clientB`.
