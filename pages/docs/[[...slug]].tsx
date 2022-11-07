@@ -51,26 +51,26 @@ export default function DocsPage({
   useEffect(() => {
     if (headings.length === 0) return;
 
-    const onScroll = () => {
+    const setActiveTOCLink = () => {
       const scrollTop = document.documentElement.scrollTop;
-      const vh = window.innerHeight;
+      const yOffset = 150;
 
       const currentHeading =
         scrollTop < 10
           ? headingTops.find((headingTop) => {
-              return scrollTop >= headingTop.top - vh * 0.4;
+              return scrollTop >= headingTop.top - yOffset;
             })
           : [...headingTops].reverse().find((headingTop) => {
-              return scrollTop >= headingTop.top - vh * 0.4;
+              return scrollTop >= headingTop.top - yOffset;
             });
 
       setActiveId(currentHeading?.id || '');
     };
 
-    window.addEventListener('scroll', onScroll);
-    onScroll();
+    window.addEventListener('scroll', setActiveTOCLink);
+    setActiveTOCLink();
     return () => {
-      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('scroll', setActiveTOCLink);
     };
   }, [headings, headingTops]);
 
