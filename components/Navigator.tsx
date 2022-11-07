@@ -23,7 +23,7 @@ function NavList({ navList }: { navList: DocsOrderList }) {
         return (
           <NavGroup key={href} isActive={isActive}>
             {subMenu.length === 0 ? (
-              <NavItem title={title} href={href} isActive={asPath === href} />
+              <NavItem title={title} href={href} isActive={asPath.split('#')[0] === href} />
             ) : (
               <>
                 <NavMenu title={title} href={href} hasSubMenu />

@@ -1,14 +1,22 @@
 import type { GetStaticProps, GetStaticPaths } from 'next';
+import { useState, useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { type DocsMeta, type DocsOrderList, getSlugs, getDocsFromSlug, getDocsOrderList } from '@/utils/mdxUtils';
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote';
 import { serialize } from 'next-mdx-remote/serialize';
 import type { MDXComponents } from 'mdx/types';
+import rehypeSlug from 'rehype-slug';
+import rehypeAutolinkHeadings from 'rehype-autolink-headings';
+import rehypeToc, { HtmlElementNode, ListItemNode } from '@jsdevtools/rehype-toc';
 import { Layout, CustomLink, Navigator } from '@/components';
 
 // Custom components/renderers to pass to MDX.
 const components: MDXComponents = {
   a: CustomLink,
+  h3: (props) => <h3 className='heading' {...props} />,
+  h4: (props) => <h4 className='heading' {...props} />,
+  h5: (props) => <h5 className='heading' {...props} />,
+  h6: (props) => <h6 className='heading' {...props} />,
   TestComponent: dynamic(() => import('@/components/TestComponent')),
 };
 
@@ -20,6 +28,58 @@ export default function DocsPage({
   meta: DocsMeta;
   navList: DocsOrderList;
 }) {
+  const [activeId, setActiveId] = useState<string>('');
+  const [headings, setHeadings] = useState<Array<Element>>([]);
+  const [headingTops, setHeadingTops] = useState<Array<{ id: string; top: number }>>([]);
+
+  const updateHeadingPositions = useCallback(() => {
+    const scrollTop = document.documentElement.scrollTop;
+    const headingTops = [...headings].map((heading) => {
+      const top = heading.getBoundingClientRect().top + scrollTop;
+      return {
+        id: heading.id,
+        top,
+      };
+    });
+    setHeadingTops(headingTops);
+  }, [headings]);
+
+  useEffect(() => {
+    setHeadings(Array.from(document.querySelectorAll('.documentation_page .heading')));
+  }, [source]);
+
+  useEffect(() => {
+    if (headings.length === 0) return;
+
+    const onScroll = () => {
+      const scrollTop = document.documentElement.scrollTop;
+      const vh = window.innerHeight;
+
+      const currentHeading =
+        scrollTop < 10
+          ? headingTops.find((headingTop) => {
+              return scrollTop >= headingTop.top - vh * 0.4;
+            })
+          : [...headingTops].reverse().find((headingTop) => {
+              return scrollTop >= headingTop.top - vh * 0.4;
+            });
+
+      setActiveId(currentHeading?.id || '');
+    };
+
+    window.addEventListener('scroll', onScroll);
+    onScroll();
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+    };
+  }, [headings, headingTops]);
+
+  useEffect(() => {
+    updateHeadingPositions();
+    document.querySelector(`.toc-item.is_active`)?.classList.remove('is_active');
+    document.querySelector(`[data-heading="${activeId}"]`)?.classList.add('is_active');
+  }, [activeId, updateHeadingPositions]);
+
   return (
     <Layout className='documentation_page' shortFooter>
       <Navigator navList={navList} />
@@ -36,7 +96,49 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   const mdxSource = await serialize(content, {
     mdxOptions: {
       remarkPlugins: [],
-      rehypePlugins: [],
+      rehypePlugins: [
+        rehypeSlug,
+        [
+          rehypeAutolinkHeadings,
+          {
+            test: ['h3', 'h4', 'h5', 'h6'],
+            behavior: 'wrap',
+          },
+        ],
+        [
+          rehypeToc,
+          {
+            position: 'afterend',
+            headings: ['h3', 'h4', 'h5', 'h6'],
+            customizeTOC: (toc: HtmlElementNode) => {
+              const children = toc.children || [];
+              const contents = (children[0] as any)?.children?.length;
+              if (!contents) return false;
+
+              toc.tagName = 'div';
+              toc.properties.className = 'pagination';
+              const wrapper = {
+                type: 'element',
+                tagName: 'div',
+                properties: { className: 'pagination_inner' },
+                children: [
+                  {
+                    type: 'element',
+                    tagName: 'strong',
+                    properties: { className: 'pagination_title' },
+                    children: [{ type: 'text', value: 'On this page' }],
+                  },
+                  ...children,
+                ],
+              };
+              toc.children = [wrapper];
+            },
+            customizeTOCItem: (tocItem: ListItemNode, heading: HtmlElementNode) => {
+              tocItem.properties['data-heading'] = heading.properties.id;
+            },
+          },
+        ],
+      ],
     },
   });
 
