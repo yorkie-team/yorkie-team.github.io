@@ -1,0 +1,128 @@
+---
+title: 'Quick Start'
+order: 20
+---
+
+## Quick Start
+
+Let's start using Yorkie with the JS SDK and a Server. You need an environment that can run JavaScript, such as a browser.
+
+### Requirements
+
+You must run docker to test Yorkie. You can start `Envoy` and `Yorkie` with `docker-compose`. To run docker, download manifest files from [docker folder](https://github.com/yorkie-team/yorkie-team.github.io/tree/main/docker), and then type `docker-compose up --build -d` in the folder directory.
+
+```bash
+$ docker-compose up --build -d
+```
+
+For more details, please refer to [Server for Web](/docs/tasks/server-for-web).
+
+### Installation
+
+Install Yorkie JS SDK using npm:
+
+```bash
+$ npm install yorkie-js-sdk
+```
+
+or just include the following code in the `<head>` tag of your HTML:
+
+```html
+<!-- include yorkie js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/yorkie-js-sdk/{{site.version}}/yorkie-js-sdk.js"></script>
+```
+
+> The JS SDKs are also provided by [cdnjs](https://cdnjs.com) to make loading library files faster and easier on websites.<br/>For more the JS SDKs: [https://cdnjs.com/libraries/yorkie-js-sdk](https://cdnjs.com/libraries/yorkie-js-sdk)
+
+### How to use Yorkie
+
+#### 1. Initializing Document Properties
+
+First, create a Client and a Document.
+
+```js
+async function main() {
+  // 01. create a new client instance and connect to the yorkie server
+  const client = new yorkie.Client('http://localhost:8080');
+  await client.activate();
+
+  // 02. create a new document and attach it to the client
+  const doc = new yorkie.Document('document');
+  await client.attach(doc);
+}
+```
+
+The created document should be attached to the client to automatically synchronize the document between the client and peers.
+
+#### 2. Updating the Document
+
+The created document is initially an empty object. You can create or update a key-value property you would like to share with peers using `doc.update()`.
+
+```js
+doc.update((root) => {
+  root['key'] = 'value'; // {"key":"value"}
+});
+```
+
+#### 3. Accessing Document Properties
+
+If you want to access the document properties, you can use `doc.getRoot()`. Using a dot notation, you can access a key-value property you or your peers have set.
+
+```js
+doc.update((root) => {
+  root.sharedMessage = 'Hello World!';
+});
+console.log(doc.getRoot().sharedMessage); // "Hello World!";
+```
+
+#### 4. Subscribing to the changes that happen in the Document
+
+Clients sharing the same document can subscribe to the changes that happen in the Document using `doc.subscribe()`
+
+```js
+doc.subscribe((event) => {
+  console.log('A change event occurred in the Document!');
+});
+```
+
+You can execute different actions depending on the source of change. The source can be accessed from `event.type`.
+
+```js
+doc.subscribe((event) => {
+  if (event.type === 'remote-change') {
+    console.log('A peer has changed the Document!');
+  }
+});
+```
+
+Accessing certain document properties when a specific property in the document is changed is the key to creating a collaborative application. You can perform different actions based on which property has changed in the document by examining `paths` array that exists in `event.value` array.
+
+```js
+doc.subscribe((event) => {
+ if (event.type === 'remote-change') {
+    for (const changeInfo of event.value) {
+      for (const path of changeInfo.paths) {
+        if (path.startsWith('$.sharedMessage') {
+          console.log(`One of your peers has changed the message to ${doc.getRoot().sharedMessage}`)
+        }
+      }
+    }
+  }
+});
+```
+
+#### 5. Viewing the presence of other peers
+
+Other peers' activities can be accessed by subscribing to the client.
+
+```js
+client.subscribe((event) => {
+  if (event.type === 'peers-changed') {
+    const peers = event.value[doc.getKey()];
+    const peersCount = Object.entries(peers).length;
+    console.log(`There are currently ${peersCount} peers`);
+  }
+});
+```
+
+Next, let's take a look at the [JS SDK](/docs/js-sdk).
