@@ -8,7 +8,7 @@ import type { MDXComponents } from 'mdx/types';
 import rehypeSlug from 'rehype-slug';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import rehypeToc, { HtmlElementNode, ListItemNode } from '@jsdevtools/rehype-toc';
-import { Layout, CustomLink, Navigator } from '@/components';
+import { Layout, CustomLink, Navigator, CodeBlock } from '@/components';
 
 // Custom components/renderers to pass to MDX.
 const components: MDXComponents = {
@@ -17,6 +17,7 @@ const components: MDXComponents = {
   h4: (props) => <h4 className='heading' {...props} />,
   h5: (props) => <h5 className='heading' {...props} />,
   h6: (props) => <h6 className='heading' {...props} />,
+  pre: (props) => <CodeBlock {...props} />,
   TestComponent: dynamic(() => import('@/components/TestComponent')),
 };
 
