@@ -5,6 +5,7 @@ import { type DocsMeta, type DocsOrderList, getSlugs, getDocsFromSlug, getDocsOr
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote';
 import { serialize } from 'next-mdx-remote/serialize';
 import type { MDXComponents } from 'mdx/types';
+import remarkGfm from 'remark-gfm';
 import rehypeSlug from 'rehype-slug';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import rehypeToc, { HtmlElementNode, ListItemNode } from '@jsdevtools/rehype-toc';
@@ -96,7 +97,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   const { content, meta } = getDocsFromSlug(slug);
   const mdxSource = await serialize(content, {
     mdxOptions: {
-      remarkPlugins: [],
+      remarkPlugins: [remarkGfm],
       rehypePlugins: [
         rehypeSlug,
         [
