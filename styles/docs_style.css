@@ -52,3 +52,8 @@
 .toc-item.is_active {
   background: url('/assets/icons/icon_arrow_circle_right.svg') no-repeat 0 10px;
 }
+
+.next_image {
+  width: 100%;
+  height: auto;
+}
