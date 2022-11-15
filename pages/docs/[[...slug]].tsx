@@ -9,7 +9,8 @@ import remarkGfm from 'remark-gfm';
 import rehypeSlug from 'rehype-slug';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import rehypeToc, { HtmlElementNode, ListItemNode } from '@jsdevtools/rehype-toc';
-import { Layout, CustomLink, Navigator, CodeBlock } from '@/components';
+import rehypeImageMeta from '@/utils/rehypeImageMeta';
+import { Layout, CustomLink, Navigator, CodeBlock, Image } from '@/components';
 
 // Custom components/renderers to pass to MDX.
 const components: MDXComponents = {
@@ -20,6 +21,10 @@ const components: MDXComponents = {
   h6: (props) => <h6 className='heading' {...props} />,
   pre: (props) => <CodeBlock {...props} />,
   TestComponent: dynamic(() => import('@/components/TestComponent')),
+  img: ({ src, alt, title, width, height }) => (
+    <Image src={src!} alt={alt || ''} title={title} width={width as number} height={height as number} />
+  ),
+  Image,
 };
 
 export default function DocsPage({
@@ -99,6 +104,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     mdxOptions: {
       remarkPlugins: [remarkGfm],
       rehypePlugins: [
+        rehypeImageMeta,
         rehypeSlug,
         [
           rehypeAutolinkHeadings,
