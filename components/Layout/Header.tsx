@@ -17,8 +17,8 @@ export function Header(): ReactElement {
         </h1>
         <nav className='nav'>
           <ul className='gnb'>
-            <li className={`gnb_item ${pathname == '/' ? 'is_active' : ''}`}>
-              <Link href='/' className='link'>
+            <li className={`gnb_item ${pathname == '/products' ? 'is_active' : ''}`}>
+              <Link href='/products' className='link'>
                 Products
               </Link>
             </li>
