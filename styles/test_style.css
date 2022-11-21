@@ -57,3 +57,21 @@
   width: 100%;
   height: auto;
 }
+
+.main_page .banner_img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+
+.main_page .banner_img svg {
+  width: auto;
+  min-width: 100%;
+  height: calc(100vh - 64px);
+}
+
+.main_page .inner {
+  position: relative;
+  z-index: 1;
+}
