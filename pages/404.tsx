@@ -1,59 +1,54 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import Link from 'next/link';
-import { Layout } from '@/components';
+import { Button, Icon, Layout } from '@/components';
 import Error404SVG from '@/public/assets/icons/error_404.svg';
-import BackHomeSVG from '@/public/assets/icons/icon_back_home.svg';
-import SlackSVG from '@/public/assets/icons/icon_slack.svg';
-import GitHubSVG from '@/public/assets/icons/icon_github.svg';
 
 const Custom404: NextPage = () => {
   return (
-    <Layout className='error_page' shortFooter>
+    <Layout className="error_page" shortFooter>
+      <Head>
+        <title>Page not found · Yorkie</title>
+      </Head>
       <div className="content error_404">
-        <Head>
-          <title>Page not found · Yorkie</title>
-        </Head>
-        <div className='img_box'>
+        <h2 className="blind">404 : not found</h2>
+        <div className="img_box">
           <Error404SVG />
         </div>
-        <h2 className='blind'>404 : not found</h2>
-        <p className='title'>
+        <p className="title">
           Oops! Wait a minute... <br />
           Yorkie ate your request
         </p>
-        <p className='desc'>The page you are looking for might be removed or is temporarily unavailable.</p>
-        <div className='btn_box'>
-          <Link href='/' className='btn orange_0'>
-            <span className='icon'>
-              <BackHomeSVG />
-            </span>
-            <span className='text'>Back to home</span>
-          </Link>
-          <Link
-            href='https://communityinviter.com/apps/dev-yorkie/yorkie'
-            className='btn btn_line gray50'
-            target='_blank'
-            rel='noreferrer'
+        <p className="desc">
+          The page you are looking for might be
+          <br className="br_mo" /> removed or is temporarily unavailable.
+        </p>
+        <Button.Box>
+          <Button as="link" href="/" className="orange_0" icon={<Icon type="backHome" />}>
+            Back to home
+          </Button>
+          <Button
+            as="a"
+            href="https://communityinviter.com/apps/dev-yorkie/yorkie"
+            className="gray50"
+            outline
+            target="_blank"
+            rel="noreferrer"
+            icon={<Icon type="slack" />}
           >
-            <span className='icon'>
-              <SlackSVG />
-            </span>
-            <span className='text'>Slack</span>
-          </Link>
-          <Link
-            href='https://github.com/yorkie-team/yorkie-house/issues'
-            className='btn btn_line gray50'
-            target='_blank'
-            rel='noreferrer'
+            Slack
+          </Button>
+          <Button
+            as="a"
+            href="https://github.com/yorkie-team/yorkie-house/issues"
+            className="gray50"
+            outline
+            target="_blank"
+            rel="noreferrer"
+            icon={<Icon type="github" />}
           >
-            <span className='icon'>
-              <GitHubSVG />
-            </span>
-            <span className='text'>GitHub</span>
-          </Link>
-        </div>
-
+            GitHub
+          </Button>
+        </Button.Box>
       </div>
     </Layout>
   );

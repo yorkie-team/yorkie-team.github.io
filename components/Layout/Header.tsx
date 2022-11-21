@@ -1,54 +1,116 @@
 import { ReactElement } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import { Button, Icon, Popover } from '@/components';
 import LogoSVG from '@/public/assets/icons/logo_horizontal_xs.svg';
-import StarsSVG from '@/public/assets/icons/icon_stars.svg';
+import LogoGnbSVG from '@/public/assets/icons/logo_gnb.svg';
 
-export function Header(): ReactElement {
+export function Header({
+  gnbPageName,
+}: {
+  gnbPageName?: 'Products' | 'Documentation' | 'Example' | 'Community';
+}): ReactElement {
   const { pathname } = useRouter();
+
   return (
-    <header className='header_service'>
-      <div className='header_inner'>
-        <h1 className='logo'>
-          <Link href='/'>
+    <header className="header_service">
+      <div className="header_inner">
+        <h1 className="logo">
+          <Link href="/">
             <LogoSVG />
-            <span className='blind'>Yorkie</span>
+            <LogoGnbSVG />
+            <span className="blind">Yorkie</span>
           </Link>
         </h1>
-        <nav className='nav'>
-          <ul className='gnb'>
+        <Popover>
+          <Popover.Target>
+            <button className="btn_menu">
+              {gnbPageName}
+              <Icon type="openSelector" />
+            </button>
+          </Popover.Target>
+          <Popover.Dropdown>
+            <div className="menu_list_mo dropdown shadow_m">
+              <ul className="dropdown_list">
+                <li className="dropdown_item">
+                  <Link href="/products" className="dropdown_menu">
+                    <span className="dropdown_text">Products</span>
+                  </Link>
+                </li>
+                <li className="dropdown_item">
+                  <Link href="/docs" className="dropdown_menu">
+                    <span className="dropdown_text">Documentation</span>
+                  </Link>
+                </li>
+                <li className="dropdown_item">
+                  <Link href="/examples" className="dropdown_menu">
+                    <span className="dropdown_text">Example</span>
+                  </Link>
+                </li>
+                <li className="dropdown_item">
+                  <Link href="/community" className="dropdown_menu">
+                    <span className="dropdown_text">Community</span>
+                  </Link>
+                </li>
+              </ul>
+            </div>
+          </Popover.Dropdown>
+        </Popover>
+        <nav className="nav">
+          <ul className="gnb">
             <li className={`gnb_item ${pathname == '/products' ? 'is_active' : ''}`}>
-              <Link href='/products' className='link'>
+              <Link href="/products" className="link">
                 Products
               </Link>
             </li>
             <li className={`gnb_item ${pathname == '/docs/[[...slug]]' ? 'is_active' : ''}`}>
-              <Link href='/docs' className='link'>
+              <Link href="/docs" className="link">
                 Documentation
               </Link>
             </li>
             <li className={`gnb_item ${pathname == '/examples' ? 'is_active' : ''}`}>
-              <Link href='/examples' className='link'>
+              <Link href="/examples" className="link">
                 Examples
               </Link>
             </li>
             <li className={`gnb_item ${pathname == '/community' ? 'is_active' : ''}`}>
-              <Link href='/community' className='link'>
+              <Link href="/community" className="link">
                 Community
               </Link>
             </li>
           </ul>
         </nav>
-        <div className='header_util'>
-          <Link href='#' className='btn btn_line gray50'>
+        <div className="header_util">
+          <Button as="link" href="/login" outline className="gray50">
             Login
-          </Link>
-          <Link href='#' className='btn orange_0'>
-            <span className='icon'>
-              <StarsSVG />
-            </span>
-            <span className='text'>Start for free</span>
-          </Link>
+          </Button>
+          <Button as="link" href="#" className="orange_0" icon={<Icon type="star" />}>
+            Start for free
+          </Button>
+          <Popover>
+            <Popover.Target>
+              <button className="btn_uiil_menu">
+                <span className="blind">Open menu</span>
+                <Icon type="gnbMenu" className="icon_menu" />
+              </button>
+            </Popover.Target>
+            <Popover.Dropdown>
+              <div className="util_list_mo dropdown shadow_m">
+                <ul className="dropdown_list">
+                  <li className="dropdown_item">
+                    <button type="button" className="dropdown_menu">
+                      <span className="dropdown_text">Login</span>
+                    </button>
+                  </li>
+                  <li className="dropdown_item">
+                    <button type="button" className="dropdown_menu">
+                      <span className="dropdown_text">Start for free</span>
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            </Popover.Dropdown>
+          </Popover>
         </div>
       </div>
     </header>
