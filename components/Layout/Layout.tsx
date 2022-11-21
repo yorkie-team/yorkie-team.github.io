@@ -10,7 +10,7 @@ export function Layout({
   shortFooter,
 }: {
   className?: string;
-  gnbPageName?: 'Products' | 'Documentation' | 'Example' | 'Community';
+  gnbPageName?: 'Products' | 'Documentation' | 'Examples' | 'Community';
   children: ReactNode;
   shortFooter?: boolean;
 }): ReactElement {
