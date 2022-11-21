@@ -6,3 +6,4 @@ export * from './Image';
 export * from './Button/Button';
 export * from './Icons/Icon';
 export * from './motions';
+export * from './Popover/Popover';

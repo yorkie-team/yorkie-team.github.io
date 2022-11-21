@@ -15,10 +15,10 @@ import { Layout, CustomLink, Navigator, CodeBlock, Image } from '@/components';
 // Custom components/renderers to pass to MDX.
 const components: MDXComponents = {
   a: CustomLink,
-  h3: (props) => <h3 className='heading' {...props} />,
-  h4: (props) => <h4 className='heading' {...props} />,
-  h5: (props) => <h5 className='heading' {...props} />,
-  h6: (props) => <h6 className='heading' {...props} />,
+  h3: (props) => <h3 className="heading" {...props} />,
+  h4: (props) => <h4 className="heading" {...props} />,
+  h5: (props) => <h5 className="heading" {...props} />,
+  h6: (props) => <h6 className="heading" {...props} />,
   pre: (props) => <CodeBlock {...props} />,
   TestComponent: dynamic(() => import('@/components/TestComponent')),
   img: ({ src, alt, title, width, height }) => (
@@ -88,9 +88,9 @@ export default function DocsPage({
   }, [activeId, updateHeadingPositions]);
 
   return (
-    <Layout className='documentation_page' shortFooter>
+    <Layout className="documentation_page" gnbPageName="Documentation" shortFooter>
       <Navigator navList={navList} />
-      <section className='section'>
+      <section className="section">
         <MDXRemote {...source} components={components} />
       </section>
     </Layout>
