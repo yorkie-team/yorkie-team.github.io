@@ -16,7 +16,7 @@ export function Layout({
       <div className={`wrap ${className}`}>
         <Header />
         <main className='container'>
-          <div className='content'>{children}</div>
+          {children}
         </main>
         <Footer shortFooter={shortFooter} />
       </div>
