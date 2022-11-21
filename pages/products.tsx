@@ -1,7 +1,6 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import Link from 'next/link';
-import { Layout, Button, Icon } from '@/components';
+import { Layout } from '@/components';
 import ProductBannerSVG from '@/public/assets/images/banner/img_product_banner.svg';
 
 const Products: NextPage = () => {
