@@ -11,10 +11,15 @@ import CloseSVG from '@/public/assets/icons/icon_close.svg';
 import OpenSelectorSVG from '@/public/assets/icons/icon_open_selector.svg';
 import DiamondSVG from '@/public/assets/icons/icon_diamond.svg';
 import ToolSVG from '@/public/assets/icons/icon_tool.svg';
+import MessageSquareSVG from '@/public/assets/icons/icon_message_square.svg';
 import MessageSmileSVG from '@/public/assets/icons/icon_message_smile.svg';
+import SmileSVG from '@/public/assets/icons/icon_smile.svg';
 import CheckCircleSVG from '@/public/assets/icons/icon_check_circle.svg';
 import SecenarioSVG from '@/public/assets/icons/icon_secenario.svg';
 import ArrowSVG from '@/public/assets/icons/icon_arrow.svg';
+import RecorderSVG from '@/public/assets/icons/icon_recorder.svg';
+import BulbSVG from '@/public/assets/icons/icon_bulb.svg';
+import TwinkleSVG from '@/public/assets/icons/icon_twinkle.svg';
 
 const svgMap = {
   star: <StarSVG />,
@@ -28,10 +33,15 @@ const svgMap = {
   openSelector: <OpenSelectorSVG />,
   diamond: <DiamondSVG />,
   tool: <ToolSVG />,
+  messageSquare: <MessageSquareSVG />,
   messageSmile: <MessageSmileSVG />,
+  smile: <SmileSVG />,
   checkCircle: <CheckCircleSVG />,
   secenario: <SecenarioSVG />,
   arrow: <ArrowSVG />,
+  recorder: <RecorderSVG />,
+  bulb: <BulbSVG />,
+  twinkle: <TwinkleSVG />,
 };
 type SVGType = keyof typeof svgMap;
 

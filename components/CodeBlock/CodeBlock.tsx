@@ -1,7 +1,7 @@
 import Highlight, { defaultProps, Language } from 'prism-react-renderer';
 import theme from './prismThemeLight';
 
-function PrismCode({
+export function PrismCode({
   code,
   language,
   withLineNumbers,
@@ -16,8 +16,8 @@ function PrismCode({
         <pre className={className}>
           {tokens.map((line, i) => (
             <div key={i} {...getLineProps({ line, key: i })}>
-              {withLineNumbers && <span className='line-number'>{i + 1}</span>}
-              <span className='line-content'>
+              {withLineNumbers && <span className="line-number">{i + 1}</span>}
+              <span className="line-content">
                 {line.map((token, key) => (
                   <span key={key} {...getTokenProps({ token, key })} />
                 ))}
@@ -35,7 +35,7 @@ export function CodeBlock(props: any) {
   const code = props.children.props.children.replace(/\n$/, '');
 
   return (
-    <div className='codeblock'>
+    <div className="codeblock">
       <PrismCode
         code={code}
         language={language}

@@ -700,6 +700,7 @@ export const MainBannerMotion = ({ bannerActive }: { bannerActive: boolean }) =>
         <motion.g
           animate={bannerActive ? 'show' : 'hide'}
           variants={{ show: { opacity: 1 }, hide: { opacity: 0 } }}
+          initial={{ opacity: 0 }}
           clipPath="url(#clip7_6449_212729)"
         >
           <g opacity="0.7" filter="url(#filter12_f_6449_212729)">
