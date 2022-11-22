@@ -8,7 +8,7 @@ import LogoGnbSVG from '@/public/assets/icons/logo_gnb.svg';
 export function Header({
   gnbPageName,
 }: {
-  gnbPageName?: 'Products' | 'Documentation' | 'Example' | 'Community';
+  gnbPageName?: 'Products' | 'Documentation' | 'Examples' | 'Community';
 }): ReactElement {
   const { pathname } = useRouter();
 
@@ -44,7 +44,7 @@ export function Header({
                 </li>
                 <li className="dropdown_item">
                   <Link href="/examples" className="dropdown_menu">
-                    <span className="dropdown_text">Example</span>
+                    <span className="dropdown_text">Examples</span>
                   </Link>
                 </li>
                 <li className="dropdown_item">
