@@ -1,46 +1,53 @@
-import Highlight, { defaultProps, Language } from 'prism-react-renderer';
-import theme from './prismThemeLight';
+import { ReactNode } from 'react';
+import { CopyButton, Button, Icon } from '@/components';
+import { PrismCodeProps, PrismCode } from './PrismCode';
 
-function PrismCode({
-  code,
-  language,
-  withLineNumbers,
-}: {
-  code: string;
-  language: Language;
-  withLineNumbers?: boolean;
-}) {
-  return (
-    <Highlight {...defaultProps} code={code} theme={theme} language={language}>
-      {({ className, tokens, getLineProps, getTokenProps }) => (
-        <pre className={className}>
-          {tokens.map((line, i) => (
-            <div key={i} {...getLineProps({ line, key: i })}>
-              {withLineNumbers && <span className='line-number'>{i + 1}</span>}
-              <span className='line-content'>
-                {line.map((token, key) => (
-                  <span key={key} {...getTokenProps({ token, key })} />
-                ))}
-              </span>
-            </div>
-          ))}
-        </pre>
-      )}
-    </Highlight>
-  );
-}
-
-export function CodeBlock(props: any) {
-  const language = props.children.props.className?.replace(/language-/, '') || '';
-  const code = props.children.props.children.replace(/\n$/, '');
+export function CodeBlock({ withCopyButton, ...restProps }: { withCopyButton?: boolean } & PrismCodeProps) {
+  if (withCopyButton) {
+    return (
+      <div className="codeblock_box">
+        <div className="codeblock">
+          <PrismCode {...restProps} />
+        </div>
+        <CopyButtonBox value={restProps.code} />
+      </div>
+    );
+  }
 
   return (
-    <div className='codeblock'>
-      <PrismCode
-        code={code}
-        language={language}
-        withLineNumbers={['js', 'ts', 'javascript', 'typescript'].includes(language)}
-      />
+    <div className="codeblock">
+      <PrismCode {...restProps} />
     </div>
   );
 }
+
+function CopyButtonBox({ value, timeout = 1000 }: { value: string; timeout?: number }) {
+  return (
+    <div className="btn_area">
+      <CopyButton value={value} timeout={timeout}>
+        {({ copied, copy }) => (
+          <>
+            <Button icon={<Icon type="copy" />} outline onClick={copy} title="Copy to clipboard" />
+            {copied && (
+              <div className="toast_box shadow_l">
+                <Icon type="check" />
+                Copied
+              </div>
+            )}
+          </>
+        )}
+      </CopyButton>
+    </div>
+  );
+}
+
+function Wrapper({ children }: { children: ReactNode }) {
+  return <div className="codeblock_content">{children}</div>;
+}
+
+function ContentWrapper({ children }: { children: ReactNode }) {
+  return <div className="codeblock_wrap">{children}</div>;
+}
+
+CodeBlock.Wrapper = Wrapper;
+CodeBlock.ContentWrapper = ContentWrapper;

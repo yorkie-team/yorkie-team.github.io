@@ -17,7 +17,7 @@ Server records the logical timestamp of the last change pulled by the client whe
 
 An example of garbage collection:
 
-State 1:
+#### State 1
 
 <Image
   alt="state1"
@@ -29,7 +29,7 @@ State 1:
 
 In the initial state, both clients have `"ab"`.
 
-State 2:
+#### State 2
 
 <Image
   alt="state2"
@@ -46,7 +46,7 @@ purged by garbage collection.
 
 Meanwhile, client `c2` inserts `"c"` after textnode `"b"`.
 
-State 3:
+#### State 3
 
 <Image
   alt="state3"
@@ -58,7 +58,7 @@ State 3:
 
 Client `c2` pushes change `4` to server and receives as a response that `min_synced_seq` is `3`. After the client applies change `4`, the contents of document are changed to `ac`. This time, all clients have received change `3`, so textnode `"b"` is completely removed.
 
-State 4:
+#### State 4
 
 <Image
   alt="state4"

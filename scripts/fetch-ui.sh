@@ -16,6 +16,7 @@ rm styles/style.css
 cp ./temp/dist/assets/styles/page/service.css styles/style.css
 mv public/assets/images/favicon* public/ 
 mv public/assets/images/og* public/
+mkdir -p public/assets/images/docs
 mv docs-images/* public/assets/images/docs
 rm -rf temp
 rm -rf docs-images
