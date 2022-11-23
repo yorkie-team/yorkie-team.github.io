@@ -1,6 +1,6 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import { Button, Icon, Layout } from '@/components';
+import { Button, Icon, Layout, CodeBlock, CodeBlockHeader } from '@/components';
 import { StateSharingDetailMotion, FlexibleDocumentMotion } from '@/components/motions';
 import ProductBannerSVG from '@/public/assets/images/banner/img_product_banner.svg';
 import ProductAwarenessLeftSVG from '@/public/assets/images/banner/img_product_awareness_left.svg';
@@ -8,6 +8,23 @@ import ProductAwarenessRightSVG from '@/public/assets/images/banner/img_product_
 import ProductPCSVG from '@/public/assets/images/banner/img_product_pc.svg';
 import ProductMobileSVG from '@/public/assets/images/banner/img_product_mobile.svg';
 import ProductPackageSVG from '@/public/assets/images/banner/img_product_package.svg';
+
+const sampleCode = `// Text provides supports for collaborative plain text editing.
+// It also has selection information for sharing the cursor position.
+doc.update((root) => {
+  root.text = new yorkie.Text();  // {"text":""}
+  root.text.edit(0, 0, 'hello');  // {"text":"hello"}
+  root.text.edit(0, 1, 'H');      // {"text":"Hello"}
+  root.text.select(0, 1);         // {"text":"^H^ello"}
+});
+
+// Counter supports numeric types that change with addition and subtraction.
+doc.update((root) => {
+  root.counter = new yorkie.Counter(1);     // {"counter":1}
+  root.counter.increase(2);                 // {"counter":3}
+  root.counter.increase(3.5);               // {"counter":6.5}
+  root.counter.increase(-3.5);              // {"counter":3}
+});`;
 
 const Products: NextPage = () => {
   return (
@@ -73,47 +90,22 @@ const Products: NextPage = () => {
               of applications, Yorkie provides a general purpose JSON-like documents to unleash the limitation.
             </p>
             <div className="db_content">
-              <div className="codeblock_content">
-                <div className="codeblock_header">
-                  <div className="box_left">
-                    <button type="button" className="btn_item">
+              <CodeBlock.Wrapper>
+                <CodeBlockHeader>
+                  <CodeBlockHeader.LeftBox>
+                    <button type="button" className="btn_item is_active">
                       Text
                     </button>
-                    <button type="button" className="btn_item is_active">
+                    <button type="button" className="btn_item">
                       Board
                     </button>
-                  </div>
-                  <div className="box_right">
-                    <div className="btn_area">
-                      <Button outline blindText className="gray50" icon={<Icon type="copy" />}>
-                        copy
-                      </Button>
-                      <div className="toast_box shadow_l" style={{ display: 'none' }}>
-                        <span className="icon">
-                          <svg
-                            width="12"
-                            height="12"
-                            viewBox="0 0 12 12"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              clipRule="evenodd"
-                              d="M10.3536 2.64645C10.5488 2.84171 10.5488 3.15829 10.3536 3.35355L4.85355 8.85355C4.65829 9.04882 4.34171 9.04882 4.14645 8.85355L1.64645 6.35355C1.45118 6.15829 1.45118 5.84171 1.64645 5.64645C1.84171 5.45118 2.15829 5.45118 2.35355 5.64645L4.5 7.79289L9.64645 2.64645C9.84171 2.45118 10.1583 2.45118 10.3536 2.64645Z"
-                              fill="#23C176"
-                            ></path>
-                          </svg>
-                        </span>
-                        Copied
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="codeblock">
-                  <pre className="prism-code language-markup"></pre>
-                </div>
-              </div>
+                  </CodeBlockHeader.LeftBox>
+                  <CodeBlockHeader.RightBox>
+                    <CodeBlockHeader.CopyButton value={sampleCode} />
+                  </CodeBlockHeader.RightBox>
+                </CodeBlockHeader>
+                <CodeBlock code={sampleCode} language="javascript" withLineNumbers />
+              </CodeBlock.Wrapper>
               <div className="img_box">
                 <FlexibleDocumentMotion />
               </div>

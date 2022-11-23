@@ -1,6 +1,6 @@
 import type { GetStaticProps, GetStaticPaths } from 'next';
 import { useState, useEffect, useCallback } from 'react';
-import dynamic from 'next/dynamic';
+import Head from 'next/head';
 import { type DocsMeta, type DocsOrderList, getSlugs, getDocsFromSlug, getDocsOrderList } from '@/utils/mdxUtils';
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote';
 import { serialize } from 'next-mdx-remote/serialize';
@@ -10,7 +10,18 @@ import rehypeSlug from 'rehype-slug';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import rehypeToc, { HtmlElementNode, ListItemNode } from '@jsdevtools/rehype-toc';
 import rehypeImageMeta from '@/utils/rehypeImageMeta';
-import { Layout, CustomLink, Navigator, CodeBlock, Image } from '@/components';
+import rehypeWrapContents from '@/utils/rehypeWrapContents';
+import { Layout, Navigator, Button, Icon, CodeBlock, CodeBlockHeader } from '@/components';
+import {
+  CustomLink,
+  CustomCodeBlock,
+  CustomImage,
+  BreadCrumb,
+  Caption,
+  ImageWrap,
+  Alert,
+  Blockquote,
+} from '@/components/docs';
 
 // Custom components/renderers to pass to MDX.
 const components: MDXComponents = {
@@ -19,12 +30,20 @@ const components: MDXComponents = {
   h4: (props) => <h4 className="heading" {...props} />,
   h5: (props) => <h5 className="heading" {...props} />,
   h6: (props) => <h6 className="heading" {...props} />,
-  pre: (props) => <CodeBlock {...props} />,
-  TestComponent: dynamic(() => import('@/components/TestComponent')),
+  Button,
+  Icon,
+  pre: (props) => <CustomCodeBlock {...props} />,
+  blockquote: (props) => <Blockquote {...props} />,
   img: ({ src, alt, title, width, height }) => (
-    <Image src={src!} alt={alt || ''} title={title} width={width as number} height={height as number} />
+    <CustomImage src={src!} alt={alt || ''} title={title} width={width as number} height={height as number} />
   ),
-  Image,
+  Image: CustomImage,
+  ImageWrap,
+  BreadCrumb,
+  Caption,
+  Alert,
+  CodeBlock,
+  CodeBlockHeader,
 };
 
 export default function DocsPage({
@@ -88,11 +107,16 @@ export default function DocsPage({
   }, [activeId, updateHeadingPositions]);
 
   return (
-    <Layout className="documentation_page" gnbPageName="Documentation" shortFooter>
-      <Navigator navList={navList} />
-      <section className="section">
-        <MDXRemote {...source} components={components} />
-      </section>
+    <Layout className="documentation_page" gnbPageName="Documentation">
+      <Head>
+        <title>Documentation · Yorkie</title>
+      </Head>
+      <div className="content">
+        <Navigator navList={navList} />
+        <section className="section">
+          <MDXRemote {...source} components={components} />
+        </section>
+      </div>
     </Layout>
   );
 }
@@ -146,6 +170,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
             },
           },
         ],
+        rehypeWrapContents,
       ],
     },
   });

@@ -20,6 +20,12 @@ import ArrowSVG from '@/public/assets/icons/icon_arrow.svg';
 import RecorderSVG from '@/public/assets/icons/icon_recorder.svg';
 import BulbSVG from '@/public/assets/icons/icon_bulb.svg';
 import TwinkleSVG from '@/public/assets/icons/icon_twinkle.svg';
+import MenuSVG from '@/public/assets/icons/icon_menu.svg';
+import DangerSVG from '@/public/assets/icons/icon_alert_danger.svg';
+import SuccessSVG from '@/public/assets/icons/icon_alert_success.svg';
+import WarningSVG from '@/public/assets/icons/icon_alert_warning.svg';
+import InfoSVG from '@/public/assets/icons/icon_alert_info.svg';
+import CheckSVG from '@/public/assets/icons/icon_check.svg';
 
 const svgMap = {
   star: <StarSVG />,
@@ -42,6 +48,12 @@ const svgMap = {
   recorder: <RecorderSVG />,
   bulb: <BulbSVG />,
   twinkle: <TwinkleSVG />,
+  menu: <MenuSVG />,
+  danger: <DangerSVG />,
+  success: <SuccessSVG />,
+  warning: <WarningSVG />,
+  info: <InfoSVG />,
+  check: <CheckSVG />,
 };
 type SVGType = keyof typeof svgMap;
 

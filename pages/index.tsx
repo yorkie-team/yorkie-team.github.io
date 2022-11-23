@@ -1,9 +1,9 @@
-import { useState, MouseEvent } from 'react';
+import { useState } from 'react';
 import classNames from 'classnames';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
-import { Layout, Button, Icon, PrismCode } from '@/components';
+import { Layout, Button, Icon, CodeBlock, CodeBlockHeader } from '@/components';
 import { ChartMotion, StateSharingMotion, ServerMotion, MainBannerMotion } from '@/components/motions';
 import UserGroupSVG from '@/public/assets/icons/icon_service_main_users_group.svg';
 import CollaboProfileSVG from '@/public/assets/icons/icon_collaborate_profile.svg';
@@ -12,6 +12,25 @@ import CollaboSelectionSVG from '@/public/assets/icons/icon_collaborate_selectio
 import CollaboEditingSVG from '@/public/assets/icons/icon_collaborate_editing.svg';
 
 type FeatureType = 'profile' | 'cursor' | 'selection' | 'editing';
+const sampleCode = `import yorkie from 'yorkie-js-sdk';
+
+async function main() {
+  const client = new yorkie.Client('xxxx', {
+    apiKey: 'xxxx',
+  });
+  await client.activate();
+
+  const doc = new yorkie.Document('my-first-document');
+  await client.attach(doc);
+
+  client.subscribe((event) => {
+    if (event.type === 'peers-changed') {
+      const peers = event.value[doc.getKey()];
+      document.getElementById('peersCount').innerHTML = Object.entries(peers).length;
+    }
+  });
+}
+main();`;
 
 const Home: NextPage = () => {
   const [bannerActive, setBannerActive] = useState(false);
@@ -205,50 +224,22 @@ const Home: NextPage = () => {
                 </button>
               </li>
             </ul>
-            <div className="codeblock_content">
-              <div className="codeblock_header">
-                <div className="box_left">
+            <CodeBlock.Wrapper>
+              <CodeBlockHeader>
+                <CodeBlockHeader.LeftBox>
                   <button type="button" className="btn_item is_active">
                     React
                   </button>
                   <button type="button" className="btn_item">
                     Redux
                   </button>
-                </div>
-                <div className="box_right">
-                  <div className="btn_area">
-                    <Button className="gray50" outline blindText icon={<Icon type="copy" />}>
-                      copy
-                    </Button>
-                  </div>
-                </div>
-              </div>
-              <div className="codeblock">
-                <PrismCode
-                  code={`import yorkie from 'yorkie-js-sdk';
-
-    async function main() {
-      const client = new yorkie.Client('xxxx', {
-        apiKey: 'xxxx',
-      });
-      await client.activate();
-    
-      const doc = new yorkie.Document('my-first-document');
-      await client.attach(doc);
-    
-      client.subscribe((event) => {
-        if (event.type === 'peers-changed') {
-          const peers = event.value[doc.getKey()];
-          document.getElementById('peersCount').innerHTML = Object.entries(peers).length;
-        }
-      });
-    }
-    main();`}
-                  language="javascript"
-                  withLineNumbers
-                />
-              </div>
-            </div>
+                </CodeBlockHeader.LeftBox>
+                <CodeBlockHeader.RightBox>
+                  <CodeBlockHeader.CopyButton value={sampleCode} />
+                </CodeBlockHeader.RightBox>
+              </CodeBlockHeader>
+              <CodeBlock code={sampleCode} language="javascript" withLineNumbers />
+            </CodeBlock.Wrapper>
           </div>
         </section>
         <section className="section">

@@ -3,9 +3,33 @@ title: 'Docs-Sample'
 order: 80
 ---
 
+
+<BreadCrumb
+  menus={[
+    { name: 'Overview', href: '#' },
+    { name: 'Chapter3', href: '#' },
+  ]}
+/>
+
 ## Docs-Sample
 
 Describe about this section breifly. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam dignissim sem enim, convallis auctor arcu volutpat bibendum. Mauris augue est, pulvinar et neque ut, cursus porttitor tortor. Integer placerat velit quis dignissim consequat. Sed pellentesque ullamcorper rhoncus. Maecenas in urna porttitor, fringilla est accumsan, pellentesque sem.
+
+### h3
+
+h3 contents
+
+#### h4
+
+h4 contents
+
+##### h5
+
+h5 contents
+
+###### h6
+
+h6 contents
 
 ### Subsection 1
 
@@ -15,8 +39,41 @@ Describe about the subsection breifly. If you want to put a link in your sentenc
 - Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 - Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 
+1. Download the compressed archive file for your platform from [Releases](https://github.com/yorkie-team/yorkie/releases).
+2. Unpack the archive file. This results in a directory containing the binaries.
+3. Add the executable binaries to your PATH.
+4. Test if Yorkie is in your PATH in shell.
+
 ![sample image](/assets/images/docs/codepair.png 'caption')
+
+<Caption>Put annotation here if needed</Caption>
+
 ![sample image2](/assets/images/docs/todomvc.gif 'caption2')
+
+<Caption>Put annotation here if needed</Caption>
+
+<ImageWrap>
+  <ImageWrap.Box>
+    <ImageWrap.Image
+      src="https://dummyimage.com/600x400/faf8f6/514C4&text=Image+File"
+      alt="sample image"
+      title="caption"
+      width={600}
+      height={400}
+    />
+    <ImageWrap.Caption>Put annotation here if needed</ImageWrap.Caption>
+  </ImageWrap.Box>
+  <ImageWrap.Box>
+    <ImageWrap.Image
+      src="https://dummyimage.com/600x400/faf8f6/514C4&text=Image+File"
+      alt="sample image"
+      title="caption"
+      width={600}
+      height={400}
+    />
+    <ImageWrap.Caption>Put annotation here if needed</ImageWrap.Caption>
+  </ImageWrap.Box>
+</ImageWrap>
 
 ### Subsection 2
 
@@ -32,6 +89,8 @@ table align sample
 | contents | contents | contents | contents |
 | contents | contents | contents | contents |
 | contents | contents | contents | contents |
+
+<Caption>Put annotation here if needed</Caption>
 
 #### Codeblock
 
@@ -49,6 +108,38 @@ table align sample
     await client.activate();
 </script>
 ```
+
+<CodeBlockHeader>
+    <CodeBlockHeader.LeftBox>
+    <button type="button" className="btn_item is_active">
+        Text
+    </button>
+    <button type="button" className="btn_item">
+        Board
+    </button>
+    </CodeBlockHeader.LeftBox>
+</CodeBlockHeader>
+<CodeBlock 
+    code={`// Text provides supports for collaborative plain text editing.
+// It also has selection information for sharing the cursor position.
+doc.update((root) => {
+  root.text = new yorkie.Text();  // {"text":""}
+  root.text.edit(0, 0, 'hello');  // {"text":"hello"}
+  root.text.edit(0, 1, 'H');      // {"text":"Hello"}
+  root.text.select(0, 1);         // {"text":"^H^ello"}
+});
+
+// Counter supports numeric types that change with addition and subtraction.
+doc.update((root) => {
+  root.counter = new yorkie.Counter(1);     // {"counter":1}
+  root.counter.increase(2);                 // {"counter":3}
+  root.counter.increase(3.5);               // {"counter":6.5}
+  root.counter.increase(-3.5);              // {"counter":3}
+});`} 
+    language="javascript" 
+    withLineNumbers 
+    withCopyButton
+/>
 
 ### Subsection 3
 
@@ -74,3 +165,75 @@ Describe about this section breifly. Lorem ipsum dolor sit amet, consectetur adi
 [Attach/Detach, PushPull API](https://github.com/yorkie-team/yorkie/blob/main/server/rpc/yorkie_server.go):
 
 - Kaleido: Implementing a Novel Data System for Multi-Device Synchronization: [Link](https://www.semanticscholar.org/paper/Kaleido%3A-Implementing-a-Novel-Data-System-for-Roh-Kim/9c850fcf2763243e56e6248af5315d4b86602fda)
+
+### Custom
+
+<Alert.Box>
+    <Alert status="danger">Don’t do something wrong. Here’s some description.</Alert>
+    <Alert status="success">Do something the right way. Here’s some description.</Alert>
+    <Alert status="warning">Beware of something that may have inappropriate results.</Alert>
+    <Alert status="info">Tip: Here’s some tips for time saving.</Alert>
+</Alert.Box>
+
+<div className="card_box">
+    <div className="card">
+    <strong className="title">Page Title</strong>
+    <p className="desc">Here’s short descriptions of the contents of this page. </p>
+    </div>
+    <div className="card">
+    <strong className="title">Page Title</strong>
+    <p className="desc">Here’s short descriptions of the contents of this page. </p>
+    </div>
+    <div className="card">
+    <strong className="title">Page Title</strong>
+    <p className="desc">Here’s short descriptions of the contents of this page. </p>
+    </div>
+</div>
+
+<CodeBlockHeader>
+    <CodeBlockHeader.LeftBox>
+    <button type="button" className="btn_item is_active">
+        Use npm
+    </button>
+    <button type="button" className="btn_item">
+        Use a &lt;script&gt; tag
+    </button>
+    </CodeBlockHeader.LeftBox>
+</CodeBlockHeader>
+<CodeBlock.ContentWrapper>
+<div className="init_content">
+    <div className="init_box">
+        <div className="title_box title_box_s">
+            <strong className="title">Use npm</strong>
+        </div>
+        <p className="title_desc">Your project is now ready to use with its own APIs.</p>
+    </div>
+    <CodeBlock code={`$ npm install yorkie-js-sdk`} language="bash" withCopyButton/>
+    <div className="init_box">
+        <p className="title_desc">Then, import yorkie and begin using the SDKs.</p>
+    </div>
+    <CodeBlock code={`import yorkie from 'yorkie-js-sdk';
+
+async function main() {
+  const client = new yorkie.Client('xxxx', {
+    apiKey: 'xxxx',
+  });
+  await client.activate();
+
+  const doc = new yorkie.Document('my-first-document');
+  await client.attach(doc);
+
+  client.subscribe((event) => {
+    if (event.type === 'peers-changed') {
+      const peers = event.value[doc.getKey()];
+      document.getElementById('peersCount').innerHTML = Object.entries(peers).length;
+    }
+  });
+}
+main();`} language="javascript" withCopyButton/>
+</div>
+</CodeBlock.ContentWrapper>
+
+<Button.Box>
+  <Button className="gray800" icon={<Icon type="book" />}>Learn more about the [SUBSUBSECTION]</Button>
+</Button.Box>
