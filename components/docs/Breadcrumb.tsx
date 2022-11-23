@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Icon } from '@/components';
 
-export function BreadCrumb({ menus }: { menus: Array<{ name: string; href: string }> }) {
+export function Breadcrumb({ menus }: { menus: Array<{ name: string; href: string }> }) {
   return (
     <div className="docs_breadcrumbs">
       <button type="button" className="nav_btn">
