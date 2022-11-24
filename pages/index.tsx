@@ -71,7 +71,7 @@ const Home: NextPage = () => {
       </Head>
       <div className="content">
         <section className="key_visual">
-          <div className="banner_img">
+          <div className="kv_bg">
             <MainBannerMotion bannerActive={bannerActive} />
           </div>
           <div className="inner">

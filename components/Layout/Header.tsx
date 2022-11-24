@@ -22,40 +22,6 @@ export function Header({
             <span className="blind">Yorkie</span>
           </Link>
         </h1>
-        <Popover>
-          <Popover.Target>
-            <button className="btn_menu">
-              {gnbPageName}
-              <Icon type="openSelector" />
-            </button>
-          </Popover.Target>
-          <Popover.Dropdown>
-            <div className="menu_list_mo dropdown shadow_m">
-              <ul className="dropdown_list">
-                <li className="dropdown_item">
-                  <Link href="/products" className="dropdown_menu">
-                    <span className="dropdown_text">Products</span>
-                  </Link>
-                </li>
-                <li className="dropdown_item">
-                  <Link href="/docs" className="dropdown_menu">
-                    <span className="dropdown_text">Documentation</span>
-                  </Link>
-                </li>
-                <li className="dropdown_item">
-                  <Link href="/examples" className="dropdown_menu">
-                    <span className="dropdown_text">Examples</span>
-                  </Link>
-                </li>
-                <li className="dropdown_item">
-                  <Link href="/community" className="dropdown_menu">
-                    <span className="dropdown_text">Community</span>
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </Popover.Dropdown>
-        </Popover>
         <nav className="nav">
           <ul className="gnb">
             <li className={`gnb_item ${pathname == '/products' ? 'is_active' : ''}`}>
@@ -98,6 +64,26 @@ export function Header({
               <div className="util_list_mo dropdown shadow_m">
                 <ul className="dropdown_list">
                   <li className="dropdown_item">
+                    <button type="button" className="dropdown_menu">
+                      <span className="dropdown_text">Products</span>
+                    </button>
+                  </li>
+                  <li className="dropdown_item">
+                    <button type="button" className="dropdown_menu">
+                      <span className="dropdown_text">Documentation</span>
+                    </button>
+                  </li>
+                  <li className="dropdown_item">
+                    <button type="button" className="dropdown_menu">
+                      <span className="dropdown_text">Examples</span>
+                    </button>
+                  </li>
+                  <li className="dropdown_item">
+                    <button type="button" className="dropdown_menu">
+                      <span className="dropdown_text">Community</span>
+                    </button>
+                  </li>
+                  <li className="dropdown_item has_border">
                     <button type="button" className="dropdown_menu">
                       <span className="dropdown_text">Login</span>
                     </button>
