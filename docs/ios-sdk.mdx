@@ -1,0 +1,121 @@
+---
+title: 'iOS SDK'
+order: 30
+---
+
+## iOS SDK
+
+Through Yorkie iOS SDK, you can efficiently build collaborative applications. On the client-side implementation, you can create Documents that are automatically synced with remote peers with minimal effort.
+
+### Client
+
+`Client` is a normal client that can communicate with the server. It has Documents and sends changes of the Document from local to the server to synchronize with other replicas in remote.
+
+#### Creating a Client
+
+We can create a Client using `Client(rpcAddress: RPCAddress(host:,port:), options:)`. After the Client has been activated, it is connected to the server and ready to use.
+
+```swift
+let client = try! Client(rpcAddress: RPCAddress(host: "localhost", port: 8080), options: ClientOptions())
+try await client.activate()
+```
+
+#### Subscribing to Client events
+
+We can use `client.eventStream` to subscribe to client-based events, such as `status-changed`, `stream-connection-status-changed` and `peer-changed`.
+
+```swift
+target.eventStream.sink { event in
+    switch event.type {
+    case .statusChanged:
+        ()
+    case .streamConnectionStatusChanged:
+        ()
+    default:
+        break
+    }
+}
+```
+
+By using the value of the `stream-connection-status-changed` event, it is possible to determine whether the Client is connected to the network.
+
+If you want to know about other ClientEvents, please refer to the [ClientEventType](https://yorkie.dev/yorkie-ios-sdk/documentation/yorkie/clienteventtype).
+
+### Document
+
+`Document` is a primary data type in Yorkie, which provides a JSON-like updating experience that makes it easy to represent your application's model. A `Document` can be updated without being attached to the client, and its changes are automatically propagated to other peers when the Document is attached to the Client or when the network is restored.
+
+#### Creating a Document
+
+We can create a Document using `Document(key: "doc-key")`. Let's create a Document with a key and attach it to the Client.
+
+```swift
+let doc = Document(key: docKey)
+await client.attach(doc);
+```
+
+After attaching the Document to the Client, all changes to the Document are automatically synchronized with remote peers.
+
+#### Editing the Document
+
+`Document.update(:,message:)` enables you to modify a Document. The optional `message` allows you to add a description to the change. If the Document is attached to the Client, all changes are automatically synchronized with other Clients.
+
+```swift
+let message = "update document for test";
+await doc.update({ root in
+  root.obj = [:] // {"obj":{}}
+  let obj = root.obj as! JSONObject
+  obj.num = Int64(1) // {"obj":{"num":1}}
+  obj.obj = ["str": "a"] // {"obj":{"num":1,"obj":{"str":"a"}}}
+  obj.arr = [Int64(1), Int64(2)] // {"obj":{"num":1,"obj":{"str":"a"},"arr":[1,2]}}
+}, message: message);
+```
+
+Under the hood, `root` in the `update` function creates a `change`, a set of operations, using a JavaScript proxy. Every element has its unique ID, created by the logical clock. This ID is used by Yorkie to track which object is which.
+
+You can get the contents of the Document using `doc.getRoot()`.
+
+```swift
+let root = doc.getRoot()
+print(root.obj!) // {"num":1,"obj":{"str":"a"},"arr":[1,2]}
+let obj = root.obj as! JSONObject
+print(obj.num!) // 1
+print(obj.obj!) // {"str":"a"}
+print(obj.arr!) // [1,2]
+```
+
+#### Subscribing to Document events
+
+A Document is modified by changes generated remotely or locally in Yorkie. When the Document is modified, change events occur, to which we can subscribe using `document.subscribe`. Here, we can do post-processing such as repaint in the application using the `path` of the change events.
+
+```swift
+await target.eventStream.sink { event in
+    switch event {
+    case let event as LocalChangeEvent:
+        print(event)
+    case let event as RemoteChangeEvent:
+        for changeInfo in event.value {
+            print(changeInfo.change.message)
+            for path in changeInfo.paths {
+                if path.starts(with: "$.obj.num") {
+                    // root.obj.num is changed
+                } else if path.starts(with: "$.obj") {
+                    // root.obj is changed
+                }
+            }
+        }
+    }
+}
+```
+
+#### Detaching the Document
+
+If the document is no longer used, it should be detached to increase the efficiency of GC removing [CRDT tombstones](https://crdt.tech/glossary). For more information about GC, please refer to [Garbage Collection](/docs/internals/garbage-collection).
+
+```swift
+try await client.detach(doc)
+```
+
+### Reference
+
+For details on how to use the iOS SDK, please refer to [iOS SDK Reference](https://yorkie.dev/yorkie-ios-sdk/documentation/yorkie).
