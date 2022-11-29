@@ -1,0 +1,147 @@
+---
+title: 'Project'
+order: 60
+---
+
+## Project
+
+Project represents your service or application in Yorkie. Separate Projects can exist within a single application. You can add more Projects as needed, for example, if you want to manage [auth webhook](/docs/project#auth-webhook) and documents for specific purposes.
+
+To manage Projects, you can use the `project` subcommand:
+
+```bash
+$ yorkie project
+Manage projects
+
+Usage:
+  yorkie project [command]
+
+Available Commands:
+  create      Create a new project
+  ls          List all projects
+  update      Update a project
+
+Flags:
+  -h, --help   help for project
+
+Use "yorkie project [command] --help" for more information about a command.
+```
+
+### Listing Projects
+
+You can list Projects on the server using `ls`.
+
+```bash
+$ yorkie project ls
+ NAME     PUBLIC KEY            SECRET KEY            AUTH WEBHOOK URL  AUTH WEBHOOK METHODS  CREATED AT
+ default  caes5i3hkdftdruae2tg  caes5i3hkdftdruae2u0                    []                    2 minutes
+```
+
+_Server creates a `default project` automatically. If you create a Client without apiKey, the Client is created in the default Project._
+
+### Creating a Project
+
+You can create a new Project with a name using `create`.
+
+```bash
+$ yorkie project create test-project
+{"id":"627c9125d02654d3f0f769d8","name":"test-project","public_key":"c9u9298qp9as73b8i190","secret_key":"c9u9298qp9as73b8i19g","auth_webhook_url":"","auth_webhook_methods":null,"created_at":"2022-05-12T04:46:29.781052056Z"}
+```
+
+If you create a Client with `public_key` of the Project as `apiKey`, you can manage the Client in the Project.
+
+```javascript
+const client = new yorkie.Client('localhost:8080', {
+  apiKey: 'c9u9298qp9as73b8i190', // public_key of the project
+});
+```
+
+Then Documents attached to the Client are isolated and stored in the Project.
+
+### Updating the Project
+
+You can update the Project on the server using `update`.
+
+```
+Usage:
+  yorkie project update [name] [flags]
+
+Examples:
+yorkie project update name [options]
+
+Flags:
+      --auth-webhook-url string   authorization-webhook update url
+  -h, --help                      help for update
+      --name string               new project name
+```
+
+You can update the name of the Project with `--name` flag.
+
+```bash
+$ yorkie project update test-project --name new-test-project
+{"id":"627c9125d02654d3f0f769d8","name":"new-test-project","auth_webhook_url":"http://localhost:3000/webhook","auth_webhook_methods":["AttachDocument","WatchDocuments"],"public_key":"cblt65lcefodjh0aeakg","secret_key":"cblt65lcefodjh0aeal0","created_at":"2022-05-12T04:46:29.781052056Z","updated_at":"2022-08-11T14:58:22.11Z"}
+```
+
+### Auth Webhook
+
+A webhook is an HTTP POST that is called when something happens. If the Auth Webhook has been configured, when a Server receives a request from a Client, the Server checks if the Client has been authorized for a certain Document by asking an outside service with a REST request.
+
+This page shows how to set up an Auth Webhook. The overall flow is as follows:
+
+```
+(5) response the request  (4) handle the request
+     ┌─────────────────┐  ┌──┐
+     │                 │  │  │   (3) response
+     ▼                 │  ▼  │    - allowed
+ ┌──────┐             ┌┴─────┤    - reason   ┌──────────────┐
+ │Client├────────────►│Server│◄──────────────┤Outside Server│
+ └──────┘ (1)request  └────┬─┘               └──────────────┘
+           - token         │                      ▲
+           - dockey        └──────────────────────┘
+                               (2) call webhook
+                                - token
+                                - dockey
+                                - verb: r or rw
+```
+
+First, We need to pass some tokens (that identify users in the service) when creating a Client:
+
+```javascript
+const client = new yorkie.Client('localhost:8080', {
+  token: SOME_TOKEN,
+});
+```
+
+This token will be sent to the Server upon every request from the Client.
+
+We can specify an Auth Webhook for the project by update command with the `--auth-webhook-url` flag:
+
+```bash
+$ yorkie project update [name] --auth-webhook-url http://localhost:3000/auth-hook
+```
+
+The Server who receives the token calls the given webhook URL before processing the requests.
+
+Here is an example of the webhook requests:
+
+```javascript
+{
+  "token": "SOME_TOKEN",          // token passed by the client
+  "method": "PushPull",           // method: ActivateClient, DeactivateClient, AttachDocument, DetachDocument, WatchDocuments
+  documentAttributes: [{
+    key: "DOCUMENT_KEY",          // document key
+    verb: "r"                     // 'r' or 'rw'
+  }]
+}
+```
+
+The outside server should respond like this:
+
+```javascript
+{
+  "allowed": true, // or false if the given token is not authorized for this document.
+  "reason": "ok"   // [optional] reason for this response.
+}
+```
+
+If the server receives a response with `allowed: true` from the outside server, it handles the request normally, otherwise it sends the `codes.Unauthenticated` error to the client.

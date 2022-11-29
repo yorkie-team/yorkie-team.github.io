@@ -7,6 +7,8 @@ order: 30
 
 Through Yorkie JS SDK, you can efficiently build collaborative applications. On the client-side implementation, you can create Documents that are automatically synced with remote peers with minimal effort.
 
+If you want to install the SDK, refer to the [Quick Start](/docs/quick-start).
+
 ### Client
 
 `Client` is a normal client that can communicate with the server. It has Documents and sends changes of the Document from local to the server to synchronize with other replicas in remote.
@@ -37,6 +39,64 @@ const unsubscribe = client.subscribe((event) => {
 By using the value of the `stream-connection-status-changed` event, it is possible to determine whether the Client is connected to the network.
 
 If you want to know about other ClientEvents, please refer to the [ClientEventType](https://yorkie.dev/yorkie-js-sdk/yorkie-js-sdk.clienteventtype).
+
+#### Peer Awareness
+
+Peer Awareness is a feature often required in collaborative applications. With Peer Awareness, we can display information such as names and colors of peers who are editing a Document together in the application. Example of Peer Awareness in [CodePair](https://codepair.yorkie.dev/):
+
+<Image
+  alt="peer awareness"
+  src="/assets/images/docs/peer-awareness.png"
+  width={400}
+  height={136}
+  style={{ maxWidth: '400px' }}
+/>
+
+When creating a Client, we can pass information of the Client to other peers attaching the same Document with presence.
+
+```javascript
+const clientA = new yorkie.Client('localhost:8080', {
+  presence: {
+    username: 'alice',
+    color: 'blue',
+  },
+});
+await client.activate();
+
+const docA = new yorkie.Document('doc-1');
+await clientA.attach(docA);
+```
+
+Then, another Client is created and attaches a Document with the same name as before.
+
+```javascript
+const clientB = new yorkie.Client('localhost:8080', {
+  presence: {
+    username: 'bob',
+    color: 'red',
+  },
+});
+await clientB.activate();
+
+const docB = new yorkie.Document('doc-1');
+await clientB.attach(docB);
+```
+
+When a new peer registers or leaves, the `peers-changed` event is fired, and the other peer's clientID and presence can be obtained from the event.
+
+```javascript
+const unsubscribe = clientA.subscribe((event) => {
+  if (event.type === 'peers-changed') {
+    const peers = event.value[doc.getKey()];
+    for (const [clientID, presence] of Object.entries(peers)) {
+      console.log(clientID, presence); // e.g.) presence: {username: 'bob', color: 'red'}
+    }
+  }
+});
+```
+
+In the example above, `clientA` will receive information from `clientB`.
+
 
 ### Document
 
@@ -105,7 +165,7 @@ doc.subscribe((event) => {
 
 #### Detaching the Document
 
-If the document is no longer used, it should be detached to increase the efficiency of GC removing [CRDT tombstones](https://crdt.tech/glossary). For more information about GC, please refer to [Garbage Collection](/docs/internals/garbage-collection).
+If the document is no longer used, it should be detached to increase the efficiency of GC removing [CRDT tombstones](https://crdt.tech/glossary). For more information about GC, please refer to [Garbage Collection](/docs/internals#garbage-collection).
 
 ```javascript
 await client.detach(doc);

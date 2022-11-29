@@ -114,7 +114,7 @@ serving profiling on 11102
 
 The Server stores its data using an in-memory DB, which does not provide durability by default.
 
-### Running the Server with MongoDB
+### Persistence
 
 If you start the Server with a MongoDB address, you can permanently save the data stored by Yorkie.
 
@@ -130,3 +130,161 @@ backend created: id: c6ljibt948102kkt9neg, rpc: localhost:11101: db: mongodb://l
 serving profiling on 11102
 serving RPC on 11101
 ```
+
+### Server for Web
+
+Server uses [gRPC](https://grpc.io/) to provide an API that Clients can connect to. Since it is currently impossible to implement the HTTP/2 gRPC in some browsers, [Envoy](https://www.envoyproxy.io/) is required for web. For more details: [gRPC-web](https://grpc.io/blog/state-of-grpc-web/)
+
+This page shows how to start the Server for web. Overall structure is as follows:
+
+```
+ Browser            Envoy                  Server
+┌────────┐         ┌──────────────┐       ┌───────────┐
+│gRPC-web├─HTTP1.1─┤gRPC-web Proxy├─HTTP2─┤gRPC Server│
+└────────┘         └──────────────┘       └───────────┘
+```
+
+Configuring Envoy by hand with its config file is cumbersome, but using [Docker Compose](https://docs.docker.com/compose/) makes it easy.
+
+<Alert status="warning">If docker compose is not installed, install it : [Install Docker Compose](https://docs.docker.com/compose/install/)</Alert>
+
+First, download all manifests files from [docker folder](https://github.com/yorkie-team/yorkie-team.github.io/tree/main/docker). Then, execute the following command in the folder containing the downloaded file.
+
+```bash
+$ docker-compose up --build -d
+
+Starting yorkie ... done
+Starting envoy  ... done
+```
+
+This will launch Yorkie(Server) and envoy containers on your environment.
+
+```bash
+$ docker ps
+
+IMAGE                      COMMAND                  PORTS                                  NAMES
+grpcweb:envoy              "/usr/local/bin/envo…"   0.0.0.0:8080->9090/tcp                 envoy
+yorkieteam/yorkie:latest   "yorkie server --ena…"   0.0.0.0:11101-11103->11101-11103/tcp   yorkie
+```
+
+Then, the ports of the services are bound to the host environment.
+
+- 8080: gRPC-web port for SDK
+- 9090: gRPC-web port for Web Admin([Yorkie House](https://github.com/yorkie-team/yorkie-house))
+- 11101: gRPC port for SDK
+- 11102: HTML port for profiling Server
+- 11103: gRPC port for admin Server
+
+<Alert status="warning">Server stores its data using an in-memory DB, which does not provide durability. If you want to store data permanently, please refer to [Running Server With MongoDB](/docs/server#running-server-with-mongodb)</Alert>
+
+Now, let's create a Client with address `localhost:8080`.
+
+```javascript
+const client = new yorkie.Client('localhost:8080');
+await client.activate();
+```
+
+Next, let's take a look at the [JS SDK](/docs/js-sdk).
+
+### Monitoring
+
+Server exports metrics under the `/metrics` path on its profiling port.
+The metrics can be fetched with curl:
+
+```bash
+$ curl http://localhost:11102/metrics
+
+yorkie_server_version{server_version="{{site.version}}"} 1
+# HELP yorkie_pushpull_received_changes_total The total count of changes included
+# TYPE yorkie_pushpull_received_changes_total counter
+yorkie_pushpull_received_changes_total 6
+...
+```
+
+This metrics can be collected from [Prometheus](https://prometheus.io/).
+
+Running [Prometheus](https://prometheus.io/) and [Grafana](https://grafana.com/oss/grafana/) is the easiest way to monitor Server's metrics.
+
+First, download all manifests files from [docker folder](https://github.com/yorkie-team/yorkie-team.github.io/tree/main/docker). Then, start the applications with `docker-compose`:
+
+```bash
+$ docker-compose -f docker-compose-monitoring.yml up --build -d
+
+Creating prometheus ... done
+Creating grafana    ... done
+```
+
+Now, Prometheus will collect Server metrics every 10 seconds.
+
+Grafana has a built-in Prometheus support; just add a Prometheus data source:
+
+```
+Name:   prometheus
+Type:   Prometheus
+Url:    http://localhost:9090
+Access: proxy
+```
+
+Then, import the [default Yorkie dashboard template](https://github.com/yorkie-team/yorkie-team.github.io/tree/main/docker/yorkie-dashboard.json) and customize it. For instance, if Prometheus data source name is `my-prometheus`, the datasource field values in JSON also need to be `my-prometheus`.
+
+Sample dashboard:
+
+<Image alt="dashboard" src="/assets/images/docs/dashboard.png" width={600} height={626} style={{ maxWidth: '600px' }} />
+
+### Cluster Mode
+
+In a production environment, it is generally expected that more than one server handles requests. Even if a Server goes down, the other Servers must be able to handle the request. We can achieve that by setting up Servers with Cluster-Mode.
+
+This page describes how to set up a cluster of Servers. An example of the cluster is as follows:
+
+```
+                        ┌───────────┐
+                        │  ┌──────┐ │
+                      ┌─┼─►│Server│ │    ┌───────┐
+                      │ │  └──▲───┘ │ ┌─►│MongoDB│
+┌──────┐  ┌────────┐  │ │     │     │ │  └───────┘
+│Client├─►│Load    ├──┤ │ Broadcast ├─┤
+└──────┘  │Balancer│  │ │ DocEvents │ │  ┌────┐
+          └────────┘  │ │     │     │ └─►│etcd│
+                      │ │  ┌──▼───┐ │    └────┘
+                      └─┼─►│Server│ │
+                        │  └──────┘ │
+                        └───────────┘
+```
+
+- Load Balancer: It is responsible for distributing the load of the requests to the Servers.
+- Broadcast Channel: It is responsible for broadcasting the events to all Servers.
+- MongoDB: It stores the data of Yorkie.
+- etcd: It is used to store the state of the cluster such as MemberMap, SubscriptionMap, etc.
+
+First, we need components such as etcd, MongoDB, and Load Balancer in order to set up the cluster.
+
+Various types of load balancer can be used for the cluster. For CodePair, We have configured the cluster on AWS, so we use [ALB](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html) as Load Balancer.
+
+> For testing cluster mode, we can use Docker Compose to run applications such as etcd and MongoDB. To start them, type `docker-compose -f docker/docker-compose-ci.yml up --build -d` in [the project root](https://github.com/yorkie-team/yorkie).
+
+If etcd and MongoDB are ready, we can run Servers in cluster mode. In the terminal, run the Server with flags for MongoDB and etcd.
+
+```bash
+$ yorkie server --mongodb-uri mongodb://localhost:27017 --etcd-endpoints http://localhost:2379
+
+MongoDB connected, URI: mongodb://localhost:27017, DB: yorkie-meta
+etcd connected, URI: [http://localhost:2379]
+backend created: id: c6n20nnblaroaopqdbp0, rpc: localhost:11101: db: mongodb://localhost:27017
+serving profiling on 11102
+serving RPC on 11101
+```
+
+Open a new terminal and run the Server by using `xxx-port` flags to avoid ports conflicts.
+
+```bash
+$ yorkie server --rpc-port 21101 --profiling-port 21102 --mongo-connection-uri mongodb://localhost:27017 --etcd-endpoints http://localhost:2379
+
+MongoDB connected, URI: mongodb://localhost:27017, DB: yorkie-meta
+etcd connected, URI: [http://localhost:2379]
+backend created: id: c6n25o7blarohq3ve250, rpc: localhost:21101: db: mongodb://localhost:27017
+serving profiling on 21102
+serving RPC on 21101
+```
+
+Now both Servers are ready to receive requests from Clients.

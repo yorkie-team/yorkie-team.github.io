@@ -15,7 +15,7 @@ You must run docker to test Yorkie. You can start `Envoy` and `Yorkie` with `doc
 $ docker-compose up --build -d
 ```
 
-For more details, please refer to [Server for Web](/docs/tasks/server-for-web).
+For more details, please refer to [Server for Web](/docs/server#server-for-web).
 
 ### Installation
 
@@ -36,7 +36,7 @@ or just include the following code in the `<head>` tag of your HTML:
 
 ### How to use Yorkie
 
-#### 1. Initializing Document Properties
+#### 1. Creating a Document
 
 First, create a Client and a Document.
 
@@ -64,7 +64,7 @@ doc.update((root) => {
 });
 ```
 
-#### 3. Accessing Document Properties
+#### 3. Accessing Document
 
 If you want to access the document properties, you can use `doc.getRoot()`. Using a dot notation, you can access a key-value property you or your peers have set.
 
