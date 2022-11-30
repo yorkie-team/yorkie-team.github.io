@@ -1,5 +1,15 @@
-import Highlight, { defaultProps, Language } from 'prism-react-renderer';
+import Highlight, { defaultProps, Language, Prism } from 'prism-react-renderer';
 import theme from './prismThemeLight';
+
+// NOTE(chacha912): By default prism-react-renderer only includes
+// an arbitrary subset of the languages that Prism supports.
+// To include more languages, you need to import them from the main prismjs package.
+// https://github.com/FormidableLabs/prism-react-renderer#faq
+// @ts-ignore
+(typeof global !== 'undefined' ? global : window).Prism = Prism;
+require('prismjs/components/prism-kotlin');
+require('prismjs/components/prism-swift');
+require('prismjs/components/prism-markup');
 
 export type PrismCodeProps = {
   code: string;
