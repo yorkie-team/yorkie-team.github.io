@@ -1,0 +1,159 @@
+---
+title: 'Android SDK'
+order: 32
+---
+
+## Android SDK
+
+Through Yorkie Android SDK, you can efficiently build collaborative applications. On the client-side implementation, you can create Documents that are automatically synced with remote peers with minimal effort.
+
+### Client
+
+`Client` is a normal client that can communicate with the server. It has Documents and sends changes of the Document from local to the server to synchronize with other replicas in remote.
+
+#### Creating a Client
+
+We can create a Client using `Client(context: Context, rpcAddress: String)`. After the Client has been activated, it is connected to the server and ready to use.
+
+```kotlin
+val client = Client(context, "10.0.2.2:8080")
+// Declare your own CoroutineScope
+scope.launch {
+  client.activateAsync().await	
+}
+```
+
+#### Subscribing to Client status changes
+
+We can observe various Client status such as `status`, `streamConnectionStatus`, and `peerStatus`. 
+
+```kotlin
+// Declare your own CoroutineScope
+scope.launch {
+  client.status.collect {
+    println(it) // 'Activated' or 'Deactivated' 
+  }
+}
+
+scope.launch {
+  streamConnectionStatus.collect {
+    println(it) // 'Connected' or 'Disconnected'
+  }
+}
+
+```
+By using the value of the `streamConnectionStatus`, it is possible to determine whether the Client is connected to the network.
+
+
+### Document
+
+`Document` is a primary data type in Yorkie, which provides a JSON-like updating experience that makes it easy to represent your application's model. A `Document` can be updated without being attached to the client, and its changes are automatically propagated to other peers when the Document is attached to the Client or when the network is restored.
+
+#### Creating a Document
+
+We can create a Document using `Document(key: Key)`. Let's create a Document with a key and attach it to the Client.
+
+```kotlin
+val document = Document(Key("doc-1"))
+
+// Declare your own CoroutineScope
+scope.launch {
+  client.attachAsync(document).await()
+}
+```
+
+After attaching the Document to the Client, all changes to the Document are automatically synchronized with remote peers.
+
+#### Editing the Document
+
+`Document.updateAsync(message, updater)` enables you to modify a Document. The optional `message` allows you to add a description to the change. If the Document is attached to the Client, all changes are automatically synchronized with other Clients.
+
+```kotlin
+// Declare your own CoroutineScope
+scope.launch {
+  val message = "update document for test"
+  document.updateAsync(message) { root ->
+    root.setNewObject("obj") // {"obj":{}}
+    root.getAs<JsonObject>("obj")["num"] = 1 // {"obj":{"num":1}}
+    root.getAs<JsonObject>("obj").setNewObject("obj")["str"] = "a" // {"obj":{"num":1,"obj":{"str":"a"}}}
+    root.getAs<JsonObject>("obj").setNewArray("arr").apply {
+      put(1)
+      put(2)
+    } // {"obj":{"num":1,"obj":{"str":"a"},"arr":[1,2]}}
+  }.await()
+}
+```
+
+Under the hood, `root` in the `update` function creates a `change`, a set of operations, using a JavaScript proxy. Every element has its unique ID, created by the logical clock. This ID is used by Yorkie to track which object is which.
+
+You can get the contents of the Document using `document.getRoot()`.
+
+```kotlin
+val root = document.getRoot()
+println(root["obj"]) // {"num":1,"obj":{"str":"a"},"arr":[1,2]}
+println(root.getAs<JsonObject>("obj")["num"]) // 1
+println(root.getAs<JsonObject>("obj")["obj"]) // {"str":"a"}
+println(root.getAs<JsonObject>("obj")["arr"]) // [1,2]
+```
+
+#### Subscribing to Document events
+
+A Document is modified by changes generated remotely or locally in Yorkie. When the Document is modified, change events occur, to which we can subscribe. Here, we can do post-processing in the application using the `path` of the change events.
+
+```kotlin
+// Declare your own CoroutineScope
+scope.launch {
+  document.collect { event ->
+    if (event is Document.Event.LocalChange) {
+      println(event)
+    } else if (event is Document.Event.RemoteChange) {
+      event.changeInfos.forEach { changeInfo ->
+        changeInfo.paths.forEach { path ->
+          if (path.startsWith("$.obj.num")) {
+            // root.obj.num is changed
+          } else if (path.startsWith("$.obj")) {
+            // root.obj is changed
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+#### Detaching the Document
+
+If the document is no longer used, it should be detached to increase the efficiency of GC removing [CRDT tombstones](https://crdt.tech/glossary). For more information about GC, please refer to [Garbage Collection]().
+
+```kotlin
+// Declare your own CoroutineScope
+scope.launch {
+  client.detachAsync(document).await()
+}
+```
+
+### Custom CRDT types
+
+Custom CRDT types are data types that can be used for special applications such as text editors and counters, unlike general JSON data types such as `Object` and `Array`. Custom CRDT types can be created in the callback function of `document.update`.
+
+#### Counter
+
+`Counter` supports numeric types that change with addition and subtraction. If a numeric data needs to be modified at the same time, `Counter` should be used instead of primitives.
+
+```kotlin
+// Declare your own CoroutineScope
+scope.launch {
+  target.updateAsync("") { root ->
+    root.setNewCounter("counter", 1) // {"counter":1}
+    root.getAs<JsonCounter>("counter").increase(3) // {"counter":4}
+    root.getAs<JsonCounter>("counter").increase(6L) // {"counter":10}
+    root.getAs<JsonCounter>("counter").increase(-3) // {"counter":7}
+  }.await()
+}
+```
+
+
+### Reference
+
+For details on how to use the Android SDK, please refer to [Android SDK Reference](https://yorkie.dev/yorkie-android-sdk).
+
