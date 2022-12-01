@@ -26,101 +26,101 @@ export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement
           <div className='site'>
             <strong className='title'>
               <a href='#' className='link'>
-                Product
+                Products
               </a>
             </strong>
             <ul className='site_list'>
               <li className='site_item'>
                 <a href='#' className='link'>
-                  Yorkie SDK
+                  Document
                 </a>
               </li>
               <li className='site_item'>
                 <a href='#' className='link'>
-                  Yorkie house
+                  Presence
                 </a>
               </li>
               <li className='site_item'>
                 <a href='#' className='link'>
-                  Open source package
+                  Yorkie House
                 </a>
               </li>
             </ul>
           </div>
           <div className='site'>
             <strong className='title'>
-              <a href='#' className='link'>
+              <Link href='/docs' className='link'>
                 Documentation
-              </a>
+              </Link>
             </strong>
             <ul className='site_list'>
               <li className='site_item'>
-                <a href='#' className='link'>
+                <Link href='/docs' className='link'>
                   About Yorkie
-                </a>
+                </Link>
               </li>
               <li className='site_item'>
-                <a href='#' className='link'>
-                  Getting started
-                </a>
+                <Link href='/docs/quick-start' className='link'>
+                  Quick Start
+                </Link>
               </li>
               <li className='site_item'>
-                <a href='#' className='link'>
-                  Tasks
-                </a>
+                <Link href='/docs/js-sdk' className='link'>
+                  JS SDK
+                </Link>
               </li>
               <li className='site_item'>
-                <a href='#' className='link'>
-                  Tutorials
-                </a>
+                <Link href='/docs/ios-sdk' className='link'>
+                  iOS SDK
+                </Link>
               </li>
               <li className='site_item'>
-                <a href='#' className='link'>
-                  Agent Commands (CLI)
-                </a>
+                <Link href='/docs/android-sdk' className='link'>
+                  Android SDK
+                </Link>
               </li>
               <li className='site_item'>
-                <a href='#' className='link'>
-                  References
-                </a>
+                <Link href='/docs/project' className='link'>
+                  Project
+                </Link>
               </li>
             </ul>
           </div>
           <div className='site'>
             <strong className='title'>
-              <a href='#' className='link'>
-                Example
-              </a>
+              <Link href='/examples' className='link'>
+                Examples
+              </Link>
             </strong>
             <ul className='site_list'>
               <li className='site_item'>
-                <a href='#' className='link'>
+                <Link href='/examples' className='link'>
                   Basic examples
-                </a>
+                </Link>
               </li>
               <li className='site_item'>
-                <a href='#' className='link'>
+                <Link href='/examples' className='link'>
                   Scenario examples
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
           <div className='site'>
             <strong className='title'>
-              <a href='#' className='link'>
+              <Link href='#' className='link'>
                 Community
-              </a>
+              </Link>
             </strong>
             <ul className='site_list'>
               <li className='site_item'>
-                <a href='#' className='link'>
-                  Slack
-                </a>
+                <Link href='https://discord.gg/MVEAwz9sBy' className='link'>
+                  Discord
+                </Link>
               </li>
               <li className='site_item'>
-                <a href='#' className='link'>
-                  Github
-                </a>
+                <Link href='https://github.com/yorkie-team' className='link'>
+                  GitHub
+                </Link>
               </li>
             </ul>
           </div>

@@ -28,12 +28,12 @@ const Custom404: NextPage = () => {
           </Button>
           <Button
             as="a"
-            href="https://communityinviter.com/apps/dev-yorkie/yorkie"
+            href="https://discord.gg/MVEAwz9sBy"
             className="gray50"
             outline
             target="_blank"
             rel="noreferrer"
-            icon={<Icon type="slack" />}
+            icon={<Icon type="discord" />}
           >
             Slack
           </Button>

@@ -94,7 +94,7 @@ const Home: NextPage = () => {
                 </Button>
               </div>
               <Link
-                href="#"
+                href="/signup"
                 className="btn orange_0 btn_start"
                 onPointerOver={() => setBannerActive(true)}
                 onPointerOut={() => setBannerActive(false)}
@@ -135,7 +135,7 @@ const Home: NextPage = () => {
                 <Button className="orange_0" icon={<Icon type="recorder" />}>
                   Quick start guide
                 </Button>
-                <Button outline icon={<Icon type="book" />}>
+                <Button as="link" href="/docs" outline icon={<Icon type="book" />}>
                   Read documentation
                 </Button>
               </Button.Box>
@@ -254,7 +254,7 @@ const Home: NextPage = () => {
             <div className="draw_box"></div>
           </div>
           <Button.Box>
-            <Button as="link" className="orange_0" icon={<Icon type="bulb" />}>
+            <Button as="link" href="/examples" className="orange_0" icon={<Icon type="bulb" />}>
               View all examples
             </Button>
           </Button.Box>

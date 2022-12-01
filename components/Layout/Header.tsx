@@ -50,7 +50,7 @@ export function Header({
           <Button as="link" href="/login" outline className="gray50">
             Login
           </Button>
-          <Button as="link" href="#" className="orange_0" icon={<Icon type="star" />}>
+          <Button as="link" href="/signup" className="orange_0" icon={<Icon type="star" />}>
             Start for free
           </Button>
           <Popover>
@@ -64,34 +64,34 @@ export function Header({
               <div className="util_list_mo dropdown shadow_m">
                 <ul className="dropdown_list">
                   <li className="dropdown_item">
-                    <button type="button" className="dropdown_menu">
+                    <Link href="/products" className="dropdown_menu">
                       <span className="dropdown_text">Products</span>
-                    </button>
+                    </Link>
                   </li>
                   <li className="dropdown_item">
-                    <button type="button" className="dropdown_menu">
+                    <Link href="/docs" className="dropdown_menu">
                       <span className="dropdown_text">Documentation</span>
-                    </button>
+                    </Link>
                   </li>
                   <li className="dropdown_item">
-                    <button type="button" className="dropdown_menu">
+                    <Link href="/examples" className="dropdown_menu">
                       <span className="dropdown_text">Examples</span>
-                    </button>
+                    </Link>
                   </li>
                   <li className="dropdown_item">
-                    <button type="button" className="dropdown_menu">
+                    <Link href="/community" className="dropdown_menu">
                       <span className="dropdown_text">Community</span>
-                    </button>
+                    </Link>
                   </li>
                   <li className="dropdown_item has_border">
-                    <button type="button" className="dropdown_menu">
+                    <Link href="/login" className="dropdown_menu">
                       <span className="dropdown_text">Login</span>
-                    </button>
+                    </Link>
                   </li>
                   <li className="dropdown_item">
-                    <button type="button" className="dropdown_menu">
+                    <Link href="/signup" className="dropdown_menu">
                       <span className="dropdown_text">Start for free</span>
-                    </button>
+                    </Link>
                   </li>
                 </ul>
               </div>

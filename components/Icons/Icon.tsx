@@ -26,6 +26,7 @@ import SuccessSVG from '@/public/assets/icons/icon_alert_success.svg';
 import WarningSVG from '@/public/assets/icons/icon_alert_warning.svg';
 import InfoSVG from '@/public/assets/icons/icon_alert_info.svg';
 import CheckSVG from '@/public/assets/icons/icon_check.svg';
+import DiscordSVG from '@/public/assets/icons/icon_discord.svg';
 
 const svgMap = {
   star: <StarSVG />,
@@ -54,6 +55,7 @@ const svgMap = {
   warning: <WarningSVG />,
   info: <InfoSVG />,
   check: <CheckSVG />,
+  discord: <DiscordSVG />,
 };
 type SVGType = keyof typeof svgMap;
 
