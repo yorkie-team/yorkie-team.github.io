@@ -5,11 +5,7 @@ import { Button, Icon, Popover } from '@/components';
 import LogoSVG from '@/public/assets/icons/logo_horizontal_xs.svg';
 import LogoGnbSVG from '@/public/assets/icons/logo_gnb.svg';
 
-export function Header({
-  gnbPageName,
-}: {
-  gnbPageName?: 'Products' | 'Documentation' | 'Examples' | 'Community';
-}): ReactElement {
+export function Header(): ReactElement {
   const { pathname } = useRouter();
 
   return (

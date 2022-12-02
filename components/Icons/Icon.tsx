@@ -8,6 +8,7 @@ import SlackSVG from '@/public/assets/icons/icon_slack.svg';
 import GitHubSVG from '@/public/assets/icons/icon_github.svg';
 import GnbMenuSVG from '@/public/assets/icons/icon_gnb_menu.svg';
 import CloseSVG from '@/public/assets/icons/icon_close.svg';
+import CloseSmallSVG from '@/public/assets/icons/icon_close_small.svg';
 import OpenSelectorSVG from '@/public/assets/icons/icon_open_selector.svg';
 import DiamondSVG from '@/public/assets/icons/icon_diamond.svg';
 import ToolSVG from '@/public/assets/icons/icon_tool.svg';
@@ -27,6 +28,14 @@ import WarningSVG from '@/public/assets/icons/icon_alert_warning.svg';
 import InfoSVG from '@/public/assets/icons/icon_alert_info.svg';
 import CheckSVG from '@/public/assets/icons/icon_check.svg';
 import DiscordSVG from '@/public/assets/icons/icon_discord.svg';
+import ViewFullSVG from '@/public/assets/icons/icon_view_full.svg';
+import ViewShowSVG from '@/public/assets/icons/icon_view_show.svg';
+import ViewGridSVG from '@/public/assets/icons/icon_view_grid.svg';
+import ViewSplitSVG from '@/public/assets/icons/icon_view_split.svg';
+import ExpandSVG from '@/public/assets/icons/icon_expand.svg';
+import PlusSVG from '@/public/assets/icons/icon_plus.svg';
+import MinimizeSVG from '@/public/assets/icons/icon_minimize.svg';
+import PinSVG from '@/public/assets/icons/icon_pin.svg';
 
 const svgMap = {
   star: <StarSVG />,
@@ -37,6 +46,7 @@ const svgMap = {
   github: <GitHubSVG />,
   gnbMenu: <GnbMenuSVG />,
   close: <CloseSVG />,
+  closeSmall: <CloseSmallSVG />,
   openSelector: <OpenSelectorSVG />,
   diamond: <DiamondSVG />,
   tool: <ToolSVG />,
@@ -56,6 +66,14 @@ const svgMap = {
   info: <InfoSVG />,
   check: <CheckSVG />,
   discord: <DiscordSVG />,
+  viewFull: <ViewFullSVG />,
+  viewShow: <ViewShowSVG />,
+  viewGrid: <ViewGridSVG />,
+  viewSplit: <ViewSplitSVG />,
+  expand: <ExpandSVG />,
+  plus: <PlusSVG />,
+  minimize: <MinimizeSVG />,
+  pin: <PinSVG />,
 };
 type SVGType = keyof typeof svgMap;
 

@@ -1,5 +1,6 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
+import Link from 'next/link';
 import { Button, Icon, Layout } from '@/components';
 import ExampleBannerSVG from '@/public/assets/images/banner/img_example_banner.svg';
 import ExampleMultiCursorSVG from '@/public/assets/images/@tmp/example_multi_cursor_mo.svg';
@@ -19,7 +20,7 @@ import ExampleOrderingSVG from '@/public/assets/images/@tmp/example_ordering_mo.
 
 const Examples: NextPage = () => {
   return (
-    <Layout className="examples_page" gnbPageName="Examples">
+    <Layout className="examples_page">
       <Head>
         <title>Examples · Yorkie</title>
       </Head>
@@ -143,7 +144,7 @@ const Examples: NextPage = () => {
           </div>
           <ul className="grid_list">
             <li className="grid_item">
-              <a href="#" className="grid_card">
+              <Link href="/examples/multi-cursor" className="grid_card">
                 <div className="grid_thumbnail">
                   <ExampleMultiCursorSVG />
                 </div>
@@ -151,7 +152,21 @@ const Examples: NextPage = () => {
                   <strong className="title">Multi Cursor</strong>
                   <p className="desc">Multi cursor displays different users’ cursors in real time for collaboration.</p>
                 </div>
-              </a>
+              </Link>
+            </li>
+            <li className="grid_item">
+              <Link href="/examples/webtoons" className="grid_card">
+                <div className="grid_thumbnail">
+                  <ExampleCreatingSVG />
+                </div>
+                <div className="grid_card_info">
+                  <strong className="title">Creating Webtoons</strong>
+                  <p className="desc">
+                    Creating webtoon scenario includes the ability to assist in effective communication of webtoon
+                    related tasks.
+                  </p>
+                </div>
+              </Link>
             </li>
             <li className="grid_item">
               <a href="#" className="grid_card">
@@ -277,20 +292,6 @@ const Examples: NextPage = () => {
                   <p className="desc">
                     The leader board system ranks users activities within the whiteboardby their activities and
                     contribution.
-                  </p>
-                </div>
-              </a>
-            </li>
-            <li className="grid_item">
-              <a href="#" className="grid_card">
-                <div className="grid_thumbnail">
-                  <ExampleCreatingSVG />
-                </div>
-                <div className="grid_card_info">
-                  <strong className="title">Creating Webtoons</strong>
-                  <p className="desc">
-                    Creating webtoon scenario includes the ability to assist in effective communication of webtoon
-                    related tasks.
                   </p>
                 </div>
               </a>

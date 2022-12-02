@@ -28,7 +28,7 @@ doc.update((root) => {
 
 const Products: NextPage = () => {
   return (
-    <Layout className="product_page" gnbPageName="Products">
+    <Layout className="product_page">
       <Head>
         <title>Products · Yorkie</title>
       </Head>
