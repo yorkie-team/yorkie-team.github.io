@@ -11,17 +11,8 @@ import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import rehypeToc, { HtmlElementNode, ListItemNode } from '@jsdevtools/rehype-toc';
 import rehypeImageMeta from '@/utils/rehypeImageMeta';
 import rehypeWrapContents from '@/utils/rehypeWrapContents';
-import { Layout, Navigator, Button, Icon, CodeBlock, CodeBlockHeader } from '@/components';
-import {
-  CustomLink,
-  CustomCodeBlock,
-  CustomImage,
-  Breadcrumb,
-  Caption,
-  ImageWrap,
-  Alert,
-  Blockquote,
-} from '@/components/docs';
+import { Layout, Navigator, Button, Icon, CodeBlock, CodeBlockHeader, Image } from '@/components';
+import { CustomLink, CustomCodeBlock, Breadcrumb, Caption, ImageWrap, Alert, Blockquote } from '@/components/docs';
 
 // Custom components/renderers to pass to MDX.
 const components: MDXComponents = {
@@ -35,9 +26,9 @@ const components: MDXComponents = {
   pre: (props) => <CustomCodeBlock {...props} />,
   blockquote: (props) => <Blockquote {...props} />,
   img: ({ src, alt, title, width, height }) => (
-    <CustomImage src={src!} alt={alt || ''} title={title} width={width as number} height={height as number} />
+    <Image src={src!} alt={alt || ''} title={title} width={width as number} height={height as number} />
   ),
-  Image: CustomImage,
+  Image,
   ImageWrap,
   Breadcrumb,
   Caption,
@@ -107,7 +98,7 @@ export default function DocsPage({
   }, [activeId, updateHeadingPositions]);
 
   return (
-    <Layout className="documentation_page" gnbPageName="Documentation">
+    <Layout className="documentation_page">
       <Head>
         <title>Documentation · Yorkie</title>
       </Head>

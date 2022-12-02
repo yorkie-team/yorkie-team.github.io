@@ -5,22 +5,18 @@ import classNames from 'classnames';
 
 export function Layout({
   className,
-  gnbPageName,
   children,
   shortFooter,
 }: {
   className?: string;
-  gnbPageName?: 'Products' | 'Documentation' | 'Examples' | 'Community';
   children: ReactNode;
   shortFooter?: boolean;
 }): ReactElement {
   return (
-    <>
-      <div className={classNames('wrap', className)}>
-        <Header gnbPageName={gnbPageName} />
-        <main className="container">{children}</main>
-        <Footer shortFooter={shortFooter} />
-      </div>
-    </>
+    <div className={classNames('wrap', className)}>
+      <Header />
+      <main className="container">{children}</main>
+      <Footer shortFooter={shortFooter} />
+    </div>
   );
 }

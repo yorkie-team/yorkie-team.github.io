@@ -5,7 +5,7 @@ import CommunitySVG from '@/public/assets/icons/community_help.svg';
 
 const Community: NextPage = () => {
   return (
-    <Layout className="community_page" gnbPageName="Community">
+    <Layout className="community_page">
       <Head>
         <title>Community · Yorkie</title>
       </Head>

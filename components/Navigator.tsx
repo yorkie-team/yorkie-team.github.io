@@ -1,4 +1,3 @@
-import React from 'react';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
@@ -7,7 +6,7 @@ import ArrowSVG from '@/public/assets/icons/icon_arrow.svg';
 
 export function Navigator({ navList }: { navList: DocsOrderList }) {
   return (
-    <nav className='navigator'>
+    <nav className="navigator">
       <NavList navList={navList} />
     </nav>
   );
@@ -17,7 +16,7 @@ function NavList({ navList }: { navList: DocsOrderList }) {
   const { asPath } = useRouter();
 
   return (
-    <ul className='navigator_list'>
+    <ul className="navigator_list">
       {navList.map(({ title, href, subMenu }) => {
         const isActive = href === '/docs' ? asPath === href : new RegExp(`^${href}`).test(asPath);
         return (
@@ -43,9 +42,9 @@ function NavGroup({ isActive, children }: { isActive: boolean; children: React.R
 
 function NavMenu({ title, href, hasSubMenu }: { title: string; href: string; hasSubMenu?: boolean }) {
   return (
-    <Link href={href} className='navigator_menu'>
+    <Link href={href} className="navigator_menu">
       {hasSubMenu && (
-        <span className='icon'>
+        <span className="icon">
           <ArrowSVG />
         </span>
       )}

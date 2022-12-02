@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
-import { Layout, Button, Icon, CodeBlock, CodeBlockHeader } from '@/components';
+import { Layout, Button, Icon, CodeBlock, CodeBlockHeader, Accordion } from '@/components';
 import { ChartMotion, StateSharingMotion, ServerMotion, MainBannerMotion } from '@/components/motions';
 import UserGroupSVG from '@/public/assets/icons/icon_service_main_users_group.svg';
 import CollaboProfileSVG from '@/public/assets/icons/icon_collaborate_profile.svg';
@@ -35,33 +35,6 @@ main();`;
 const Home: NextPage = () => {
   const [bannerActive, setBannerActive] = useState(false);
   const [activeFeatureCard, setActiveFeatureCard] = useState<FeatureType>('profile');
-  const [faq, setFaq] = useState([
-    {
-      title: 'Are you sure I can make money with it?',
-      desc: 'Yorkie provides SDKs, Server, and Database to eliminate the tedious work can be operational and can use the services just out-of-box. Yorkie will take care of the collaborative features while you focus on your direct services.',
-      isActive: false,
-    },
-    {
-      title: 'title2',
-      desc: 'desc2',
-      isActive: false,
-    },
-    {
-      title: 'Frequently asked questions examples?',
-      desc: 'Yorkie provides SDKs, Server, and Database to eliminate the tedious work can be operational and can use the services just out-of-box. Yorkie will take care of the collaborative features while you focus on your direct services.',
-      isActive: false,
-    },
-    {
-      title: 'How cheap is it?',
-      desc: 'Yorkie provides SDKs, Server, and Database to eliminate the tedious work can be operational and can use the services just out-of-box. Yorkie will take care of the collaborative features while you focus on your direct services.',
-      isActive: false,
-    },
-    {
-      title: 'Frequently asked questions examples? long long long long long long',
-      desc: 'Yorkie provides SDKs, Server, and Database to eliminate the tedious work can be operational and can use the services just out-of-box. Yorkie will take care of the collaborative features while you focus on your direct services.',
-      isActive: false,
-    },
-  ]);
 
   return (
     <Layout className="main_page">
@@ -320,29 +293,52 @@ const Home: NextPage = () => {
         <section className="section section_faq">
           <h2 className="section_title">FAQ</h2>
           <div className="section_content">
-            <ul className="accordion_list" onClick={(e) => {}}>
-              {faq.map(({ title, desc, isActive }, index) => (
-                <li className="accordion_item" key={title}>
-                  <button
-                    className={classNames('accordion_btn', { is_active: isActive })}
-                    onClick={() => {
-                      setFaq(
-                        faq.map((item, idx) => {
-                          if (index === idx) {
-                            return { ...item, isActive: !item.isActive };
-                          }
-                          return item;
-                        }),
-                      );
-                    }}
-                  >
-                    <Icon type="messageSquare" />
-                    {title}
-                  </button>
-                  <p className="accordion_content">{desc}</p>
-                </li>
-              ))}
-            </ul>
+            <Accordion defaultValue={[]} multiple icon={null}>
+              <Accordion.Item value="faq1">
+                <Accordion.Control>
+                  <Icon type="messageSquare" />
+                  Are you sure I can make money with it?
+                </Accordion.Control>
+                <Accordion.Panel>
+                  Yorkie provides SDKs, Server, and Database to eliminate the tedious work can be operational and can
+                  use the services just out-of-box. Yorkie will take care of the collaborative features while you focus
+                  on your direct services.
+                </Accordion.Panel>
+              </Accordion.Item>
+              <Accordion.Item value="faq2">
+                <Accordion.Control>
+                  <Icon type="messageSquare" />
+                  Frequently asked questions examples?
+                </Accordion.Control>
+                <Accordion.Panel>
+                  Yorkie provides SDKs, Server, and Database to eliminate the tedious work can be operational and can
+                  use the services just out-of-box. Yorkie will take care of the collaborative features while you focus
+                  on your direct services.
+                </Accordion.Panel>
+              </Accordion.Item>
+              <Accordion.Item value="faq3">
+                <Accordion.Control>
+                  <Icon type="messageSquare" />
+                  How cheap is it?
+                </Accordion.Control>
+                <Accordion.Panel>
+                  Yorkie provides SDKs, Server, and Database to eliminate the tedious work can be operational and can
+                  use the services just out-of-box. Yorkie will take care of the collaborative features while you focus
+                  on your direct services.
+                </Accordion.Panel>
+              </Accordion.Item>
+              <Accordion.Item value="faq4">
+                <Accordion.Control>
+                  <Icon type="messageSquare" />
+                  Frequently asked questions examples? long long long long long long
+                </Accordion.Control>
+                <Accordion.Panel>
+                  Yorkie provides SDKs, Server, and Database to eliminate the tedious work can be operational and can
+                  use the services just out-of-box. Yorkie will take care of the collaborative features while you focus
+                  on your direct services.
+                </Accordion.Panel>
+              </Accordion.Item>
+            </Accordion>
           </div>
           <Button.Box>
             <Button as="link" outline icon={<Icon type="smile" />}>
