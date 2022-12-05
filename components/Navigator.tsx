@@ -18,7 +18,7 @@ function NavList({ navList }: { navList: DocsOrderList }) {
   return (
     <ul className="navigator_list">
       {navList.map(({ title, href, subMenu }) => {
-        const isActive = href === '/docs' ? asPath === href : new RegExp(`^${href}`).test(asPath);
+        const isActive = href === '/docs' ? asPath === href : asPath.startsWith(href);
         return (
           <NavGroup key={href} isActive={isActive}>
             {subMenu.length === 0 ? (

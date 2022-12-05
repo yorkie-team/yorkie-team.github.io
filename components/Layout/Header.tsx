@@ -1,7 +1,8 @@
 import { ReactElement } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { Button, Icon, Popover } from '@/components';
+import { Button, Icon } from '@/components';
+import { MobileGnbDropdown } from './MobileGnbDropdown';
 import LogoSVG from '@/public/assets/icons/logo_horizontal_xs.svg';
 import LogoGnbSVG from '@/public/assets/icons/logo_gnb.svg';
 
@@ -49,50 +50,7 @@ export function Header(): ReactElement {
           <Button as="link" href="/signup" className="orange_0" icon={<Icon type="star" />}>
             Start for free
           </Button>
-          <Popover>
-            <Popover.Target>
-              <button className="btn_uiil_menu">
-                <span className="blind">Open menu</span>
-                <Icon type="gnbMenu" className="icon_menu" />
-              </button>
-            </Popover.Target>
-            <Popover.Dropdown>
-              <div className="util_list_mo dropdown shadow_m">
-                <ul className="dropdown_list">
-                  <li className="dropdown_item">
-                    <Link href="/products" className="dropdown_menu">
-                      <span className="dropdown_text">Products</span>
-                    </Link>
-                  </li>
-                  <li className="dropdown_item">
-                    <Link href="/docs" className="dropdown_menu">
-                      <span className="dropdown_text">Documentation</span>
-                    </Link>
-                  </li>
-                  <li className="dropdown_item">
-                    <Link href="/examples" className="dropdown_menu">
-                      <span className="dropdown_text">Examples</span>
-                    </Link>
-                  </li>
-                  <li className="dropdown_item">
-                    <Link href="/community" className="dropdown_menu">
-                      <span className="dropdown_text">Community</span>
-                    </Link>
-                  </li>
-                  <li className="dropdown_item has_border">
-                    <Link href="/login" className="dropdown_menu">
-                      <span className="dropdown_text">Login</span>
-                    </Link>
-                  </li>
-                  <li className="dropdown_item">
-                    <Link href="/signup" className="dropdown_menu">
-                      <span className="dropdown_text">Start for free</span>
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-            </Popover.Dropdown>
-          </Popover>
+          <MobileGnbDropdown />
         </div>
       </div>
     </header>
