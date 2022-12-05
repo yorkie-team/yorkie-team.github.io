@@ -105,7 +105,7 @@ const Home: NextPage = () => {
                 <br className="br_tablet" /> collaborative features for your products.
               </p>
               <Button.Box>
-                <Button className="orange_0" icon={<Icon type="recorder" />}>
+                <Button as="link" href="/docs/quick-start" className="orange_0" icon={<Icon type="book" />}>
                   Quick start guide
                 </Button>
                 <Button as="link" href="/docs" outline icon={<Icon type="book" />}>
@@ -253,7 +253,7 @@ const Home: NextPage = () => {
                     <br className="br_tablet" /> CRDT is formed in solid and clean architecture, effectively resolving
                     conflicts when editing multiple concurrent data.
                   </p>
-                  <Button type="link" className="gray800" icon={<Icon type="book" />}>
+                  <Button as="link" href="/products#multiplayer" className="gray800" icon={<Icon type="book" />}>
                     Learn more about Yorkie SDK
                   </Button>
                 </div>
@@ -268,7 +268,12 @@ const Home: NextPage = () => {
                     Yorkie House allows project members to browse stored documents and supervise the data warehouse
                     easily.
                   </p>
-                  <Button type="link" className="gray800" icon={<Icon type="book" />}>
+                  <Button
+                    as="link"
+                    href="/products#real-time-monitoring"
+                    className="gray800"
+                    icon={<Icon type="book" />}
+                  >
                     Learn more about Yorkie House
                   </Button>
                 </div>
@@ -282,7 +287,7 @@ const Home: NextPage = () => {
                   <p className="desc">
                     If needed, Yorkie open source packages allow you to build servers and databases locally.
                   </p>
-                  <Button type="link" className="gray800" icon={<Icon type="book" />}>
+                  <Button as="link" href="/products#build-local-server" className="gray800" icon={<Icon type="book" />}>
                     How to build a local server
                   </Button>
                 </div>
@@ -341,10 +346,17 @@ const Home: NextPage = () => {
             </Accordion>
           </div>
           <Button.Box>
-            <Button as="link" outline icon={<Icon type="smile" />}>
+            <Button
+              as="a"
+              href="https://discord.gg/MVEAwz9sBy"
+              outline
+              icon={<Icon type="smile" />}
+              target="_blank"
+              rel="noreferrer"
+            >
               Contact
             </Button>
-            <Button as="link" className="orange_0 btn_start" icon={<Icon type="twinkle" />}>
+            <Button as="link" href="/signup" className="orange_0 btn_start" icon={<Icon type="twinkle" />}>
               Start for free
             </Button>
           </Button.Box>
