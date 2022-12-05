@@ -35,7 +35,7 @@ const Custom404: NextPage = () => {
             rel="noreferrer"
             icon={<Icon type="discord" />}
           >
-            Slack
+            Discord
           </Button>
           <Button
             as="a"

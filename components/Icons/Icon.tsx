@@ -36,6 +36,8 @@ import ExpandSVG from '@/public/assets/icons/icon_expand.svg';
 import PlusSVG from '@/public/assets/icons/icon_plus.svg';
 import MinimizeSVG from '@/public/assets/icons/icon_minimize.svg';
 import PinSVG from '@/public/assets/icons/icon_pin.svg';
+import PackageSVG from '@/public/assets/icons/icon_package.svg';
+import CloudSVG from '@/public/assets/icons/icon_cloud_orange.svg';
 
 const svgMap = {
   star: <StarSVG />,
@@ -74,6 +76,8 @@ const svgMap = {
   plus: <PlusSVG />,
   minimize: <MinimizeSVG />,
   pin: <PinSVG />,
+  package: <PackageSVG />,
+  cloud: <CloudSVG />,
 };
 type SVGType = keyof typeof svgMap;
 
