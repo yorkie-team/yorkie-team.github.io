@@ -58,7 +58,7 @@ const Home: NextPage = () => {
               <span className="text">your products</span>
             </h2>
             <Button.Box>
-              <Link
+              <a
                 href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup`}
                 className="btn orange_0 btn_start"
                 onPointerOver={() => setBannerActive(true)}
@@ -67,7 +67,7 @@ const Home: NextPage = () => {
                 <span className="bg"></span>
                 <Icon type="star" />
                 <span className="text">Start for free</span>
-              </Link>
+              </a>
             </Button.Box>
             <p className="desc">
               Open-source SDKs, Server, Database API package for real-time collaborative experiences

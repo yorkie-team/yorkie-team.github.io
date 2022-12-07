@@ -4,7 +4,9 @@ import Link from 'next/link';
 import classNames from 'classnames';
 import { Popover, Icon } from 'components';
 
-export function MobileGnbDropdown() {
+export function MobileGnbDropdown({isLoggedIn} : {
+  isLoggedIn: boolean;
+}) {
   const [gnbOpened, setGnbOpened] = useState(false);
   const [docsMenuOpened, setDocsMenuOpened] = useState(false);
   const { asPath } = useRouter();
@@ -181,22 +183,35 @@ export function MobileGnbDropdown() {
             </li>
           </ul>
           <ul className="dropdown_list">
-            <li className="dropdown_item">
-              <a
-                href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/login`}
-                className={classNames('dropdown_menu', { is_active: asPath.split('#')[0] === `${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/login` })}
-              >
-                <span className="dropdown_text">Login</span>
-              </a>
-            </li>
-            <li className="dropdown_item">
-              <a
-                href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup`}
-                className={classNames('dropdown_menu', { is_active: asPath.split('#')[0] === `${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup` })}
-              >
-                <span className="dropdown_text">Start for free</span>
-              </a>
-            </li>
+            {isLoggedIn ? (
+              <li className="dropdown_item">
+                <a
+                  href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`}
+                  className={classNames('dropdown_menu', { is_active: asPath.split('#')[0] === `${process.env.NEXT_PUBLIC_DASHBOARD_PATH}` })}
+                >
+                  <span className="dropdown_text">Dashboard</span>
+                </a>
+              </li>
+            ) : (
+              <>
+                <li className="dropdown_item">
+                  <a
+                    href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/login`}
+                    className={classNames('dropdown_menu', { is_active: asPath.split('#')[0] === `${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/login` })}
+                  >
+                    <span className="dropdown_text">Sign in</span>
+                  </a>
+                </li>
+                <li className="dropdown_item">
+                  <a
+                    href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup`}
+                    className={classNames('dropdown_menu', { is_active: asPath.split('#')[0] === `${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup` })}
+                  >
+                    <span className="dropdown_text">Start for free</span>
+                  </a>
+                </li>
+              </>
+            )}
           </ul>
         </div>
       </Popover.Dropdown>
