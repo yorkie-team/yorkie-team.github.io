@@ -49,7 +49,7 @@ const Products: NextPage = () => {
               <br className="br_pc" /> store.
             </p>
             <Button.Box>
-              <Button as="link" href="/signup" className="orange_0 btn_start" icon={<Icon type="star" />}>
+              <Button as="a" href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup`} className="orange_0 btn_start" icon={<Icon type="star" />}>
                 Start for free
               </Button>
             </Button.Box>
@@ -169,14 +169,14 @@ const Products: NextPage = () => {
               </a>
             </h2>
             <p className="section_desc">
-              Yorkie House allows project members to browse stored documents and supervise the data warehouse easily.
+              Dashboard allows project members to browse stored documents and supervise the data warehouse easily.
             </p>
           </div>
           <strong className="sub_big_title">
             <Icon type="cloud" />
-            Yorkie House Web
+            Dashboard
           </strong>
-          <p className="sub_big_desc">Yorkie House web is available on any device, and no installation is required.</p>
+          <p className="sub_big_desc">Dashboard is available on any device, and no installation is required.</p>
           <div className="house_content">
             <div className="img_box shadow_l img_pc">
               <ProductPCSVG />

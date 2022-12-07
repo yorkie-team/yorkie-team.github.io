@@ -19,6 +19,7 @@ export function MobileGnbDropdown() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // TODO(hackerwins): Remove examples condition when examples are ready.
   return (
     <Popover opened={gnbOpened} onChange={setGnbOpened}>
       <Popover.Target>
@@ -158,14 +159,18 @@ export function MobileGnbDropdown() {
                 </ul>
               </nav>
             </li>
-            <li className="dropdown_item">
-              <Link
-                href="/examples"
-                className={classNames('dropdown_menu', { is_active: asPath.split('#')[0] === '/examples' })}
-              >
-                <span className="dropdown_text">Example</span>
-              </Link>
-            </li>
+            {
+              process.env.NODE_ENV === 'development' && (
+                <li className="dropdown_item">
+                  <Link
+                    href="/examples"
+                    className={classNames('dropdown_menu', { is_active: asPath.split('#')[0] === '/examples' })}
+                  >
+                    <span className="dropdown_text">Example</span>
+                  </Link>
+                </li>
+              )
+            }
             <li className="dropdown_item">
               <Link
                 href="/community"
@@ -177,20 +182,20 @@ export function MobileGnbDropdown() {
           </ul>
           <ul className="dropdown_list">
             <li className="dropdown_item">
-              <Link
-                href="/login"
-                className={classNames('dropdown_menu', { is_active: asPath.split('#')[0] === '/login' })}
+              <a
+                href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/login`}
+                className={classNames('dropdown_menu', { is_active: asPath.split('#')[0] === `${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/login` })}
               >
                 <span className="dropdown_text">Login</span>
-              </Link>
+              </a>
             </li>
             <li className="dropdown_item">
-              <Link
-                href="/signup"
-                className={classNames('dropdown_menu', { is_active: asPath.split('#')[0] === '/signup' })}
+              <a
+                href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup`}
+                className={classNames('dropdown_menu', { is_active: asPath.split('#')[0] === `${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup` })}
               >
                 <span className="dropdown_text">Start for free</span>
-              </Link>
+              </a>
             </li>
           </ul>
         </div>

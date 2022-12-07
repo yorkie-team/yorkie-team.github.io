@@ -9,6 +9,7 @@ import LogoGnbSVG from '@/public/assets/icons/logo_gnb.svg';
 export function Header(): ReactElement {
   const { pathname } = useRouter();
 
+  // TODO(hackerwins): Remove examples condition when examples are ready.
   return (
     <header className="header_service">
       <div className="header_inner">
@@ -31,11 +32,15 @@ export function Header(): ReactElement {
                 Documentation
               </Link>
             </li>
-            <li className={`gnb_item ${pathname == '/examples' ? 'is_active' : ''}`}>
-              <Link href="/examples" className="link">
-                Examples
-              </Link>
-            </li>
+            {
+              process.env.NODE_ENV === 'development' && (
+                <li className={`gnb_item ${pathname == '/examples' ? 'is_active' : ''}`}>
+                  <Link href="/examples" className="link">
+                    Examples
+                  </Link>
+                </li>
+              )
+            }
             <li className={`gnb_item ${pathname == '/community' ? 'is_active' : ''}`}>
               <Link href="/community" className="link">
                 Community
@@ -44,10 +49,10 @@ export function Header(): ReactElement {
           </ul>
         </nav>
         <div className="header_util">
-          <Button as="link" href="/login" outline className="gray50">
+          <Button as="a" href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/login`} outline className="gray50">
             Login
           </Button>
-          <Button as="link" href="/signup" className="orange_0" icon={<Icon type="star" />}>
+          <Button as="a" href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup`} className="orange_0" icon={<Icon type="star" />}>
             Start for free
           </Button>
           <MobileGnbDropdown />

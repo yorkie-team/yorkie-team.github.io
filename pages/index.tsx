@@ -36,6 +36,7 @@ const Home: NextPage = () => {
   const [bannerActive, setBannerActive] = useState(false);
   const [activeFeatureCard, setActiveFeatureCard] = useState<FeatureType>('profile');
 
+  // TODO(hackerwins): Remove examples condition when examples are ready.
   return (
     <Layout className="main_page">
       <Head>
@@ -57,17 +58,8 @@ const Home: NextPage = () => {
               <span className="text">your products</span>
             </h2>
             <Button.Box>
-              <div className="npm_box">
-                <label htmlFor="npm" className="blind">
-                  Npm Install
-                </label>
-                <input className="input" id="npm" type="text" value="$ npm install yorkie-js-sdk" readOnly />
-                <Button className="gray800" blindText icon={<Icon type="copy" />}>
-                  copy
-                </Button>
-              </div>
               <Link
-                href="/signup"
+                href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup`}
                 className="btn orange_0 btn_start"
                 onPointerOver={() => setBannerActive(true)}
                 onPointerOut={() => setBannerActive(false)}
@@ -226,11 +218,15 @@ const Home: NextPage = () => {
             <div className="draw_box"></div>
             <div className="draw_box"></div>
           </div>
-          <Button.Box>
-            <Button as="link" href="/examples" className="orange_0" icon={<Icon type="bulb" />}>
-              View all examples
-            </Button>
-          </Button.Box>
+          {
+            process.env.NODE_ENV === 'development' && (
+              <Button.Box>
+                <Button as="link" href="/examples" className="orange_0" icon={<Icon type="bulb" />}>
+                  View all examples
+                </Button>
+              </Button.Box>
+            )
+          }
         </section>
         <section className="section">
           <h2 className="section_title">
@@ -265,7 +261,7 @@ const Home: NextPage = () => {
                 <div className="text_box">
                   <strong className="title">Real-time usage monitoring</strong>
                   <p className="desc">
-                    Yorkie House allows project members to browse stored documents and supervise the data warehouse
+                    Dashboard allows project members to browse stored documents and supervise the data warehouse
                     easily.
                   </p>
                   <Button
@@ -274,7 +270,7 @@ const Home: NextPage = () => {
                     className="gray800"
                     icon={<Icon type="book" />}
                   >
-                    Learn more about Yorkie House
+                    Learn more about Dashboard
                   </Button>
                 </div>
               </li>
@@ -356,7 +352,7 @@ const Home: NextPage = () => {
             >
               Contact
             </Button>
-            <Button as="link" href="/signup" className="orange_0 btn_start" icon={<Icon type="twinkle" />}>
+            <Button as="a" href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup`} className="orange_0 btn_start" icon={<Icon type="twinkle" />}>
               Start for free
             </Button>
           </Button.Box>
