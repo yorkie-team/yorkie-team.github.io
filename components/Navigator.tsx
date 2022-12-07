@@ -25,7 +25,7 @@ function NavList({ navList }: { navList: DocsOrderList }) {
               <NavItem title={title} href={href} isActive={asPath.split('#')[0] === href} />
             ) : (
               <>
-                <NavMenu title={title} href={href} hasSubMenu />
+                <NavMenu title={title} href={href} isActive={isActive} />
                 {isActive && <NavList navList={subMenu} />}
               </>
             )}
@@ -40,14 +40,12 @@ function NavGroup({ isActive, children }: { isActive: boolean; children: React.R
   return <li className={classNames('navigator_group', { is_active: isActive })}>{children}</li>;
 }
 
-function NavMenu({ title, href, hasSubMenu }: { title: string; href: string; hasSubMenu?: boolean }) {
+function NavMenu({ title, href, isActive }: { title: string; href: string; isActive: boolean }) {
   return (
-    <Link href={href} className="navigator_menu">
-      {hasSubMenu && (
-        <span className="icon">
-          <ArrowSVG />
-        </span>
-      )}
+    <Link href={href} className={classNames('navigator_menu', { is_active: isActive })}>
+      <span className="icon">
+        <ArrowSVG />
+      </span>
       {title}
     </Link>
   );
