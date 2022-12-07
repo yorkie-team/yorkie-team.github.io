@@ -49,7 +49,7 @@ const Products: NextPage = () => {
               <br className="br_pc" /> store.
             </p>
             <Button.Box>
-              <Button as="link" href="/signup" className="orange_0 btn_start" icon={<Icon type="star" />}>
+              <Button as="a" href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup`} className="orange_0 btn_start" icon={<Icon type="star" />}>
                 Start for free
               </Button>
             </Button.Box>
@@ -169,14 +169,14 @@ const Products: NextPage = () => {
               </a>
             </h2>
             <p className="section_desc">
-              Yorkie House allows project members to browse stored documents and supervise the data warehouse easily.
+              Dashboard allows project members to browse stored documents and supervise the data warehouse easily.
             </p>
           </div>
           <strong className="sub_big_title">
             <Icon type="cloud" />
-            Yorkie House Web
+            Dashboard
           </strong>
-          <p className="sub_big_desc">Yorkie House web is available on any device, and no installation is required.</p>
+          <p className="sub_big_desc">Dashboard is available on any device, and no installation is required.</p>
           <div className="house_content">
             <div className="img_box shadow_l img_pc">
               <ProductPCSVG />
@@ -188,7 +188,7 @@ const Products: NextPage = () => {
         </section>
         <section className="section">
           <div className="section_title_wrap">
-            <h2 className="section_title" id="build-local-server">
+            <h2 className="section_title" id="self-hosted-server">
               <a href="#build-local-server">
                 Build your own
                 <br />
@@ -196,7 +196,7 @@ const Products: NextPage = () => {
               </a>
             </h2>
             <p className="section_desc">
-              If needed, Yorkie open source packages allow you to build servers and databases locally.
+              If needed, Yorkie open source packages allow you to build self-hosted server locally.
             </p>
           </div>
           <div className="package_group">
@@ -208,7 +208,7 @@ const Products: NextPage = () => {
             </div>
             <Link href="/docs/server" className="btn gray800">
               <Icon type="book" />
-              <span className="text">How to build a local server</span>
+              <span className="text">How to build self-hosted server</span>
             </Link>
             <p className="sub_big_desc">
               Yorkie open source package contains SDKs, a server, and a DB, enabling the implementation of the

@@ -36,6 +36,7 @@ const Home: NextPage = () => {
   const [bannerActive, setBannerActive] = useState(false);
   const [activeFeatureCard, setActiveFeatureCard] = useState<FeatureType>('profile');
 
+  // TODO(hackerwins): Remove examples condition when examples are ready.
   return (
     <Layout className="main_page">
       <Head>
@@ -57,17 +58,8 @@ const Home: NextPage = () => {
               <span className="text">your products</span>
             </h2>
             <Button.Box>
-              <div className="npm_box">
-                <label htmlFor="npm" className="blind">
-                  Npm Install
-                </label>
-                <input className="input" id="npm" type="text" value="$ npm install yorkie-js-sdk" readOnly />
-                <Button className="gray800" blindText icon={<Icon type="copy" />}>
-                  copy
-                </Button>
-              </div>
               <Link
-                href="/signup"
+                href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup`}
                 className="btn orange_0 btn_start"
                 onPointerOver={() => setBannerActive(true)}
                 onPointerOut={() => setBannerActive(false)}
@@ -226,11 +218,15 @@ const Home: NextPage = () => {
             <div className="draw_box"></div>
             <div className="draw_box"></div>
           </div>
-          <Button.Box>
-            <Button as="link" href="/examples" className="orange_0" icon={<Icon type="bulb" />}>
-              View all examples
-            </Button>
-          </Button.Box>
+          {
+            process.env.NODE_ENV === 'development' && (
+              <Button.Box>
+                <Button as="link" href="/examples" className="orange_0" icon={<Icon type="bulb" />}>
+                  View all examples
+                </Button>
+              </Button.Box>
+            )
+          }
         </section>
         <section className="section">
           <h2 className="section_title">
@@ -249,12 +245,12 @@ const Home: NextPage = () => {
                 <div className="text_box">
                   <strong className="title">Conflict-free state sharing</strong>
                   <p className="desc">
-                    Yorkie implements real-time collaboration based on the CRDT algorithm.
+                    Yorkie implements real-time collaboration API based on the CRDT algorithm.
                     <br className="br_tablet" /> CRDT is formed in solid and clean architecture, effectively resolving
                     conflicts when editing multiple concurrent data.
                   </p>
                   <Button as="link" href="/products#multiplayer" className="gray800" icon={<Icon type="book" />}>
-                    Learn more about Yorkie SDK
+                    Learn more about state sharing
                   </Button>
                 </div>
               </li>
@@ -265,7 +261,7 @@ const Home: NextPage = () => {
                 <div className="text_box">
                   <strong className="title">Real-time usage monitoring</strong>
                   <p className="desc">
-                    Yorkie House allows project members to browse stored documents and supervise the data warehouse
+                    Dashboard allows project members to browse stored documents and supervise the data warehouse
                     easily.
                   </p>
                   <Button
@@ -274,7 +270,7 @@ const Home: NextPage = () => {
                     className="gray800"
                     icon={<Icon type="book" />}
                   >
-                    Learn more about Yorkie House
+                    Learn more about monitoring
                   </Button>
                 </div>
               </li>
@@ -283,12 +279,12 @@ const Home: NextPage = () => {
                   <ServerMotion />
                 </div>
                 <div className="text_box">
-                  <strong className="title">Easy cloud server or private local server</strong>
+                  <strong className="title">Easy cloud server or self-hosted server</strong>
                   <p className="desc">
-                    If needed, Yorkie open source packages allow you to build servers and databases locally.
+                    If needed, Yorkie open source packages allow you to build self-hosted server.
                   </p>
-                  <Button as="link" href="/products#build-local-server" className="gray800" icon={<Icon type="book" />}>
-                    How to build a local server
+                  <Button as="link" href="/products#self-hosted-server" className="gray800" icon={<Icon type="book" />}>
+                    How to build a self-hosted server
                   </Button>
                 </div>
               </li>
@@ -302,45 +298,40 @@ const Home: NextPage = () => {
               <Accordion.Item value="faq1">
                 <Accordion.Control>
                   <Icon type="messageSquare" />
-                  Are you sure I can make money with it?
+                  Can we use the Yorkie for free?
                 </Accordion.Control>
                 <Accordion.Panel>
-                  Yorkie provides SDKs, Server, and Database to eliminate the tedious work can be operational and can
-                  use the services just out-of-box. Yorkie will take care of the collaborative features while you focus
-                  on your direct services.
+                  Yes, Yorkie is free to use. <br/><br/>
+                  You can access it at no cost. Please note that the availability of the service and any associated features
+                  may be subject to change without notice. It is always a good idea to check the latest information on the
+                  service&apos;s website to ensure that it is still available and meets your needs.
                 </Accordion.Panel>
               </Accordion.Item>
               <Accordion.Item value="faq2">
                 <Accordion.Control>
                   <Icon type="messageSquare" />
-                  Frequently asked questions examples?
+                  Is the Yorkie production ready?
                 </Accordion.Control>
                 <Accordion.Panel>
-                  Yorkie provides SDKs, Server, and Database to eliminate the tedious work can be operational and can
-                  use the services just out-of-box. Yorkie will take care of the collaborative features while you focus
-                  on your direct services.
+                  No, Yorkie is not yet production ready. <br/><br/>
+                  While the CRDT algorithm has been verified, not all of the code has been fully battle-tested. The developers of the
+                  service currently estimate that the right time to use it in a production environment will be <b>around summer of &apos;23</b>.
+                  Until then, it is recommended to carefully evaluate the service&apos;s capabilities and reliability before using
+                  it in a production setting. It is also important to note that the availability and features of the service
+                  may change without notice, so it is always best to check the latest information on the service&apos;s website before using it. 
                 </Accordion.Panel>
               </Accordion.Item>
               <Accordion.Item value="faq3">
                 <Accordion.Control>
                   <Icon type="messageSquare" />
-                  How cheap is it?
+                  How can I contribute to the Yorkie project?
                 </Accordion.Control>
                 <Accordion.Panel>
-                  Yorkie provides SDKs, Server, and Database to eliminate the tedious work can be operational and can
-                  use the services just out-of-box. Yorkie will take care of the collaborative features while you focus
-                  on your direct services.
-                </Accordion.Panel>
-              </Accordion.Item>
-              <Accordion.Item value="faq4">
-                <Accordion.Control>
-                  <Icon type="messageSquare" />
-                  Frequently asked questions examples? long long long long long long
-                </Accordion.Control>
-                <Accordion.Panel>
-                  Yorkie provides SDKs, Server, and Database to eliminate the tedious work can be operational and can
-                  use the services just out-of-box. Yorkie will take care of the collaborative features while you focus
-                  on your direct services.
+                  Yorkie is an open source project, so there are many ways to contribute to its development. <br /><br />
+                  One way to contribute is by reporting any bugs you encounter while using the service. You can also submit
+                  pull requests with improvements or new features that you have developed. If you plan to use Yorkie in your
+                  company, you can also consider donating to the Yorkie community to support its continued development.
+                  You can learn more about how to contribute to the Yorkie project on its website or by visiting our <u><a href="https://discord.com/invite/MVEAwz9sBy">Discord</a></u>.
                 </Accordion.Panel>
               </Accordion.Item>
             </Accordion>
@@ -356,7 +347,7 @@ const Home: NextPage = () => {
             >
               Contact
             </Button>
-            <Button as="link" href="/signup" className="orange_0 btn_start" icon={<Icon type="twinkle" />}>
+            <Button as="a" href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup`} className="orange_0 btn_start" icon={<Icon type="twinkle" />}>
               Start for free
             </Button>
           </Button.Box>
