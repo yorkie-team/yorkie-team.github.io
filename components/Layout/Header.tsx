@@ -1,13 +1,36 @@
-import { ReactElement } from 'react';
+import { ReactElement, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import jwt_decode, { JwtPayload } from 'jwt-decode';
 import { Button, Icon } from '@/components';
 import { MobileGnbDropdown } from './MobileGnbDropdown';
 import LogoSVG from '@/public/assets/icons/logo_horizontal_xs.svg';
 import LogoGnbSVG from '@/public/assets/icons/logo_gnb.svg';
 
+// isValidToken checks if the given token is valid. This function is used to
+// check if the token is expired or not.
+function isValidToken(token: string | null) {
+  if (!token) {
+    return false;
+  }
+  
+  const decoded = jwt_decode<JwtPayload>(token);
+  const currentTime = new Date().getTime() / 1000;
+  if (!decoded || decoded.exp! < currentTime) {
+    return false;
+  }
+
+  return true
+}
+
 export function Header(): ReactElement {
   const { pathname } = useRouter();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const isLoggedIn = isValidToken(localStorage.getItem('token'));
+    setIsLoggedIn(isLoggedIn);
+  }, [setIsLoggedIn])
 
   // TODO(hackerwins): Remove examples condition when examples are ready.
   return (
@@ -48,15 +71,25 @@ export function Header(): ReactElement {
             </li>
           </ul>
         </nav>
-        <div className="header_util">
-          <Button as="a" href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/login`} outline className="gray50">
-            Login
-          </Button>
-          <Button as="a" href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup`} className="orange_0" icon={<Icon type="star" />}>
-            Start for free
-          </Button>
-          <MobileGnbDropdown />
-        </div>
+        {
+          isLoggedIn ? (
+            <div className="header_util">
+              <Button as="a" href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`} outline className="gray50">
+                Dashboard
+              </Button>
+            </div>
+          ) : (
+            <div className="header_util">
+              <Button as="a" href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/login`} outline className="gray50">
+                Login
+              </Button>
+              <Button as="a" href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup`} className="orange_0" icon={<Icon type="star" />}>
+                Start for free
+              </Button>
+              <MobileGnbDropdown />
+            </div>
+          )
+        }
       </div>
     </header>
   );
