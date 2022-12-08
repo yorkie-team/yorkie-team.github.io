@@ -50,12 +50,12 @@ const Home: NextPage = () => {
           </div>
           <div className="inner">
             <h2 className="title">
-              <span className="text">Breathe</span>
+              <span className="text">Bring</span>
               <span className={classNames('point', { is_hover: bannerActive })}>
                 collaboration
                 <span className="bg"></span>
               </span>
-              <span className="text">your products</span>
+              <span className="text">to your app</span>
             </h2>
             <Button.Box>
               <a
@@ -70,14 +70,14 @@ const Home: NextPage = () => {
               </a>
             </Button.Box>
             <p className="desc">
-              Open-source SDKs, Server, Database API package for real-time collaborative experiences
+              Unlock the full potential of real-time collaboration with open-source SDKs and API package.
             </p>
           </div>
         </section>
         <section className="section section_app">
           <div className="align_box">
             <div className="app_header">
-              <h2 className="tag_name">Putting Yorkie, Extending Your App</h2>
+              <h2 className="tag_name">Extend Your App with Yorkie</h2>
               <span className="icon">
                 <UserGroupSVG />
               </span>
@@ -89,12 +89,7 @@ const Home: NextPage = () => {
                 <span className="point">collaborative</span> in a flash!
               </strong>
               <p className="section_desc">
-                Don&#39;t waste time and money implementing collaboration features. <br className="br_tablet" />
-                <br className="br_mo" />
-                <br className="br_mo_xs" /> Leverage our free API-based services
-                <br className="br_pc" />
-                <br className="br_mo_xs" /> to quickly and easily build high-performance
-                <br className="br_tablet" /> collaborative features for your products.
+                Easily add collaboration to your apps with our API-based services. <br /> Sign up now and start building powerful, high-performance collaborative features in no time.
               </p>
               <Button.Box>
                 <Button as="link" href="/docs/quick-start" className="orange_0" icon={<Icon type="book" />}>
@@ -109,25 +104,14 @@ const Home: NextPage = () => {
         </section>
         <section className="section">
           <h2 className="section_title">
-            Every feature
-            <br className="br_mo_xs" /> you need
-            <br /> to start collaborating.
+            Variety of <br className="br_mo" /> collaboration features <br /> for your app
           </h2>
           <p className="section_desc">
-            Add stable and diverse collaborative features
-            <br className="br_mo" /> to your product with Yorkie.
-            <br className="br_tablet" />
-            <br className="br_mo_xs" /> Now it&#39;s not difficult to
-            <br className="br_mo" /> make a local-
-            <br className="br_pc" />
-            based product collaborative.
-            <br className="br_tablet" />
+            Easily add stable and diverse collaborative features
             <br className="br_mo" />
-            <br className="br_mo_xs" /> Put basic features of collaborative tools
-            <br className="br_mo_xs" /> on your
-            <br className="br_mo" /> product
-            <br className="br_tablet" /> and provide a completely
-            <br className="br_pc" /> different online real-time experience.
+            to your product with Yorkie. <br />
+            Transform your local-based product into a <br className="br_mo" />  collaborative online experience with our powerful tools. <br/>
+            Sign up now and start providing your users <br className="br_mo" /> with a completely new real-time experience.
           </p>
           <div className="section_content">
             <ul
