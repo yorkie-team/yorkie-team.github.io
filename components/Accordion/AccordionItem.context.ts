@@ -1,4 +1,4 @@
-import { createSafeContext } from '@/utils/create-safe-context';
+import { createSafeContext } from '@/utils/createSafeContext';
 import { ACCORDION_ERRORS } from './Accordion.errors';
 
 interface AccordionItemContext {

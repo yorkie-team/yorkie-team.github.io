@@ -139,22 +139,22 @@ const Products: NextPage = () => {
             <strong className="sub_title" id="more-features">
               <a href="#more-features">More features of Yorkie SDK</a>
             </strong>
-            <ul className="card_list">
-              <li className="card_item">
-                <strong className="card_title">Size management</strong>
-                <p className="card_desc">
+            <ul className="product_card_list">
+              <li className="product_card_item">
+                <strong className="product_card_title">Size management</strong>
+                <p className="product_card_desc">
                   Yorkie uses ‘Garbage collection’ and ‘Lamport timestamp’ to keep smaller document sizes.
                 </p>
               </li>
-              <li className="card_item">
-                <strong className="card_title">Auth Webhook</strong>
-                <p className="card_desc">
+              <li className="product_card_item">
+                <strong className="product_card_title">Auth Webhook</strong>
+                <p className="product_card_desc">
                   Check from an external service that the client is authorized to the document.
                 </p>
               </li>
-              <li className="card_item">
-                <strong className="card_title">App &amp; Web SDK</strong>
-                <p className="card_desc">Support development for both mobile apps and the web.</p>
+              <li className="product_card_item">
+                <strong className="product_card_title">App &amp; Web SDK</strong>
+                <p className="product_card_desc">Support development for both mobile apps and the web.</p>
               </li>
             </ul>
           </div>
@@ -188,7 +188,7 @@ const Products: NextPage = () => {
         </section>
         <section className="section">
           <div className="section_title_wrap">
-            <h2 className="section_title" id="build-local-server">
+            <h2 className="section_title" id="self-hosted-server">
               <a href="#build-local-server">
                 Build your own
                 <br />
@@ -196,7 +196,7 @@ const Products: NextPage = () => {
               </a>
             </h2>
             <p className="section_desc">
-              If needed, Yorkie open source packages allow you to build servers and databases locally.
+              If needed, Yorkie open source packages allow you to build self-hosted server locally.
             </p>
           </div>
           <div className="package_group">
@@ -208,7 +208,7 @@ const Products: NextPage = () => {
             </div>
             <Link href="/docs/server" className="btn gray800">
               <Icon type="book" />
-              <span className="text">How to build a local server</span>
+              <span className="text">How to build self-hosted server</span>
             </Link>
             <p className="sub_big_desc">
               Yorkie open source package contains SDKs, a server, and a DB, enabling the implementation of the

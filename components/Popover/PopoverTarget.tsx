@@ -1,5 +1,5 @@
 import { cloneElement } from 'react';
-import { isElement } from '@/utils/is-element';
+import { isElement } from '@/utils/isElement';
 import { usePopoverContext } from './Popover.context';
 
 export interface PopoverTargetProps {

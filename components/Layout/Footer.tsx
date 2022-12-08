@@ -1,6 +1,7 @@
 import { ReactElement } from 'react';
 import Link from 'next/link';
 import LogoSVG from '@/public/assets/icons/logo_horizontal_s.svg';
+import { ThemeDropdown } from './ThemeDropdown';
 
 export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement {
   if (shortFooter) {
@@ -21,7 +22,8 @@ export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement
               <LogoSVG />
             </Link>
           </strong>
-          <p className="copyright">Copyright © 2022 Yorkie</p>
+          <p className="copyright">Copyright &copy; 2022 Yorkie</p>
+          <ThemeDropdown />
         </div>
         <div className="box_site">
           <div className="site">
@@ -33,12 +35,12 @@ export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement
             <ul className="site_list">
               <li className="site_item">
                 <Link href="/products#conflict-free-state-sharing" className="link">
-                  Document
+                  Conflict-free State sharing
                 </Link>
               </li>
               <li className="site_item">
                 <Link href="/products#collaboration-awareness" className="link">
-                  Presence
+                  Collaboration awareness
                 </Link>
               </li>
               <li className="site_item">
@@ -47,8 +49,8 @@ export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement
                 </Link>
               </li>
               <li className="site_item">
-                <Link href="/products#build-local-server" className="link">
-                  Build a local server
+                <Link href="/products#self-hosted-server" className="link">
+                  Self-hosted server
                 </Link>
               </li>
             </ul>

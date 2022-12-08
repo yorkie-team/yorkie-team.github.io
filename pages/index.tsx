@@ -50,15 +50,15 @@ const Home: NextPage = () => {
           </div>
           <div className="inner">
             <h2 className="title">
-              <span className="text">Breathe</span>
+              <span className="text">Bring</span>
               <span className={classNames('point', { is_hover: bannerActive })}>
                 collaboration
                 <span className="bg"></span>
               </span>
-              <span className="text">your products</span>
+              <span className="text">to your app</span>
             </h2>
             <Button.Box>
-              <Link
+              <a
                 href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup`}
                 className="btn orange_0 btn_start"
                 onPointerOver={() => setBannerActive(true)}
@@ -67,17 +67,17 @@ const Home: NextPage = () => {
                 <span className="bg"></span>
                 <Icon type="star" />
                 <span className="text">Start for free</span>
-              </Link>
+              </a>
             </Button.Box>
             <p className="desc">
-              Open-source SDKs, Server, Database API package for real-time collaborative experiences
+              Unlock the full potential of real-time collaboration with open-source SDKs and API package.
             </p>
           </div>
         </section>
         <section className="section section_app">
           <div className="align_box">
             <div className="app_header">
-              <h2 className="tag_name">Putting Yorkie, Extending Your App</h2>
+              <h2 className="tag_name">Extend Your App with Yorkie</h2>
               <span className="icon">
                 <UserGroupSVG />
               </span>
@@ -89,12 +89,8 @@ const Home: NextPage = () => {
                 <span className="point">collaborative</span> in a flash!
               </strong>
               <p className="section_desc">
-                Don&#39;t waste time and money implementing collaboration features. <br className="br_tablet" />
-                <br className="br_mo" />
-                <br className="br_mo_xs" /> Leverage our free API-based services
-                <br className="br_pc" />
-                <br className="br_mo_xs" /> to quickly and easily build high-performance
-                <br className="br_tablet" /> collaborative features for your products.
+                Easily add collaboration to your apps with our API-based services. <br /> Sign up now and start building
+                powerful, high-performance collaborative features in no time.
               </p>
               <Button.Box>
                 <Button as="link" href="/docs/quick-start" className="orange_0" icon={<Icon type="book" />}>
@@ -109,25 +105,16 @@ const Home: NextPage = () => {
         </section>
         <section className="section">
           <h2 className="section_title">
-            Every feature
-            <br className="br_mo_xs" /> you need
-            <br /> to start collaborating.
+            Variety of <br className="br_mo" /> collaboration features <br /> for your app
           </h2>
           <p className="section_desc">
-            Add stable and diverse collaborative features
-            <br className="br_mo" /> to your product with Yorkie.
-            <br className="br_tablet" />
-            <br className="br_mo_xs" /> Now it&#39;s not difficult to
-            <br className="br_mo" /> make a local-
-            <br className="br_pc" />
-            based product collaborative.
-            <br className="br_tablet" />
+            Easily add stable and diverse collaborative features
             <br className="br_mo" />
-            <br className="br_mo_xs" /> Put basic features of collaborative tools
-            <br className="br_mo_xs" /> on your
-            <br className="br_mo" /> product
-            <br className="br_tablet" /> and provide a completely
-            <br className="br_pc" /> different online real-time experience.
+            to your product with Yorkie. <br />
+            Transform your local-based product into a <br className="br_mo" /> collaborative online experience with our
+            powerful tools. <br />
+            Sign up now and start providing your users <br className="br_mo" /> with a completely new real-time
+            experience.
           </p>
           <div className="section_content">
             <ul
@@ -218,15 +205,13 @@ const Home: NextPage = () => {
             <div className="draw_box"></div>
             <div className="draw_box"></div>
           </div>
-          {
-            process.env.NODE_ENV === 'development' && (
-              <Button.Box>
-                <Button as="link" href="/examples" className="orange_0" icon={<Icon type="bulb" />}>
-                  View all examples
-                </Button>
-              </Button.Box>
-            )
-          }
+          {process.env.NODE_ENV === 'development' && (
+            <Button.Box>
+              <Button as="link" href="/examples" className="orange_0" icon={<Icon type="bulb" />}>
+                View all examples
+              </Button>
+            </Button.Box>
+          )}
         </section>
         <section className="section">
           <h2 className="section_title">
@@ -245,12 +230,12 @@ const Home: NextPage = () => {
                 <div className="text_box">
                   <strong className="title">Conflict-free state sharing</strong>
                   <p className="desc">
-                    Yorkie implements real-time collaboration based on the CRDT algorithm.
+                    Yorkie implements real-time collaboration API based on the CRDT algorithm.
                     <br className="br_tablet" /> CRDT is formed in solid and clean architecture, effectively resolving
                     conflicts when editing multiple concurrent data.
                   </p>
                   <Button as="link" href="/products#multiplayer" className="gray800" icon={<Icon type="book" />}>
-                    Learn more about Yorkie SDK
+                    Learn more about state sharing
                   </Button>
                 </div>
               </li>
@@ -261,8 +246,7 @@ const Home: NextPage = () => {
                 <div className="text_box">
                   <strong className="title">Real-time usage monitoring</strong>
                   <p className="desc">
-                    Dashboard allows project members to browse stored documents and supervise the data warehouse
-                    easily.
+                    Dashboard allows project members to browse stored documents and supervise the data warehouse easily.
                   </p>
                   <Button
                     as="link"
@@ -270,7 +254,7 @@ const Home: NextPage = () => {
                     className="gray800"
                     icon={<Icon type="book" />}
                   >
-                    Learn more about Dashboard
+                    Learn more about monitoring
                   </Button>
                 </div>
               </li>
@@ -279,12 +263,10 @@ const Home: NextPage = () => {
                   <ServerMotion />
                 </div>
                 <div className="text_box">
-                  <strong className="title">Easy cloud server or private local server</strong>
-                  <p className="desc">
-                    If needed, Yorkie open source packages allow you to build servers and databases locally.
-                  </p>
-                  <Button as="link" href="/products#build-local-server" className="gray800" icon={<Icon type="book" />}>
-                    How to build a local server
+                  <strong className="title">Easy cloud server or self-hosted server</strong>
+                  <p className="desc">If needed, Yorkie open source packages allow you to build self-hosted server.</p>
+                  <Button as="link" href="/products#self-hosted-server" className="gray800" icon={<Icon type="book" />}>
+                    How to build a self-hosted server
                   </Button>
                 </div>
               </li>
@@ -298,45 +280,49 @@ const Home: NextPage = () => {
               <Accordion.Item value="faq1">
                 <Accordion.Control>
                   <Icon type="messageSquare" />
-                  Are you sure I can make money with it?
+                  Can we use the Yorkie for free?
                 </Accordion.Control>
                 <Accordion.Panel>
-                  Yorkie provides SDKs, Server, and Database to eliminate the tedious work can be operational and can
-                  use the services just out-of-box. Yorkie will take care of the collaborative features while you focus
-                  on your direct services.
+                  Yes, Yorkie is free to use. <br />
+                  <br />
+                  You can access it at no cost. Please note that the availability of the service and any associated
+                  features may be subject to change without notice. It is always a good idea to check the latest
+                  information on the service&apos;s website to ensure that it is still available and meets your needs.
                 </Accordion.Panel>
               </Accordion.Item>
               <Accordion.Item value="faq2">
                 <Accordion.Control>
                   <Icon type="messageSquare" />
-                  Frequently asked questions examples?
+                  Is the Yorkie production ready?
                 </Accordion.Control>
                 <Accordion.Panel>
-                  Yorkie provides SDKs, Server, and Database to eliminate the tedious work can be operational and can
-                  use the services just out-of-box. Yorkie will take care of the collaborative features while you focus
-                  on your direct services.
+                  No, Yorkie is not yet production ready. <br />
+                  <br />
+                  While the CRDT algorithm has been verified, not all of the code has been fully battle-tested. The
+                  developers of the service currently estimate that the right time to use it in a production environment
+                  will be <b>around summer of &apos;23</b>. Until then, it is recommended to carefully evaluate the
+                  service&apos;s capabilities and reliability before using it in a production setting. It is also
+                  important to note that the availability and features of the service may change without notice, so it
+                  is always best to check the latest information on the service&apos;s website before using it.
                 </Accordion.Panel>
               </Accordion.Item>
               <Accordion.Item value="faq3">
                 <Accordion.Control>
                   <Icon type="messageSquare" />
-                  How cheap is it?
+                  How can I contribute to the Yorkie project?
                 </Accordion.Control>
                 <Accordion.Panel>
-                  Yorkie provides SDKs, Server, and Database to eliminate the tedious work can be operational and can
-                  use the services just out-of-box. Yorkie will take care of the collaborative features while you focus
-                  on your direct services.
-                </Accordion.Panel>
-              </Accordion.Item>
-              <Accordion.Item value="faq4">
-                <Accordion.Control>
-                  <Icon type="messageSquare" />
-                  Frequently asked questions examples? long long long long long long
-                </Accordion.Control>
-                <Accordion.Panel>
-                  Yorkie provides SDKs, Server, and Database to eliminate the tedious work can be operational and can
-                  use the services just out-of-box. Yorkie will take care of the collaborative features while you focus
-                  on your direct services.
+                  Yorkie is an open source project, so there are many ways to contribute to its development. <br />
+                  <br />
+                  One way to contribute is by reporting any bugs you encounter while using the service. You can also
+                  submit pull requests with improvements or new features that you have developed. If you plan to use
+                  Yorkie in your company, you can also consider donating to the Yorkie community to support its
+                  continued development. You can learn more about how to contribute to the Yorkie project on its website
+                  or by visiting our{' '}
+                  <u>
+                    <a href="https://discord.com/invite/MVEAwz9sBy">Discord</a>
+                  </u>
+                  .
                 </Accordion.Panel>
               </Accordion.Item>
             </Accordion>
@@ -352,7 +338,12 @@ const Home: NextPage = () => {
             >
               Contact
             </Button>
-            <Button as="a" href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup`} className="orange_0 btn_start" icon={<Icon type="twinkle" />}>
+            <Button
+              as="a"
+              href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup`}
+              className="orange_0 btn_start"
+              icon={<Icon type="twinkle" />}
+            >
               Start for free
             </Button>
           </Button.Box>
