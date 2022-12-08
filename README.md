@@ -1,4 +1,32 @@
+# Homepage
+
+Homepage is a comprehensive resource for information about Yorkie. It includes detailed documentation and information about Yorkie and its features, capabilities, and usage.
+
+## Developing Homepage
+
+### Building Homepage
+
+For building homepage, You'll first need Node.js installed(Node.js version 16+ and npm version 7.10+ are required).
+
+```
+# install packages
+npm install
+
+# build
+npm run build
+```
+
+### Running Homepage
+
+In the project directory, you can run:
+
+```
+$ npm run dev
+```
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+
+<details>
 
 ## Getting Started
 
@@ -32,3 +60,13 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+  
+</details>
+
+## Deploying Homepage
+
+When PR is merged into main, it is automatically distributed by GitHub Actions.
+
+## Contributing
+
+See [CONTRIBUTING](CONTRIBUTING.md) for details on submitting patches and the contribution workflow.
