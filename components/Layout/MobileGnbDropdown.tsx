@@ -45,13 +45,13 @@ export function MobileGnbDropdown({isLoggedIn} : {
             <li className="dropdown_item">
               <button
                 type="button"
-                className={classNames('dropdown_menu', { is_active: docsMenuOpened })}
+                className={classNames('dropdown_menu', 'btn_docs', { is_show: docsMenuOpened })}
                 onClick={() => {
                   setDocsMenuOpened((opened) => !opened);
                 }}
               >
+                <Icon type="arrow" className="icon_toggle"/>
                 <span className="dropdown_text">Documentation</span>
-                <Icon type="arrow" />
               </button>
               <nav
                 className="navigator"

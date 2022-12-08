@@ -139,22 +139,22 @@ const Products: NextPage = () => {
             <strong className="sub_title" id="more-features">
               <a href="#more-features">More features of Yorkie SDK</a>
             </strong>
-            <ul className="card_list">
-              <li className="card_item">
-                <strong className="card_title">Size management</strong>
-                <p className="card_desc">
+            <ul className="product_card_list">
+              <li className="product_card_item">
+                <strong className="product_card_title">Size management</strong>
+                <p className="product_card_desc">
                   Yorkie uses ‘Garbage collection’ and ‘Lamport timestamp’ to keep smaller document sizes.
                 </p>
               </li>
-              <li className="card_item">
-                <strong className="card_title">Auth Webhook</strong>
-                <p className="card_desc">
+              <li className="product_card_item">
+                <strong className="product_card_title">Auth Webhook</strong>
+                <p className="product_card_desc">
                   Check from an external service that the client is authorized to the document.
                 </p>
               </li>
-              <li className="card_item">
-                <strong className="card_title">App &amp; Web SDK</strong>
-                <p className="card_desc">Support development for both mobile apps and the web.</p>
+              <li className="product_card_item">
+                <strong className="product_card_title">App &amp; Web SDK</strong>
+                <p className="product_card_desc">Support development for both mobile apps and the web.</p>
               </li>
             </ul>
           </div>
