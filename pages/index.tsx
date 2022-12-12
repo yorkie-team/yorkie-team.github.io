@@ -194,25 +194,25 @@ const Home: NextPage = () => {
             </CodeBlock.Wrapper>
           </div>
         </section>
-        <section className="section">
-          <h2 className="section_title">
-            What experiences <br />
-            can you create
-            <br className="br_mo_xs" /> with Yorkie?
-          </h2>
-          <p className="section_desc">Test our examples to add diverse collaborative features to your product.</p>
-          <div className="section_content draw">
-            <div className="draw_box"></div>
-            <div className="draw_box"></div>
-          </div>
-          {process.env.NODE_ENV === 'development' && (
+        {process.env.NODE_ENV === 'development' && (
+          <section className="section">
+            <h2 className="section_title">
+              What experiences <br />
+              can you create
+              <br className="br_mo_xs" /> with Yorkie?
+            </h2>
+            <p className="section_desc">Test our examples to add diverse collaborative features to your product.</p>
+            <div className="section_content draw">
+              <div className="draw_box"></div>
+              <div className="draw_box"></div>
+            </div>
             <Button.Box>
               <Button as="link" href="/examples" className="orange_0" icon={<Icon type="bulb" />}>
                 View all examples
               </Button>
             </Button.Box>
-          )}
-        </section>
+          </section>
+        )}
         <section className="section">
           <h2 className="section_title">
             Stable.
@@ -228,14 +228,15 @@ const Home: NextPage = () => {
                   <StateSharingMotion />
                 </div>
                 <div className="text_box">
-                  <strong className="title">Conflict-free state sharing</strong>
+                  <strong className="title">Document and Presence</strong>
                   <p className="desc">
-                    Yorkie implements real-time collaboration API based on the CRDT algorithm.
-                    <br className="br_tablet" /> CRDT is formed in solid and clean architecture, effectively resolving
-                    conflicts when editing multiple concurrent data.
+                    Document is stored using conflict-free replicated data types(CRDTs), which ensures that multiple
+                    users can edit the same data concurrently without encountering conflicts. Presence represents a
+                    peer&apos;s awareness of the data being edited. It is used to track which users are currently
+                    editing the document.
                   </p>
                   <Button as="link" href="/products#multiplayer" className="gray800" icon={<Icon type="book" />}>
-                    Learn more about state sharing
+                    Learn more about Document and Presence
                   </Button>
                 </div>
               </li>
@@ -244,9 +245,11 @@ const Home: NextPage = () => {
                   <ChartMotion />
                 </div>
                 <div className="text_box">
-                  <strong className="title">Real-time usage monitoring</strong>
+                  <strong className="title">Data Warehouse with Dashboard</strong>
                   <p className="desc">
-                    Dashboard allows project members to browse stored documents and supervise the data warehouse easily.
+                    Dashboard allows users to easily browse stored documents and monitor the data warehouse in
+                    real-time. With Dashboard, users can quickly and easily supervise the data warehouse and ensure that
+                    it is functioning properly.
                   </p>
                   <Button
                     as="link"
@@ -254,7 +257,7 @@ const Home: NextPage = () => {
                     className="gray800"
                     icon={<Icon type="book" />}
                   >
-                    Learn more about monitoring
+                    Learn more about Data Warehouse with Dashboard
                   </Button>
                 </div>
               </li>
@@ -263,10 +266,14 @@ const Home: NextPage = () => {
                   <ServerMotion />
                 </div>
                 <div className="text_box">
-                  <strong className="title">Easy cloud server or self-hosted server</strong>
-                  <p className="desc">If needed, Yorkie open source packages allow you to build self-hosted server.</p>
+                  <strong className="title">Cloud or Self-Hosted Server</strong>
+                  <p className="desc">
+                    Yorkie offers flexible deployment options, allowing user to use a cloud or host the server on your
+                    own premises. Whether you want the convenience of cloud or the control of a self-hosted server,
+                    Yorkie has you covered.
+                  </p>
                   <Button as="link" href="/products#self-hosted-server" className="gray800" icon={<Icon type="book" />}>
-                    How to build a self-hosted server
+                    Learn more about Cloud or Self-Hosted Server
                   </Button>
                 </div>
               </li>
