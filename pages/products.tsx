@@ -73,7 +73,7 @@ const Products: NextPage = () => {
               configuration and conflict management tasks.
             </p>
           </div>
-          <div className="section_content">
+          <div className="section_content conflict_free">
             <strong className="sub_title" id="conflict-free-state-sharing">
               <a href="#conflict-free-state-sharing">Conflict-free state sharing</a>
             </strong>
@@ -118,7 +118,7 @@ const Products: NextPage = () => {
               </div>
             </div>
           </div>
-          <div className="section_content">
+          <div className="section_content collaboration">
             <strong className="sub_title" id="collaboration-awareness">
               <a href="#collaboration-awareness">Collaboration Awareness</a>
             </strong>
