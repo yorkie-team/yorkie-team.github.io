@@ -23,7 +23,13 @@ export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement
             </Link>
           </strong>
           <p className="copyright">Copyright &copy; 2022 Yorkie</p>
-          <ThemeDropdown />
+          <div className="filter">
+            <div className="filter_list">
+              <div className="filter_item">
+                <ThemeDropdown />
+              </div>
+            </div>
+          </div>
         </div>
         <div className="box_site">
           <div className="site">
