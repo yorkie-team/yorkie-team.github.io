@@ -15,8 +15,8 @@ type FeatureType = 'profile' | 'cursor' | 'selection' | 'editing';
 const sampleCode = `import yorkie from 'yorkie-js-sdk';
 
 async function main() {
-  const client = new yorkie.Client('xxxx', {
-    apiKey: 'xxxx',
+  const client = new yorkie.Client('${process.env.NEXT_PUBLIC_API_ADDR}', {
+    apiKey: 'MY_API_KEY',
   });
   await client.activate();
 
@@ -93,8 +93,8 @@ const Home: NextPage = () => {
                 powerful, high-performance collaborative features in no time.
               </p>
               <Button.Box>
-                <Button as="link" href="/docs/quick-start" className="orange_0" icon={<Icon type="book" />}>
-                  Quick start guide
+                <Button as="link" href="/docs/getting-started" className="orange_0" icon={<Icon type="book" />}>
+                  Getting Started
                 </Button>
                 <Button as="link" href="/docs" outline icon={<Icon type="book" />}>
                   Read documentation
@@ -180,10 +180,7 @@ const Home: NextPage = () => {
               <CodeBlockHeader>
                 <CodeBlockHeader.LeftBox>
                   <button type="button" className="btn_item is_active">
-                    React
-                  </button>
-                  <button type="button" className="btn_item">
-                    Redux
+                    JS SDK
                   </button>
                 </CodeBlockHeader.LeftBox>
                 <CodeBlockHeader.RightBox>
@@ -235,7 +232,7 @@ const Home: NextPage = () => {
                     peer&apos;s awareness of the data being edited. It is used to track which users are currently
                     editing the document.
                   </p>
-                  <Button as="link" href="/products#multiplayer" className="gray800" icon={<Icon type="book" />}>
+                  <Button as="link" href="/products#document-and-presence" className="gray800" icon={<Icon type="book" />}>
                     Learn more about Document and Presence
                   </Button>
                 </div>
@@ -253,11 +250,11 @@ const Home: NextPage = () => {
                   </p>
                   <Button
                     as="link"
-                    href="/products#real-time-monitoring"
+                    href="/products#dashboard"
                     className="gray800"
                     icon={<Icon type="book" />}
                   >
-                    Learn more about Data Warehouse with Dashboard
+                    Learn more about Dashboard
                   </Button>
                 </div>
               </li>
@@ -273,7 +270,7 @@ const Home: NextPage = () => {
                     Yorkie has you covered.
                   </p>
                   <Button as="link" href="/products#self-hosted-server" className="gray800" icon={<Icon type="book" />}>
-                    Learn more about Cloud or Self-Hosted Server
+                    Learn more about Self-Hosted Server
                   </Button>
                 </div>
               </li>

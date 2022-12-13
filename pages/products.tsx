@@ -10,21 +10,13 @@ import ProductPCSVG from '@/public/assets/images/banner/img_product_pc.svg';
 import ProductMobileSVG from '@/public/assets/images/banner/img_product_mobile.svg';
 import ProductPackageSVG from '@/public/assets/images/banner/img_product_package.svg';
 
-const sampleCode = `// Text provides supports for collaborative plain text editing.
+const textCode = `// Text provides supports for collaborative plain text editing.
 // It also has selection information for sharing the cursor position.
 doc.update((root) => {
   root.text = new yorkie.Text();  // {"text":""}
   root.text.edit(0, 0, 'hello');  // {"text":"hello"}
   root.text.edit(0, 1, 'H');      // {"text":"Hello"}
   root.text.select(0, 1);         // {"text":"^H^ello"}
-});
-
-// Counter supports numeric types that change with addition and subtraction.
-doc.update((root) => {
-  root.counter = new yorkie.Counter(1);     // {"counter":1}
-  root.counter.increase(2);                 // {"counter":3}
-  root.counter.increase(3.5);               // {"counter":6.5}
-  root.counter.increase(-3.5);              // {"counter":3}
 });`;
 
 const Products: NextPage = () => {
@@ -37,16 +29,14 @@ const Products: NextPage = () => {
         <div className="top_banner_inner">
           <div className="title_group">
             <h2 className="title">
-              Easy integration,
+              Ship faster,
               <br />
-              continuous
-              <br className="br_mo" /> management
+              Stay in control
             </h2>
             <p className="desc">
-              Yorkie provides synchronization primitives such as JSON-like document and Peer
-              <br className="br_pc" /> Awareness API.
-              <br className="br_tablet" /> It also provides Admin API to manage documents as a document
-              <br className="br_pc" /> store.
+              Yorkie provides synchronization primitives such as JSON-like document <br className="br_pc" />
+              and Peer Awareness API. Dashboard allows for efficient management of documents <br className="br_pc" />
+              as a document store.
             </p>
             <Button.Box>
               <Button as="a" href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup`} className="orange_0 btn_start" icon={<Icon type="star" />}>
@@ -63,26 +53,24 @@ const Products: NextPage = () => {
         <section className="section">
           <div className="section_title_wrap">
             <h2 className="section_title" id="multiplayer">
-              <a href="#multiplayer">
+              <a href="#document-and-presence">
                 Turn anything <br />
                 into multiplayer.
               </a>
             </h2>
             <p className="section_desc">
-              Yorkie cloud services let you build any multiplayer product without investing time and money in database
-              configuration and conflict management tasks.
+              Yorkie allow you to build multiplayer products without the need for database configuration
+              and conflict management. This saves time and money.
             </p>
           </div>
           <div className="section_content conflict_free">
             <strong className="sub_title" id="conflict-free-state-sharing">
-              <a href="#conflict-free-state-sharing">Conflict-free state sharing</a>
+              Conflict-free state sharing
             </strong>
             <p className="sub_desc">
-              Yorkie implements real-time collaboration based on the CRDT algorithm. CRDT is formed in solid and clean
-              architecture, effectively resolving conflicts when editing multiple concurrent data, much better than
-              Operational Transformation(OT). It has been known that some OT algorithms are more complex than CRDT and
-              cannot satisfy the convergence after publication. which would be difficult to use. Yorkie uses the
-              well-proven CRDT algorithm to achieve reliable services.
+              Yorkie implements real-time collaboration based on the Conflict-free Replicated Data Type(CRDT) algorithm.
+              CRDTs offer a clean and reliable way to resolve conflicts when editing concurrent data, unlike Operational Transformation(OT) algorithms
+              which can be complex and may not always ensure convergence. Yorkie&apos;s use of the well-proven CRDT algorithm ensures reliable services.
             </p>
             <div className="img_box">
               <StateSharingDetailMotion />
@@ -90,28 +78,33 @@ const Products: NextPage = () => {
           </div>
           <div className="section_content">
             <strong className="sub_title" id="flexible-database">
-              <a href="#flexible-database">Flexible database</a>
+              Document
             </strong>
             <p className="sub_desc">
-              While some CRDT libraries only provide basic datatypes which is very difficult to represent complex models
-              of applications, Yorkie provides a general purpose JSON-like documents to unleash the limitation.
+              Yorkie provides a general-purpose JSON-like <Link href="/docs/js-sdk#document">document</Link> to enable complex application models while some CRDT libraries that only offer basic data types.
             </p>
             <div className="db_content">
               <CodeBlock.Wrapper>
                 <CodeBlockHeader>
                   <CodeBlockHeader.LeftBox>
+                    <button type="button" className="btn_item">
+                      Object
+                    </button>
                     <button type="button" className="btn_item is_active">
                       Text
                     </button>
                     <button type="button" className="btn_item">
-                      Board
+                      RichText
+                    </button>
+                    <button type="button" className="btn_item">
+                      Counter
                     </button>
                   </CodeBlockHeader.LeftBox>
                   <CodeBlockHeader.RightBox>
-                    <CodeBlockHeader.CopyButton value={sampleCode} />
+                    <CodeBlockHeader.CopyButton value={textCode} />
                   </CodeBlockHeader.RightBox>
                 </CodeBlockHeader>
-                <CodeBlock code={sampleCode} language="javascript" withLineNumbers />
+                <CodeBlock code={textCode} language="javascript" withLineNumbers />
               </CodeBlock.Wrapper>
               <div className="img_box">
                 <FlexibleDocumentMotion />
@@ -120,11 +113,10 @@ const Products: NextPage = () => {
           </div>
           <div className="section_content collaboration">
             <strong className="sub_title" id="collaboration-awareness">
-              <a href="#collaboration-awareness">Collaboration Awareness</a>
+              <a href="#collaboration-awareness">Presence</a>
             </strong>
             <p className="sub_desc">
-              Yorkie recognizes all users as soon as they log in and tracks their availability and behavior. Make your
-              users feel like they&apos;re together.
+              You can build a sense of presence by tracking the status of users who are editing the same document with Presence.
             </p>
             <div className="img_group">
               <div className="img_box">
@@ -141,32 +133,32 @@ const Products: NextPage = () => {
             </strong>
             <ul className="product_card_list">
               <li className="product_card_item">
-                <strong className="product_card_title">Size management</strong>
+                <strong className="product_card_title">SDKs for Mobile &amp; Web</strong>
                 <p className="product_card_desc">
-                  Yorkie uses ‘Garbage collection’ and ‘Lamport timestamp’ to keep smaller document sizes.
+                  Yorkie SDKs support development for <Link href="/docs/ios-sdk">iOS</Link>, <Link href="/docs/android-sdk">Android</Link> and <Link href="/docs/js-sdk">Web</Link> applications.
                 </p>
               </li>
               <li className="product_card_item">
-                <strong className="product_card_title">Auth Webhook</strong>
+                <strong className="product_card_title">Size optimization</strong>
                 <p className="product_card_desc">
-                  Check from an external service that the client is authorized to the document.
+                  Yorkie uses <Link href="/docs/internals#garbage-collection">Garbage Collection</Link> and <a href="https://en.wikipedia.org/wiki/Lamport_timestamp">Lamport timestamps</a> to reduce the size of documents.
                 </p>
               </li>
               <li className="product_card_item">
-                <strong className="product_card_title">App &amp; Web SDK</strong>
-                <p className="product_card_desc">Support development for both mobile apps and the web.</p>
+                <strong className="product_card_title">Security</strong>
+                <p className="product_card_desc">
+                  <Link href="/docs/project#auth-webhook">Auth Webhook</Link> allows users to verify the authorization of clients to access documents from an external service.
+                </p>
               </li>
             </ul>
           </div>
         </section>
         <section className="section">
           <div className="section_title_wrap">
-            <h2 className="section_title" id="real-time-monitoring">
-              <a href="#real-time-monitoring">
-                Real-time monitoring
-                <br />
-                anytime, anywhere.
-              </a>
+            <h2 className="section_title" id="dashboard">
+              Real-time monitoring
+              <br />
+              anytime, anywhere.
             </h2>
             <p className="section_desc">
               Dashboard allows project members to browse stored documents and supervise the data warehouse easily.
@@ -176,7 +168,7 @@ const Products: NextPage = () => {
             <Icon type="cloud" />
             Dashboard
           </strong>
-          <p className="sub_big_desc">Dashboard is available on any device, and no installation is required.</p>
+          <p className="sub_big_desc">Dashboard in Cloud is accessible from any device without the need for installation.</p>
           <div className="house_content">
             <div className="img_box shadow_l img_pc">
               <ProductPCSVG />
@@ -189,10 +181,10 @@ const Products: NextPage = () => {
         <section className="section">
           <div className="section_title_wrap">
             <h2 className="section_title" id="self-hosted-server">
-              <a href="#build-local-server">
+              <a href="#self-hosted-server">
                 Build your own
                 <br />
-                Yorkie
+                Cluster
               </a>
             </h2>
             <p className="section_desc">
@@ -203,7 +195,7 @@ const Products: NextPage = () => {
             <div className="sub_title_wrap">
               <strong className="sub_big_title">
                 <Icon type="package" />
-                Yorkie open source package
+                Yorkie open-source package
               </strong>
             </div>
             <Link href="/docs/server" className="btn gray800">
@@ -211,8 +203,7 @@ const Products: NextPage = () => {
               <span className="text">How to build self-hosted server</span>
             </Link>
             <p className="sub_big_desc">
-              Yorkie open source package contains SDKs, a server, and a DB, enabling the implementation of the
-              co-editing feature with less effort.
+              Yorkie open-source package includes SDKs, a server, and a database, making it easy to implement the co-editing feature.
             </p>
             <div className="img_box">
               <ProductPackageSVG />

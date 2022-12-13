@@ -40,18 +40,13 @@ export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement
             </strong>
             <ul className="site_list">
               <li className="site_item">
-                <Link href="/products#conflict-free-state-sharing" className="link">
-                  Conflict-free State sharing
+                <Link href="/products#document-and-presence" className="link">
+                  Document and Presence
                 </Link>
               </li>
               <li className="site_item">
-                <Link href="/products#collaboration-awareness" className="link">
-                  Collaboration awareness
-                </Link>
-              </li>
-              <li className="site_item">
-                <Link href="/products#real-time-monitoring" className="link">
-                  Real-time monitoring
+                <Link href="/products#dashboard" className="link">
+                  Dashboard
                 </Link>
               </li>
               <li className="site_item">
@@ -74,8 +69,8 @@ export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement
                 </Link>
               </li>
               <li className="site_item">
-                <Link href="/docs/quick-start" className="link">
-                  Quick Start
+                <Link href="/docs/getting-started" className="link">
+                  Getting Started
                 </Link>
               </li>
               <li className="site_item">
@@ -91,11 +86,6 @@ export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement
               <li className="site_item">
                 <Link href="/docs/android-sdk" className="link">
                   Android SDK
-                </Link>
-              </li>
-              <li className="site_item">
-                <Link href="/docs/project" className="link">
-                  Project
                 </Link>
               </li>
             </ul>

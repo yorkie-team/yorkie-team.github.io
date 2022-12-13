@@ -9,8 +9,8 @@ const sampleCode = `<div>There are currently <span id='peersCount'></span> peers
 <script src="https://cdnjs.cloudflare.com/ajax/libs/yorkie-js-sdk/0.2.16/yorkie-js-sdk.js"></script>
 <script>
   async function main() {
-    const client = new yorkie.Client('https://api.yorkie.dev', {
-      apiKey: 'http://localhost:8080',
+    const client = new yorkie.Client('${process.env.NEXT_PUBLIC_API_ADDR}', {
+      apiKey: 'MY_API_KEY',
     });
     await client.activate();
 
