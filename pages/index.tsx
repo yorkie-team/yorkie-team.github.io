@@ -92,8 +92,8 @@ const Home: NextPage = () => {
                 Easily add collaboration to your apps with our API-based services. <br /> Sign up now and start building powerful, high-performance collaborative features in no time.
               </p>
               <Button.Box>
-                <Button as="link" href="/docs/quick-start" className="orange_0" icon={<Icon type="book" />}>
-                  Quick start guide
+                <Button as="link" href="/docs/getting-started" className="orange_0" icon={<Icon type="book" />}>
+                  Getting Started
                 </Button>
                 <Button as="link" href="/docs" outline icon={<Icon type="book" />}>
                   Read documentation

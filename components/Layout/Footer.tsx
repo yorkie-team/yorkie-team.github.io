@@ -69,8 +69,8 @@ export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement
                 </Link>
               </li>
               <li className="site_item">
-                <Link href="/docs/quick-start" className="link">
-                  Quick Start
+                <Link href="/docs/getting-started" className="link">
+                  Getting Started
                 </Link>
               </li>
               <li className="site_item">

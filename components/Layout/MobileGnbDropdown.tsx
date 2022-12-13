@@ -72,12 +72,12 @@ export function MobileGnbDropdown({isLoggedIn} : {
                   </li>
                   <li className="navigator_group">
                     <Link
-                      href="/docs/quick-start"
+                      href="/docs/getting-started"
                       className={classNames('navigator_item', 'add_icon', {
-                        is_active: asPath.startsWith(`/docs/quick-start`),
+                        is_active: asPath.startsWith(`/docs/getting-started`),
                       })}
                     >
-                      Quick Start
+                      Getting Started
                     </Link>
                   </li>
                   <li className="navigator_group">
