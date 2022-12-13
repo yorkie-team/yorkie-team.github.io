@@ -15,8 +15,8 @@ type FeatureType = 'profile' | 'cursor' | 'selection' | 'editing';
 const sampleCode = `import yorkie from 'yorkie-js-sdk';
 
 async function main() {
-  const client = new yorkie.Client('xxxx', {
-    apiKey: 'xxxx',
+  const client = new yorkie.Client('${process.env.NEXT_PUBLIC_API_ADDR}', {
+    apiKey: 'MY_API_KEY',
   });
   await client.activate();
 
@@ -177,10 +177,7 @@ const Home: NextPage = () => {
               <CodeBlockHeader>
                 <CodeBlockHeader.LeftBox>
                   <button type="button" className="btn_item is_active">
-                    React
-                  </button>
-                  <button type="button" className="btn_item">
-                    Redux
+                    JS SDK
                   </button>
                 </CodeBlockHeader.LeftBox>
                 <CodeBlockHeader.RightBox>
@@ -232,7 +229,7 @@ const Home: NextPage = () => {
                     Document is stored using conflict-free replicated data types(CRDTs), which ensures that multiple users can edit the same data concurrently without encountering conflicts.
                     Presence represents a peer&apos;s awareness of the data being edited. It is used to track which users are currently editing the document.
                   </p>
-                  <Button as="link" href="/products#multiplayer" className="gray800" icon={<Icon type="book" />}>
+                  <Button as="link" href="/products#document-and-presence" className="gray800" icon={<Icon type="book" />}>
                     Learn more about Document and Presence
                   </Button>
                 </div>
@@ -249,11 +246,11 @@ const Home: NextPage = () => {
                   </p>
                   <Button
                     as="link"
-                    href="/products#real-time-monitoring"
+                    href="/products#dashboard"
                     className="gray800"
                     icon={<Icon type="book" />}
                   >
-                    Learn more about Data Warehouse with Dashboard
+                    Learn more about Dashboard
                   </Button>
                 </div>
               </li>
@@ -268,7 +265,7 @@ const Home: NextPage = () => {
                     Whether you want the convenience of cloud or the control of a self-hosted server, Yorkie has you covered.
                   </p>
                   <Button as="link" href="/products#self-hosted-server" className="gray800" icon={<Icon type="book" />}>
-                    Learn more about Cloud or Self-Hosted Server
+                    Learn more about Self-Hosted Server
                   </Button>
                 </div>
               </li>

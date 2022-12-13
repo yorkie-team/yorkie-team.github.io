@@ -140,24 +140,6 @@ export function MobileGnbDropdown({isLoggedIn} : {
                       Internals
                     </Link>
                   </li>
-                  <li className="navigator_group">
-                    <Link href="/docs/sample" className="navigator_menu is_active">
-                      <Icon type="arrow" />
-                      Docs-Sample
-                    </Link>
-                    <ul className="navigator_list">
-                      <li className="navigator_group">
-                        <Link
-                          href="/docs/sample/sample-nested"
-                          className={classNames('navigator_item', {
-                            is_active: asPath.startsWith(`/docs/sample/sample-nested`),
-                          })}
-                        >
-                          Docs-Sample nested
-                        </Link>
-                      </li>
-                    </ul>
-                  </li>
                 </ul>
               </nav>
             </li>
