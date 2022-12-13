@@ -70,7 +70,7 @@ const Products: NextPage = () => {
             <p className="sub_desc">
               Yorkie implements real-time collaboration based on the Conflict-free Replicated Data Type(CRDT) algorithm.
               CRDTs offer a clean and reliable way to resolve conflicts when editing concurrent data, unlike Operational Transformation(OT) algorithms
-              which can be complex and may not always ensure convergence. Yorkie's use of the well-proven CRDT algorithm ensures reliable services.
+              which can be complex and may not always ensure convergence. Yorkie&apos;s use of the well-proven CRDT algorithm ensures reliable services.
             </p>
             <div className="img_box">
               <StateSharingDetailMotion />

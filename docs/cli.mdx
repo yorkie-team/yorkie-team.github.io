@@ -1,9 +1,107 @@
 ---
-title: 'Project'
+title: 'CLI'
 order: 60
 ---
 
-## Project
+## CLI
+
+CLI is a command-line interface for Yorkie. You can use CLI to manage your projects, documents or to start the server.
+
+### Getting started
+
+Let's get started with the CLI. There are two ways to install the CLI: pre-built binaries and Homebrew.
+
+#### Install pre-built binaries
+
+The easiest way to install Yorkie is from pre-built binaries:
+
+1. Download the compressed archive file for your platform from [Releases](https://github.com/yorkie-team/yorkie/releases).
+2. Unpack the archive file. This results in a directory containing the binaries.
+3. Add the executable binaries to your PATH. For example, rename and/or move the binaries to a directory in your PATH (like /usr/local/bin), or add the directory created from the previous step to your PATH.
+4. Test if Yorkie is in your PATH in shell:
+
+```bash
+$ yorkie version
+Yorkie: {{site.version}}
+Commit: ...
+Go: ...
+Build date: ...
+```
+
+#### Install via Homebrew
+
+[Homebrew](https://brew.sh/) is a free and open-source package management system for Mac OS X. Install the official [Yorkie formula](https://formulae.brew.sh/formula/yorkie) in Terminal.
+
+To update Yorkie to the latest version, update Homebrew first.
+
+```bash
+$ brew update
+```
+
+Now, install Yorkie.
+
+```bash
+$ brew install yorkie
+```
+
+Verify that the installation worked by opening a new Terminal session and trying Yorkie's available subcommands.
+
+```bash
+$ yorkie version
+Yorkie: {{site.version}}
+Commit: ...
+Go: ...
+Build date: ...
+```
+
+#### Commands
+
+Yorkie is just a single command-line application `yorkie`, which takes a subcommand such as `server`.
+
+The Yorkie CLI is a well-behaved command-line application. In erroneous cases, a non-zero exit status will be returned. It also responds to `-h` and `---help` as you'd most likely expect.
+
+To get help for any specific command, pass the `-h` flag to the relevant subcommand. For example, to see help about the `server` subcommand:
+
+```bash
+$ yorkie server --help
+Start Yorkie server
+
+Usage:
+  yorkie server [options] [flags]
+
+Flags:
+      --auth-webhook-cache-auth-ttl duration         TTL value to set when caching authorized webhook response. (default 10s)
+      --auth-webhook-cache-size int                  The cache size of the authorization webhook. (default 5000)
+      --auth-webhook-cache-unauth-ttl duration       TTL value to set when caching unauthorized webhook response. (default 10s)
+      --auth-webhook-max-retries uint                Maximum number of retries for an authorization webhook. (default 10)
+      --auth-webhook-max-wait-interval duration      Maximum wait interval for authorization webhook. (default 3s)
+      --backend-snapshot-interval uint               Interval of changes to create a snapshot. (default 1000)
+      --backend-snapshot-threshold uint              Threshold that determines if changes should be sent with snapshot when the number of changes is greater than this value. (default 500)
+      --backend-use-default-project                  Whether to use the default project. Even if public key is not provided from the client, the default project will be used for the request. (default true)
+  -c, --config string                                Config path
+      --enable-pprof                                 Enable runtime profiling data via HTTP server.
+      --etcd-dial-timeout duration                   ETCD's dial timeout (default 5s)
+      --etcd-endpoints strings                       Comma separated list of etcd endpoints
+      --etcd-lock-lease-time duration                ETCD's lease time for lock (default 30s)
+      --etcd-password string                         ETCD's password
+      --etcd-username string                         ETCD's user name
+  -h, --help                                         help for server
+      --housekeeping-candidates-limit int            candidates limit for a single housekeeping run (default 500)
+      --housekeeping-deactivate-threshold duration   time after which clients are considered deactivate (default 168h0m0s)
+      --housekeeping-interval duration               housekeeping interval between housekeeping runs (default 1m0s)
+  -l, --log-level string                             Log level: debug, info, warn, error, panic, fatal (default "info")
+      --mongo-connection-timeout duration            Mongo DB's connection timeout (default 5s)
+      --mongo-connection-uri string                  MongoDB's connection URI
+      --mongo-ping-timeout duration                  Mongo DB's ping timeout (default 5s)
+      --mongo-yorkie-database string                 Yorkie's database name in MongoDB (default "yorkie-meta")
+      --profiling-port int                           Profiling port (default 11102)
+      --rpc-cert-file string                         RPC certification file's path
+      --rpc-key-file string                          RPC key file's path
+      --rpc-max-requests-bytes uint                  Maximum client request size in bytes the server will accept. (default 4194304)
+      --rpc-port int                                 RPC port (default 11101)
+```
+
+### Project
 
 Project represents your service or application in Yorkie. Separate Projects can exist within a single application. You can add more Projects as needed, for example, if you want to manage [auth webhook](/docs/project#auth-webhook) and documents for specific purposes.
 
@@ -27,7 +125,7 @@ Flags:
 Use "yorkie project [command] --help" for more information about a command.
 ```
 
-### Listing Projects
+#### Listing Projects
 
 You can list Projects on the server using `ls`.
 
@@ -39,7 +137,7 @@ $ yorkie project ls
 
 _Server creates a `default project` automatically. If you create a Client without apiKey, the Client is created in the default Project._
 
-### Creating a Project
+#### Creating a Project
 
 You can create a new Project with a name using `create`.
 
@@ -58,7 +156,7 @@ const client = new yorkie.Client('localhost:8080', {
 
 Then Documents attached to the Client are isolated and stored in the Project.
 
-### Updating the Project
+#### Updating the Project
 
 You can update the Project on the server using `update`.
 
@@ -82,7 +180,7 @@ $ yorkie project update test-project --name new-test-project
 {"id":"627c9125d02654d3f0f769d8","name":"new-test-project","auth_webhook_url":"http://localhost:3000/webhook","auth_webhook_methods":["AttachDocument","WatchDocuments"],"public_key":"cblt65lcefodjh0aeakg","secret_key":"cblt65lcefodjh0aeal0","created_at":"2022-05-12T04:46:29.781052056Z","updated_at":"2022-08-11T14:58:22.11Z"}
 ```
 
-### Auth Webhook
+#### Auth Webhook
 
 A webhook is an HTTP POST that is called when something happens. If the Auth Webhook has been configured, when a Server receives a request from a Client, the Server checks if the Client has been authorized for a certain Document by asking an outside service with a REST request.
 
