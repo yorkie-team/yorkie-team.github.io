@@ -22,8 +22,9 @@ const Home: NextPage = () => {
       const $visual = document.querySelector('.kv_bg svg') as HTMLElement;
       if (!$visual) return;
 
-      const visualWidth = (1512 * (window.innerHeight - 64)) / 868;
-      const scale = window.innerWidth / visualWidth;
+      const SVG_ASPECT_RATIO = 1512 / 868;
+      const HEADER_HEIGHT = 64;
+      const scale = window.innerWidth / ((window.innerHeight - HEADER_HEIGHT) * SVG_ASPECT_RATIO);
       $visual.style.setProperty('--scale', scale < 1 ? '1' : `${scale}`);
     };
     window.addEventListener('resize', handleVisualSize);
