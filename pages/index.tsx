@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import type { NextPage } from 'next';
 import Head from 'next/head';
@@ -16,6 +16,24 @@ const Home: NextPage = () => {
   const [bannerActive, setBannerActive] = useState(false);
   const [activeFeatureCard, setActiveFeatureCard] = useState<FeatureType>('profile');
   const [activeFeatureCode, setActiveFeatureCode] = useState({ type: 'js', info: FEATURES_CODE.profile.js });
+
+  useEffect(() => {
+    const handleVisualSize = () => {
+      const $visual = document.querySelector('.kv_bg svg') as HTMLElement;
+      if (!$visual) return;
+
+      const SVG_ASPECT_RATIO = 1512 / 868;
+      const HEADER_HEIGHT = 64;
+      const scale = window.innerWidth / ((window.innerHeight - HEADER_HEIGHT) * SVG_ASPECT_RATIO);
+      $visual.style.setProperty('--scale', scale < 1 ? '1' : `${scale}`);
+    };
+    window.addEventListener('resize', handleVisualSize);
+    handleVisualSize();
+
+    return () => {
+      window.removeEventListener('resize', handleVisualSize);
+    };
+  }, []);
 
   // TODO(hackerwins): Remove examples condition when examples are ready.
   return (
