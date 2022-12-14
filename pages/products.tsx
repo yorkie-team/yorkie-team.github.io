@@ -82,8 +82,11 @@ const Products: NextPage = () => {
               Document
             </strong>
             <p className="sub_desc">
-              Yorkie provides a general-purpose JSON-like <Link href="/docs/js-sdk#document">document</Link> to enable
-              complex application models while some CRDT libraries that only offer basic data types.
+              Yorkie provides a general-purpose JSON-like{' '}
+              <Link href="/docs/js-sdk#document" className="link">
+                Document
+              </Link>{' '}
+              to enable complex application models while some CRDT libraries that only offer basic data types.
             </p>
             <div className="db_content">
               <CodeBlock.Wrapper>
@@ -162,23 +165,42 @@ const Products: NextPage = () => {
               <li className="product_card_item">
                 <strong className="product_card_title">SDKs for Mobile &amp; Web</strong>
                 <p className="product_card_desc">
-                  Yorkie SDKs support development for <Link href="/docs/ios-sdk">iOS</Link>,{' '}
-                  <Link href="/docs/android-sdk">Android</Link> and <Link href="/docs/js-sdk">Web</Link> applications.
+                  Yorkie SDKs support development for{' '}
+                  <Link href="/docs/ios-sdk" className="link">
+                    iOS
+                  </Link>
+                  ,{' '}
+                  <Link href="/docs/android-sdk" className="link">
+                    Android
+                  </Link>{' '}
+                  and{' '}
+                  <Link href="/docs/js-sdk" className="link">
+                    Web
+                  </Link>{' '}
+                  applications.
                 </p>
               </li>
               <li className="product_card_item">
                 <strong className="product_card_title">Size optimization</strong>
                 <p className="product_card_desc">
-                  Yorkie uses <Link href="/docs/internals#garbage-collection">Garbage Collection</Link> and
-                  <a href="https://en.wikipedia.org/wiki/Lamport_timestamp">Lamport timestamps</a> to reduce the size of
-                  documents.
+                  Yorkie uses{' '}
+                  <Link href="/docs/internals#garbage-collection" className="link">
+                    Garbage Collection
+                  </Link>{' '}
+                  and{' '}
+                  <a href="https://en.wikipedia.org/wiki/Lamport_timestamp" className="link">
+                    Lamport timestamps
+                  </a>{' '}
+                  to reduce the size of documents.
                 </p>
               </li>
               <li className="product_card_item">
                 <strong className="product_card_title">Security</strong>
                 <p className="product_card_desc">
-                  <Link href="/docs/project#auth-webhook">Auth Webhook</Link> allows users to verify the authorization
-                  of clients to access documents from an external service.
+                  <Link href="/docs/project#auth-webhook" className="link">
+                    Auth Webhook
+                  </Link>{' '}
+                  allows users to verify the authorization of clients to access documents from an external service.
                 </p>
               </li>
             </ul>
