@@ -19,7 +19,7 @@ export type PrismCodeProps = {
 
 export function PrismCode({ code, language, withLineNumbers }: PrismCodeProps) {
   return (
-    <Highlight {...defaultProps} code={code} theme={theme} language={language}>
+    <Highlight {...defaultProps} code={code.trim()} theme={theme} language={language}>
       {({ className, tokens, getLineProps, getTokenProps }) => (
         <pre className={className}>
           {tokens.map((line, i) => (

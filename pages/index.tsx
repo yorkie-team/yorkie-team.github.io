@@ -2,7 +2,6 @@ import { useState } from 'react';
 import classNames from 'classnames';
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import Link from 'next/link';
 import { Layout, Button, Icon, CodeBlock, CodeBlockHeader, Accordion } from '@/components';
 import { ChartMotion, StateSharingMotion, ServerMotion, MainBannerMotion } from '@/components/motions';
 import UserGroupSVG from '@/public/assets/icons/icon_service_main_users_group.svg';
@@ -10,31 +9,13 @@ import CollaboProfileSVG from '@/public/assets/icons/icon_collaborate_profile.sv
 import CollaboCursorSVG from '@/public/assets/icons/icon_collaborate_cursor.svg';
 import CollaboSelectionSVG from '@/public/assets/icons/icon_collaborate_selection.svg';
 import CollaboEditingSVG from '@/public/assets/icons/icon_collaborate_editing.svg';
+import { FEATURES_CODE } from '@/codes/features';
 
-type FeatureType = 'profile' | 'cursor' | 'selection' | 'editing';
-const sampleCode = `import yorkie from 'yorkie-js-sdk';
-
-async function main() {
-  const client = new yorkie.Client('${process.env.NEXT_PUBLIC_API_ADDR}', {
-    apiKey: 'MY_API_KEY',
-  });
-  await client.activate();
-
-  const doc = new yorkie.Document('my-first-document');
-  await client.attach(doc);
-
-  client.subscribe((event) => {
-    if (event.type === 'peers-changed') {
-      const peers = event.value[doc.getKey()];
-      document.getElementById('peersCount').innerHTML = Object.entries(peers).length;
-    }
-  });
-}
-main();`;
-
+type FeatureType = keyof typeof FEATURES_CODE;
 const Home: NextPage = () => {
   const [bannerActive, setBannerActive] = useState(false);
   const [activeFeatureCard, setActiveFeatureCard] = useState<FeatureType>('profile');
+  const [activeFeatureCode, setActiveFeatureCode] = useState({ type: 'js', info: FEATURES_CODE.profile.js });
 
   // TODO(hackerwins): Remove examples condition when examples are ready.
   return (
@@ -123,7 +104,13 @@ const Home: NextPage = () => {
                 const target = (e.target as Element).closest('.service_card_menu');
                 if (!target) return;
 
-                setActiveFeatureCard(target.getAttribute('data-item') as FeatureType);
+                const featureType = target.getAttribute('data-item') as FeatureType;
+                const codeType = FEATURES_CODE[featureType].tabOrder[0];
+                setActiveFeatureCard(featureType);
+                setActiveFeatureCode({
+                  type: codeType,
+                  info: (FEATURES_CODE[featureType] as any)[codeType],
+                });
               }}
             >
               <li className={classNames('service_card_item', { is_active: activeFeatureCard === 'profile' })}>
@@ -179,15 +166,31 @@ const Home: NextPage = () => {
             <CodeBlock.Wrapper>
               <CodeBlockHeader>
                 <CodeBlockHeader.LeftBox>
-                  <button type="button" className="btn_item is_active">
-                    JS SDK
-                  </button>
+                  {FEATURES_CODE[activeFeatureCard].tabOrder.map((codeType) => (
+                    <button
+                      type="button"
+                      key={codeType}
+                      className={classNames('btn_item', { is_active: activeFeatureCode.type === codeType })}
+                      onClick={() =>
+                        setActiveFeatureCode({
+                          type: codeType,
+                          info: (FEATURES_CODE[activeFeatureCard] as any)[codeType],
+                        })
+                      }
+                    >
+                      {(FEATURES_CODE[activeFeatureCard] as any)[codeType].title}
+                    </button>
+                  ))}
                 </CodeBlockHeader.LeftBox>
                 <CodeBlockHeader.RightBox>
-                  <CodeBlockHeader.CopyButton value={sampleCode} />
+                  <CodeBlockHeader.CopyButton value={activeFeatureCode.info.code} />
                 </CodeBlockHeader.RightBox>
               </CodeBlockHeader>
-              <CodeBlock code={sampleCode} language="javascript" withLineNumbers />
+              <CodeBlock
+                code={activeFeatureCode.info.code}
+                language={activeFeatureCode.info.language as any}
+                withLineNumbers
+              />
             </CodeBlock.Wrapper>
           </div>
         </section>
@@ -232,7 +235,12 @@ const Home: NextPage = () => {
                     peer&apos;s awareness of the data being edited. It is used to track which users are currently
                     editing the document.
                   </p>
-                  <Button as="link" href="/products#document-and-presence" className="gray800" icon={<Icon type="book" />}>
+                  <Button
+                    as="link"
+                    href="/products#document-and-presence"
+                    className="gray800"
+                    icon={<Icon type="book" />}
+                  >
                     Learn more about Document and Presence
                   </Button>
                 </div>
@@ -248,12 +256,7 @@ const Home: NextPage = () => {
                     real-time. With Dashboard, users can quickly and easily supervise the data warehouse and ensure that
                     it is functioning properly.
                   </p>
-                  <Button
-                    as="link"
-                    href="/products#dashboard"
-                    className="gray800"
-                    icon={<Icon type="book" />}
-                  >
+                  <Button as="link" href="/products#dashboard" className="gray800" icon={<Icon type="book" />}>
                     Learn more about Dashboard
                   </Button>
                 </div>
