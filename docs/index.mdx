@@ -5,48 +5,46 @@ order: 10
 
 ## About Yorkie
 
-Yorkie is an open source document store for building collaborative applications such as [Google Docs](https://docs.google.com/) and [Figma](https://www.figma.com/). To achieve that, Yorkie provides synchronization primitives such as a JSON-like Document([CRDT](https://crdt.tech/)), [Peer Awareness](/docs/js-sdk#peer-awareness) and [Authentication](/docs/server#auth-webhook).
+Yorkie is an open-source document store that provides a suite of tools for building real-time collaborative applications like Google Docs and Figma. It includes a JSON-like Document based on Conflict-free Replicated Data Types(CRDTs), Presence, and auth webhook features to enable synchronous co-editing.
 
-Unlike libraries such as AutoMerge and Yjs, it contains SDKs, a server, and a DB, enabling the implementation of the co-editing feature with less effort.
+Unlike other libraries like AutoMerge and Yjs, Yorkie includes a full-stack solution with SDKs, Cloud or Self-Hosted Server, making it easier to implement co-editing capabilities in your application.
 
-Next, let's take a look at Yorkie's structure and how it works.
+In the following sections, we will explore the structure and workings of Yorkie in more detail.
 
 ### Components
 
-Yorkie consists of Clients, Documents, and a Server.
+Yorkie consists of three main components: Clients, Documents, and Server.
 
-- [Client](/docs/js-sdk#client): A Client is a normal client that can communicate with a Server. Changes on a Document can be synchronized by using a Client.
-- [Server](/docs/server): A Server receives changes from Clients, stores them in the DB, and propagates them to Clients who subscribe to Documents.
-- [Document](/docs/js-sdk#document): A Document is a CRDT-based data type through which the model of the application is represented. Clients can edit it even while offline.
-- [Project](/docs/cli#project): A Project represents services or applications in Yorkie. Separate Projects can exist within a single application.
+- [Client](/docs/js-sdk#client)s are the entities that communicate with the server. Changes made by documents can be synchronized with the server, allowing for real-time collaboration.
+- [Document](/docs/js-sdk#document)s are the core data structures of Yorkie, and are based on Conflict-free Replicated Data Types(CRDTs). This allows for seamless collaboration on a document, even when clients are offline.
+- [Server](/docs/server) is the central hub of the Yorkie, receiving changes from clients, storing them in the database, and propagating them to other clients who are subscribed to the same documents.
+
+In addition, [Project](/docs/cli#project)s in Yorkie represent separate services or applications within the system. This allows for multiple independent projects to coexist within a single Yorkie installation.
+
+> Server can be used either in Cloud or Self-Hosted Server. <br/><br/> When using Yorkie in the cloud, you can access the API directly through the SDK without the need for server installation. For security reason, you can also build and operate a self-hosted Yorkie server.
 
 ### How it works
 
 A high-level overview of Yorkie is as follows:
 
 ```
- Client "A" (Go)                 Server                       MemDB or MongoDB
-┌───────────────────┐           ┌────────────────────────┐   ┌───────────┐
-│  Document "D-1"   │◄─Changes─►│  Project "p-1"         │   │ Changes   │
-│  { a: 1, b: {} }  │           │ ┌───────────────────┐  │◄─►│ Snapshots │
-└───────────────────┘           │ │  Document "D-1"   │  │   └───────────┘
+ Client "A" (Go)                 Cloud or Self-Hosted Server     MemDB or MongoDB
+┌───────────────────┐           ┌────────────────────────┐      ┌───────────┐
+│  Document "D-1"   │◄─Changes─►│  Project "p-1"         │      │ Changes   │
+│  { a: 1, b: {} }  │           │ ┌───────────────────┐  │◄────►│ Snapshots │
+└───────────────────┘           │ │  Document "D-1"   │  │      └───────────┘
  Client "B" (JS)                │ │  { a: 2, b: {} }  │  │
 ┌───────────────────┐           │ │                   │  │
 │  Document "D-1"   │◄─Changes─►│ │  Document "D-2"   │  │
 │  { a: 2, b: {} }  │           │ │  { a: 3, b: {} }  │  │
 └───────────────────┘           │ └───────────────────┘  │
- Admin (CLI, Web)               │                        │
+ Dashboard or CLI               │                        │
 ┌───────────────────┐           └────────────────────────┘
 │  Query "Q-1"      │                 ▲
 │  P-1.find({a:2})  ├─────── Query────┘
 └───────────────────┘
 ```
 
-The overall flow is as follows:
+The Yorkie system allows clients to have replicas of a document, representing an application model, on multiple devices. Each client can edit the document independently on their local devices, even when offline. When a network connection is available, Yorkie determines which changes need to be synced between clients and brings their replicas into the same state. In the event that the document is being edited concurrently on different devices, Yorkie automatically syncs the changes and resolves any conflicts, ensuring that all replicas end up in the same state.
 
-- Clients can have a replica of a Document representing an application model locally on several devices.
-- Each Client can independently edit the Document on his or her local devices, even while offline.
-- When a network connection is available, Yorkie figures out which changes need to be synced from one Client to another, and brings them into the same state.
-- If the Document is being changed concurrently on different devices, Yorkie automatically syncs the changes so that every replica ends up in the same state with conflicts resolved.
-
-Next, let's see how to use Yorkie from [Getting Started](/docs/getting-started).
+To get started with Yorkie, please refer to the [Getting Started](/docs/getting-started).
