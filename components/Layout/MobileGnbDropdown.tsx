@@ -4,9 +4,7 @@ import Link from 'next/link';
 import classNames from 'classnames';
 import { Popover, Icon } from 'components';
 
-export function MobileGnbDropdown({isLoggedIn} : {
-  isLoggedIn: boolean;
-}) {
+export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
   const [gnbOpened, setGnbOpened] = useState(false);
   const [docsMenuOpened, setDocsMenuOpened] = useState(false);
   const { asPath } = useRouter();
@@ -50,7 +48,7 @@ export function MobileGnbDropdown({isLoggedIn} : {
                   setDocsMenuOpened((opened) => !opened);
                 }}
               >
-                <Icon type="arrow" className="icon_toggle"/>
+                <Icon type="arrow" className="icon_toggle" />
                 <span className="dropdown_text">Documentation</span>
               </button>
               <nav
@@ -143,18 +141,16 @@ export function MobileGnbDropdown({isLoggedIn} : {
                 </ul>
               </nav>
             </li>
-            {
-              process.env.NODE_ENV === 'development' && (
-                <li className="dropdown_item">
-                  <Link
-                    href="/examples"
-                    className={classNames('dropdown_menu', { is_active: asPath.split('#')[0] === '/examples' })}
-                  >
-                    <span className="dropdown_text">Example</span>
-                  </Link>
-                </li>
-              )
-            }
+            {process.env.NODE_ENV === 'development' && (
+              <li className="dropdown_item">
+                <Link
+                  href="/examples"
+                  className={classNames('dropdown_menu', { is_active: asPath.split('#')[0] === '/examples' })}
+                >
+                  <span className="dropdown_text">Example</span>
+                </Link>
+              </li>
+            )}
             <li className="dropdown_item">
               <Link
                 href="/community"
@@ -169,7 +165,9 @@ export function MobileGnbDropdown({isLoggedIn} : {
               <li className="dropdown_item">
                 <a
                   href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`}
-                  className={classNames('dropdown_menu', { is_active: asPath.split('#')[0] === `${process.env.NEXT_PUBLIC_DASHBOARD_PATH}` })}
+                  className={classNames('dropdown_menu', {
+                    is_active: asPath.split('#')[0] === `${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`,
+                  })}
                 >
                   <span className="dropdown_text">Dashboard</span>
                 </a>
@@ -179,7 +177,9 @@ export function MobileGnbDropdown({isLoggedIn} : {
                 <li className="dropdown_item">
                   <a
                     href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/login`}
-                    className={classNames('dropdown_menu', { is_active: asPath.split('#')[0] === `${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/login` })}
+                    className={classNames('dropdown_menu', {
+                      is_active: asPath.split('#')[0] === `${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/login`,
+                    })}
                   >
                     <span className="dropdown_text">Sign in</span>
                   </a>
@@ -187,7 +187,9 @@ export function MobileGnbDropdown({isLoggedIn} : {
                 <li className="dropdown_item">
                   <a
                     href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup`}
-                    className={classNames('dropdown_menu', { is_active: asPath.split('#')[0] === `${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup` })}
+                    className={classNames('dropdown_menu', {
+                      is_active: asPath.split('#')[0] === `${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup`,
+                    })}
                   >
                     <span className="dropdown_text">Start for free</span>
                   </a>
