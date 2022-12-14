@@ -1,13 +1,78 @@
-import { ExampleLayout } from '@/components';
-import { KanbanProject } from '@/components/BasicExampleCodes';
-import { BasicExampleView } from '@/components/BasicExampleView';
-import { FullView, Sidebar } from '@/components/exampleView';
-import { SimpleDualView } from '@/components/exampleView/SimpleDualView';
-import { NextPage } from 'next';
-import Head from 'next/head';
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
+import classNames from 'classnames';
+import { Icon, CodeBlock, Accordion } from '@/components';
+import { ProjectStructure } from '../BasicExampleCodes';
 
-const sampleCode = `<script>
+export function Sidebar({
+  defaultOpened = true,
+  title,
+  description,
+  code,
+}: {
+  defaultOpened?: boolean;
+  title: string;
+  description: string;
+  code: ProjectStructure;
+}) {
+  const [viewType, setViewType] = useState<'code' | 'documentStructure'>('code');
+  const [isOpened, setIsOpened] = useState<boolean>(defaultOpened);
+
+  useEffect(() => {
+    setIsOpened(defaultOpened);
+  }, [defaultOpened]);
+
+  return (
+    <div
+      className={classNames('sidebar', { type_shadow: !defaultOpened }, { is_hide: !isOpened })}
+      style={{ width: isOpened ? '50%' : undefined, minHeight: '100%' }}
+    >
+      <div className="sidebar_top">
+        <div className="codeblock_navigator">
+          <button
+            type="button"
+            onClick={() => {
+              setViewType('code');
+            }}
+            className={classNames('item', { is_active: viewType === 'code' })}
+          >
+            Code
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setViewType('documentStructure');
+            }}
+            className={classNames('item', { is_active: viewType === 'documentStructure' })}
+          >
+            Document Structure
+          </button>
+        </div>
+        <button type="button" className="btn btn_toggle" onClick={() => setIsOpened(!isOpened)}>
+          <Icon type="arrow" />
+          <span className="blind">Close sidebar</span>
+        </button>
+      </div>
+      {viewType === 'code' && (
+        <>
+          <div className="guide_box" style={{ display: 'flex', flexDirection: 'column' }}>
+            <h2 className="guide_title">{title}</h2>
+            <p className="guide_desc">{description}</p>
+            <div
+              style={{
+                display: isOpened ? 'block' : 'none',
+                borderRadius: 'none',
+                marginBottom: -31,
+                marginLeft: -31,
+                marginRight: -31,
+                backgroundColor: '#514C48',
+                color: 'white',
+                overflowY: 'auto',
+                padding: 0,
+                zIndex: 5,
+                boxSizing: 'border-box',
+              }}
+            >
+              {`<script>
 import yorkie from "yorkie-js-sdk";
 
 const defaultLists = [
@@ -195,52 +260,23 @@ export default {
     </div>
   </div>
 </template>
-`;
-
-export interface DocChangeInfo {
-  type: 'modification' | 'initialize';
-  path: string;
-}
-
-const KanbanExampleView: NextPage = () => {
-  const [docChangeInfos, setDocChangeInfos] = useState<DocChangeInfo[]>([]);
-  useEffect(() => {
-    const activate = async () => {
-      const yorkie = await import('yorkie-js-sdk');
-      const client = new yorkie.Client('https://api.yorkie.dev');
-      await client.activate();
-      const doc = new yorkie.Document('vuejs-kanban');
-      await client.attach(doc);
-      setDocChangeInfos((prev) => [...prev, { type: 'initialize', path: 'Connection has been established!' }]);
-      doc.subscribe((event) => {
-        if (event.type === 'remote-change') {
-          for (const changeInfo of event.value) {
-            for (const path of changeInfo.paths) {
-              setDocChangeInfos((prev) => [...prev, { type: 'modification', path }]);
-            }
-          }
-        }
-      });
-    };
-    activate();
-  }, []);
-  return (
-    <ExampleLayout breadcrumbTitle="Kanban Board" defaultViewType="split">
-      {({ viewType }) => (
-        <>
-          <Head>
-            <title>Kanban Board · Yorkie Examples</title>
-          </Head>
-          <BasicExampleView
-            yorkieClientAddress="https://api.yorkie.dev"
-            yorkieDocumentKey="vuejs-kanban"
-            projectStructure={KanbanProject}
-            iframeUrl="https://hunkim98.github.io/vuejs-kanban-yorkie/"
-          />
+`}
+            </div>
+          </div>
         </>
       )}
-    </ExampleLayout>
+      {viewType === 'documentStructure' && <div></div>}
+      <div className="sidebar_bottom" style={{ zIndex: 0 }}>
+        <div className="btn_box full_width">
+          <a href="#" className="btn gray600 ">
+            Github
+          </a>
+          <a href="#" className="btn gray900 btn_share">
+            Share to invite other
+          </a>
+        </div>
+        <p className="guide_desc">Last updated 4 days ago</p>
+      </div>
+    </div>
   );
-};
-
-export default KanbanExampleView;
+}
