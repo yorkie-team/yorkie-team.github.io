@@ -11,6 +11,7 @@ import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import rehypeToc, { HtmlElementNode, ListItemNode } from '@jsdevtools/rehype-toc';
 import rehypeImageMeta from '@/utils/rehypeImageMeta';
 import rehypeWrapContents from '@/utils/rehypeWrapContents';
+import rehypeVariables from '@/utils/rehypeVariables';
 import { Layout, Navigator, Button, Icon, CodeBlock, CodeBlockHeader, Image } from '@/components';
 import { CustomLink, CustomCodeBlock, Breadcrumb, Caption, ImageWrap, Alert, Blockquote } from '@/components/docs';
 
@@ -120,6 +121,15 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
       remarkPlugins: [remarkGfm],
       rehypePlugins: [
         rehypeImageMeta,
+        [
+          rehypeVariables,
+          {
+            variables: [
+              { pattern: 'API_ADDR', value: process.env.NEXT_PUBLIC_API_ADDR },
+              { pattern: 'SITE_VERSION', value: '1.0' },
+            ],
+          },
+        ],
         rehypeSlug,
         [
           rehypeAutolinkHeadings,

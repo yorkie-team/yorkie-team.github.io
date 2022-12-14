@@ -89,10 +89,10 @@ Then, the ports of the services are bound to the host environment.
 
 <Alert status="warning">Server stores its data using an in-memory DB, which does not provide durability. If you want to store data permanently, please refer to [Running Server With MongoDB](/docs/server#running-server-with-mongodb)</Alert>
 
-Now, let's create a Client with address `localhost:8080`.
+Now, let's create a Client with address `{{API_ADDR}}`.
 
 ```javascript
-const client = new yorkie.Client('localhost:8080');
+const client = new yorkie.Client('{{API_ADDR}}');
 await client.activate();
 ```
 
