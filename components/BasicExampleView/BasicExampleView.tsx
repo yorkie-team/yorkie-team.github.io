@@ -22,7 +22,6 @@ interface Props {
   projectCode: ProjectCode;
   documentStructure: string;
   iframeUrl: string;
-  defaultOpenFile: ProjectFile;
 }
 
 export const UserNames = {
@@ -43,7 +42,6 @@ export function BasicExampleView({
   yorkieDocumentKey,
   projectCode,
   iframeUrl,
-  defaultOpenFile,
   documentStructure,
   yorkieApiKey,
 }: Props) {
@@ -126,7 +124,6 @@ export function BasicExampleView({
         projectCodeState={projectCodeState}
         setProjectCodeState={setProjectCodeState}
         documentStructure={documentStructure}
-        defaultOpenFile={defaultOpenFile}
       />
       <div className="content code_view">
         <div className="pin_box">

@@ -11,7 +11,6 @@ export function Sidebar({
   description,
   projectCodeState,
   setProjectCodeState,
-  defaultOpenFile,
   documentStructure,
 }: {
   defaultOpened?: boolean;
@@ -19,7 +18,6 @@ export function Sidebar({
   description: string;
   projectCodeState: ProjectCode;
   setProjectCodeState: React.Dispatch<React.SetStateAction<ProjectCode>>;
-  defaultOpenFile: ProjectFile;
   documentStructure: string;
 }) {
   const [viewType, setViewType] = useState<'code' | 'documentStructure'>('code');
@@ -60,13 +58,7 @@ export function Sidebar({
       <div className="guide_box">
         <h2 className="guide_title">{title}</h2>
         <p className="guide_desc">{description}</p>
-        {viewType === 'code' && (
-          <ProjectCodes
-            code={projectCodeState}
-            defaultOpenFile={defaultOpenFile}
-            setProjectCodeState={setProjectCodeState}
-          />
-        )}
+        {viewType === 'code' && <ProjectCodes code={projectCodeState} setProjectCodeState={setProjectCodeState} />}
         {viewType === 'documentStructure' && (
           <div className="codeblock_box">
             <CodeBlock code={documentStructure} language="typescript" />

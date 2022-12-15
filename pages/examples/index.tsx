@@ -168,7 +168,7 @@ const Examples: NextPage = () => {
                 </div>
               </Link>
             </li>
-            <li className="grid_item">
+            {/* <li className="grid_item">
               <Link href="/examples/webtoons" className="grid_card">
                 <div className="grid_thumbnail">
                   <ExampleCreatingSVG />
@@ -336,7 +336,7 @@ const Examples: NextPage = () => {
                   </p>
                 </div>
               </a>
-            </li>
+            </li> */}
           </ul>
         </div>
       </div>

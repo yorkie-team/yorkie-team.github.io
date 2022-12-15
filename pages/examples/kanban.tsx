@@ -46,7 +46,6 @@ const KanbanExampleView: NextPage = () => {
             projectCode={KanbanProject}
             documentStructure={KanbanDocumentStructure}
             iframeUrl="https://yorkie.dev/yorkie-js-sdk/examples/vuejs-kanban/"
-            defaultOpenFile={KanbanProject.children[0].children?.[1] as ProjectFile}
           />
         </>
       )}

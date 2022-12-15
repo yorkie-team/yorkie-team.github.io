@@ -42,11 +42,10 @@ function SubProjectComponent({
 
 interface Props {
   code: ProjectCode;
-  defaultOpenFile: ProjectFile;
   setProjectCodeState: React.Dispatch<React.SetStateAction<ProjectCode>>;
 }
 
-function ProjectCodes({ code, defaultOpenFile, setProjectCodeState }: Props) {
+function ProjectCodes({ code, setProjectCodeState }: Props) {
   const recursiveFindOpen = useCallback((components: Array<ProjectFile | ProjectFolder>): ProjectFile | undefined => {
     for (let i = 0; i < components.length; i++) {
       const component = components[i];
