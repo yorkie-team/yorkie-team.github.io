@@ -52,27 +52,28 @@ export function Sidebar({
           <span className="blind">Close sidebar</span>
         </button>
       </div>
-      {viewType === 'code' && (
-        <>
-          <div className="guide_box" style={{ display: 'flex', flexDirection: 'column' }}>
-            <h2 className="guide_title">{title}</h2>
-            <p className="guide_desc">{description}</p>
-            <div
-              style={{
-                display: isOpened ? 'block' : 'none',
-                borderRadius: 'none',
-                marginBottom: -31,
-                marginLeft: -31,
-                marginRight: -31,
-                backgroundColor: '#514C48',
-                color: 'white',
-                overflowY: 'auto',
-                padding: 0,
-                zIndex: 5,
-                boxSizing: 'border-box',
-              }}
-            >
-              {`<script>
+
+      <div className="guide_box" style={{ display: isOpened ? 'flex' : 'none', flexDirection: 'column' }}>
+        <h2 className="guide_title">{title}</h2>
+        <p className="guide_desc">{description}</p>
+        {viewType === 'code' && (
+          <div
+            style={{
+              borderRadius: 'none',
+              marginBottom: -31,
+              marginLeft: -31,
+              marginRight: -31,
+              marginTop: 15,
+              backgroundColor: '#514C48',
+              color: 'white',
+              overflowY: 'auto',
+              height: '100%',
+              padding: 0,
+              zIndex: 5,
+              boxSizing: 'border-box',
+            }}
+          >
+            {`<script>
 import yorkie from "yorkie-js-sdk";
 
 const defaultLists = [
@@ -261,11 +262,27 @@ export default {
   </div>
 </template>
 `}
-            </div>
           </div>
-        </>
-      )}
-      {viewType === 'documentStructure' && <div></div>}
+        )}
+        {viewType === 'documentStructure' && (
+          <div
+            style={{
+              borderRadius: 'none',
+              marginBottom: -31,
+              marginLeft: -31,
+              marginRight: -31,
+              marginTop: 15,
+              backgroundColor: '#D9D9D9',
+              color: 'white',
+              overflowY: 'auto',
+              height: '100%',
+              padding: 0,
+              zIndex: 5,
+              boxSizing: 'border-box',
+            }}
+          ></div>
+        )}
+      </div>
       <div className="sidebar_bottom" style={{ zIndex: 0 }}>
         <div className="btn_box full_width">
           <a href="#" className="btn gray600 ">

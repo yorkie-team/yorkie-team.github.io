@@ -41,11 +41,8 @@ export const UserColors = {
 
 export function BasicExampleView({ yorkieClientAddress, yorkieDocumentKey, projectStructure, iframeUrl }: Props) {
   const [docChangeInfos, setDocChangeInfos] = useState<DocChangeInfo[]>([]);
-  const [usersCount, setUsersCount] = useState<number>(2);
-  const [userList, setUserList] = useState<('user1' | 'user2' | 'user3' | 'user4')[]>(['user1', 'user2']);
-  const pinList = useMemo(() => {
-    return Array.from({ length: usersCount }, (_, i) => `user${i + 1}` as 'user1' | 'user2' | 'user3' | 'user4');
-  }, [usersCount]);
+  const [userList, setUserList] = useState<('user1' | 'user2' | 'user3' | 'user4')[]>(['user1', 'user2', 'user3']);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const activate = async () => {
@@ -74,6 +71,37 @@ export function BasicExampleView({ yorkieClientAddress, yorkieDocumentKey, proje
   };
 
   useEffect(scrollToBottom, [docChangeInfos]);
+
+  const deleteUser = (userId: string) => {
+    if (userList.length === 1) {
+      alert('You need at least one user');
+      return;
+    }
+    setUserList((prev) => prev.filter((user) => user !== userId));
+  };
+
+  const addUser = () => {
+    if (userList.length === 4) {
+      alert("You can't add more users");
+      return;
+    }
+    if (userList[0] !== 'user1') {
+      setUserList((prev) => ['user1', ...prev]);
+      return;
+    }
+    if (userList[1] !== 'user2') {
+      setUserList((prev) => prev.slice(0, 1).concat(['user2']).concat(prev.slice(1)));
+      return;
+    }
+    if (userList[2] !== 'user3') {
+      setUserList((prev) => prev.slice(0, 2).concat(['user3']).concat(prev.slice(2)));
+      return;
+    }
+    if (userList[3] !== 'user4') {
+      setUserList((prev) => prev.slice(0, 3).concat(['user4']).concat(prev.slice(3)));
+      return;
+    }
+  };
   return (
     <div style={{ width: '100%', display: 'flex' }}>
       <Sidebar
@@ -90,7 +118,7 @@ export function BasicExampleView({ yorkieClientAddress, yorkieDocumentKey, proje
                 <li
                   key={user}
                   style={{ padding: '5px 10px' }}
-                  className={classNames('pin_item shadow_m', { is_active: pinList.includes(user) })}
+                  className={classNames('pin_item shadow_m', { is_active: userList.includes(user) })}
                 >
                   <span className="user" style={{ margin: '0px' }}>
                     <span className={`icon gradient_180deg_${UserColors[user]}`}></span>
@@ -99,16 +127,23 @@ export function BasicExampleView({ yorkieClientAddress, yorkieDocumentKey, proje
                   <div className="btn_box">
                     <button
                       type="button"
-                      className={classNames('btn btn_line btn_pin', { blue_0: pinList.includes('user1') })}
+                      className={classNames('btn btn_line btn_pin', { blue_0: userList.includes('user1') })}
                       title="Pin"
+                      onClick={() => {
+                        deleteUser(user);
+                      }}
                     >
-                      <Icon type="pin" />
+                      <Icon type="close" />
                     </button>
                   </div>
                 </li>
               );
             })}
           </ul>
+          <button type="button" className="btn btn_add" onClick={addUser}>
+            <Icon type="plus" />
+            <span className="blind">유저 추가하기</span>
+          </button>
         </div>
         <div style={{ flex: '1 0', position: 'relative' }}>
           <ul
@@ -116,23 +151,31 @@ export function BasicExampleView({ yorkieClientAddress, yorkieDocumentKey, proje
               flexWrap: 'wrap',
               display: 'flex',
               height: '100%',
-              flexDirection: usersCount <= 2 ? 'column' : 'row',
+              flexDirection: userList.length <= 2 ? 'column' : 'row',
               margin: '0 15px',
             }}
           >
             {userList.map((user) => {
-              return <UserContent key={user} user={user} iframeUrl={iframeUrl} />;
+              return <UserContent key={user} user={user} iframeUrl={iframeUrl} userCount={userList.length} />;
             })}
           </ul>
         </div>
-        <div style={{ height: 120, backgroundColor: '#514C47', color: 'white', marginBottom: 25 }}>
+        <div
+          style={{
+            height: 120,
+            backgroundColor: '#d9d9d9',
+            color: 'black',
+            marginBottom: 25,
+            marginLeft: 15,
+            marginRight: 15,
+          }}
+        >
           <div
             style={{
+              marginTop: 5,
               paddingLeft: 8,
-              backgroundColor: '#FDC432',
               width: 'max-content',
               paddingRight: 5,
-              color: 'black',
               marginBottom: 5,
             }}
           >
@@ -140,8 +183,8 @@ export function BasicExampleView({ yorkieClientAddress, yorkieDocumentKey, proje
           </div>
           <div style={{ overflowY: 'auto', paddingLeft: 3, maxHeight: 113 - 18 - 5, fontSize: 12 }}>
             {docChangeInfos.map((changeInfo, index) => (
-              <div style={{ marginBottom: 5 }} key={index}>
-                <span style={{ color: '#FDC432' }}>event</span> -{' '}
+              <div style={{ marginBottom: 5, paddingLeft: 8 }} key={index}>
+                <span style={{ fontWeight: 'bold' }}>event</span> -{' '}
                 {changeInfo.type === 'modification' && <span style={{ opacity: 0.5 }}>modification occured at </span>}
                 <span>{changeInfo.content}</span>
               </div>
