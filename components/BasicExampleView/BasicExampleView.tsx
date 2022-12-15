@@ -6,12 +6,7 @@ import { Sidebar } from './Sidebar';
 import UserContent from './UserContent';
 
 interface DocChangeInfo {
-  type: 'modification' | 'initialize';
-  content: string;
-}
-
-interface PresenceChangeInfo {
-  type: 'presence';
+  type: 'update' | 'initialize' | 'presence';
   content: string;
 }
 
@@ -50,31 +45,38 @@ export function BasicExampleView({
   const [projectCodeState, setProjectCodeState] = useState<ProjectCode>(projectCode);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    let unsubscribe: Function;
+    let unsubscribeDoc: Function;
+    let unsubscribePresence: Function;
     const activate = async () => {
       const yorkie = await import('yorkie-js-sdk');
       const client = new yorkie.Client(yorkieClientAddress, {
         apiKey: yorkieApiKey,
       });
-      console.log(yorkieApiKey);
       await client.activate();
       const doc = new yorkie.Document('vuejs-kanban');
       await client.attach(doc);
       setDocChangeInfos((prev) => [...prev, { type: 'initialize', content: 'Connection has been established!' }]);
-      unsubscribe = doc.subscribe((event) => {
-        console.log('hihihih');
+      unsubscribeDoc = doc.subscribe((event) => {
         if (event.type === 'remote-change') {
           for (const changeInfo of event.value) {
             for (const path of changeInfo.paths) {
-              setDocChangeInfos((prev) => [...prev, { type: 'modification', content: path }]);
+              setDocChangeInfos((prev) => [...prev, { type: 'update', content: path }]);
             }
           }
+        }
+      });
+      unsubscribePresence = client.subscribe((event) => {
+        if (event.type === 'peers-changed') {
+          // const documentKey = doc.getKey();
+          // const changedPeers = event.value[documentKey];
+          // setDocChangeInfos((prev) => [...prev, { type: 'presence', content: 'presence change has occurred!' }]);
         }
       });
     };
     activate();
     return () => {
-      if (unsubscribe) unsubscribe();
+      if (unsubscribeDoc) unsubscribeDoc();
+      if (unsubscribePresence) unsubscribePresence();
     };
   }, [yorkieClientAddress, yorkieDocumentKey, yorkieApiKey]);
 
@@ -157,16 +159,7 @@ export function BasicExampleView({
           </button>
         </div>
 
-        <ul
-          className="grid_list2"
-          // style={{
-          //   flexWrap: 'wrap',
-          //   display: 'flex',
-          //   height: '100%',
-          //   flexDirection: userList.length <= 2 ? 'column' : 'row',
-          //   margin: '0 15px',
-          // }}
-        >
+        <ul className="grid_list2">
           {userList.map((user) => {
             return <UserContent key={user} user={user} iframeUrl={iframeUrl} userCount={userList.length} />;
           })}
@@ -179,7 +172,7 @@ export function BasicExampleView({
               {docChangeInfos.map((changeInfo, index) => (
                 <div className="log_desc" key={index}>
                   <span style={{ fontWeight: 'bold' }}>event</span> -{' '}
-                  {changeInfo.type === 'modification' && <span style={{ opacity: 0.5 }}>modification occured at </span>}
+                  {changeInfo.type === 'update' && <span style={{ opacity: 0.5 }}>modification occured at </span>}
                   <span>{changeInfo.content}</span>
                 </div>
               ))}
