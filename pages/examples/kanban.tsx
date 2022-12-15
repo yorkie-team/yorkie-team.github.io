@@ -1,8 +1,6 @@
 import { ExampleLayout } from '@/components';
-import { KanbanProject } from '@/components/BasicExampleCodes';
+import { KanbanDocumentStructure, KanbanProject, ProjectFile } from '@/components/BasicExampleProjects';
 import { BasicExampleView } from '@/components/BasicExampleView';
-import { FullView, Sidebar } from '@/components/exampleView';
-import { SimpleDualView } from '@/components/exampleView/SimpleDualView';
 import { NextPage } from 'next';
 import Head from 'next/head';
 import { useEffect, useState } from 'react';
@@ -44,8 +42,11 @@ const KanbanExampleView: NextPage = () => {
           <BasicExampleView
             yorkieClientAddress="https://api.yorkie.dev"
             yorkieDocumentKey="vuejs-kanban"
-            projectStructure={KanbanProject}
-            iframeUrl="https://hunkim98.github.io/vuejs-kanban-yorkie/"
+            yorkieApiKey={process.env.VITE_YORKIE_API_KEY ?? ''}
+            projectCode={KanbanProject}
+            documentStructure={KanbanDocumentStructure}
+            iframeUrl="https://yorkie.dev/yorkie-js-sdk/examples/vuejs-kanban/"
+            defaultOpenFile={KanbanProject.children[0].children?.[1] as ProjectFile}
           />
         </>
       )}

@@ -39,7 +39,7 @@ export function ExampleLayout({
           <span className="nav_text">Yorkie Example</span>
           <span className="nav_text">{breadcrumbTitle}</span>
         </nav>
-        <Button.Box>
+        {/* <Button.Box>
           {viewTypes.map((type) => (
             <Button
               blindText
@@ -51,7 +51,7 @@ export function ExampleLayout({
               {exampleViewTypeMap[type].label}
             </Button>
           ))}
-        </Button.Box>
+        </Button.Box> */}
       </header>
       <main className="container">{children({ viewType })}</main>
     </div>

@@ -1,6 +1,6 @@
 import classNames from 'classnames';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { ProjectStructure } from '../BasicExampleCodes';
+import { ProjectFile, ProjectCode } from '../BasicExampleProjects';
 import { Icon } from '../Icons/Icon';
 import { Sidebar } from './Sidebar';
 import UserContent from './UserContent';
@@ -18,13 +18,12 @@ interface PresenceChangeInfo {
 interface Props {
   yorkieClientAddress: string;
   yorkieDocumentKey: string;
-  projectStructure: ProjectStructure;
+  yorkieApiKey: string;
+  projectCode: ProjectCode;
+  documentStructure: string;
   iframeUrl: string;
+  defaultOpenFile: ProjectFile;
 }
-
-const ExampleContent = () => {
-  return <div></div>;
-};
 
 export const UserNames = {
   user1: 'User 1',
@@ -39,20 +38,33 @@ export const UserColors = {
   user4: 'yellow',
 };
 
-export function BasicExampleView({ yorkieClientAddress, yorkieDocumentKey, projectStructure, iframeUrl }: Props) {
+export function BasicExampleView({
+  yorkieClientAddress,
+  yorkieDocumentKey,
+  projectCode: projectStructure,
+  iframeUrl,
+  defaultOpenFile,
+  documentStructure,
+  yorkieApiKey,
+}: Props) {
   const [docChangeInfos, setDocChangeInfos] = useState<DocChangeInfo[]>([]);
-  const [userList, setUserList] = useState<('user1' | 'user2' | 'user3' | 'user4')[]>(['user1', 'user2', 'user3']);
+  const [userList, setUserList] = useState<('user1' | 'user2' | 'user3' | 'user4')[]>(['user1', 'user2']);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
+    let unsubscribe: Function;
     const activate = async () => {
       const yorkie = await import('yorkie-js-sdk');
-      const client = new yorkie.Client('https://api.yorkie.dev');
+      const client = new yorkie.Client(yorkieClientAddress, {
+        apiKey: yorkieApiKey,
+      });
+      console.log(yorkieApiKey);
       await client.activate();
       const doc = new yorkie.Document('vuejs-kanban');
       await client.attach(doc);
       setDocChangeInfos((prev) => [...prev, { type: 'initialize', content: 'Connection has been established!' }]);
-      doc.subscribe((event) => {
+      unsubscribe = doc.subscribe((event) => {
+        console.log('hihihih');
         if (event.type === 'remote-change') {
           for (const changeInfo of event.value) {
             for (const path of changeInfo.paths) {
@@ -63,7 +75,10 @@ export function BasicExampleView({ yorkieClientAddress, yorkieDocumentKey, proje
       });
     };
     activate();
-  }, []);
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, [yorkieClientAddress, yorkieDocumentKey, yorkieApiKey]);
 
   const scrollToBottom = () => {
     if (!messagesEndRef.current) return;
@@ -103,23 +118,21 @@ export function BasicExampleView({ yorkieClientAddress, yorkieDocumentKey, proje
     }
   };
   return (
-    <div style={{ width: '100%', display: 'flex' }}>
+    <main className="container">
       <Sidebar
         defaultOpened={true}
         title="Kanban Board"
         description="Kanban Board is a tool for managing tasks and workflow. It is a visual way to manage tasks and workflow."
         code={projectStructure}
+        documentStructure={documentStructure}
+        defaultOpenFile={defaultOpenFile}
       />
-      <div style={{ flex: '1 0', display: 'flex', flexDirection: 'column' }}>
-        <div className="pin_box" style={{ height: 85, border: 'none' }}>
-          <ul className="pin_list" style={{ padding: 20 }}>
+      <div className="content code_view">
+        <div className="pin_box">
+          <ul className="pin_list">
             {userList.map((user) => {
               return (
-                <li
-                  key={user}
-                  style={{ padding: '5px 10px' }}
-                  className={classNames('pin_item shadow_m', { is_active: userList.includes(user) })}
-                >
+                <li key={user} className={classNames('pin_item shadow_m')}>
                   <span className="user" style={{ margin: '0px' }}>
                     <span className={`icon gradient_180deg_${UserColors[user]}`}></span>
                     <span className="text">{UserNames[user]}</span>
@@ -127,7 +140,7 @@ export function BasicExampleView({ yorkieClientAddress, yorkieDocumentKey, proje
                   <div className="btn_box">
                     <button
                       type="button"
-                      className={classNames('btn btn_line btn_pin', { blue_0: userList.includes('user1') })}
+                      className={classNames('btn btn_line btn_pin')}
                       title="Pin"
                       onClick={() => {
                         deleteUser(user);
@@ -145,54 +158,38 @@ export function BasicExampleView({ yorkieClientAddress, yorkieDocumentKey, proje
             <span className="blind">유저 추가하기</span>
           </button>
         </div>
-        <div style={{ flex: '1 0', position: 'relative' }}>
-          <ul
-            style={{
-              flexWrap: 'wrap',
-              display: 'flex',
-              height: '100%',
-              flexDirection: userList.length <= 2 ? 'column' : 'row',
-              margin: '0 15px',
-            }}
-          >
-            {userList.map((user) => {
-              return <UserContent key={user} user={user} iframeUrl={iframeUrl} userCount={userList.length} />;
-            })}
-          </ul>
-        </div>
-        <div
-          style={{
-            height: 120,
-            backgroundColor: '#d9d9d9',
-            color: 'black',
-            marginBottom: 25,
-            marginLeft: 15,
-            marginRight: 15,
-          }}
+
+        <ul
+          className="grid_list2"
+          // style={{
+          //   flexWrap: 'wrap',
+          //   display: 'flex',
+          //   height: '100%',
+          //   flexDirection: userList.length <= 2 ? 'column' : 'row',
+          //   margin: '0 15px',
+          // }}
         >
-          <div
-            style={{
-              marginTop: 5,
-              paddingLeft: 8,
-              width: 'max-content',
-              paddingRight: 5,
-              marginBottom: 5,
-            }}
-          >
-            Event Log
-          </div>
-          <div style={{ overflowY: 'auto', paddingLeft: 3, maxHeight: 113 - 18 - 5, fontSize: 12 }}>
-            {docChangeInfos.map((changeInfo, index) => (
-              <div style={{ marginBottom: 5, paddingLeft: 8 }} key={index}>
-                <span style={{ fontWeight: 'bold' }}>event</span> -{' '}
-                {changeInfo.type === 'modification' && <span style={{ opacity: 0.5 }}>modification occured at </span>}
-                <span>{changeInfo.content}</span>
-              </div>
-            ))}
-            <div ref={messagesEndRef} />
+          {userList.map((user) => {
+            return <UserContent key={user} user={user} iframeUrl={iframeUrl} userCount={userList.length} />;
+          })}
+        </ul>
+
+        <div className="log_box">
+          <div className="log_inner">
+            <div className="log_title">Event Log</div>
+            <div style={{ overflowY: 'auto', paddingLeft: 3, maxHeight: 113 - 18 - 5, fontSize: 12 }}>
+              {docChangeInfos.map((changeInfo, index) => (
+                <div className="log_desc" key={index}>
+                  <span style={{ fontWeight: 'bold' }}>event</span> -{' '}
+                  {changeInfo.type === 'modification' && <span style={{ opacity: 0.5 }}>modification occured at </span>}
+                  <span>{changeInfo.content}</span>
+                </div>
+              ))}
+              <div ref={messagesEndRef} />
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
