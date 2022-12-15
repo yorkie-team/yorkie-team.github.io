@@ -16,7 +16,7 @@ Through Yorkie Android SDK, you can efficiently build collaborative applications
 We can create a Client using `Client(context: Context, rpcAddress: String)`. After the Client has been activated, it is connected to the server and ready to use.
 
 ```kotlin
-val client = Client(context, "10.0.2.2:8080")
+val client = Client(context, "{{API_ADDR}}")
 // Declare your own CoroutineScope
 scope.launch {
   client.activateAsync().await	
