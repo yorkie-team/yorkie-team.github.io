@@ -1,7 +1,14 @@
 import type { GetStaticProps, GetStaticPaths } from 'next';
 import { useState, useEffect, useCallback } from 'react';
 import Head from 'next/head';
-import { type DocsMeta, type DocsOrderList, getSlugs, getDocsFromSlug, getDocsOrderList } from '@/utils/mdxUtils';
+import {
+  type DocsMeta,
+  type DocsOrderList,
+  getSlugs,
+  getDocsFromSlug,
+  getDocsMetaFromSlug,
+  getDocsOrderList,
+} from '@/utils/mdxUtils';
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote';
 import { serialize } from 'next-mdx-remote/serialize';
 import type { MDXComponents } from 'mdx/types';
@@ -188,13 +195,20 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 };
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const paths = getSlugs().map((slug) => {
-    return {
-      params: {
-        slug: slug === 'index' ? [''] : slug.split('/'),
-      },
-    };
-  });
+  const paths = getSlugs()
+    .filter((slug) => {
+      if (process.env.NODE_ENV === 'development') return true;
+
+      const { phase } = getDocsMetaFromSlug(slug);
+      return phase !== 'development';
+    })
+    .map((slug) => {
+      return {
+        params: {
+          slug: slug === 'index' ? [''] : slug.split('/'),
+        },
+      };
+    });
 
   return {
     paths,
