@@ -155,31 +155,35 @@ const Home: NextPage = () => {
                   </span>
                 </button>
               </li>
-              <li className={classNames('service_card_item', { is_active: activeFeatureCard === 'selection' })}>
-                <button type="button" className="service_card_menu" data-item="selection">
-                  <span className="img_box">
-                    <CollaboSelectionSVG />
-                  </span>
-                  <strong className="service_card_title">Live Selection</strong>
-                  <span className="service_card_desc">
-                    Live Selection displays the object selected by each user who accesses the same canvas. Users can see
-                    what each other is doing in real-time.
-                  </span>
-                </button>
-              </li>
-              <li className={classNames('service_card_item', { is_active: activeFeatureCard === 'editing' })}>
-                <button type="button" className="service_card_menu" data-item="editing">
-                  <span className="img_box">
-                    <CollaboEditingSVG />
-                  </span>
-                  <strong className="service_card_title">Multiplayer Editing</strong>
-                  <span className="service_card_desc">
-                    Interact in real-time with the presence of others and edit material together. Any real-time
-                    interaction, such as texting, drawing, commenting, or expressing emotion, could be shared with
-                    Yorkie.
-                  </span>
-                </button>
-              </li>
+              {process.env.NODE_ENV === 'development' && (
+                <>
+                  <li className={classNames('service_card_item', { is_active: activeFeatureCard === 'selection' })}>
+                    <button type="button" className="service_card_menu" data-item="selection">
+                      <span className="img_box">
+                        <CollaboSelectionSVG />
+                      </span>
+                      <strong className="service_card_title">Live Selection</strong>
+                      <span className="service_card_desc">
+                        Live Selection displays the object selected by each user who accesses the same canvas. Users can
+                        see what each other is doing in real-time.
+                      </span>
+                    </button>
+                  </li>
+                  <li className={classNames('service_card_item', { is_active: activeFeatureCard === 'editing' })}>
+                    <button type="button" className="service_card_menu" data-item="editing">
+                      <span className="img_box">
+                        <CollaboEditingSVG />
+                      </span>
+                      <strong className="service_card_title">Multiplayer Editing</strong>
+                      <span className="service_card_desc">
+                        Interact in real-time with the presence of others and edit material together. Any real-time
+                        interaction, such as texting, drawing, commenting, or expressing emotion, could be shared with
+                        Yorkie.
+                      </span>
+                    </button>
+                  </li>
+                </>
+              )}
             </ul>
             <CodeBlock.Wrapper>
               <CodeBlockHeader>

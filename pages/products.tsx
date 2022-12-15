@@ -52,7 +52,7 @@ const Products: NextPage = () => {
       <div className="content">
         <section className="section">
           <div className="section_title_wrap">
-            <h2 className="section_title" id="multiplayer">
+            <h2 className="section_title" id="document-and-presence">
               <a href="#document-and-presence">
                 Turn anything <br />
                 into multiplayer.
@@ -112,15 +112,6 @@ const Products: NextPage = () => {
                     </button>
                     <button
                       type="button"
-                      className={classNames('btn_item', { is_active: documentType === 'richText' })}
-                      onClick={() => {
-                        setDocumentType('richText');
-                      }}
-                    >
-                      RichText
-                    </button>
-                    <button
-                      type="button"
                       className={classNames('btn_item', { is_active: documentType === 'counter' })}
                       onClick={() => {
                         setDocumentType('counter');
@@ -145,8 +136,11 @@ const Products: NextPage = () => {
               <a href="#collaboration-awareness">Presence</a>
             </strong>
             <p className="sub_desc">
-              You can build a sense of presence by tracking the status of users who are editing the same document with
-              Presence.
+              You can build a sense of presence by tracking the status of users who are editing the same document with{' '}
+              <Link href="/docs/js-sdk#peer-awareness" className="link">
+                Presence
+              </Link>
+              .
             </p>
             <div className="img_group">
               <div className="img_box">
@@ -209,9 +203,11 @@ const Products: NextPage = () => {
         <section className="section">
           <div className="section_title_wrap">
             <h2 className="section_title" id="dashboard">
-              Real-time monitoring
-              <br />
-              anytime, anywhere.
+              <a href="#dashboard">
+                Real-time monitoring
+                <br />
+                anytime, anywhere.
+              </a>
             </h2>
             <p className="section_desc">
               Dashboard allows project members to browse stored documents and supervise the data warehouse easily.
