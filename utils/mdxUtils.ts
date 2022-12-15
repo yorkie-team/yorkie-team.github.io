@@ -47,10 +47,15 @@ export const getDocsOrderList = (basePath: string): DocsOrderList => {
         href,
         title: data.title || slug,
         order: data.order || 0,
+        phase: data.phase || '',
         subMenu: [],
       };
     })
-    .sort((a, b) => a.order - b.order);
+    .sort((a, b) => a.order - b.order)
+    .filter((list) => {
+      if (process.env.NODE_ENV === 'development') return true;
+      return list.phase !== 'development';
+    });
 
   const navList: DocsOrderList = [];
   let temp: DocsOrderInfo | null = null;
@@ -69,9 +74,9 @@ export const getDocsOrderList = (basePath: string): DocsOrderList => {
 };
 
 export type DocsMeta = {
-  slug: string;
   title: string;
-  description: string;
+  order: number;
+  phase: string;
 };
 
 type Docs = {
@@ -87,9 +92,21 @@ export const getDocsFromSlug = (slug: string): Docs => {
   return {
     content,
     meta: {
-      slug,
       title: data.title || slug,
-      description: data.description || '',
+      order: data.order || 0,
+      phase: data.phase || '',
     },
+  };
+};
+
+export const getDocsMetaFromSlug = (slug: string): DocsMeta => {
+  const docsFilePath = path.join(DOCS_PATH, `${slug}.mdx`);
+  const source = fs.readFileSync(docsFilePath);
+  const { data } = matter(source);
+
+  return {
+    title: data.title || slug,
+    order: data.order || 0,
+    phase: data.phase || '',
   };
 };
