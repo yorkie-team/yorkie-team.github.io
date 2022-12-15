@@ -41,7 +41,7 @@ export const UserColors = {
 export function BasicExampleView({
   yorkieClientAddress,
   yorkieDocumentKey,
-  projectCode: projectStructure,
+  projectCode,
   iframeUrl,
   defaultOpenFile,
   documentStructure,
@@ -49,7 +49,7 @@ export function BasicExampleView({
 }: Props) {
   const [docChangeInfos, setDocChangeInfos] = useState<DocChangeInfo[]>([]);
   const [userList, setUserList] = useState<('user1' | 'user2' | 'user3' | 'user4')[]>(['user1', 'user2']);
-
+  const [projectCodeState, setProjectCodeState] = useState<ProjectCode>(projectCode);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     let unsubscribe: Function;
@@ -123,7 +123,8 @@ export function BasicExampleView({
         defaultOpened={true}
         title="Kanban Board"
         description="Kanban Board is a tool for managing tasks and workflow. It is a visual way to manage tasks and workflow."
-        code={projectStructure}
+        projectCodeState={projectCodeState}
+        setProjectCodeState={setProjectCodeState}
         documentStructure={documentStructure}
         defaultOpenFile={defaultOpenFile}
       />
