@@ -13,7 +13,7 @@ const nextConfig = {
     nextImageExportOptimizer_quality: 75,
     nextImageExportOptimizer_storePicturesInWEBP: true,
     nextImageExportOptimizer_generateAndUseBlurImages: true,
-    VITE_YORKIE_API_KEY: process.env.VITE_YORKIE_API_KEY,
+    YORKIE_API_KEY: process.env.YORKIE_API_KEY,
   },
   basePath: process.env.NEXT_PUBLIC_BASE_PATH || '',
   webpack: (config) => {

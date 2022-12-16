@@ -1,5 +1,5 @@
 import { ExampleLayout } from '@/components';
-import { KanbanDocumentStructure, KanbanProject } from '@/components/BasicExampleProjects';
+import { KanbanDocumentStructure, KanbanProjectCode } from '@/components/BasicExampleProjects';
 import { BasicExampleView } from '@/components/BasicExampleView';
 import { NextPage } from 'next';
 import Head from 'next/head';
@@ -21,7 +21,7 @@ const KanbanExampleView: NextPage = () => {
             yorkieClientAddress="https://api.yorkie.dev"
             yorkieDocumentKey="vuejs-kanban"
             yorkieApiKey={process.env.VITE_YORKIE_API_KEY ?? ''}
-            projectCode={KanbanProject}
+            projectCode={KanbanProjectCode}
             documentStructure={KanbanDocumentStructure}
             iframeUrl="https://yorkie.dev/yorkie-js-sdk/examples/vuejs-kanban/"
           />

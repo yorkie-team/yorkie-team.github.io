@@ -65,7 +65,7 @@ export function Sidebar({ defaultOpened = true, title, description, projectCode,
             href="https://github.com/yorkie-team/yorkie-js-sdk/tree/main/examples/vuejs-kanban"
             className="btn gray600 "
           >
-            Github
+            GitHub
           </a>
         </div>
         <p className="guide_desc">Last updated 4 days ago</p>
