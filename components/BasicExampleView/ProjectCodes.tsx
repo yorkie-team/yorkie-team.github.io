@@ -1,7 +1,6 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { ProjectFile, ProjectFolder, ProjectCode } from '../BasicExampleProjects';
 import { CodeBlock, Icon } from '@/components';
-import { PrismCode } from '../CodeBlock/PrismCode';
 import classNames from 'classnames';
 
 function SubProjectComponent({

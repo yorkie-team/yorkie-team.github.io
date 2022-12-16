@@ -1,6 +1,6 @@
 import classNames from 'classnames';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { ProjectFile, ProjectCode } from '../BasicExampleProjects';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { ProjectCode } from '../BasicExampleProjects';
 import { Icon } from '../Icons/Icon';
 import { Sidebar } from './Sidebar';
 import UserContent from './UserContent';
@@ -80,22 +80,25 @@ export function BasicExampleView({
     };
   }, [yorkieClientAddress, yorkieDocumentKey, yorkieApiKey]);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = useCallback(() => {
     if (!messagesEndRef.current) return;
     messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-  };
+  }, [messagesEndRef]);
 
-  useEffect(scrollToBottom, [docChangeInfos]);
+  useEffect(scrollToBottom, [docChangeInfos, scrollToBottom]);
 
-  const deleteUser = (userId: string) => {
-    if (userList.length === 1) {
-      alert('You need at least one user');
-      return;
-    }
-    setUserList((prev) => prev.filter((user) => user !== userId));
-  };
+  const deleteUser = useCallback(
+    (userId: string) => {
+      if (userList.length === 1) {
+        alert('You need at least one user');
+        return;
+      }
+      setUserList((prev) => prev.filter((user) => user !== userId));
+    },
+    [setUserList, userList.length],
+  );
 
-  const addUser = () => {
+  const addUser = useCallback(() => {
     if (userList.length === 4) {
       alert("You can't add more users");
       return;
@@ -116,15 +119,15 @@ export function BasicExampleView({
       setUserList((prev) => prev.slice(0, 3).concat(['user4']).concat(prev.slice(3)));
       return;
     }
-  };
+  }, [setUserList, userList]);
+
   return (
     <main className="container">
       <Sidebar
         defaultOpened={true}
         title="Kanban Board"
         description="Kanban Board is a tool for managing tasks and workflow. It is a visual way to manage tasks and workflow."
-        projectCodeState={projectCodeState}
-        setProjectCodeState={setProjectCodeState}
+        projectCode={projectCode}
         documentStructure={documentStructure}
       />
       <div className="content code_view">
@@ -161,7 +164,7 @@ export function BasicExampleView({
 
         <ul className="grid_list2">
           {userList.map((user) => {
-            return <UserContent key={user} user={user} iframeUrl={iframeUrl} userCount={userList.length} />;
+            return <UserContent key={user} user={user} iframeUrl={iframeUrl} />;
           })}
         </ul>
 

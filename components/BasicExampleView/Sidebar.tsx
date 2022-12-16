@@ -1,25 +1,19 @@
 import { useState, useEffect } from 'react';
 import classNames from 'classnames';
-import { Icon, CodeBlock, Accordion } from '@/components';
+import { Icon, CodeBlock } from '@/components';
 import { ProjectCode } from '../BasicExampleProjects';
 import ProjectCodes from './ProjectCodes';
-import { ProjectFile } from '../BasicExampleProjects';
 
-export function Sidebar({
-  defaultOpened = true,
-  title,
-  description,
-  projectCodeState,
-  setProjectCodeState,
-  documentStructure,
-}: {
+interface Props {
   defaultOpened?: boolean;
   title: string;
   description: string;
-  projectCodeState: ProjectCode;
-  setProjectCodeState: React.Dispatch<React.SetStateAction<ProjectCode>>;
+  projectCode: ProjectCode;
   documentStructure: string;
-}) {
+}
+
+export function Sidebar({ defaultOpened = true, title, description, projectCode, documentStructure }: Props) {
+  const [projectCodeState, setProjectCodeState] = useState<ProjectCode>(projectCode);
   const [viewType, setViewType] = useState<'code' | 'documentStructure'>('code');
   const [isOpened, setIsOpened] = useState<boolean>(defaultOpened);
 

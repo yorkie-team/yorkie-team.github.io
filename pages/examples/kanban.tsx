@@ -1,9 +1,8 @@
 import { ExampleLayout } from '@/components';
-import { KanbanDocumentStructure, KanbanProject, ProjectFile } from '@/components/BasicExampleProjects';
+import { KanbanDocumentStructure, KanbanProject } from '@/components/BasicExampleProjects';
 import { BasicExampleView } from '@/components/BasicExampleView';
 import { NextPage } from 'next';
 import Head from 'next/head';
-import { useEffect, useState } from 'react';
 
 export interface DocChangeInfo {
   type: 'modification' | 'initialize';

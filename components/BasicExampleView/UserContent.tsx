@@ -1,15 +1,7 @@
 import React from 'react';
 import { UserColors, UserNames } from './BasicExampleView';
 
-function UserContent({
-  user,
-  iframeUrl,
-  userCount,
-}: {
-  user: 'user1' | 'user2' | 'user3' | 'user4';
-  iframeUrl: string;
-  userCount: number;
-}) {
+function UserContent({ user, iframeUrl }: { user: 'user1' | 'user2' | 'user3' | 'user4'; iframeUrl: string }) {
   return (
     <>
       <li className="grid_item shadow_m" key={user}>
