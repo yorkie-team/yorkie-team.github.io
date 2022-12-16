@@ -38,6 +38,8 @@ import MinimizeSVG from '@/public/assets/icons/icon_minimize.svg';
 import PinSVG from '@/public/assets/icons/icon_pin.svg';
 import PackageSVG from '@/public/assets/icons/icon_package.svg';
 import CloudSVG from '@/public/assets/icons/icon_cloud_orange.svg';
+import FolderSVG from '@/public/assets/icons/icon_folder.svg';
+import FileSVG from '@/public/assets/icons/icon_file.svg';
 
 const svgMap = {
   star: <StarSVG />,
@@ -78,6 +80,8 @@ const svgMap = {
   pin: <PinSVG />,
   package: <PackageSVG />,
   cloud: <CloudSVG />,
+  folder: <FolderSVG />,
+  file: <FileSVG />,
 };
 type SVGType = keyof typeof svgMap;
 

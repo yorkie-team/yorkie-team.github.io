@@ -28,7 +28,8 @@
     "rehype-autolink-headings": "^6.1.1",
     "rehype-slug": "^5.1.0",
     "remark-gfm": "^3.0.1",
-    "unist-util-visit": "^4.1.1"
+    "unist-util-visit": "^4.1.1",
+    "yorkie-js-sdk": "^0.2.19"
   },
   "devDependencies": {
     "@mdx-js/loader": "^2.1.5",
