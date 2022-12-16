@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import { Icon, CodeBlock, Accordion } from '@/components';
 import { ProjectCode } from '../BasicExampleProjects';
-import ProjectCodes from './ProjectsCodes';
+import ProjectCodes from './ProjectCodes';
 import { ProjectFile } from '../BasicExampleProjects';
 
 export function Sidebar({
