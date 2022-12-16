@@ -18,7 +18,7 @@ If you want to install the SDK, refer to the [Getting Started with JS SDK](/docs
 We can create a Client using `new yorkie.Client()`. After the Client has been activated, it is connected to the server and ready to use.
 
 ```javascript
-const client = new yorkie.Client('localhost:8080');
+const client = new yorkie.Client('{{API_ADDR}}');
 await client.activate();
 ```
 
@@ -55,7 +55,7 @@ Peer Awareness is a feature often required in collaborative applications. With P
 When creating a Client, we can pass information of the Client to other peers attaching the same Document with presence.
 
 ```javascript
-const clientA = new yorkie.Client('localhost:8080', {
+const clientA = new yorkie.Client('{{API_ADDR}}', {
   presence: {
     username: 'alice',
     color: 'blue',
@@ -70,7 +70,7 @@ await clientA.attach(docA);
 Then, another Client is created and attaches a Document with the same name as before.
 
 ```javascript
-const clientB = new yorkie.Client('localhost:8080', {
+const clientB = new yorkie.Client('{{API_ADDR}}', {
   presence: {
     username: 'bob',
     color: 'red',
@@ -120,10 +120,10 @@ After attaching the Document to the Client, all changes to the Document are auto
 ```javascript
 const message = 'update document for test';
 doc.update((root) => {
-  root.obj = {}; // {"obj":{}}
-  root.obj.num = 1; // {"obj":{"num":1}}
+  root.obj = {};               // {"obj":{}}
+  root.obj.num = 1;            // {"obj":{"num":1}}
   root.obj.obj = { str: 'a' }; // {"obj":{"num":1,"obj":{"str":"a"}}}
-  root.obj.arr = ['1', '2']; // {"obj":{"num":1,"obj":{"str":"a"},"arr":[1,2]}}
+  root.obj.arr = ['1', '2'];   // {"obj":{"num":1,"obj":{"str":"a"},"arr":[1,2]}}
 }, message);
 ```
 
@@ -133,7 +133,7 @@ You can get the contents of the Document using `document.getRoot()`.
 
 ```javascript
 const root = doc.getRoot();
-console.log(root.obj); // {"num":1,"obj":{"str":"a"},"arr":[1,2]}
+console.log(root.obj);     // {"num":1,"obj":{"str":"a"},"arr":[1,2]}
 console.log(root.obj.num); // 1
 console.log(root.obj.obj); // {"str":"a"}
 console.log(root.obj.arr); // [1,2]
@@ -183,8 +183,8 @@ Custom CRDT types are data types that can be used for special applications such 
 doc.update((root) => {
   root.text = new yorkie.Text(); // {"text":""}
   root.text.edit(0, 0, 'hello'); // {"text":"hello"}
-  root.text.edit(0, 1, 'H'); // {"text":"Hello"}
-  root.text.select(0, 1); // {"text":"^H^ello"}
+  root.text.edit(0, 1, 'H');     // {"text":"Hello"}
+  root.text.select(0, 1);        // {"text":"^H^ello"}
 });
 ```
 
@@ -196,9 +196,9 @@ An example of Text co-editing with CodeMirror: [CodeMirror example](https://gith
 
 ```javascript
 doc.update((root) => {
-  root.text = new yorkie.RichText(); // {"text":""}
-  root.text.edit(0, 0, 'hello'); // {"text":"hello"}
-  root.text.edit(0, 1, 'H'); // {"text":"Hello"}
+  root.text = new yorkie.RichText();        // {"text":""}
+  root.text.edit(0, 0, 'hello');            // {"text":"hello"}
+  root.text.edit(0, 1, 'H');                // {"text":"Hello"}
   root.text.setStyle(0, 1, { bold: true }); // {"text":"<b>H</b>ello"}
 });
 ```
@@ -212,9 +212,9 @@ An example of RichText co-editing with Quill: [Quill example](https://github.com
 ```javascript
 doc.update((root) => {
   root.counter = new yorkie.Counter(1); // {"counter":1}
-  root.counter.increase(2); // {"counter":3}
-  root.counter.increase(3.5); // {"counter":6.5}
-  root.counter.increase(-3.5); // {"counter":3}
+  root.counter.increase(2);             // {"counter":3}
+  root.counter.increase(3.5);           // {"counter":6.5}
+  root.counter.increase(-3.5);          // {"counter":3}
 });
 ```
 
@@ -237,4 +237,4 @@ doc.update((root) => {
 
 ### Reference
 
-For details on how to use the JS SDK, please refer to [JS SDK Reference](https://yorkie.dev/yorkie-js-sdk).
+For details on how to use the JS SDK, please refer to [JS SDK Reference](https://yorkie.dev/yorkie-js-sdk/api-reference/).

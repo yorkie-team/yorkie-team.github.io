@@ -16,7 +16,7 @@ Through Yorkie Android SDK, you can efficiently build collaborative applications
 We can create a Client using `Client(context: Context, rpcAddress: String)`. After the Client has been activated, it is connected to the server and ready to use.
 
 ```kotlin
-val client = Client(context, "10.0.2.2:8080")
+val client = Client(context, "{{API_ADDR}}")
 // Declare your own CoroutineScope
 scope.launch {
   client.activateAsync().await	
@@ -40,7 +40,6 @@ scope.launch {
     println(it) // 'Connected' or 'Disconnected'
   }
 }
-
 ```
 By using the value of the `streamConnectionStatus`, it is possible to determine whether the Client is connected to the network.
 
@@ -73,13 +72,13 @@ After attaching the Document to the Client, all changes to the Document are auto
 scope.launch {
   val message = "update document for test"
   document.updateAsync(message) { root ->
-    root.setNewObject("obj") // {"obj":{}}
-    root.getAs<JsonObject>("obj")["num"] = 1 // {"obj":{"num":1}}
+    root.setNewObject("obj")                                       // {"obj":{}}
+    root.getAs<JsonObject>("obj")["num"] = 1                       // {"obj":{"num":1}}
     root.getAs<JsonObject>("obj").setNewObject("obj")["str"] = "a" // {"obj":{"num":1,"obj":{"str":"a"}}}
-    root.getAs<JsonObject>("obj").setNewArray("arr").apply {
+    root.getAs<JsonObject>("obj").setNewArray("arr").apply {       // {"obj":{"num":1,"obj":{"str":"a"},"arr":[1,2]}}
       put(1)
       put(2)
-    } // {"obj":{"num":1,"obj":{"str":"a"},"arr":[1,2]}}
+    } 
   }.await()
 }
 ```
@@ -90,7 +89,7 @@ You can get the contents of the Document using `document.getRoot()`.
 
 ```kotlin
 val root = document.getRoot()
-println(root["obj"]) // {"num":1,"obj":{"str":"a"},"arr":[1,2]}
+println(root["obj"])                          // {"num":1,"obj":{"str":"a"},"arr":[1,2]}
 println(root.getAs<JsonObject>("obj")["num"]) // 1
 println(root.getAs<JsonObject>("obj")["obj"]) // {"str":"a"}
 println(root.getAs<JsonObject>("obj")["arr"]) // [1,2]
@@ -144,9 +143,9 @@ Custom CRDT types are data types that can be used for special applications such 
 // Declare your own CoroutineScope
 scope.launch {
   target.updateAsync("") { root ->
-    root.setNewCounter("counter", 1) // {"counter":1}
-    root.getAs<JsonCounter>("counter").increase(3) // {"counter":4}
-    root.getAs<JsonCounter>("counter").increase(6L) // {"counter":10}
+    root.setNewCounter("counter", 1)                // {"counter":1}
+    root.getAs<JsonCounter>("counter").increase(3)  // {"counter":4}
+    root.getAs<JsonCounter>("counter").increase(6)  // {"counter":10}
     root.getAs<JsonCounter>("counter").increase(-3) // {"counter":7}
   }.await()
 }

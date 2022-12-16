@@ -19,7 +19,7 @@ or just include the following code in the `<head>` tag of your HTML:
 
 ```html
 <!-- include yorkie js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/yorkie-js-sdk/{{site.version}}/yorkie-js-sdk.js"></script>
+<script src="{{JS_SDK_URL}}"></script>
 ```
 
 > The JS SDKs are also provided by [cdnjs](https://cdnjs.com) to make loading library files faster and easier on websites.<br/>For more the JS SDKs: [https://cdnjs.com/libraries/yorkie-js-sdk](https://cdnjs.com/libraries/yorkie-js-sdk)
@@ -33,7 +33,7 @@ First, create a Client and a Document.
 ```js
 async function main() {
   // 01. create a new client instance and connect to the yorkie server
-  const client = new yorkie.Client('http://localhost:8080');
+  const client = new yorkie.Client('{{API_ADDR}}');
   await client.activate();
 
   // 02. create a new document and attach it to the client

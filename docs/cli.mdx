@@ -22,7 +22,7 @@ The easiest way to install Yorkie is from pre-built binaries:
 
 ```bash
 $ yorkie version
-Yorkie: {{site.version}}
+Yorkie: {{YORKIE_VERSION}}
 Commit: ...
 Go: ...
 Build date: ...
@@ -48,7 +48,7 @@ Verify that the installation worked by opening a new Terminal session and trying
 
 ```bash
 $ yorkie version
-Yorkie: {{site.version}}
+Yorkie: {{YORKIE_VERSION}}
 Commit: ...
 Go: ...
 Build date: ...
@@ -149,7 +149,7 @@ $ yorkie project create test-project
 If you create a Client with `public_key` of the Project as `apiKey`, you can manage the Client in the Project.
 
 ```javascript
-const client = new yorkie.Client('localhost:8080', {
+const client = new yorkie.Client('{{API_ADDR}}', {
   apiKey: 'c9u9298qp9as73b8i190', // public_key of the project
 });
 ```
@@ -205,7 +205,7 @@ This page shows how to set up an Auth Webhook. The overall flow is as follows:
 First, We need to pass some tokens (that identify users in the service) when creating a Client:
 
 ```javascript
-const client = new yorkie.Client('localhost:8080', {
+const client = new yorkie.Client('{{API_ADDR}}', {
   token: SOME_TOKEN,
 });
 ```

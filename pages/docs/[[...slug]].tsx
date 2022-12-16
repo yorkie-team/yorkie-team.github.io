@@ -1,7 +1,14 @@
 import type { GetStaticProps, GetStaticPaths } from 'next';
 import { useState, useEffect, useCallback } from 'react';
 import Head from 'next/head';
-import { type DocsMeta, type DocsOrderList, getSlugs, getDocsFromSlug, getDocsOrderList } from '@/utils/mdxUtils';
+import {
+  type DocsMeta,
+  type DocsOrderList,
+  getSlugs,
+  getDocsFromSlug,
+  getDocsMetaFromSlug,
+  getDocsOrderList,
+} from '@/utils/mdxUtils';
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote';
 import { serialize } from 'next-mdx-remote/serialize';
 import type { MDXComponents } from 'mdx/types';
@@ -11,6 +18,7 @@ import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import rehypeToc, { HtmlElementNode, ListItemNode } from '@jsdevtools/rehype-toc';
 import rehypeImageMeta from '@/utils/rehypeImageMeta';
 import rehypeWrapContents from '@/utils/rehypeWrapContents';
+import rehypeVariables from '@/utils/rehypeVariables';
 import { Layout, Navigator, Button, Icon, CodeBlock, CodeBlockHeader, Image } from '@/components';
 import { CustomLink, CustomCodeBlock, Breadcrumb, Caption, ImageWrap, Alert, Blockquote } from '@/components/docs';
 
@@ -120,6 +128,18 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
       remarkPlugins: [remarkGfm],
       rehypePlugins: [
         rehypeImageMeta,
+        [
+          rehypeVariables,
+          {
+            variables: [
+              { pattern: 'JS_SDK_URL', value: process.env.NEXT_PUBLIC_JS_SDK_URL },
+              { pattern: 'YORKIE_VERSION', value: process.env.NEXT_PUBLIC_YORKIE_VERSION },
+              { pattern: 'API_ADDR', value: process.env.NEXT_PUBLIC_API_ADDR },
+              { pattern: 'API_HOST', value: process.env.NEXT_PUBLIC_API_HOST },
+              { pattern: 'API_PORT', value: process.env.NEXT_PUBLIC_API_PORT },
+            ],
+          },
+        ],
         rehypeSlug,
         [
           rehypeAutolinkHeadings,
@@ -178,13 +198,20 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 };
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const paths = getSlugs().map((slug) => {
-    return {
-      params: {
-        slug: slug === 'index' ? [''] : slug.split('/'),
-      },
-    };
-  });
+  const paths = getSlugs()
+    .filter((slug) => {
+      if (process.env.NODE_ENV === 'development') return true;
+
+      const { phase } = getDocsMetaFromSlug(slug);
+      return phase !== 'development';
+    })
+    .map((slug) => {
+      return {
+        params: {
+          slug: slug === 'index' ? [''] : slug.split('/'),
+        },
+      };
+    });
 
   return {
     paths,

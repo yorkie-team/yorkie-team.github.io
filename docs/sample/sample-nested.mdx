@@ -1,8 +1,38 @@
 ---
 title: 'Docs-Sample-Nested'
 order: 81
+phase: development
 ---
 
 ## Docs-Sample-Nested
 
 Describe about this section breifly. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam dignissim sem enim, convallis auctor arcu volutpat bibendum. Mauris augue est, pulvinar et neque ut, cursus porttitor tortor. Integer placerat velit quis dignissim consequat. Sed pellentesque ullamcorper rhoncus. Maecenas in urna porttitor, fringilla est accumsan, pellentesque sem.
+
+```html
+<span>{{API_ADDR}}</span>
+```
+
+You can use variables in mdx using the `rehypeVariables` plugin. 
+For example, `{{API_ADDR}}` will be replaced with `process.env.NEXT_PUBLIC_API_ADDR` on this page.
+
+- use in codeblock: `{{API_ADDR}}`
+- You need to escape `{` in contents: \{\{API_ADDR\}\}
+
+To use variables, you should add the variables option in the `pages/docs`.
+
+```js
+// [[...slug]].tsx 
+rehypePlugins: [
+  ...,
+  [
+    rehypeVariables,
+    {
+      variables: [
+        { pattern: 'API_ADDR', value: process.env.NEXT_PUBLIC_API_ADDR },
+        { pattern: 'YORKIE_VERSION', value: '1.0' },
+      ],
+    },
+  ],
+  ...
+],
+```

@@ -16,7 +16,7 @@ Through Yorkie iOS SDK, you can efficiently build collaborative applications. On
 We can create a Client using `Client(rpcAddress: RPCAddress(host:,port:), options:)`. After the Client has been activated, it is connected to the server and ready to use.
 
 ```swift
-let client = try! Client(rpcAddress: RPCAddress(host: "localhost", port: 8080), options: ClientOptions())
+let client = try! Client(rpcAddress: RPCAddress(host: "{{API_HOST}}", port: {{API_PORT}}), options: ClientOptions())
 try await client.activate()
 ```
 
@@ -63,11 +63,11 @@ After attaching the Document to the Client, all changes to the Document are auto
 ```swift
 let message = "update document for test";
 await doc.update({ root in
-  root.obj = [:] // {"obj":{}}
+  root.obj = [:]                      // {"obj":{}}
   let obj = root.obj as! JSONObject
-  obj.num = Int64(1) // {"obj":{"num":1}}
-  obj.obj = ["str": "a"] // {"obj":{"num":1,"obj":{"str":"a"}}}
-  obj.arr = [Int64(1), Int64(2)] // {"obj":{"num":1,"obj":{"str":"a"},"arr":[1,2]}}
+  obj.num = Int64(1)                  // {"obj":{"num":1}}
+  obj.obj = ["str": "a"]              // {"obj":{"num":1,"obj":{"str":"a"}}}
+  obj.arr = [Int64(1), Int64(2)]      // {"obj":{"num":1,"obj":{"str":"a"},"arr":[1,2]}}
 }, message: message);
 ```
 
@@ -79,9 +79,9 @@ You can get the contents of the Document using `doc.getRoot()`.
 let root = doc.getRoot()
 print(root.obj!) // {"num":1,"obj":{"str":"a"},"arr":[1,2]}
 let obj = root.obj as! JSONObject
-print(obj.num!) // 1
-print(obj.obj!) // {"str":"a"}
-print(obj.arr!) // [1,2]
+print(obj.num!)  // 1
+print(obj.obj!)  // {"str":"a"}
+print(obj.arr!)  // [1,2]
 ```
 
 #### Subscribing to Document events
