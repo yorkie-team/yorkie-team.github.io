@@ -39,19 +39,6 @@ export function ExampleLayout({
           <span className="nav_text">Yorkie Example</span>
           <span className="nav_text">{breadcrumbTitle}</span>
         </nav>
-        <Button.Box>
-          {viewTypes.map((type) => (
-            <Button
-              blindText
-              onClick={() => setViewType(type)}
-              className={classNames('btn_toggle', { btn_grid: type === 'grid' }, { is_active: viewType === type })}
-              icon={<Icon type={exampleViewTypeMap[type].icon as ExampleViewIconType} />}
-              key={type}
-            >
-              {exampleViewTypeMap[type].label}
-            </Button>
-          ))}
-        </Button.Box>
       </header>
       <main className="container">{children({ viewType })}</main>
     </div>

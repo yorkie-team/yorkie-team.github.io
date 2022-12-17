@@ -144,6 +144,20 @@ const Examples: NextPage = () => {
           </div>
           <ul className="grid_list">
             <li className="grid_item">
+              <Link href="/examples/kanban" className="grid_card">
+                <div className="grid_thumbnail">
+                  <ExampleStatusSVG />
+                </div>
+                <div className="grid_card_info">
+                  <strong className="title">Kanban Board</strong>
+                  <p className="desc">
+                    Kanban Board is a tool for managing tasks and workflow. It is a visual way to manage tasks and
+                    workflow.
+                  </p>
+                </div>
+              </Link>
+            </li>
+            <li className="grid_item">
               <Link href="/examples/multi-cursor" className="grid_card">
                 <div className="grid_thumbnail">
                   <ExampleMultiCursorSVG />
@@ -154,7 +168,7 @@ const Examples: NextPage = () => {
                 </div>
               </Link>
             </li>
-            <li className="grid_item">
+            {/* <li className="grid_item">
               <Link href="/examples/webtoons" className="grid_card">
                 <div className="grid_thumbnail">
                   <ExampleCreatingSVG />
@@ -322,7 +336,7 @@ const Examples: NextPage = () => {
                   </p>
                 </div>
               </a>
-            </li>
+            </li> */}
           </ul>
         </div>
       </div>
