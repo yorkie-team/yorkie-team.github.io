@@ -57,7 +57,7 @@ const Home: NextPage = () => {
             </h2>
             <Button.Box>
               <a
-                href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup`}
+                href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`}
                 className="btn orange_0 btn_start"
                 onPointerOver={() => setBannerActive(true)}
                 onPointerOut={() => setBannerActive(false)}
@@ -368,7 +368,7 @@ const Home: NextPage = () => {
             </Button>
             <Button
               as="a"
-              href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup`}
+              href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`}
               className="orange_0 btn_start"
               icon={<Icon type="twinkle" />}
             >

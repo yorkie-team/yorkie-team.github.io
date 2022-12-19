@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from 'react';
-import { ProjectFile, ProjectFolder, ProjectCode } from '../BasicExampleProjects';
-import { CodeBlock, Icon } from '@/components';
 import classNames from 'classnames';
+import { ProjectFile, ProjectFolder, ProjectCodeType } from './types';
+import { CodeBlock, Icon } from '@/components';
 
 function SubProjectComponent({
   component,
@@ -29,9 +29,10 @@ function SubProjectComponent({
             >
               {child.isFile ? <Icon type="file" /> : <Icon type="folder" />}
               <span className="name">{child.name}</span>
-              {/* TODO: nested folder does not work */}
-              {/* {!child.isFile && child.children && <SubProjectComponent component={child.children} />} */}
             </button>
+            {!child.isFile && child.children && (
+              <SubProjectComponent component={child.children} onClickFile={onClickFile} />
+            )}
           </li>
         );
       })}
@@ -40,8 +41,8 @@ function SubProjectComponent({
 }
 
 interface Props {
-  code: ProjectCode;
-  setProjectCodeState: React.Dispatch<React.SetStateAction<ProjectCode>>;
+  code: ProjectCodeType;
+  setProjectCodeState: React.Dispatch<React.SetStateAction<ProjectCodeType>>;
 }
 
 function ProjectCodes({ code, setProjectCodeState }: Props) {

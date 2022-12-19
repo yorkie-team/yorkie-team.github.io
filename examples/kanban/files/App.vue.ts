@@ -34,8 +34,8 @@ const defaultLists = [
   },
 ];
 
-const client = new yorkie.Client(${process.env.NEXT_PUBLIC_API_ADDR}, {
-  apiKey: ${process.env.NEXT_PUBLIC_EXAMPLES_API_KEY},
+const client = new yorkie.Client(import.meta.env.VITE_YORKIE_API_ADDR, {
+  apiKey: import.meta.env.VITE_YORKIE_API_KEY,
 });
 const doc = new yorkie.Document('vuejs-kanban');
 

@@ -1,19 +1,20 @@
 import { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import { Icon, CodeBlock } from '@/components';
-import { ProjectCode } from '../BasicExampleProjects';
+import { ProjectCodeType } from './types';
 import ProjectCodes from './ProjectCodes';
 
 interface Props {
-  defaultOpened?: boolean;
+  defaultOpened: boolean;
   title: string;
   description: string;
-  projectCode: ProjectCode;
+  projectCode: ProjectCodeType;
+  codeURL: string;
   documentStructure: string;
 }
 
-export function Sidebar({ defaultOpened = true, title, description, projectCode, documentStructure }: Props) {
-  const [projectCodeState, setProjectCodeState] = useState<ProjectCode>(projectCode);
+export function Sidebar({ defaultOpened = true, title, description, projectCode, codeURL, documentStructure }: Props) {
+  const [projectCodeState, setProjectCodeState] = useState<ProjectCodeType>(projectCode);
   const [viewType, setViewType] = useState<'code' | 'documentStructure'>('code');
   const [isOpened, setIsOpened] = useState<boolean>(defaultOpened);
 
@@ -50,9 +51,13 @@ export function Sidebar({ defaultOpened = true, title, description, projectCode,
         </button>
       </div>
       <div className="guide_box">
-        <h2 className="guide_title">{title}</h2>
-        <p className="guide_desc">{description}</p>
-        {viewType === 'code' && <ProjectCodes code={projectCodeState} setProjectCodeState={setProjectCodeState} />}
+        {viewType === 'code' && (
+          <>
+            <h2 className="guide_title">{title}</h2>
+            <p className="guide_desc">{description}</p>
+            <ProjectCodes code={projectCodeState} setProjectCodeState={setProjectCodeState} />
+          </>
+        )}
         {viewType === 'documentStructure' && (
           <div className="codeblock_box">
             <CodeBlock code={documentStructure} language="typescript" />
@@ -61,14 +66,10 @@ export function Sidebar({ defaultOpened = true, title, description, projectCode,
       </div>
       <div className="sidebar_bottom" style={{ zIndex: 0 }}>
         <div className="btn_box">
-          <a
-            href="https://github.com/yorkie-team/yorkie-js-sdk/tree/main/examples/vuejs-kanban"
-            className="btn gray600 "
-          >
+          <a href={codeURL} className="btn gray600 ">
             GitHub
           </a>
         </div>
-        <p className="guide_desc">Last updated 4 days ago</p>
       </div>
     </div>
   );

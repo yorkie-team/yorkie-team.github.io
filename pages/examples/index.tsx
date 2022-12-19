@@ -3,15 +3,15 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { Button, Icon, Layout } from '@/components';
 import ExampleBannerSVG from '@/public/assets/images/banner/img_example_banner.svg';
+import ExampleStatusSVG from '@/public/assets/images/@tmp/example_status_mo.svg';
+import ExampleToDoSVG from '@/public/assets/images/@tmp/example_to_do_mo.svg';
 import ExampleMultiCursorSVG from '@/public/assets/images/@tmp/example_multi_cursor_mo.svg';
 import ExampleSelectionSVG from '@/public/assets/images/@tmp/example_selection_mo.svg';
-import ExampleStatusSVG from '@/public/assets/images/@tmp/example_status_mo.svg';
 import ExampleDrawingSVG from '@/public/assets/images/@tmp/example_drawing_mo.svg';
 import ExampleCursorChatSVG from '@/public/assets/images/@tmp/example_cursor_chat_mo.svg';
 import ExampleMessageSVG from '@/public/assets/images/@tmp/example_message_mo.svg';
 import ExampleSplitViewSVG from '@/public/assets/images/@tmp/example_split_view_mo.svg';
 import ExamplePortalSVG from '@/public/assets/images/@tmp/example_portal_mo.svg';
-import ExampleToDoSVG from '@/public/assets/images/@tmp/example_to_do_mo.svg';
 import ExampleDataDropSVG from '@/public/assets/images/@tmp/example_data_drop_mo.svg';
 import ExampleLeaderBoardSVG from '@/public/assets/images/@tmp/example_leader_board_mo.svg';
 import ExampleCreatingSVG from '@/public/assets/images/@tmp/example_creating_mo.svg';
@@ -36,7 +36,12 @@ const Examples: NextPage = () => {
               Yorkie tools can be easily integrated to make products collaborative.
             </p>
             <Button.Box>
-              <Button as="link" href="/" className="orange_0 btn_start" icon={<Icon type="star" />}>
+              <Button
+                as="a"
+                href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`}
+                className="orange_0 btn_start"
+                icon={<Icon type="star" />}
+              >
                 Start for free
               </Button>
             </Button.Box>
@@ -62,6 +67,7 @@ const Examples: NextPage = () => {
                   Basic tools
                 </a>
               </li>
+              {/*
               <li className="navigator_group  ">
                 <a className="navigator_item add_icon">
                   <Icon type="messageSmile" />
@@ -80,6 +86,7 @@ const Examples: NextPage = () => {
                   Scenario examples
                 </a>
               </li>
+                */}
             </ul>
           </nav>
           <div className="filter">
@@ -146,7 +153,7 @@ const Examples: NextPage = () => {
             <li className="grid_item">
               <Link href="/examples/kanban" className="grid_card">
                 <div className="grid_thumbnail">
-                  <ExampleStatusSVG />
+                  <ExampleToDoSVG />
                 </div>
                 <div className="grid_card_info">
                   <strong className="title">Kanban Board</strong>
@@ -158,6 +165,19 @@ const Examples: NextPage = () => {
               </Link>
             </li>
             <li className="grid_item">
+              <a href="/examples/profile-stack" className="grid_card">
+                <div className="grid_thumbnail">
+                  <ExampleStatusSVG />
+                </div>
+                <div className="grid_card_info">
+                  <strong className="title">Profile Stack</strong>
+                  <p className="desc">
+                    Profile stack display indicates other collaborators’ current task with a status icon.
+                  </p>
+                </div>
+              </a>
+            </li>
+            {/* <li className="grid_item">
               <Link href="/examples/multi-cursor" className="grid_card">
                 <div className="grid_thumbnail">
                   <ExampleMultiCursorSVG />
@@ -168,7 +188,7 @@ const Examples: NextPage = () => {
                 </div>
               </Link>
             </li>
-            {/* <li className="grid_item">
+            <li className="grid_item">
               <Link href="/examples/webtoons" className="grid_card">
                 <div className="grid_thumbnail">
                   <ExampleCreatingSVG />
@@ -190,19 +210,6 @@ const Examples: NextPage = () => {
                 <div className="grid_card_info">
                   <strong className="title">Selection</strong>
                   <p className="desc">Selection feature showes selected components of other users in real time.</p>
-                </div>
-              </a>
-            </li>
-            <li className="grid_item">
-              <a href="#" className="grid_card">
-                <div className="grid_thumbnail">
-                  <ExampleStatusSVG />
-                </div>
-                <div className="grid_card_info">
-                  <strong className="title">Profile and Status Display</strong>
-                  <p className="desc">
-                    Profile status display indicates other collaborators’ current task with a status icon.
-                  </p>
                 </div>
               </a>
             </li>

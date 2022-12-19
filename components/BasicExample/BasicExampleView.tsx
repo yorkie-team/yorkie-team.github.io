@@ -1,6 +1,7 @@
 import classNames from 'classnames';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { ProjectCode } from '../BasicExampleProjects';
+import yorkie from 'yorkie-js-sdk';
+import { ProjectCodeType } from './types';
 import { Icon } from '../Icons/Icon';
 import { Sidebar } from './Sidebar';
 import UserContent from './UserContent';
@@ -8,15 +9,6 @@ import UserContent from './UserContent';
 interface DocChangeInfo {
   type: 'update' | 'initialize' | 'presence';
   content: string;
-}
-
-interface Props {
-  yorkieClientAddress: string;
-  yorkieDocumentKey: string;
-  yorkieApiKey: string;
-  projectCode: ProjectCode;
-  documentStructure: string;
-  iframeUrl: string;
 }
 
 export const UserNames = {
@@ -33,28 +25,35 @@ export const UserColors = {
 };
 
 export function BasicExampleView({
-  yorkieClientAddress,
-  yorkieDocumentKey,
+  rpcAddr,
+  documentKey,
   projectCode,
-  iframeUrl,
+  iframeURL,
   documentStructure,
-  yorkieApiKey,
-}: Props) {
+  apiKey: apiKey,
+  codeURL,
+}: {
+  rpcAddr: string;
+  apiKey: string;
+  documentKey: string;
+  projectCode: ProjectCodeType;
+  documentStructure: string;
+  iframeURL: string;
+  codeURL: string;
+}) {
   const [docChangeInfos, setDocChangeInfos] = useState<DocChangeInfo[]>([]);
   const [userList, setUserList] = useState<('user1' | 'user2' | 'user3' | 'user4')[]>(['user1', 'user2']);
-  const [projectCodeState, setProjectCodeState] = useState<ProjectCode>(projectCode);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     let unsubscribeDoc: Function;
     let unsubscribePresence: Function;
+
     const activate = async () => {
-      const yorkie = await import('yorkie-js-sdk');
-      const client = new yorkie.Client(yorkieClientAddress, {
-        apiKey: yorkieApiKey,
-      });
+      const client = new yorkie.Client(rpcAddr, { apiKey });
       await client.activate();
-      const doc = new yorkie.Document('vuejs-kanban');
+      const doc = new yorkie.Document(documentKey);
       await client.attach(doc);
+
       setDocChangeInfos((prev) => [...prev, { type: 'initialize', content: 'Connection has been established!' }]);
       unsubscribeDoc = doc.subscribe((event) => {
         if (event.type === 'remote-change') {
@@ -74,11 +73,12 @@ export function BasicExampleView({
       });
     };
     activate();
+
     return () => {
       if (unsubscribeDoc) unsubscribeDoc();
       if (unsubscribePresence) unsubscribePresence();
     };
-  }, [yorkieClientAddress, yorkieDocumentKey, yorkieApiKey]);
+  }, [rpcAddr, documentKey, apiKey]);
 
   const scrollToBottom = useCallback(() => {
     if (!messagesEndRef.current) return;
@@ -124,11 +124,12 @@ export function BasicExampleView({
   return (
     <main className="container">
       <Sidebar
-        defaultOpened={true}
         title="Kanban Board"
         description="Kanban Board is a tool for managing tasks and workflow. It is a visual way to manage tasks and workflow."
+        codeURL={codeURL}
         projectCode={projectCode}
         documentStructure={documentStructure}
+        defaultOpened
       />
       <div className="content code_view">
         <div className="pin_box">
@@ -158,13 +159,12 @@ export function BasicExampleView({
           </ul>
           <button type="button" className="btn btn_add" onClick={addUser}>
             <Icon type="plus" />
-            <span className="blind">유저 추가하기</span>
           </button>
         </div>
 
         <ul className="grid_list2">
           {userList.map((user) => {
-            return <UserContent key={user} user={user} iframeUrl={iframeUrl} />;
+            return <UserContent key={user} user={user} iframeURL={iframeURL} />;
           })}
         </ul>
 

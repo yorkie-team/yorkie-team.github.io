@@ -1,7 +1,7 @@
-import { ProjectCode } from '..';
+import { ProjectCodeType } from '@/components/BasicExample';
 import { files } from './files';
 
-export const KanbanProjectCode: ProjectCode = {
+export const ProjectCode: ProjectCodeType = {
   name: 'vuejs-kanban',
   children: [
     {

@@ -36,7 +36,7 @@ const Products: NextPage = () => {
             <Button.Box>
               <Button
                 as="a"
-                href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup`}
+                href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`}
                 className="orange_0 btn_start"
                 icon={<Icon type="star" />}
               >

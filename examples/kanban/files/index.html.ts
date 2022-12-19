@@ -5,7 +5,7 @@ export const content = `<!DOCTYPE html>
     <meta charset="UTF-8" />
     <link rel="icon" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>vuejs-kanban-yorkie</title>
+    <title>vuejs-kanban</title>
   </head>
 
   <body>

@@ -4,16 +4,15 @@ body {
   margin: 0;
   padding: 0;
 }
+
 .kanban {
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
-  /* margin-bottom: 10px; */
+
   background: #807b77;
-  /* border: 1px solid #ccc; */
-  height: 450px;
   align-items: flex-start;
-  overflow: auto;
+  overflow: hidden;
   min-height: 100vh;
   user-select: none;
 }
@@ -34,7 +33,7 @@ body {
 }
 
 .kaban .add-list-opener::before {
-  content: "＋ ";
+  content: '＋ ';
 }
 
 .delete {
@@ -50,7 +49,7 @@ body {
   flex-direction: column;
 }
 
-.add-form input[type="text"] {
+.add-form input[type='text'] {
   border: none;
   overflow: auto;
   outline: none;
@@ -66,12 +65,12 @@ body {
   word-break: break-word;
 }
 
-.add-form input[type="button"] {
+.add-form input[type='button'] {
   font-size: 1em;
   padding: 5px;
 }
 
-.add-form input[type="button"].pull-right {
+.add-form input[type='button'].pull-right {
   float: right;
 }
 
@@ -129,5 +128,5 @@ body {
 }
 
 .add-card-opener::before {
-  content: "＋ ";
+  content: '＋ ';
 }`;

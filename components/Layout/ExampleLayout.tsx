@@ -36,7 +36,9 @@ export function ExampleLayout({
             </Link>
             <span className="blind">Yorkie</span>
           </h1>
-          <span className="nav_text">Yorkie Example</span>
+          <span className="nav_text">
+            <Link href="/examples">Examples</Link>
+          </span>
           <span className="nav_text">{breadcrumbTitle}</span>
         </nav>
       </header>

@@ -1,7 +1,5 @@
 import { Language } from 'prism-react-renderer';
 
-export * from './kanban';
-
 interface ProjectComponent {
   isFile: boolean;
   name: string;
@@ -18,7 +16,7 @@ export interface ProjectFolder extends ProjectComponent {
   children?: Array<ProjectFolder | ProjectFile>;
 }
 
-export interface ProjectCode {
+export interface ProjectCodeType {
   name: string;
   children: Array<ProjectFolder | ProjectFile>;
 }
