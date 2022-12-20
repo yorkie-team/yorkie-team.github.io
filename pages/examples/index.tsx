@@ -165,17 +165,15 @@ const Examples: NextPage = () => {
               </Link>
             </li>
             <li className="grid_item">
-              <a href="/examples/profile-stack" className="grid_card">
+              <Link href="/examples/profile-stack" className="grid_card">
                 <div className="grid_thumbnail">
                   <ExampleStatusSVG />
                 </div>
                 <div className="grid_card_info">
                   <strong className="title">Profile Stack</strong>
-                  <p className="desc">
-                    Profile stack display indicates other collaborators’ current task with a status icon.
-                  </p>
+                  <p className="desc">Profile stack shows the list of users currently accessing the Document.</p>
                 </div>
-              </a>
+              </Link>
             </li>
             {/* <li className="grid_item">
               <Link href="/examples/multi-cursor" className="grid_card">

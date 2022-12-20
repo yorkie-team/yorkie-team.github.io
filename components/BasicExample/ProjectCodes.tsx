@@ -123,7 +123,7 @@ function ProjectCodes({ code, setProjectCodeState }: Props) {
       <div className="codeblock_area">
         <em className="file_title">{openedFile.name}</em>
         <div className="codeblock_box">
-          <CodeBlock code={openedFile.content} language="javascript" withLineNumbers />
+          <CodeBlock code={openedFile.content} language={openedFile.language} withLineNumbers />
         </div>
       </div>
     </div>
