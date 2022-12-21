@@ -64,9 +64,9 @@ export function Sidebar({ defaultOpened = true, title, description, projectCode,
           </div>
         )}
       </div>
-      <div className="sidebar_bottom" style={{ zIndex: 0 }}>
+      <div className="sidebar_bottom">
         <div className="btn_box">
-          <a href={codeURL} className="btn gray600 ">
+          <a href={codeURL} className="btn gray600" target="_blank" rel="noreferrer">
             GitHub
           </a>
         </div>
