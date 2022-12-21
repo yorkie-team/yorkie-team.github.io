@@ -22,6 +22,7 @@ export function Sidebar({ defaultOpened = true, title, description, projectCode,
     setIsOpened(defaultOpened);
   }, [defaultOpened]);
 
+  // TODO(hackerwins): Uncomment the document structure view when the how it works is ready.
   return (
     <div className={classNames('sidebar type_wide', { type_shadow: !defaultOpened }, { is_hide: !isOpened })}>
       <div className="sidebar_top">
@@ -35,15 +36,17 @@ export function Sidebar({ defaultOpened = true, title, description, projectCode,
           >
             Code
           </button>
-          <button
-            type="button"
-            onClick={() => {
-              setViewType('documentStructure');
-            }}
-            className={classNames('item', { is_active: viewType === 'documentStructure' })}
-          >
-            Document Structure
-          </button>
+          {process.env.NODE_ENV === 'development' && (
+            <button
+              type="button"
+              onClick={() => {
+                setViewType('documentStructure');
+              }}
+              className={classNames('item', { is_active: viewType === 'documentStructure' })}
+            >
+              Document Structure
+            </button>
+          )}
         </div>
         <button type="button" className="btn btn_toggle" onClick={() => setIsOpened(!isOpened)}>
           <Icon type="arrow" />

@@ -16,7 +16,6 @@ export function Header(): ReactElement {
     setIsLoggedIn(isLoggedIn);
   }, [setIsLoggedIn]);
 
-  // TODO(hackerwins): Remove examples condition when examples are ready.
   return (
     <header className="header_service">
       <div className="header_inner">
@@ -39,13 +38,11 @@ export function Header(): ReactElement {
                 Documentation
               </Link>
             </li>
-            {process.env.NODE_ENV === 'development' && (
-              <li className={`gnb_item ${pathname == '/examples' ? 'is_active' : ''}`}>
-                <Link href="/examples" className="link">
-                  Examples
-                </Link>
-              </li>
-            )}
+            <li className={`gnb_item ${pathname == '/examples' ? 'is_active' : ''}`}>
+              <Link href="/examples" className="link">
+                Examples
+              </Link>
+            </li>
             <li className={`gnb_item ${pathname == '/community' ? 'is_active' : ''}`}>
               <Link href="/community" className="link">
                 Community

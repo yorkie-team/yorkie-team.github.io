@@ -28,12 +28,11 @@ const Examples: NextPage = () => {
         <div className="top_banner_inner">
           <div className="title_group">
             <h2 className="title">
-              Collaboration tools <br /> built by Yorkie
+              Explore examples <br /> built by Yorkie
             </h2>
             <p className="desc">
-              Here you can discover open source examples built by Yorkie.
-              <br />
-              Yorkie tools can be easily integrated to make products collaborative.
+              Explore our examples and see how Yorkie can help you bring your products to the next level of
+              collaboration.
             </p>
             <Button.Box>
               <Button
@@ -61,13 +60,13 @@ const Examples: NextPage = () => {
                   All examples
                 </a>
               </li>
+              {/*
               <li className="navigator_group  ">
                 <a className="navigator_item add_icon">
                   <Icon type="tool" />
                   Basic tools
                 </a>
               </li>
-              {/*
               <li className="navigator_group  ">
                 <a className="navigator_item add_icon">
                   <Icon type="messageSmile" />

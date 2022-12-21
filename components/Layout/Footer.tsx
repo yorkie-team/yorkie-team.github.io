@@ -12,7 +12,6 @@ export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement
     );
   }
 
-  // TODO(hackerwins): Remove examples condition when examples are ready.
   return (
     <footer className="footer_service">
       <div className="footer_inner">
@@ -90,29 +89,25 @@ export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement
               </li>
             </ul>
           </div>
-          {
-            process.env.NODE_ENV === 'development' && (
-              <div className="site">
-                <strong className="title">
-                  <Link href="/examples" className="link">
-                    Examples
-                  </Link>
-                </strong>
-                <ul className="site_list">
-                  <li className="site_item">
-                    <Link href="/examples" className="link">
-                      Basic examples
-                    </Link>
-                  </li>
-                  <li className="site_item">
-                    <Link href="/examples" className="link">
-                      Scenario examples
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-            )
-          }
+          <div className="site">
+            <strong className="title">
+              <Link href="/examples" className="link">
+                Examples
+              </Link>
+            </strong>
+            <ul className="site_list">
+              <li className="site_item">
+                <Link href="/examples/kanban" className="link">
+                  Kanban Board
+                </Link>
+              </li>
+              <li className="site_item">
+                <Link href="/examples/profile-stack" className="link">
+                  Profile Stack
+                </Link>
+              </li>
+            </ul>
+          </div>
           <div className="site">
             <strong className="title">
               <Link href="/community" className="link">

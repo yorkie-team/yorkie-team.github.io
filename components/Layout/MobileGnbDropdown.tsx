@@ -19,7 +19,6 @@ export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // TODO(hackerwins): Remove examples condition when examples are ready.
   return (
     <Popover opened={gnbOpened} onChange={setGnbOpened}>
       <Popover.Target>
@@ -141,16 +140,14 @@ export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
                 </ul>
               </nav>
             </li>
-            {process.env.NODE_ENV === 'development' && (
-              <li className="dropdown_item">
-                <Link
-                  href="/examples"
-                  className={classNames('dropdown_menu', { is_active: asPath.split('#')[0] === '/examples' })}
-                >
-                  <span className="dropdown_text">Example</span>
-                </Link>
-              </li>
-            )}
+            <li className="dropdown_item">
+              <Link
+                href="/examples"
+                className={classNames('dropdown_menu', { is_active: asPath.split('#')[0] === '/examples' })}
+              >
+                <span className="dropdown_text">Example</span>
+              </Link>
+            </li>
             <li className="dropdown_item">
               <Link
                 href="/community"
