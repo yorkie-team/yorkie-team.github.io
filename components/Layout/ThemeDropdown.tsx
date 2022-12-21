@@ -10,7 +10,6 @@ export function ThemeDropdown() {
 
   useEffect(() => {
     const themeOption = (window.localStorage.getItem('theme') || 'light') as ThemeOption;
-    setTheme(themeOption);
     setThemeOption(themeOption);
   }, [setTheme]);
 

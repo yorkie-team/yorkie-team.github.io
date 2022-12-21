@@ -1,9 +1,17 @@
+import { useEffect } from 'react';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import '@/styles/style.css';
 import { prefix } from '@/utils/prefix';
+import { ThemeOption, useTheme } from '@/hooks/useTheme';
 
 function MyApp({ Component, pageProps }: AppProps) {
+  const { setTheme } = useTheme();
+  useEffect(() => {
+    const themeOption = (window.localStorage.getItem('theme') || 'light') as ThemeOption;
+    setTheme(themeOption);
+  }, [setTheme]);
+
   return (
     <>
       <Head>
