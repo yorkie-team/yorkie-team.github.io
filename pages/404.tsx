@@ -39,7 +39,7 @@ const Custom404: NextPage = () => {
           </Button>
           <Button
             as="a"
-            href="https://github.com/yorkie-team/yorkie-house/issues"
+            href="https://github.com/yorkie-team/dashboard/issues"
             className="gray50"
             outline
             target="_blank"
