@@ -18,9 +18,13 @@ If you want to install the SDK, refer to the [Getting Started with JS SDK](/docs
 We can create a Client using `new yorkie.Client()`. After the Client has been activated, it is connected to the server and ready to use.
 
 ```javascript
-const client = new yorkie.Client('{{API_ADDR}}');
+const client = new yorkie.Client('{{API_ADDR}}', {
+  apiKey: 'xxxxxxxxxxxxxxxxxxxx',
+});
 await client.activate();
 ```
+
+> The API key is used to identify the project in Yorkie. You can get the API key of the project you created in the [Dashboard]({{DASHBOARD_PATH}}).
 
 #### Subscribing to Client events
 
@@ -38,7 +42,7 @@ const unsubscribe = client.subscribe((event) => {
 
 By using the value of the `stream-connection-status-changed` event, it is possible to determine whether the Client is connected to the network.
 
-If you want to know about other ClientEvents, please refer to the [ClientEventType](https://yorkie.dev/yorkie-js-sdk/yorkie-js-sdk.clienteventtype).
+If you want to know about other ClientEvents, please refer to the [ClientEventType](https://yorkie.dev/yorkie-js-sdk/api-reference/yorkie-js-sdk.clienteventtype).
 
 #### Peer Awareness
 
@@ -188,7 +192,7 @@ doc.update((root) => {
 });
 ```
 
-An example of Text co-editing with CodeMirror: [CodeMirror example](https://github.com/yorkie-team/yorkie-js-sdk/blob/main/examples/index.html), [Demos](/demos)
+An example of Text co-editing with CodeMirror: [CodeMirror example](https://github.com/yorkie-team/yorkie-js-sdk/blob/main/examples/vanilla-codemirror6)
 
 #### RichText
 
@@ -203,7 +207,7 @@ doc.update((root) => {
 });
 ```
 
-An example of RichText co-editing with Quill: [Quill example](https://github.com/yorkie-team/yorkie-js-sdk/blob/main/examples/quill.html), [Demos](/demos)
+An example of RichText co-editing with Quill: [Quill example](https://github.com/yorkie-team/yorkie-js-sdk/blob/main/examples/vanilla-quill)
 
 #### Counter
 

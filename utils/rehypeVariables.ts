@@ -6,8 +6,24 @@ interface TextNode extends Node {
   value: string;
 }
 
+interface ElementNode extends Node {
+  type: 'element';
+  tagName: string;
+  properties: {
+    [key: string]: any;
+  };
+}
+
 function isTextNode(node: Node): node is TextNode {
   return node.type === 'text';
+}
+
+function isElementNode(node: Node): node is ElementNode {
+  return node.type === 'element';
+}
+
+function isAnchorNode(node: Node): node is ElementNode {
+  return isElementNode(node) && node.tagName === 'a';
 }
 
 type VariablePair = {
@@ -28,6 +44,8 @@ export default function rehypeVariables(options: { variables: Array<VariablePair
     visit(tree, (node: Node) => {
       if (isTextNode(node)) {
         node.value = replaceVariables(node.value, options.variables);
+      } else if (isAnchorNode(node)) {
+        node.properties.href = encodeURI(replaceVariables(decodeURI(node.properties.href), options.variables));
       }
     });
 

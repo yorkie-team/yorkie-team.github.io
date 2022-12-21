@@ -134,6 +134,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
             variables: [
               { pattern: 'JS_SDK_URL', value: process.env.NEXT_PUBLIC_JS_SDK_URL },
               { pattern: 'YORKIE_VERSION', value: process.env.NEXT_PUBLIC_YORKIE_VERSION },
+              { pattern: 'DASHBOARD_PATH', value: process.env.NEXT_PUBLIC_DASHBOARD_PATH },
               { pattern: 'API_ADDR', value: process.env.NEXT_PUBLIC_API_ADDR },
               { pattern: 'API_HOST', value: process.env.NEXT_PUBLIC_API_HOST },
               { pattern: 'API_PORT', value: process.env.NEXT_PUBLIC_API_PORT },
