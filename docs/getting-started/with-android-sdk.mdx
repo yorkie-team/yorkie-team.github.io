@@ -1,0 +1,151 @@
+---
+title: 'with Android SDK'
+order: 23
+---
+
+## Getting Started with Android SDK
+
+Let's start using Yorkie with the Android SDK. 
+
+### Using in your projects
+The library is published to Maven Central.
+
+#### Gradle
+Add a dependency to the dependencies block.
+
+```kotlin
+dependencies {
+  implementation("dev.yorkie:yorkie-android:{{YORKIE_VERSION}}")
+}
+```
+
+#### Maven
+Add a dependency to the \<dependencies> element.
+
+```xml
+<dependency>
+  <groupId>dev.yorkie</groupId>
+  <artifactId>yorkie-android</artifactId>
+  <version>{{YORKIE_VERSION}}</version>
+  <type>aar</type>
+</dependency>
+```
+
+### How to use Yorkie
+
+#### 1. Creating a Client with API key
+
+First, create a Client instance with API key and connect it to the yorkie server.
+
+```kotlin
+val client = Client(context, "{{API_HOST}}", {{API_PORT}}, false, Options(apiKey = "xxxxx"))
+
+// Declare your own CoroutineScope
+scope.launch {
+  client.activateAsync().await	
+}
+```
+
+> The API key is used to identify the project in Yorkie. You can get the API key of the project you created in the [Dashboard]({{DASHBOARD_PATH}}).
+
+#### 2. Creating a Document
+
+Then create a Document.
+
+```kotlin
+val document = Document(Key("doc-1"))
+
+// Declare your own CoroutineScope
+scope.launch {
+  client.attachAsync(document).await()
+}
+```
+
+The created document should be attached to the client to automatically synchronize the document between the client and peers.
+
+#### 3. Updating the Document
+
+The created document is initially an empty object. You can create or update a key-value property you would like to share with peers using `Document.updateAsync()`.
+
+```kotlin
+// Declare your own CoroutineScope
+scope.launch {
+  document.updateAsync { root ->
+    root["key"] = "value" // {"key":"value"}
+  }.await()
+}
+```
+
+#### 4. Accessing Document
+
+If you want to access the document properties, you can use `Document.getRoot()`.
+
+```kotlin
+// Declare your own CoroutineScope
+scope.launch {
+  document.updateAsync { root ->
+    root["sharedMessage"] = "Hello World!" // {"sharedMessage":"Hello World!"}
+  }.await()
+  println(document.getRoot()["sharedMessage"]) // "Hello World!"
+}
+```
+
+#### 5. Subscribing to the changes that happen in the Document
+
+Clients sharing the same document can subscribe to the changes that happen in the Document.
+
+```kotlin
+// Declare your own CoroutineScope
+scope.launch {
+  document.collect { event ->
+    println("A change event occured in the Document!")
+  }
+}
+```
+
+You can execute different actions depending on the source of change. 
+
+```kotlin
+// Declare your own CoroutineScope
+scope.launch {
+  document.collect { event ->
+    if (event is Document.Event.RemoteChange) {
+      println("A peer has changed the Document!")
+    }
+  }
+}
+```
+
+To create a collaborative application, it is important to be able to access certain document properties when a specific property in the document is modified. By examining the `paths`, you can determine which property has been changed and perform different actions based on that information. 
+
+```kotlin
+// Declare your own CoroutineScope
+scope.launch {
+  document.collect { event ->
+    if (event is Document.Event.RemoteChange) {
+      event.changeInfos.forEach { changeInfo ->
+        changeInfo.paths.forEach { path ->
+          if (path.startsWith("$.sharedMessage")) {
+            println("One of your peers has changed the message to ${document.getRoot()["sharedMessage"]}")
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+#### 6. Viewing the presence of other peers
+
+Other peers' activities can be accessed by subscribing to the client.
+
+```kotlin
+// Declare your own CoroutineScope
+scope.launch {
+  client.peerStatus.collect { peers ->
+    println("There are currently ${peers.size} peers")
+  }
+}
+```
+
+Next, let's take a look at the [Android SDK](/docs/android-sdk).
