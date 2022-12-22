@@ -13,15 +13,19 @@ Through Yorkie Android SDK, you can efficiently build collaborative applications
 
 #### Creating a Client
 
-We can create a Client using `Client(context: Context, rpcAddress: String)`. After the Client has been activated, it is connected to the server and ready to use.
+We can create a Client using `Client(context: Context, rpcHost: String, rpcPort: Int, usePlainText: Boolean, options: Options)`. After the Client has been activated, it is connected to the server and ready to use.
 
 ```kotlin
-val client = Client(context, "{{API_ADDR}}")
+val client = Client(context, "{{API_HOST}}", {{API_PORT}}, false, Options(apiKey = "xxxxx"))
 // Declare your own CoroutineScope
 scope.launch {
   client.activateAsync().await	
 }
 ```
+> The API key is used to identify the project in Yorkie. You can get the API key of the project you created in the [Dashboard]({{DASHBOARD_PATH}}).
+
+> usePlainText should be set false unless you use it for testing. For more information, please refer to [usePlainText](https://grpc.github.io/grpc-java/javadoc/io/grpc/ManagedChannelBuilder.html#usePlaintext--).
+
 
 #### Subscribing to Client status changes
 
@@ -31,13 +35,13 @@ We can observe various Client status such as `status`, `streamConnectionStatus`,
 // Declare your own CoroutineScope
 scope.launch {
   client.status.collect {
-    println(it) // 'Activated' or 'Deactivated' 
+    println(it) // "Activated" or "Deactivated"
   }
 }
 
 scope.launch {
-  streamConnectionStatus.collect {
-    println(it) // 'Connected' or 'Disconnected'
+  client.streamConnectionStatus.collect {
+    println(it) // "Connected" or "Disconnected"
   }
 }
 ```
