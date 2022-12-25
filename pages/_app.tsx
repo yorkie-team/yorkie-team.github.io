@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
+import Script from 'next/script';
 import '@/styles/style.css';
 import { prefix } from '@/utils/prefix';
 import { ThemeOption, useTheme } from '@/hooks/useTheme';
@@ -36,6 +37,19 @@ function MyApp({ Component, pageProps }: AppProps) {
           content="Easily add collaboration to your apps with our API-based services."
         />
       </Head>
+      <Script
+        src="https://www.googletagmanager.com/gtag/js?id=G-7KXWLDH8CH"
+        strategy="afterInteractive"
+      />
+      <Script id="google-analytics" strategy="afterInteractive">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){window.dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-7KXWLDH8CH');
+        `}
+      </Script>
       <Component {...pageProps} />
     </>
   );
