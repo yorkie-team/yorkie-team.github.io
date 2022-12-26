@@ -9,7 +9,7 @@ import LogoGnbSVG from '@/public/assets/icons/logo_gnb.svg';
 
 export function Header(): ReactElement {
   const { pathname } = useRouter();
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
 
   useEffect(() => {
     const isLoggedIn = isValidToken(localStorage.getItem('token'));
@@ -55,7 +55,7 @@ export function Header(): ReactElement {
             <Button as="a" href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`} outline className="gray50">
               Dashboard
             </Button>
-          ) : (
+          ) : isLoggedIn === false ? (
             <>
               <Button as="a" href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/login`} outline className="gray50">
                 Sign in
@@ -69,8 +69,8 @@ export function Header(): ReactElement {
                 Start for free
               </Button>
             </>
-          )}
-          <MobileGnbDropdown isLoggedIn={isLoggedIn} />
+          ) : null}
+          <MobileGnbDropdown isLoggedIn={!isLoggedIn} />
         </div>
       </div>
     </header>

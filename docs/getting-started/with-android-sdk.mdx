@@ -5,13 +5,15 @@ order: 23
 
 ## Getting Started with Android SDK
 
-Let's start using Yorkie with the Android SDK. 
+Welcome to Yorkie Android SDK! In this guide, we will walk you through the steps to get started with the Android SDK.
 
 ### Using in your projects
-The library is published to Maven Central.
+
+The library is published to [Maven Central](https://repo1.maven.org/maven2/dev/yorkie/yorkie-android/), so you can simply add the following line to your dependencies.
 
 #### Gradle
-Add a dependency to the dependencies block.
+
+To use the Yorkie Android SDK in your project, you will need to add it as a dependency in your `build.gradle` file.
 
 ```kotlin
 dependencies {
@@ -19,8 +21,10 @@ dependencies {
 }
 ```
 
+Make sure to replace `dev.yorkie` and `{{YORKIE_VERSION}}` with the correct group ID and version number for the Yorkie SDK.
+
 #### Maven
-Add a dependency to the \<dependencies> element.
+Add a dependency to the `<dependencies>` element.
 
 ```xml
 <dependency>
@@ -38,7 +42,7 @@ Add a dependency to the \<dependencies> element.
 First, create a Client instance with API key and connect it to the yorkie server.
 
 ```kotlin
-val client = Client(context, "{{API_HOST}}", {{API_PORT}}, false, Options(apiKey = "xxxxx"))
+val client = Client(context, "{{API_HOST}}", {{API_PORT}}, false, Options(apiKey = "xxxxxxxxxxxxxxxxxxxx"))
 
 // Declare your own CoroutineScope
 scope.launch {
@@ -53,7 +57,7 @@ scope.launch {
 Then create a Document.
 
 ```kotlin
-val document = Document(Key("doc-1"))
+val document = Document(Key("my-doc"))
 
 // Declare your own CoroutineScope
 scope.launch {
