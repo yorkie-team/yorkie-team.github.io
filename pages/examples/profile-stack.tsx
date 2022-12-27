@@ -1,8 +1,9 @@
+import { useState } from 'react';
 import { NextPage } from 'next';
 import Head from 'next/head';
 import { ExampleLayout } from '@/components';
-import { BasicExampleView, Sidebar } from '@/components/BasicExample';
-import { DocumentStructure, ProjectCode } from '@/examples/profile-stack';
+import { Sidebar, BasicExampleView, ProjectCodeType, ProjectCodes } from '@/components/exampleView';
+import { ProjectCode } from '@/examples/profile-stack';
 
 export interface DocChangeInfo {
   type: 'modification' | 'initialize';
@@ -10,6 +11,8 @@ export interface DocChangeInfo {
 }
 
 const ProfileStackExampleView: NextPage = () => {
+  const [projectCodeState, setProjectCodeState] = useState<ProjectCodeType>(ProjectCode);
+
   return (
     <ExampleLayout breadcrumbTitle="Profile Stack">
       {() => (
@@ -17,14 +20,24 @@ const ProfileStackExampleView: NextPage = () => {
           <Head>
             <title>Profile Stack · Yorkie Examples</title>
           </Head>
-          <Sidebar
-            title="Profile Stack"
-            description="The profile stack shows the list of users currently accessing the Document. Try adding and deleting users to see how the profile stack changes."
-            codeURL="https://github.com/yorkie-team/yorkie-js-sdk/tree/main/examples/profile-stack"
-            projectCode={ProjectCode}
-            documentStructure={DocumentStructure}
-            defaultOpened
-          />
+          <Sidebar wide>
+            <Sidebar.Tabs defaultTab="code">
+              <Sidebar.Top>
+                <Sidebar.TabsList>
+                  <Sidebar.TabsTab value="code">Code</Sidebar.TabsTab>
+                </Sidebar.TabsList>
+              </Sidebar.Top>
+              <Sidebar.TabsPanel value="code">
+                <Sidebar.GuideTitle>Profile Stack</Sidebar.GuideTitle>
+                <Sidebar.GuideDescription>
+                  The profile stack shows the list of users currently accessing the Document. Try adding and deleting
+                  users to see how the profile stack changes.
+                </Sidebar.GuideDescription>
+                <ProjectCodes code={projectCodeState} setProjectCodeState={setProjectCodeState} />
+              </Sidebar.TabsPanel>
+              <Sidebar.Bottom codeURL="https://github.com/yorkie-team/yorkie-js-sdk/tree/main/examples/profile-stack" />
+            </Sidebar.Tabs>
+          </Sidebar>
           <BasicExampleView
             rpcAddr={process.env.NEXT_PUBLIC_API_ADDR || ''}
             apiKey={process.env.NEXT_PUBLIC_EXAMPLES_API_KEY || ''}

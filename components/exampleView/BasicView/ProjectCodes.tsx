@@ -3,49 +3,13 @@ import classNames from 'classnames';
 import { ProjectFile, ProjectFolder, ProjectCodeType } from './types';
 import { CodeBlock, Icon } from '@/components';
 
-function SubProjectComponent({
-  component,
-  onClickFile,
+export function ProjectCodes({
+  code,
+  setProjectCodeState,
 }: {
-  component: Array<ProjectFile | ProjectFolder> | undefined;
-  onClickFile: (projectFile: ProjectFile) => void;
-}) {
-  if (!component) {
-    return null;
-  }
-  return (
-    <ul className="folder_sub_list" style={{ display: 'block' }}>
-      {component.map((child) => {
-        return (
-          <li className={classNames('folder_item', { is_active: child.isFile && child.isOpen })} key={child.name}>
-            <button
-              type="button"
-              className="btn_folder"
-              onClick={() => {
-                if (child.isFile) {
-                  onClickFile(child);
-                }
-              }}
-            >
-              {child.isFile ? <Icon type="file" /> : <Icon type="folder" />}
-              <span className="name">{child.name}</span>
-            </button>
-            {!child.isFile && child.children && (
-              <SubProjectComponent component={child.children} onClickFile={onClickFile} />
-            )}
-          </li>
-        );
-      })}
-    </ul>
-  );
-}
-
-interface Props {
   code: ProjectCodeType;
   setProjectCodeState: React.Dispatch<React.SetStateAction<ProjectCodeType>>;
-}
-
-function ProjectCodes({ code, setProjectCodeState }: Props) {
+}) {
   const recursiveFindOpen = useCallback((components: Array<ProjectFile | ProjectFolder>): ProjectFile | undefined => {
     for (let i = 0; i < components.length; i++) {
       const component = components[i];
@@ -130,4 +94,39 @@ function ProjectCodes({ code, setProjectCodeState }: Props) {
   );
 }
 
-export default ProjectCodes;
+function SubProjectComponent({
+  component,
+  onClickFile,
+}: {
+  component: Array<ProjectFile | ProjectFolder> | undefined;
+  onClickFile: (projectFile: ProjectFile) => void;
+}) {
+  if (!component) {
+    return null;
+  }
+  return (
+    <ul className="folder_sub_list" style={{ display: 'block' }}>
+      {component.map((child) => {
+        return (
+          <li className={classNames('folder_item', { is_active: child.isFile && child.isOpen })} key={child.name}>
+            <button
+              type="button"
+              className="btn_folder"
+              onClick={() => {
+                if (child.isFile) {
+                  onClickFile(child);
+                }
+              }}
+            >
+              {child.isFile ? <Icon type="file" /> : <Icon type="folder" />}
+              <span className="name">{child.name}</span>
+            </button>
+            {!child.isFile && child.children && (
+              <SubProjectComponent component={child.children} onClickFile={onClickFile} />
+            )}
+          </li>
+        );
+      })}
+    </ul>
+  );
+}

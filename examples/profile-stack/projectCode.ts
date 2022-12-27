@@ -1,4 +1,4 @@
-import { ProjectCodeType } from '@/components/BasicExample';
+import { ProjectCodeType } from '@/components/exampleView';
 import { files } from './files';
 
 export const ProjectCode: ProjectCodeType = {
