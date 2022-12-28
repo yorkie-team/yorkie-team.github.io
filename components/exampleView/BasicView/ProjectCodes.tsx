@@ -1,70 +1,66 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import classNames from 'classnames';
-import { ProjectFile, ProjectFolder, ProjectCodeType } from './types';
+import type { FileInfo, DirectoryInfo, CodeInfo } from '@/utils/exampleFileUtils';
+import {
+  isEmptyDirectory,
+  filterIgnoreFiles,
+  setFirstFileOpen,
+  setFileOpen,
+  getFileInfo,
+} from '@/utils/exampleFileUtils';
 import { CodeBlock, Icon } from '@/components';
 
 export function ProjectCodes({
-  code,
-  setProjectCodeState,
+  files,
+  activeFile,
+  ignoreFiles,
 }: {
-  code: ProjectCodeType;
-  setProjectCodeState: React.Dispatch<React.SetStateAction<ProjectCodeType>>;
+  files: DirectoryInfo;
+  activeFile?: string;
+  ignoreFiles?: string[];
 }) {
-  const recursiveFindOpen = useCallback((components: Array<ProjectFile | ProjectFolder>): ProjectFile | undefined => {
-    for (let i = 0; i < components.length; i++) {
-      const component = components[i];
-      if (component.isFile && component.isOpen) {
-        return component;
-      }
-      if (component.children) {
-        const recursiveResult = recursiveFindOpen(component.children);
-        if (!recursiveResult) {
-          continue;
-        } else {
-          return recursiveResult;
-        }
-      }
-    }
-  }, []);
-
-  const recursiveChangeOpenStatus = useCallback(
-    (components: Array<ProjectFile | ProjectFolder>, targetFile: ProjectFile): void => {
-      components.forEach((component) => {
-        if (component.isFile) {
-          component.isOpen = false;
-        }
-        if (component === targetFile) {
-          component.isOpen = true;
-        }
-        if (component.children) {
-          recursiveChangeOpenStatus(component.children, targetFile);
-        }
-      });
-    },
-    [],
+  const [fileInfo, setFileInfo] = useState<DirectoryInfo>({
+    isFile: false,
+    name: '',
+    path: '',
+    children: [],
+  });
+  const [activeFileInfo, setActiveFileInfo] = useState<FileInfo | null>(
+    activeFile ? getFileInfo(files, activeFile) : null,
   );
-
-  const openedFile: ProjectFile = useMemo(() => {
-    const file = recursiveFindOpen(code.children);
-    if (file) {
-      return file;
-    }
-    return { name: '', content: '', isFile: true, isOpen: false, language: 'javascript' };
-  }, [code, recursiveFindOpen]);
 
   const onClickFile = useCallback(
-    (projectFile: ProjectFile) => {
-      setProjectCodeState((prev) => {
-        recursiveChangeOpenStatus(prev.children, projectFile);
-        return { ...prev };
+    (targetFile: string) => {
+      setFileInfo((prev) => {
+        const [directoryInfo, openedFileInfo] = setFileOpen(prev, targetFile);
+        setActiveFileInfo(openedFileInfo);
+        return directoryInfo;
       });
     },
-    [setProjectCodeState, recursiveChangeOpenStatus],
+    [setFileInfo],
   );
+
+  useEffect(() => {
+    let initialFileInfo = files;
+    if (ignoreFiles) {
+      initialFileInfo = filterIgnoreFiles(initialFileInfo, ignoreFiles);
+    }
+
+    const [directoryInfoResult, openedFile] = activeFile
+      ? setFileOpen(initialFileInfo, activeFile)
+      : setFirstFileOpen(initialFileInfo);
+    initialFileInfo = directoryInfoResult;
+    setActiveFileInfo(openedFile);
+    setFileInfo(initialFileInfo);
+  }, [files, activeFile, ignoreFiles]);
+
   return (
     <div className="folder_box">
       <ul className="folder_list">
-        {code.children?.map((child) => {
+        {fileInfo.children?.map((child) => {
+          if (isEmptyDirectory(child)) {
+            return null;
+          }
           return (
             <li key={child.name} className={classNames('folder_item', { is_active: child.isFile && child.isOpen })}>
               <button
@@ -72,41 +68,45 @@ export function ProjectCodes({
                 className="btn_folder"
                 onClick={() => {
                   if (child.isFile) {
-                    onClickFile(child);
+                    onClickFile(child.path);
                   }
                 }}
               >
                 {child.isFile ? <Icon type="file" /> : <Icon type="folder" />}
                 <span className="name"> {child.name}</span>
               </button>
-              <SubProjectComponent component={child.children} onClickFile={onClickFile} />
+              {!child.isFile && <SubFolderCodes fileList={child.children} onClickFile={onClickFile} />}
             </li>
           );
         })}
       </ul>
       <div className="codeblock_area">
-        <em className="file_title">{openedFile.name}</em>
+        <em className="file_title">{activeFileInfo?.name || ''}</em>
         <div className="codeblock_box">
-          <CodeBlock code={openedFile.content} language={openedFile.language} withLineNumbers />
+          <CodeBlock
+            code={activeFileInfo?.content || ''}
+            language={(activeFileInfo?.language as any) || 'javascript'}
+            withLineNumbers
+          />
         </div>
       </div>
     </div>
   );
 }
 
-function SubProjectComponent({
-  component,
+function SubFolderCodes({
+  fileList,
   onClickFile,
 }: {
-  component: Array<ProjectFile | ProjectFolder> | undefined;
-  onClickFile: (projectFile: ProjectFile) => void;
+  fileList: Array<CodeInfo>;
+  onClickFile: (targetFile: string) => void;
 }) {
-  if (!component) {
-    return null;
-  }
   return (
-    <ul className="folder_sub_list" style={{ display: 'block' }}>
-      {component.map((child) => {
+    <ul className="folder_sub_list">
+      {fileList.map((child) => {
+        if (isEmptyDirectory(child)) {
+          return null;
+        }
         return (
           <li className={classNames('folder_item', { is_active: child.isFile && child.isOpen })} key={child.name}>
             <button
@@ -114,16 +114,14 @@ function SubProjectComponent({
               className="btn_folder"
               onClick={() => {
                 if (child.isFile) {
-                  onClickFile(child);
+                  onClickFile(child.path);
                 }
               }}
             >
               {child.isFile ? <Icon type="file" /> : <Icon type="folder" />}
               <span className="name">{child.name}</span>
             </button>
-            {!child.isFile && child.children && (
-              <SubProjectComponent component={child.children} onClickFile={onClickFile} />
-            )}
+            {!child.isFile && <SubFolderCodes fileList={child.children} onClickFile={onClickFile} />}
           </li>
         );
       })}

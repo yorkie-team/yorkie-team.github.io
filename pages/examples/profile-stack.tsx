@@ -1,18 +1,10 @@
-import { useState } from 'react';
 import { NextPage } from 'next';
 import Head from 'next/head';
 import { ExampleLayout } from '@/components';
-import { Sidebar, BasicExampleView, ProjectCodeType, ProjectCodes } from '@/components/exampleView';
-import { ProjectCode } from '@/examples/profile-stack';
-
-export interface DocChangeInfo {
-  type: 'modification' | 'initialize';
-  path: string;
-}
+import { Sidebar, BasicExampleView, ProjectCodes, COMMON_IGNORE_FILES } from '@/components/exampleView';
+import { FILE_INFO } from '@/examples/profile-stack/fileInfo';
 
 const ProfileStackExampleView: NextPage = () => {
-  const [projectCodeState, setProjectCodeState] = useState<ProjectCodeType>(ProjectCode);
-
   return (
     <ExampleLayout breadcrumbTitle="Profile Stack">
       {() => (
@@ -33,7 +25,11 @@ const ProfileStackExampleView: NextPage = () => {
                   The profile stack shows the list of users currently accessing the Document. Try adding and deleting
                   users to see how the profile stack changes.
                 </Sidebar.GuideDescription>
-                <ProjectCodes code={projectCodeState} setProjectCodeState={setProjectCodeState} />
+                <ProjectCodes
+                  files={FILE_INFO}
+                  activeFile="/main.js"
+                  ignoreFiles={[...COMMON_IGNORE_FILES, '.env', 'vite.config.js']}
+                />
               </Sidebar.TabsPanel>
               <Sidebar.Bottom codeURL="https://github.com/yorkie-team/yorkie-js-sdk/tree/main/examples/profile-stack" />
             </Sidebar.Tabs>
