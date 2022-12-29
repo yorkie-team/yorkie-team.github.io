@@ -1,4 +1,5 @@
-export const DocumentStructure = `export type KanbanDoc = {
+export const DOCUMENT_STRUCTURE = `
+export type KanbanDoc = {
     lists: Array<List>;
 };
 

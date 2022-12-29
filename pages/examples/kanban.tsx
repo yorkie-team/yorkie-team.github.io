@@ -1,21 +1,15 @@
-import { useState } from 'react';
 import { NextPage } from 'next';
 import Head from 'next/head';
 import { ExampleLayout, CodeBlock } from '@/components';
-import { Sidebar, BasicExampleView, ProjectCodeType, ProjectCodes } from '@/components/exampleView';
-import { DocumentStructure, ProjectCode } from '@/examples/kanban';
-
-export interface DocChangeInfo {
-  type: 'modification' | 'initialize';
-  path: string;
-}
+import { Sidebar, BasicExampleView, ProjectCodes, COMMON_IGNORE_FILES } from '@/components/exampleView';
+import { FILE_INFO } from '@/examples/vuejs-kanban/fileInfo';
+import { DOCUMENT_STRUCTURE } from '@/examples/vuejs-kanban/documentStructure';
 
 const KanbanExampleView: NextPage = () => {
-  const [projectCodeState, setProjectCodeState] = useState<ProjectCodeType>(ProjectCode);
   // TODO(hackerwins): Uncomment the document structure view when the how it works is ready.
   return (
     <ExampleLayout breadcrumbTitle="Kanban Board">
-      {({ viewType }) => (
+      {() => (
         <>
           <Head>
             <title>Kanban Board · Yorkie Examples</title>
@@ -36,11 +30,15 @@ const KanbanExampleView: NextPage = () => {
                   Kanban Board is a tool for managing tasks and workflow. It is a visual way to manage tasks and
                   workflow.
                 </Sidebar.GuideDescription>
-                <ProjectCodes code={projectCodeState} setProjectCodeState={setProjectCodeState} />
+                <ProjectCodes
+                  files={FILE_INFO}
+                  activeFile="/src/App.vue"
+                  ignoreFiles={[...COMMON_IGNORE_FILES, '.env']}
+                />
               </Sidebar.TabsPanel>
               <Sidebar.TabsPanel value="documentStructure">
                 <div className="codeblock_box">
-                  <CodeBlock code={DocumentStructure} language="typescript" />
+                  <CodeBlock code={DOCUMENT_STRUCTURE} language="typescript" />
                 </div>
               </Sidebar.TabsPanel>
               <Sidebar.Bottom codeURL="https://github.com/yorkie-team/yorkie-js-sdk/tree/main/examples/vuejs-kanban" />

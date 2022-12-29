@@ -8,7 +8,8 @@
     "export": "next build && next export",
     "start": "next start",
     "lint": "next lint",
-    "fetch:ui": "./scripts/fetch-ui.sh"
+    "fetch:ui": "./scripts/fetch-ui.sh",
+    "fetch:examples": "./scripts/fetch-examples.sh"
   },
   "dependencies": {
     "@jsdevtools/rehype-toc": "^3.0.2",
@@ -18,6 +19,8 @@
     "gray-matter": "^4.0.3",
     "image-size": "^1.0.2",
     "jwt-decode": "^3.1.2",
+    "lodash.clonedeep": "^4.5.0",
+    "minimatch": "^5.1.2",
     "next": "13.0.0",
     "next-image-export-optimizer": "^1.0.1",
     "next-mdx-remote": "^4.1.0",
@@ -34,6 +37,8 @@
   },
   "devDependencies": {
     "@mdx-js/loader": "^2.1.5",
+    "@types/lodash.clonedeep": "^4.5.7",
+    "@types/minimatch": "^5.1.2",
     "@types/node": "18.11.5",
     "@types/react": "18.0.23",
     "@types/react-dom": "18.0.7",
