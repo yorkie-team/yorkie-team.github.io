@@ -16,7 +16,7 @@ Through Yorkie iOS SDK, you can efficiently build collaborative applications. On
 We can create a Client using `Client(rpcAddress: RPCAddress(host:,port:), options:)`. After the Client has been activated, it is connected to the server and ready to use.
 
 ```swift
-let client = try! Client(rpcAddress: RPCAddress(host: "{{API_HOST}}", port: {{API_PORT}}), options: ClientOptions())
+let client = Client(rpcAddress: RPCAddress(host: "{{API_HOST}}", port: {{API_PORT}}), options: ClientOptions())
 try await client.activate()
 ```
 
