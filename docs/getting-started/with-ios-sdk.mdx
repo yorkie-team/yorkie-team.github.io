@@ -1,0 +1,104 @@
+---
+title: 'with iOS SDK'
+order: 22
+---
+
+## Getting Started with iOS SDK
+
+Welcome to Yorkie iOS SDK! In this guide, we will walk you through the steps to get started with the iOS SDK.
+
+### Using in your projects
+
+#### Swift Package Manager
+The Swift Package Manager is a tool for automating the distribution of Swift code and is integrated into the swift compiler.
+
+Once you have your Swift package set up, adding Yorkie as a dependency is as easy as adding it to the dependencies value of your Package.swift.
+
+```
+dependencies: [
+  .Package(url: "https://github.com/yorkie-team/yorkie-ios-sdk.git", from: "{{YORKIE_IOS_VERSION}}")
+]
+```
+
+### How to use Yorkie
+
+#### 1. Creating a Client with API key
+
+First, create a Client with API key
+
+```swift
+let client = Client(rpcAddress: RPCAddress(host: "{{API_HOST}}", port: {{API_PORT}}), options: ClientOptions(key: "xxxxxxxxxxxxxxxxxxxx"))
+try await client.activate()
+```
+
+> The API key is used to identify the project in Yorkie. You can get the API key of the project you created in the [Dashboard]({{DASHBOARD_PATH}}).
+
+#### 2. Creating a Document
+
+Then create a Document.
+
+```swift
+let doc = Document(key: docKey)
+await client.attach(doc);
+```
+
+The created document should be attached to the client to automatically synchronize the document between the client and peers.
+
+#### 3. Updating the Document
+
+The created document is initially an empty object. You can create or update a key-value property you would like to share with peers using `Document.update()`.
+
+```swift
+await doc.update { root in
+  root.key = "Key value"
+}
+```
+
+#### 4. Accessing Document
+
+If you want to access the document properties, you can use `Document.getRoot().get()`.
+
+```swift
+let value = await doc.getRoot().get("key") as? String
+```
+
+#### 5. Subscribing to the changes that happen in the Document
+
+Clients sharing the same document can subscribe to the changes that happen in the Document.
+
+```swift
+await doc.eventStream.sink { event in
+    switch event {
+    case let event as LocalChangeEvent:
+        print(event)
+    case let event as RemoteChangeEvent:
+        for changeInfo in event.value {
+            print(changeInfo.change.message)
+            for path in changeInfo.paths {
+                if path.starts(with: "$.obj.num") {
+                    // root.obj.num is changed
+                } else if path.starts(with: "$.obj") {
+                    // root.obj is changed
+                }
+            }
+        }
+    }
+}
+```
+
+#### 6. Viewing the presence of other peers
+
+Other peers' activities can be accessed by subscribing to the client.
+
+```swift
+client.eventStream.sink { event in
+    switch event {
+    case let event as PeerChangedEvent:
+        print("#### c1 \(event)")
+    default:
+        break
+    }
+}.store(in: &self.cancellables)
+```
+
+Next, let's take a look at the [iOS SDK](/docs/ios-sdk).

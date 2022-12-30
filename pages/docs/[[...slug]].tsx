@@ -132,8 +132,10 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
           rehypeVariables,
           {
             variables: [
-              { pattern: 'JS_SDK_URL', value: process.env.NEXT_PUBLIC_JS_SDK_URL },
               { pattern: 'YORKIE_VERSION', value: process.env.NEXT_PUBLIC_YORKIE_VERSION },
+              { pattern: 'YORKIE_JS_VERSION', value: process.env.NEXT_PUBLIC_YORKIE_JS_VERSION },
+              { pattern: 'YORKIE_IOS_VERSION', value: process.env.NEXT_PUBLIC_YORKIE_IOS_VERSION },
+              { pattern: 'YORKIE_ANDROID_VERSION', value: process.env.NEXT_PUBLIC_YORKIE_ANDROID_VERSION },
               { pattern: 'DASHBOARD_PATH', value: process.env.NEXT_PUBLIC_DASHBOARD_PATH },
               { pattern: 'API_ADDR', value: process.env.NEXT_PUBLIC_API_ADDR },
               { pattern: 'API_HOST', value: process.env.NEXT_PUBLIC_API_HOST },

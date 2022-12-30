@@ -8,7 +8,7 @@ const sampleCode = `
 <div>There are currently <span id='peersCount'></span> peers!</div>
 
 <!-- include yorkie js -->
-<script src="${process.env.NEXT_PUBLIC_JS_SDK_URL}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/yorkie-js-sdk/${process.env.NEXT_PUBLIC_YORKIE_JS_VERSION}/yorkie-js-sdk.js"></script>
 <script>
   async function main() {
     const client = new yorkie.Client('${process.env.NEXT_PUBLIC_API_ADDR}', {
