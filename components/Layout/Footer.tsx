@@ -3,11 +3,12 @@ import Link from 'next/link';
 import LogoSVG from '@/public/assets/icons/logo_horizontal_s.svg';
 import { ThemeDropdown } from './ThemeDropdown';
 
+const fullYear = new Date(process.env.NEXT_PUBLIC_BUILT_AT!).getFullYear();
 export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement {
   if (shortFooter) {
     return (
       <footer className="footer_service">
-        <p className="copyright">Copyright © 2022 Yorkie</p>
+        <p className="copyright">Copyright © {fullYear} Yorkie</p>
       </footer>
     );
   }
@@ -21,7 +22,7 @@ export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement
               <LogoSVG />
             </Link>
           </strong>
-          <p className="copyright">Copyright &copy; 2022 Yorkie</p>
+          <p className="copyright">Copyright &copy; {fullYear} Yorkie</p>
           <div className="filter">
             <div className="filter_list">
               <div className="filter_item">

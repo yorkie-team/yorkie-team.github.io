@@ -13,6 +13,7 @@ const nextConfig = {
     nextImageExportOptimizer_quality: 75,
     nextImageExportOptimizer_storePicturesInWEBP: true,
     nextImageExportOptimizer_generateAndUseBlurImages: true,
+    NEXT_PUBLIC_BUILT_AT: new Date().toUTCString(),
   },
   basePath: process.env.NEXT_PUBLIC_BASE_PATH || '',
   webpack: (config) => {
