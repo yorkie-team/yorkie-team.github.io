@@ -6,7 +6,9 @@ npm install
 npm run build-service
 
 cd ..
-cp -R public/assets/images/docs docs-images
+mkdir -p temp-images
+cp -R public/assets/images/docs temp-images/docs
+cp -R public/assets/images/examples temp-images/examples
 rm -rf public/assets
 mkdir -p public/assets
 cp -R ./temp/dist/assets/fonts public/assets/fonts
@@ -16,7 +18,6 @@ rm styles/style.css
 cp ./temp/dist/assets/styles/page/service.css styles/style.css
 mv public/assets/images/favicon* public/ 
 mv public/assets/images/og* public/
-mkdir -p public/assets/images/docs
-mv docs-images/* public/assets/images/docs
+mv temp-images/* public/assets/images
 rm -rf temp
-rm -rf docs-images
+rm -rf temp-images

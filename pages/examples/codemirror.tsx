@@ -9,11 +9,11 @@ import {
   EXAMPLE_CODE_URL,
   EXAMPLE_PREVIEW_URL,
 } from '@/components/exampleView';
-import { FILE_INFO } from '@/examples/profile-stack/fileInfo';
+import { FILE_INFO } from '@/examples/vanilla-codemirror6/fileInfo';
 
-const exampleKey = 'profile-stack';
-const exampleTitle = 'Profile Stack';
-const ProfileStackExampleView: NextPage = () => {
+const exampleKey = 'vanilla-codemirror6';
+const exampleTitle = 'Text Editor (Codemirror)';
+const CodemirrorExampleView: NextPage = () => {
   return (
     <ExampleLayout breadcrumbTitle={exampleTitle}>
       {() => (
@@ -31,13 +31,20 @@ const ProfileStackExampleView: NextPage = () => {
               <Sidebar.TabsPanel value="code">
                 <Sidebar.GuideTitle>{exampleTitle}</Sidebar.GuideTitle>
                 <Sidebar.GuideDescription>
-                  The profile stack shows the list of users currently accessing the Document. Try adding and deleting
-                  users to see how the profile stack changes.
+                  This is a real-time collaborative version of the{' '}
+                  <a href="https://codemirror.net/" className="link" target="_blank" rel="noreferrer">
+                    Codemirror
+                  </a>{' '}
+                  editor. It uses the{' '}
+                  <a href="https://yorkie.dev/docs/js-sdk#text" className="link" target="_blank" rel="noreferrer">
+                    Text
+                  </a>{' '}
+                  type, a custom CRDT type from Yorkie.
                 </Sidebar.GuideDescription>
                 <ProjectCodes
                   files={FILE_INFO}
-                  activeFile="/main.js"
-                  ignoreFiles={[...COMMON_IGNORE_FILES, '.env', 'vite.config.js']}
+                  activeFile="/src/main.ts"
+                  ignoreFiles={[...COMMON_IGNORE_FILES, '.env', 'vite.config.js', '/src/vite-env.d.ts']}
                 />
               </Sidebar.TabsPanel>
               <Sidebar.Bottom codeURL={EXAMPLE_CODE_URL + exampleKey} />
@@ -48,7 +55,6 @@ const ProfileStackExampleView: NextPage = () => {
             apiKey={process.env.NEXT_PUBLIC_EXAMPLES_API_KEY || ''}
             documentKey={exampleKey}
             iframeURL={EXAMPLE_PREVIEW_URL + exampleKey}
-            userMaxCount={6}
           />
         </>
       )}
@@ -56,4 +62,4 @@ const ProfileStackExampleView: NextPage = () => {
   );
 };
 
-export default ProfileStackExampleView;
+export default CodemirrorExampleView;

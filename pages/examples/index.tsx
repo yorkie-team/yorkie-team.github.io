@@ -3,20 +3,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { Button, Icon, Layout } from '@/components';
 import ExampleBannerSVG from '@/public/assets/images/banner/img_example_banner.svg';
-import ExampleStatusSVG from '@/public/assets/images/@tmp/example_status_mo.svg';
-import ExampleToDoSVG from '@/public/assets/images/@tmp/example_to_do_mo.svg';
-import ExampleMultiCursorSVG from '@/public/assets/images/@tmp/example_multi_cursor_mo.svg';
-import ExampleSelectionSVG from '@/public/assets/images/@tmp/example_selection_mo.svg';
-import ExampleDrawingSVG from '@/public/assets/images/@tmp/example_drawing_mo.svg';
-import ExampleCursorChatSVG from '@/public/assets/images/@tmp/example_cursor_chat_mo.svg';
-import ExampleMessageSVG from '@/public/assets/images/@tmp/example_message_mo.svg';
-import ExampleSplitViewSVG from '@/public/assets/images/@tmp/example_split_view_mo.svg';
-import ExamplePortalSVG from '@/public/assets/images/@tmp/example_portal_mo.svg';
-import ExampleDataDropSVG from '@/public/assets/images/@tmp/example_data_drop_mo.svg';
-import ExampleLeaderBoardSVG from '@/public/assets/images/@tmp/example_leader_board_mo.svg';
-import ExampleCreatingSVG from '@/public/assets/images/@tmp/example_creating_mo.svg';
-import ExampleTextEditingSVG from '@/public/assets/images/@tmp/example_text_editing_mo.svg';
-import ExampleOrderingSVG from '@/public/assets/images/@tmp/example_ordering_mo.svg';
+import { ExampleThumbnailImage } from '@/components/exampleView';
 
 const Examples: NextPage = () => {
   return (
@@ -150,9 +137,22 @@ const Examples: NextPage = () => {
           </div>
           <ul className="grid_list">
             <li className="grid_item">
+              <Link href="/examples/todo" className="grid_card">
+                <div className="grid_thumbnail">
+                  <ExampleThumbnailImage fileName="react-todomvc.jpg" alt="react-todomvc" />
+                </div>
+                <div className="grid_card_info">
+                  <strong className="title">Todo List</strong>
+                  <p className="desc">
+                    Todo List is an example of real-time collaborative TodoMVC using CreatReactApp and Yorkie JS SDK.
+                  </p>
+                </div>
+              </Link>
+            </li>
+            <li className="grid_item">
               <Link href="/examples/kanban" className="grid_card">
                 <div className="grid_thumbnail">
-                  <ExampleToDoSVG />
+                  <ExampleThumbnailImage fileName="vuejs-kanban.jpg" alt="vuejs-kanban" />
                 </div>
                 <div className="grid_card_info">
                   <strong className="title">Kanban Board</strong>
@@ -166,7 +166,7 @@ const Examples: NextPage = () => {
             <li className="grid_item">
               <Link href="/examples/profile-stack" className="grid_card">
                 <div className="grid_thumbnail">
-                  <ExampleStatusSVG />
+                  <ExampleThumbnailImage fileName="profile-stack.jpg" alt="profile-stack" />
                 </div>
                 <div className="grid_card_info">
                   <strong className="title">Profile Stack</strong>
@@ -174,173 +174,20 @@ const Examples: NextPage = () => {
                 </div>
               </Link>
             </li>
-            {/* <li className="grid_item">
-              <Link href="/examples/multi-cursor" className="grid_card">
-                <div className="grid_thumbnail">
-                  <ExampleMultiCursorSVG />
-                </div>
-                <div className="grid_card_info">
-                  <strong className="title">Multi Cursor</strong>
-                  <p className="desc">Multi cursor displays different users’ cursors in real time for collaboration.</p>
-                </div>
-              </Link>
-            </li>
             <li className="grid_item">
-              <Link href="/examples/webtoons" className="grid_card">
+              <Link href="/examples/codemirror" className="grid_card">
                 <div className="grid_thumbnail">
-                  <ExampleCreatingSVG />
+                  <ExampleThumbnailImage fileName="vanilla-codemirror6.jpg" alt="vanilla-codemirror6" />
                 </div>
                 <div className="grid_card_info">
-                  <strong className="title">Creating Webtoons</strong>
+                  <strong className="title">Text Editor(Codemirror)</strong>
                   <p className="desc">
-                    Creating webtoon scenario includes the ability to assist in effective communication of webtoon
-                    related tasks.
+                    This is a real-time collaborative version of the Codemirror editor. It uses the &#39;Text&#39; type,
+                    a custom CRDT type from Yorkie.
                   </p>
                 </div>
               </Link>
             </li>
-            <li className="grid_item">
-              <a href="#" className="grid_card">
-                <div className="grid_thumbnail">
-                  <ExampleSelectionSVG />
-                </div>
-                <div className="grid_card_info">
-                  <strong className="title">Selection</strong>
-                  <p className="desc">Selection feature showes selected components of other users in real time.</p>
-                </div>
-              </a>
-            </li>
-            <li className="grid_item">
-              <a href="#" className="grid_card">
-                <div className="grid_thumbnail">
-                  <ExampleDrawingSVG />
-                </div>
-                <div className="grid_card_info">
-                  <strong className="title">Drawing Comment</strong>
-                  <p className="desc">
-                    Drawing comment allows users to leave comments as free-form drawings as well as texts.
-                  </p>
-                </div>
-              </a>
-            </li>
-            <li className="grid_item">
-              <a href="#" className="grid_card">
-                <div className="grid_thumbnail">
-                  <ExampleCursorChatSVG />
-                </div>
-                <div className="grid_card_info">
-                  <strong className="title">Cursor Interaction</strong>
-                  <p className="desc">
-                    Cursor interactions is a location-based chat feature that enables users to chat based on cursor
-                    position.
-                  </p>
-                </div>
-              </a>
-            </li>
-            <li className="grid_item">
-              <a href="#" className="grid_card">
-                <div className="grid_thumbnail">
-                  <ExampleMessageSVG />
-                </div>
-                <div className="grid_card_info">
-                  <strong className="title">Instant Messaging</strong>
-                  <p className="desc">
-                    Instant messaging allowes users to send instant messages through profile stack.
-                  </p>
-                </div>
-              </a>
-            </li>
-            <li className="grid_item">
-              <a href="#" className="grid_card">
-                <div className="grid_thumbnail">
-                  <ExampleSplitViewSVG />
-                </div>
-                <div className="grid_card_info">
-                  <strong className="title">Whiteboard Split View</strong>
-                  <p className="desc">
-                    Split view enables screen segmentation, and to easily move data between the divided screens.
-                  </p>
-                </div>
-              </a>
-            </li>
-            <li className="grid_item">
-              <a href="#" className="grid_card">
-                <div className="grid_thumbnail">
-                  <ExamplePortalSVG />
-                </div>
-                <div className="grid_card_info">
-                  <strong className="title">Portal</strong>
-                  <p className="desc">
-                    Portal feature provides shortcuts to components and locations for quick operation.
-                  </p>
-                </div>
-              </a>
-            </li>
-            <li className="grid_item">
-              <a href="#" className="grid_card">
-                <div className="grid_thumbnail">
-                  <ExampleToDoSVG />
-                </div>
-                <div className="grid_card_info">
-                  <strong className="title">To-do List</strong>
-                  <p className="desc">To-do list manages and lists tasks for collaborative situations.</p>
-                </div>
-              </a>
-            </li>
-            <li className="grid_item">
-              <a href="#" className="grid_card">
-                <div className="grid_thumbnail">
-                  <ExampleDataDropSVG />
-                </div>
-                <div className="grid_card_info">
-                  <strong className="title">Data Drop</strong>
-                  <p className="desc">
-                    Data drop function can immediately send material to others within a collaborative space.
-                  </p>
-                </div>
-              </a>
-            </li>
-            <li className="grid_item">
-              <a href="#" className="grid_card">
-                <div className="grid_thumbnail">
-                  <ExampleLeaderBoardSVG />
-                </div>
-                <div className="grid_card_info">
-                  <strong className="title">Leader Board</strong>
-                  <p className="desc">
-                    The leader board system ranks users activities within the whiteboardby their activities and
-                    contribution.
-                  </p>
-                </div>
-              </a>
-            </li>
-            <li className="grid_item">
-              <a href="#" className="grid_card">
-                <div className="grid_thumbnail">
-                  <ExampleTextEditingSVG />
-                </div>
-                <div className="grid_card_info">
-                  <strong className="title">Text Co-editing</strong>
-                  <p className="desc">
-                    Text co-editing fuction alleviate existing problems when multiple users edit text at the same time.
-                  </p>
-                </div>
-              </a>
-            </li>
-            <li className="grid_item">
-              <a href="#" className="grid_card">
-                <div className="grid_thumbnail">
-                  <ExampleOrderingSVG />
-                </div>
-                <div className="grid_card_info">
-                  <strong className="title">Ordering Delivery Food</strong>
-                  <p className="desc">
-                    Ordering scenario include features that allow orders to be placed together in an existing delivery
-                    service app.
-                  </p>
-                </div>
-              </a>
-            </li> */}
           </ul>
         </div>
       </div>
