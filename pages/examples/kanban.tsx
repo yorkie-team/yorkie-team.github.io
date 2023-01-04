@@ -21,7 +21,7 @@ const KanbanExampleView: NextPage = () => {
       {() => (
         <>
           <Head>
-            <title>{exampleTitle} · Yorkie Examples</title>
+            <title>{`${exampleTitle} · Yorkie Examples`}</title>
           </Head>
           <Sidebar wide>
             <Sidebar.Tabs defaultTab="code">
