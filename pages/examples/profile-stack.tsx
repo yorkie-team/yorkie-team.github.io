@@ -1,16 +1,25 @@
 import { NextPage } from 'next';
 import Head from 'next/head';
 import { ExampleLayout } from '@/components';
-import { Sidebar, BasicExampleView, ProjectCodes, COMMON_IGNORE_FILES } from '@/components/exampleView';
+import {
+  Sidebar,
+  BasicExampleView,
+  ProjectCodes,
+  COMMON_IGNORE_FILES,
+  EXAMPLE_CODE_URL,
+  EXAMPLE_PREVIEW_URL,
+} from '@/components/exampleView';
 import { FILE_INFO } from '@/examples/profile-stack/fileInfo';
 
+const exampleKey = 'profile-stack';
+const exampleTitle = 'Profile Stack';
 const ProfileStackExampleView: NextPage = () => {
   return (
-    <ExampleLayout breadcrumbTitle="Profile Stack">
+    <ExampleLayout breadcrumbTitle={exampleTitle}>
       {() => (
         <>
           <Head>
-            <title>Profile Stack · Yorkie Examples</title>
+            <title>{`${exampleTitle} · Yorkie Examples`}</title>
           </Head>
           <Sidebar wide>
             <Sidebar.Tabs defaultTab="code">
@@ -20,7 +29,7 @@ const ProfileStackExampleView: NextPage = () => {
                 </Sidebar.TabsList>
               </Sidebar.Top>
               <Sidebar.TabsPanel value="code">
-                <Sidebar.GuideTitle>Profile Stack</Sidebar.GuideTitle>
+                <Sidebar.GuideTitle>{exampleTitle}</Sidebar.GuideTitle>
                 <Sidebar.GuideDescription>
                   The profile stack shows the list of users currently accessing the Document. Try adding and deleting
                   users to see how the profile stack changes.
@@ -31,14 +40,14 @@ const ProfileStackExampleView: NextPage = () => {
                   ignoreFiles={[...COMMON_IGNORE_FILES, '.env', 'vite.config.js']}
                 />
               </Sidebar.TabsPanel>
-              <Sidebar.Bottom codeURL="https://github.com/yorkie-team/yorkie-js-sdk/tree/main/examples/profile-stack" />
+              <Sidebar.Bottom codeURL={EXAMPLE_CODE_URL + exampleKey} />
             </Sidebar.Tabs>
           </Sidebar>
           <BasicExampleView
             rpcAddr={process.env.NEXT_PUBLIC_API_ADDR || ''}
             apiKey={process.env.NEXT_PUBLIC_EXAMPLES_API_KEY || ''}
-            documentKey="profile-stack"
-            iframeURL="https://yorkie.dev/yorkie-js-sdk/examples/profile-stack/"
+            documentKey={exampleKey}
+            iframeURL={EXAMPLE_PREVIEW_URL + exampleKey}
             userMaxCount={6}
           />
         </>

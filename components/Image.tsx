@@ -9,6 +9,8 @@ export type ImageProps = {
 export function Image({ src, alt, width, height, ...rest }: ImageProps) {
   const isInternalLink = typeof src === 'string' && src.startsWith('/');
 
+  // TODO(chacha912): Fix the 404 error that occurs for image files
+  // because `next export` is not performed in the development environment.
   return (
     <ExportedImage src={isInternalLink ? `${prefix}${src}` : src} alt={alt} width={width} height={height} {...rest} />
   );
