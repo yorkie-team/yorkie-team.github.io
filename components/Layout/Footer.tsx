@@ -107,6 +107,21 @@ export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement
                   Profile Stack
                 </Link>
               </li>
+              <li className="site_item">
+                <Link href="/examples/todomvc" className="link">
+                  TodoMVC
+                </Link>
+              </li>
+              <li className="site_item">
+                <Link href="/examples/codemirror" className="link">
+                  CodeMirror
+                </Link>
+              </li>
+              <li className="site_item">
+                <Link href="/examples/tldraw" className="link">
+                  tldraw
+                </Link>
+              </li>
             </ul>
           </div>
           <div className="site">

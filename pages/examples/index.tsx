@@ -169,7 +169,7 @@ const Examples: NextPage = () => {
                 <div className="grid_card_info">
                   <strong className="title">TodoMVC</strong>
                   <p className="desc">
-                    This is an example of real-time collaborative TodoMVC using CreatReactApp and Yorkie JS SDK.
+                    This is an example of real-time collaborative TodoMVC using CreateReactApp and Yorkie JS SDK.
                   </p>
                 </div>
               </Link>
@@ -182,8 +182,22 @@ const Examples: NextPage = () => {
                 <div className="grid_card_info">
                   <strong className="title">CodeMirror</strong>
                   <p className="desc">
-                    This is a real-time collaborative version of the CodeMirror editor. It uses the Text,
-                    a custom CRDT type from Yorkie.
+                    This is a real-time collaborative version of the CodeMirror editor. It uses the Text, a custom CRDT
+                    type from Yorkie.
+                  </p>
+                </div>
+              </Link>
+            </li>
+            <li className="grid_item">
+              <Link href="/examples/tldraw" className="grid_card">
+                <div className="grid_thumbnail">
+                  <ExampleThumbnailImage fileName="react-tldraw.jpg" alt="react-tldraw" />
+                </div>
+                <div className="grid_card_info">
+                  <strong className="title">tldraw</strong>
+                  <p className="desc">
+                    This is a real-time collaboration example of the tldraw whiteboard editor with CreateReactApp and
+                    Yorkie JS SDK
                   </p>
                 </div>
               </Link>
