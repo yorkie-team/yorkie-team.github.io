@@ -106,8 +106,7 @@ const Home: NextPage = () => {
             Variety of <br className="br_mo" /> collaboration features <br /> for your app
           </h2>
           <p className="section_desc">
-            Easily add stable and diverse collaborative features
-            <br className="br_mo" />
+            Easily add stable and diverse collaborative features <br className="br_mo" />
             to your product with Yorkie. <br />
             Transform your local-based product into a <br className="br_mo" /> collaborative online experience with our
             powerful tools. <br />

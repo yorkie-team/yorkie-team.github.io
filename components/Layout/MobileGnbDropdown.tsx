@@ -145,7 +145,7 @@ export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
                 href="/examples"
                 className={classNames('dropdown_menu', { is_active: asPath.split('#')[0] === '/examples' })}
               >
-                <span className="dropdown_text">Example</span>
+                <span className="dropdown_text">Examples</span>
               </Link>
             </li>
             <li className="dropdown_item">
