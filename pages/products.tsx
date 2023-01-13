@@ -191,7 +191,7 @@ const Products: NextPage = () => {
               <li className="product_card_item">
                 <strong className="product_card_title">Security</strong>
                 <p className="product_card_desc">
-                  <Link href="/docs/project#auth-webhook" className="link">
+                  <Link href="/docs/cli#auth-webhook" className="link">
                     Auth Webhook
                   </Link>{' '}
                   allows users to verify the authorization of clients to access documents from an external service.
