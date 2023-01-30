@@ -177,7 +177,11 @@ const Products: NextPage = () => {
               <li className="product_card_item">
                 <strong className="product_card_title">Size optimization</strong>
                 <p className="product_card_desc">
-                  Yorkie uses Garbage Collection and{' '}
+                  Yorkie uses{' '}
+                  <a href="https://github.com/yorkie-team/yorkie/blob/main/design/garbage-collection.md" className="link">
+                    Garbage Collection
+                  </a>
+                  {' '}and{' '}
                   <a href="https://en.wikipedia.org/wiki/Lamport_timestamp" className="link">
                     Lamport timestamps
                   </a>{' '}
