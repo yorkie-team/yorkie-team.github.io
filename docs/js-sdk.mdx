@@ -161,7 +161,7 @@ doc.subscribe((event) => {
 
 #### Detaching the Document
 
-If the document is no longer used, it should be detached to increase the efficiency of GC removing [CRDT tombstones](https://crdt.tech/glossary). For more information about GC, please refer to [Garbage Collection](/docs/internals#garbage-collection).
+If the document is no longer used, it should be detached to increase the efficiency of GC removing [CRDT tombstones](https://crdt.tech/glossary). For more information about GC, please refer to [Garbage Collection](https://github.com/yorkie-team/yorkie/blob/main/design/garbage-collection.md).
 
 ```javascript
 await client.detach(doc);
