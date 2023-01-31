@@ -173,44 +173,32 @@ Custom CRDT types are data types that can be used for special applications such 
 
 #### Text
 
-`Text` provides supports for collaborative plain text editing. Under the hood, `Text` is represented as a list of characters. Compared to a regular JavaScript array, Text offers better performance. It also has selection information for sharing the cursor position.
+`Text` provides supports for collaborative text editing. `Text` has selection information for sharing the cursor position. In addition, contents in `Text` can have attributes; for example, characters can be bold, italic, or underlined.
 
 ```javascript
 doc.update((root) => {
-  root.text = new yorkie.Text(); // {"text":""}
-  root.text.edit(0, 0, 'hello'); // {"text":"hello"}
-  root.text.edit(0, 1, 'H');     // {"text":"Hello"}
-  root.text.select(0, 1);        // {"text":"^H^ello"}
+  root.text = new yorkie.Text();            // {"text":""}
+  root.text.edit(0, 0, 'hello');            // {"text":"hello"}
+  root.text.edit(0, 1, 'H');                // {"text":"Hello"}
+  root.text.select(0, 1);                   // {"text":"^H^ello"}
+  root.text.setStyle(0, 1, { bold: true }); // {"text":"<b>H</b>ello"}
 });
 ```
 
 An example of Text co-editing with CodeMirror: [CodeMirror example](https://github.com/yorkie-team/yorkie-js-sdk/blob/main/examples/vanilla-codemirror6)
 
-#### RichText
-
-`RichText` is similar to `Text` except that we can add attributes to contents.
-
-```javascript
-doc.update((root) => {
-  root.text = new yorkie.RichText();        // {"text":""}
-  root.text.edit(0, 0, 'hello');            // {"text":"hello"}
-  root.text.edit(0, 1, 'H');                // {"text":"Hello"}
-  root.text.setStyle(0, 1, { bold: true }); // {"text":"<b>H</b>ello"}
-});
-```
-
-An example of RichText co-editing with Quill: [Quill example](https://github.com/yorkie-team/yorkie-js-sdk/blob/main/examples/vanilla-quill)
+An example of Text co-editing with Quill: [Quill example](https://github.com/yorkie-team/yorkie-js-sdk/blob/main/examples/vanilla-quill)
 
 #### Counter
 
-`Counter` supports numeric types that change with addition and subtraction. If a numeric data needs to be modified at the same time, `Counter` should be used instead of primitives.
+`Counter` supports integer types changing with addition and subtraction. If an integer data needs to be modified simultaneously, `Counter` should be used instead of primitives.
 
 ```javascript
 doc.update((root) => {
-  root.counter = new yorkie.Counter(1); // {"counter":1}
-  root.counter.increase(2);             // {"counter":3}
-  root.counter.increase(3.5);           // {"counter":6.5}
-  root.counter.increase(-3.5);          // {"counter":3}
+  root.counter = new yorkie.Counter(yorkie.IntType, 1); // {"counter":1}
+  root.counter.increase(2);                             // {"counter":3}
+  root.counter.increase(3);                             // {"counter":6}
+  root.counter.increase(-4);                            // {"counter":2}
 });
 ```
 
