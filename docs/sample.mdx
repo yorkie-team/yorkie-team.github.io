@@ -131,10 +131,10 @@ doc.update((root) => {
 
 // Counter supports numeric types that change with addition and subtraction.
 doc.update((root) => {
-  root.counter = new yorkie.Counter(1);     // {"counter":1}
-  root.counter.increase(2);                 // {"counter":3}
-  root.counter.increase(3.5);               // {"counter":6.5}
-  root.counter.increase(-3.5);              // {"counter":3}
+  root.counter = new yorkie.Counter(yorkie.IntType, 1); // {"counter":1}
+  root.counter.increase(2);                             // {"counter":3}
+  root.counter.increase(3);                             // {"counter":6}
+  root.counter.increase(-4);                            // {"counter":2}
 });`} 
     language="javascript" 
     withLineNumbers 

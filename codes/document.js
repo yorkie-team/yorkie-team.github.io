@@ -32,10 +32,10 @@ doc.update((root) => {
 const COUNTER_CODE = ` 
 // Counter supports numeric types that change with addition and subtraction.
 doc.update((root) => {
-  root.counter = new yorkie.Counter(1);  // {"counter":1}
-  root.counter.increase(2);              // {"counter":3}
-  root.counter.increase(3.5);            // {"counter":6.5}
-  root.counter.increase(-3.5);           // {"counter":3}
+  root.cnt = new yorkie.Counter(yorkie.IntType, 1); // {"cnt":1}
+  root.cnt.increase(2);                             // {"cnt":3}
+  root.cnt.increase(3);                             // {"cnt":6}
+  root.cnt.increase(-4);                            // {"cnt":2}
 });
 `;
 
