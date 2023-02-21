@@ -18,7 +18,9 @@ If you want to install the SDK, refer to the [Getting Started with iOS SDK](/doc
 We can create a Client using `Client(rpcAddress: RPCAddress(host:,port:), options:)`. After the Client has been activated, it is connected to the server and ready to use.
 
 ```swift
-let client = Client(rpcAddress: RPCAddress(host: "{{API_HOST}}", port: {{API_PORT}}), options: ClientOptions())
+let client = Client(rpcAddress: RPCAddress(host: "{{API_HOST}}", port: {{API_PORT}}), options: ClientOptions(
+	apiKey: "xxxxxxxxxxxxxxxxxxxx"
+))
 try await client.activate()
 ```
 
