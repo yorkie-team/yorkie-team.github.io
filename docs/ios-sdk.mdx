@@ -118,6 +118,39 @@ If the document is no longer used, it should be detached to increase the efficie
 try await client.detach(doc)
 ```
 
+### Custom CRDT types
+
+Custom CRDT types are data types that can be used for special applications such as text editors and counters, unlike general JSON data types such as `JSONObject` and `JSONArray`. Custom CRDT types can be created in the callback function of `document.update`.
+
+#### JSONText
+
+`JSONText` provides supports for collaborative text editing. `JSONText` has selection information for sharing the cursor position. In addition, contents in `Text` can have attributes; for example, characters can be bold, italic, or underlined.
+
+```swift
+await doc.update{ root in
+    root.text = JSONText() // {"text":[]}
+    (root.text as? JSONText)?.edit(0, 0, "hello")               // {"text":[{"val":"hello"}]}
+    (root.text as? JSONText)?.edit(0, 1, "H")                   // {"text":[{"val":"H"},{"val":"ello"}]}
+    (root.text as? JSONText)?.select(0, 1)
+    (root.text as? JSONText)?.setStyle(fromIdx: 0, toIdx: 1, attributes: ["bold": true])    // {"text":[{"attrs":{"bold":"true"},"val":"H"},{"val":"ello"}]}
+}
+```
+
+An example of Text Editor: [Text Editor example](https://github.com/yorkie-team/yorkie-ios-sdk/tree/main/Examples/TextEditorApp)
+
+#### JSONCounter
+
+`JSONCounter` supports integer types changing with addition and subtraction. If an integer data needs to be modified simultaneously, `JSONCounter` should be used instead of primitives.
+
+```swift
+await doc.update{ root in
+    root.counter = JSONCounter(value: Int64(1))                 // {"counter":1}
+    (root.counter as? JSONCounter<Int64>)?.increase(value: 2)   // {"counter":3}
+    (root.counter as? JSONCounter<Int64>)?.increase(value: 3)   // {"counter":6}
+    (root.counter as? JSONCounter<Int64>)?.increase(value: -4)  // {"counter":2}
+}
+```
+
 ### Reference
 
 For details on how to use the iOS SDK, please refer to [iOS SDK Reference](https://yorkie.dev/yorkie-ios-sdk/documentation/yorkie).
