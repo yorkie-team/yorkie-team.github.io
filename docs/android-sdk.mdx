@@ -139,16 +139,35 @@ scope.launch {
 
 ### Custom CRDT types
 
-Custom CRDT types are data types that can be used for special applications such as text editors and counters, unlike general JSON data types such as `Object` and `Array`. Custom CRDT types can be created in the callback function of `document.update`.
+Custom CRDT types are data types that can be used for special applications such as text editors and counters, unlike general JSON data types such as `JsonObject` and `JsonArray`. Custom CRDT types can be created in the callback function of `document.update`.
 
-#### Counter
-
-`Counter` supports integer types changing with addition and subtraction. If an integer data needs to be modified simultaneously, `Counter` should be used instead of primitives.
+#### JsonText
+`JsonText` provides supports for collaborative text editing. `JsonText` has selection information for sharing the cursor position. In addition, contents in `JsonText` can have attributes; for example, characters can be bold, italic, or underlined.
 
 ```kotlin
 // Declare your own CoroutineScope
 scope.launch {
-  target.updateAsync("") { root ->
+  target.updateAsync { root ->
+    root.setNewText("text")                                           // {"text":[]}
+    root.getAs<JsonText>("text").edit(0, 0, "hello")                  // {"text":["val":"hello"]}
+    root.getAs<JsonText>("text").edit(0, 1, "H")                      // {"text":[{"val":"H"},{"val":"ello"}]}
+    root.getAs<JsonText>("text").select(0, 1)
+    root.getAs<JsonText>("text").style(0, 1, mapOf("bold" to "true")) // {"text":[{"attrs":{"bold":"true"},"val":"H"},{"val":"ello"}]}
+  }.await()
+}
+```
+
+An example of TextEditor: [Text Editor example](https://github.com/yorkie-team/yorkie-android-sdk/tree/main/examples/texteditor)
+
+
+#### JsonCounter
+
+`JsonCounter` supports integer types changing with addition and subtraction. If an integer data needs to be modified simultaneously, `JsonCounter` should be used instead of primitives.
+
+```kotlin
+// Declare your own CoroutineScope
+scope.launch {
+  target.updateAsync { root ->
     root.setNewCounter("counter", 1)                // {"counter":1}
     root.getAs<JsonCounter>("counter").increase(3)  // {"counter":4}
     root.getAs<JsonCounter>("counter").increase(6)  // {"counter":10}
