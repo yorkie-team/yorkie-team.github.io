@@ -107,6 +107,8 @@ const doc = new yorkie.Document('doc-1');
 await client.attach(doc);
 ```
 
+> The document key is used to identify the Document in Yorkie. It is a string that can be freely defined by the user. However, it is allowed to use only `a-z`, `0-9`, `-`, `.`, `_`, `~` and must be less than 120 characters.
+
 After attaching the Document to the Client, all changes to the Document are automatically synchronized with remote peers.
 
 #### Editing the Document
