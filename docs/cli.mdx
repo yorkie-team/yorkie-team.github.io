@@ -102,6 +102,18 @@ Flags:
       --rpc-port int                                 RPC port (default 11101)
 ```
 
+### Login
+
+To use admin commands, you need to log in to the server. You can log in to the server using the `login` subcommand:
+
+```bash
+$ yorkie login --admin-addr <admin address> -u <username> -p <password>
+```
+
+Username and password are the same as the ones you used to log in to the [dashboard](/dashboard).
+
+> If you are using the [self-hosted server](/docs/server), default username and password are `admin` and `admin`.
+
 ### Project
 
 Project represents your service or application in Yorkie. Separate Projects can exist within a single application. You can add more Projects as needed, for example, if you want to manage [auth webhook](/docs/cli#auth-webhook) and documents for specific purposes.
