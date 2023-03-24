@@ -70,36 +70,42 @@ Usage:
   yorkie server [options] [flags]
 
 Flags:
-      --auth-webhook-cache-auth-ttl duration         TTL value to set when caching authorized webhook response. (default 10s)
-      --auth-webhook-cache-size int                  The cache size of the authorization webhook. (default 5000)
-      --auth-webhook-cache-unauth-ttl duration       TTL value to set when caching unauthorized webhook response. (default 10s)
-      --auth-webhook-max-retries uint                Maximum number of retries for an authorization webhook. (default 10)
-      --auth-webhook-max-wait-interval duration      Maximum wait interval for authorization webhook. (default 3s)
-      --backend-snapshot-interval uint               Interval of changes to create a snapshot. (default 1000)
-      --backend-snapshot-threshold uint              Threshold that determines if changes should be sent with snapshot when the number of changes is greater than this value. (default 500)
-      --backend-use-default-project                  Whether to use the default project. Even if public key is not provided from the client, the default project will be used for the request. (default true)
-      --client-deactivate-threshold string           Deactivate threshold of clients in specific project for housekeeping. (default "24h")
-  -c, --config string                                Config path
-      --enable-pprof                                 Enable runtime profiling data via HTTP server.
-      --etcd-dial-timeout duration                   ETCD's dial timeout (default 5s)
-      --etcd-endpoints strings                       Comma separated list of etcd endpoints
-      --etcd-lock-lease-time duration                ETCD's lease time for lock (default 30s)
-      --etcd-password string                         ETCD's password
-      --etcd-username string                         ETCD's user name
-  -h, --help                                         help for server
-      --housekeeping-candidates-limit int            candidates limit for a single housekeeping run (default 500)
-      --housekeeping-deactivate-threshold duration   time after which clients are considered deactivate (default 168h0m0s)
-      --housekeeping-interval duration               housekeeping interval between housekeeping runs (default 1m0s)
-  -l, --log-level string                             Log level: debug, info, warn, error, panic, fatal (default "info")
-      --mongo-connection-timeout duration            Mongo DB's connection timeout (default 5s)
-      --mongo-connection-uri string                  MongoDB's connection URI
-      --mongo-ping-timeout duration                  Mongo DB's ping timeout (default 5s)
-      --mongo-yorkie-database string                 Yorkie's database name in MongoDB (default "yorkie-meta")
-      --profiling-port int                           Profiling port (default 11102)
-      --rpc-cert-file string                         RPC certification file's path
-      --rpc-key-file string                          RPC key file's path
-      --rpc-max-requests-bytes uint                  Maximum client request size in bytes the server will accept. (default 4194304)
-      --rpc-port int                                 RPC port (default 11101)
+      --admin-port int                                  Admin port (default 11103)
+      --auth-webhook-cache-auth-ttl duration            TTL value to set when caching authorized webhook response. (default 10s)
+      --auth-webhook-cache-size int                     The cache size of the authorization webhook. (default 5000)
+      --auth-webhook-cache-unauth-ttl duration          TTL value to set when caching unauthorized webhook response. (default 10s)
+      --auth-webhook-max-retries uint                   Maximum number of retries for an authorization webhook. (default 10)
+      --auth-webhook-max-wait-interval duration         Maximum wait interval for authorization webhook. (default 3s)
+      --backend-admin-password string                   The password of the default admin. (default "admin")
+      --backend-admin-token-duration duration           The duration of the admin authentication token. (default 168h0m0s)
+      --backend-admin-user string                       The name of the default admin user, who has full permissions. (default "admin")
+      --backend-secret-key string                       The secret key for signing authentication tokens for admin users. (default "yorkie-secret")
+      --backend-snapshot-interval int                   Interval of changes to create a snapshot. (default 1000)
+      --backend-snapshot-threshold int                  Threshold that determines if changes should be sent with snapshot when the number of changes is greater than this value. (default 500)
+      --backend-snapshot-with-purging-changes           Whether to delete previous changes when the snapshot is created.
+      --backend-use-default-project                     Whether to use the default project. Even if public key is not provided from the client, the default project will be used for the request. (default true)
+      --client-deactivate-threshold string              Deactivate threshold of clients in specific project for housekeeping. (default "24h")
+  -c, --config string                                   Config path
+      --enable-pprof                                    Enable runtime profiling data via HTTP server.
+      --etcd-dial-timeout duration                      ETCD's dial timeout (default 5s)
+      --etcd-endpoints strings                          Comma separated list of etcd endpoints
+      --etcd-lock-lease-time duration                   ETCD's lease time for lock (default 30s)
+      --etcd-password string                            ETCD's password
+      --etcd-username string                            ETCD's user name
+  -h, --help                                            help for server
+      --hostname string                                 Yorkie Server Hostname
+      --housekeeping-candidates-limit-per-project int   candidates limit per project for a single housekeeping run (default 500)
+      --housekeeping-interval duration                  housekeeping interval between housekeeping runs (default 30s)
+  -l, --log-level string                                Log level: debug, info, warn, error, panic, fatal (default "info")
+      --mongo-connection-timeout duration               Mongo DB's connection timeout (default 5s)
+      --mongo-connection-uri string                     MongoDB's connection URI
+      --mongo-ping-timeout duration                     Mongo DB's ping timeout (default 5s)
+      --mongo-yorkie-database string                    Yorkie's database name in MongoDB (default "yorkie-meta")
+      --profiling-port int                              Profiling port (default 11102)
+      --rpc-cert-file string                            RPC certification file's path
+      --rpc-key-file string                             RPC key file's path
+      --rpc-max-requests-bytes uint                     Maximum client request size in bytes the server will accept. (default 4194304)
+      --rpc-port int                                    RPC port (default 11101)
 ```
 
 ### Login
