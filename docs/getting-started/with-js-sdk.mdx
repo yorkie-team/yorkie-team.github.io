@@ -120,8 +120,10 @@ Other peers' activities can be accessed by subscribing to the client.
 ```js
 client.subscribe((event) => {
   if (event.type === 'peers-changed') {
-    const peers = event.value[doc.getKey()];
-    const peersCount = Object.entries(peers).length;
+    // get all clients connected to the Document.
+    // [ {clientID: string, presence: {key: value}, ... ]
+    const peers = client.getPeersByDocKey(doc.getKey());
+    const peersCount = peers.length;
     console.log(`There are currently ${peersCount} peers`);
   }
 });
