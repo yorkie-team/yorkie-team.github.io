@@ -12,14 +12,14 @@ async function main() {
   });
   await client.activate();
 
-  const doc = new yorkie.Document('example-profile');
+  const doc = new yorkie.Document('profile-stack');
   await client.attach(doc);
 
   client.subscribe((event) => {
     if (event.type === 'peers-changed') {
-      // get presence of all clients connected to the Document. 
-      // {<clientID>: {name: string, color: string}}
-      const peers = event.value[doc.getKey()];
+      // get all clients connected to the Document.
+      // [ {clientID: string, presence: {name: string, color: string}}, ... ]
+      const peers = client.getPeersByDocKey(doc.getKey());
       
       // show peer list
       updatePeerList(peers);
@@ -38,14 +38,14 @@ async function main() {
   });
   await client.activate();
 
-  const doc = new yorkie.Document('my-first-document');
+  const doc = new yorkie.Document('multi-cursor');
   await client.attach(doc);
 
   client.subscribe((event) => {
     if (event.type === 'peers-changed') {
-      // get presence of all clients connected to the Document. 
-      // {<clientID>: {cursor: {x: number, y: number}}}
-      const peers = event.value[doc.getKey()];
+      // get all clients connected to the Document.
+      // [ {clientID: string, presence: {cursor: {x: number, y: number}}}, ... ]
+      const peers = client.getPeersByDocKey(doc.getKey());
       
       // show peer cursors
       updatePeerCursors(peers);
