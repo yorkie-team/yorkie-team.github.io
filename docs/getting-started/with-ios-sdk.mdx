@@ -39,7 +39,7 @@ Then create a Document.
 
 ```swift
 let doc = Document(key: docKey)
-await client.attach(doc);
+try await client.attach(doc);
 ```
 
 The created document should be attached to the client to automatically synchronize the document between the client and peers.
@@ -49,7 +49,7 @@ The created document should be attached to the client to automatically synchroni
 The created document is initially an empty object. You can create or update a key-value property you would like to share with peers using `Document.update()`.
 
 ```swift
-await doc.update { root in
+try await doc.update { root in
   root.key = "Key value"
 }
 ```
