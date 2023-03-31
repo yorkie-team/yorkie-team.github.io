@@ -45,9 +45,66 @@ By using the value of the `stream-connection-status-changed` event, it is possib
 
 If you want to know about other ClientEvents, please refer to the [ClientEventType](https://yorkie.dev/yorkie-ios-sdk/documentation/yorkie/clienteventtype).
 
+#### Presence
+
+Presence is a feature that allows you to display information about users who are currently using a collaborative application. Presence is often used in collaborative applications such as document editors, chat apps, and other real-time applications.
+
+```swift
+var optionA = ClientOptions()
+optionA.presence = ["username": "alice", "color": "blue"]
+
+let clientA = Client(rpcAddress: rpcAddress, options: optionA)
+try await clientA.activate()
+
+let docA = Document(key: "doc-1")
+try await clientA.attach(docA)
+```
+
+Then, another Client is created and attaches a Document with the same name as before.
+
+```javascript
+var optionB = ClientOptions()
+optionB.presence = ["username": "alice", "color": "blue"]
+
+let clientB = Client(rpcAddress: rpcAddress, options: optionA)
+try await clientB.activate()
+
+let docB = Document(key: "doc-1")
+try await clientB.attach(docB)
+```
+
+When a new peer registers or leaves, the `peers-changed` event is fired, and the other peer's clientID and presence can be obtained from the event.
+
+```swift
+clientA.eventStream.sink { event in
+    if let event = event as? PeerChangedEvent {
+        let peers = event.value.peers["doc-1"]
+        switch event.value.type {
+        case .initialized:
+            displayPeers(peers)
+        case .watched:
+            peers.forEach { addPeer($0) }
+            // peer as follows:
+            // {
+            //   clientID: 'xxxxxxxxxxxxxxxxxxxx',
+            //   presence: ["username": "bob", "color": "red"]
+            // }
+        case .unwatched:
+            peers.forEach { removePeer($0) }
+        case .presenceChanged:
+            peers.forEach { updatePeer($0) }
+        }
+    }
+}
+```
+
+In the code above, `clientA` receives a `watched` event from `clientB` because `clientB` attached the Document with the key `doc-1`.
+
+Presence can include their names, colors, and other identifying details.
+
 ### Document
 
-`Document` is a primary data type in Yorkie, which provides a JSON-like updating experience that makes it easy to represent your application's model. A `Document` can be updated without being attached to the client, and its changes are automatically propagated to other peers when the Document is attached to the Client or when the network is restored.
+`Document` is a primary data type in Yorkie, which provides a JSON-like updating experience that makes it easy to represent your application's model. A `Document` can be updated without being attached to the client, and its changes are automatically propagated to other peers when the `Document` is attached to the `Client` or when the network is restored.
 
 #### Creating a Document
 
@@ -55,10 +112,24 @@ We can create a Document using `Document(key: "doc-key")`. Let's create a Docume
 
 ```swift
 let doc = Document(key: docKey)
-await client.attach(doc);
+try await client.attach(doc);
 ```
 
+> The document key is used to identify the Document in Yorkie. It is a string that can be freely defined by the user. However, it is allowed to use only `a-z`, `A-Z`, `0-9`, `-`, `.`, `_`, `~` and must be less than 120 characters.
+
 After attaching the Document to the Client, all changes to the Document are automatically synchronized with remote peers.
+
+#### Changing Syncronization Mode
+
+If you want to change syncronization mode, you can use `client.pause(doc)` and `client.resume(doc)`.
+
+```swift
+// Pause real-time sync.
+await client.pause(doc);
+
+// Resume real-time sync.
+await client.resume(doc);
+```
 
 #### Editing the Document
 
@@ -66,7 +137,7 @@ After attaching the Document to the Client, all changes to the Document are auto
 
 ```swift
 let message = "update document for test";
-await doc.update({ root in
+try await doc.update({ root in
   root.obj = [:]                      // {"obj":{}}
   let obj = root.obj as! JSONObject
   obj.num = Int64(1)                  // {"obj":{"num":1}}
@@ -129,7 +200,7 @@ Custom CRDT types are data types that can be used for special applications such 
 `JSONText` provides supports for collaborative text editing. `JSONText` has selection information for sharing the cursor position. In addition, contents in `Text` can have attributes; for example, characters can be bold, italic, or underlined.
 
 ```swift
-await doc.update{ root in
+try await doc.update{ root in
     root.text = JSONText() // {"text":[]}
     (root.text as? JSONText)?.edit(0, 0, "hello")               // {"text":[{"val":"hello"}]}
     (root.text as? JSONText)?.edit(0, 1, "H")                   // {"text":[{"val":"H"},{"val":"ello"}]}
@@ -145,7 +216,7 @@ An example of Text Editor: [Text Editor example](https://github.com/yorkie-team/
 `JSONCounter` supports integer types changing with addition and subtraction. If an integer data needs to be modified simultaneously, `JSONCounter` should be used instead of primitives.
 
 ```swift
-await doc.update{ root in
+try await doc.update{ root in
     root.counter = JSONCounter(value: Int64(1))                 // {"counter":1}
     (root.counter as? JSONCounter<Int64>)?.increase(value: 2)   // {"counter":3}
     (root.counter as? JSONCounter<Int64>)?.increase(value: 3)   // {"counter":6}
