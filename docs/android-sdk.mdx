@@ -49,6 +49,71 @@ scope.launch {
 ```
 By using the value of the `streamConnectionStatus`, it is possible to determine whether the Client is connected to the network.
 
+If you want to know about other client events, please refer to [Client.Event](https://yorkie.dev/yorkie-android-sdk/yorkie/dev.yorkie.core/-client/-event/index.html).
+
+#### Presence
+
+Presence is a feature that allows you to display information about users who are currently using a collaborative application. Presence is often used in collaborative applications such as document editors, chat apps, and other real-time applications.
+
+```Kotlin
+val optionA = Client.Options(presence = PresenceInfo(0, mapOf("username" to "alice", "color" to "blue")))
+val clientA = Client(context, "api.yorkie.dev", 443, optionA)
+val documentA = Document(Document.Key("doc-1"))
+// Declare your own CoroutineScope
+scope.launch { 
+  clientA.activateAsync().await()
+  clientA.attachAsync(documentA).await()
+}
+
+```
+
+Then, another Client is created and attaches a Document with the same name as before.
+
+```Kotlin
+val optionB = Client.Options(presence = PresenceInfo(0, mapOf("username" to "bob", "color" to "red")))
+val clientB = Client(context, "api.yorkie.dev", 443, optionB)
+val documentB = Document(Document.Key("doc-1"))
+// Declare your own CoroutineScope
+scope.launch {
+  clientB.activateAsync().await()
+  clientB.attachAsync(documentB).await()
+}
+```
+
+When a new peer registers or leaves, the `PeersChanged` event is fired, and the other peer's clientID and presence can be obtained from the event.
+
+```Kotlin
+// Declare your own CoroutineScope
+scope.launch {
+  clientA.events.filterIsInstance<Client.Event.PeersChanged>()
+    .collect { event ->
+      val peers = clientA.peerStatus.value[Document.Key("doc-1")]
+      when (event.result) {
+        is Client.PeersChangedResult.Initialized -> {
+          peers?.let(::displayPeers)
+        }
+        is Client.PeersChangedResult.Watched -> {
+          peers?.forEach { peer -> addPeer(peer) }
+          // peer as follows:
+          // {
+          //   clientID: 'xxxxxxxxxxxxxxxxxxxx',
+          //   presence: {username: 'bob', color: 'red'}
+          // }
+        }
+        is Client.PeersChangedResult.Unwatched -> {
+          peers?.forEach { peer -> removePeer(peer) }
+        }
+        is Client.PeersChangedResult.PresenceChanged -> {
+          peers?.forEach { peer -> updatePeer(peer) }
+        }
+      }	
+    }
+}
+```
+
+In the code above, `clientA` receives a `PeersChangedResult.Watched` from `clientB` because `clientB` attached the Document with the key `doc-1`.
+
+Presence can include their names, colors, and other identifying details.
 
 ### Document
 
@@ -67,7 +132,23 @@ scope.launch {
 }
 ```
 
+> The document key is used to identify the Document in Yorkie. It is a string that can be freely defined by the user. However, it is allowed to use only `a-z`, `A-Z`, `0-9`, `-`, `.`, `_`, `~` and must be less than 120 characters.
+
+
 After attaching the Document to the Client, all changes to the Document are automatically synchronized with remote peers.
+
+#### Changing Syncronization Mode
+
+If you want to change synchronization mode, you can use `Client.pause(document)` and `Client.resume(document)`.
+
+```Kotlin
+// Pause real-time sync.
+client.pause(document)
+
+// Resume real-time sync.
+client.resume(document)
+
+```
 
 #### Editing the Document
 
