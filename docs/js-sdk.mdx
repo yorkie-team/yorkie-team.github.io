@@ -55,7 +55,7 @@ const clientA = new yorkie.Client('{{API_ADDR}}', {
     color: 'blue',
   },
 });
-await client.activate();
+await clientA.activate();
 
 const docA = new yorkie.Document('doc-1');
 await clientA.attach(docA);
