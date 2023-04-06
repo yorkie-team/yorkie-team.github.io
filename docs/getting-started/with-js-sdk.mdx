@@ -7,19 +7,28 @@ order: 21
 
 Let's start using Yorkie with the JS SDK. You need an environment that can run JavaScript, such as a browser.
 
-### Installation
+### Setup
 
 To use the Yorkie JavaScript SDK in your project, you will need to install it using [npm](https://www.npmjs.com/package/yorkie-js-sdk):
 
 ```bash
 $ npm install yorkie-js-sdk
 ```
+After that, you can load the SDK by importing it in your JavaScript file:
 
-or just include the following code in the `<head>` tag of your HTML:
+```js
+import yorkie from 'yorkie-js-sdk';
+```
+
+Alternatively, you can also include the following code in the `<head>` tag of your HTML:
 
 ```html
-<!-- include yorkie js -->
+<!-- Import yorkie-js-sdk -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/yorkie-js-sdk/{{YORKIE_JS_VERSION}}/yorkie-js-sdk.js"></script>
+<script>
+  // globally available as `yorkie` object
+  const doc = new yorkie.Document('my-doc');
+</script>
 ```
 
 > The JS SDKs are also provided by [cdnjs](https://cdnjs.com) to make loading library files faster and easier on websites.<br/>For more the JS SDKs: [https://cdnjs.com/libraries/yorkie-js-sdk](https://cdnjs.com/libraries/yorkie-js-sdk)
