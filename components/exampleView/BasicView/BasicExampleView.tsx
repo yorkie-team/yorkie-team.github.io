@@ -41,8 +41,8 @@ export function BasicExampleView({
       unsubscribeDoc = doc.subscribe((event) => {
         if (event.type === 'remote-change') {
           for (const changeInfo of event.value) {
-            for (const path of changeInfo.paths) {
-              setDocChangeInfos((prev) => [...prev, { type: 'update', content: path }]);
+            for (const op of changeInfo.operations) {
+              setDocChangeInfos((prev) => [...prev, { type: 'update', content: op.path }]);
             }
           }
         }
