@@ -148,10 +148,14 @@ await client.resume(doc);
 ```javascript
 const message = 'update document for test';
 doc.update((root) => {
-  root.obj = {};               // {"obj":{}}
-  root.obj.num = 1;            // {"obj":{"num":1}}
-  root.obj.obj = { str: 'a' }; // {"obj":{"num":1,"obj":{"str":"a"}}}
-  root.obj.arr = ['1', '2'];   // {"obj":{"num":1,"obj":{"str":"a"},"arr":[1,2]}}
+  root.todos = [];
+  root.todos.push('todo-1');
+  root.obj = {
+    name: 'josh',
+    age: 14,
+  };
+  root.counter = new yorkie.Counter(yorkie.IntType, 0);
+  root.counter.increase(1);
 }, message);
 ```
 
@@ -161,15 +165,15 @@ You can get the contents of the Document using `document.getRoot()`.
 
 ```javascript
 const root = doc.getRoot();
-console.log(root.obj);     // {"num":1,"obj":{"str":"a"},"arr":[1,2]}
-console.log(root.obj.num); // 1
-console.log(root.obj.obj); // {"str":"a"}
-console.log(root.obj.arr); // [1,2]
+console.log(root.todos);    // ["todo-1"]
+console.log(root.obj);      // {"name":"josh","age":14}
+console.log(root.obj.name); // "josh"
+console.log(root.counter.getValue()); // 1
 ```
 
 #### Subscribing to Document events
 
-A Document is modified by changes generated remotely or locally in Yorkie. When the Document is modified, change events occur, to which we can subscribe using `document.subscribe`. Here, we can do post-processing such as repaint in the application using the `path` of the change events.
+A Document is modified by changes generated remotely or locally in Yorkie. When the Document is modified, change events occur, to which we can subscribe using `document.subscribe`.
 
 ```javascript
 doc.subscribe((event) => {
@@ -178,16 +182,29 @@ doc.subscribe((event) => {
   } else if (event.type === 'remote-change') {
     for (const changeInfo of event.value) {
       // `message` delivered when calling document.update
-      console.log(changeInfo.change.message);
-      for (const path of changeInfo.paths) {
-        if (path.startsWith('$.obj.num') {
-          // root.obj.num is changed
-        } else if (path.startsWith('$.obj')) {
-          // root.obj is changed
+      const { message, operations } = changeInfo;
+      for (const op of operations) {
+        // ex) { type: 'increase', value: 1, path: '$.counter' }
+        switch (op.type) {
+          case 'increase':
+            // Do something...
+            break;
         }
       }
     }
   }
+});
+```
+
+If you want to know more about changeInfo for document events, please refer to the [ChangeInfo](https://yorkie.dev/yorkie-js-sdk/api-reference/yorkie-js-sdk.remotechangeevent.html).
+
+Additionally, you can subscribe to changes for a specific path, such as `$.todos`, where the `$` sign indicates the root of the document.
+
+```javascript
+doc.subscribe('$.todos', (event) => { 
+  // The callback will be called when the root.todos or any of its nested values change.
+  const target = doc.getValueByPath('$.todos') // you can get the value by path 
+  // Do something...
 });
 ```
 
