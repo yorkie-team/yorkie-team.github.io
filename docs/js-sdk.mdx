@@ -129,16 +129,42 @@ await client.attach(doc);
 
 After attaching the Document to the Client, all changes to the Document are automatically synchronized with remote peers.
 
-#### Changing Syncronization Mode
+#### Changing Syncronization Setting
 
-If you want to change syncronization mode, you can use `client.pause(doc)` and `client.resume(doc)`.
+To change the synchronization setting for a document, you can use `client.pause(doc)` and `client.resume(doc)`.
+
+When you pause a document, the synchronization process will no longer occur in realtime, and you will need to manually execute the synchronization to ensure that the changes are propagated to other clients.
+
+To resume the realtime synchronization, you can call `client.resume(doc)`.
 
 ```javascript
-// Pause real-time sync.
+// Pause real-time sync
 await client.pause(doc);
 
-// Resume real-time sync.
+// Resume real-time sync
 await client.resume(doc);
+```
+
+#### Changing Syncronization Mode
+
+By default, Yorkie synchronizes a document in `push-pull` mode, where local changes are pushed to the server, and remote changes are pulled from the server.
+
+If you only want to send your changes and not receive remote changes, you can use `push-only` mode.
+
+For realtime synchronization, you can use `client.pauseRemoteChanges(doc)` and `client.resumeRemoteChanges(doc)`.
+
+For manual synchronization, you can pass the desired sync mode to `client.sync(doc, syncMode)`.
+
+```javascript
+// Pause remote changes for realtime sync
+client.pauseRemoteChanges(doc);
+// Resume remote changes for realtime sync
+client.resumeRemoteChanges(doc);
+
+// Manual sync in Push-Only mode
+await client.sync(doc, SyncMode.PushOnly);
+// Manual sync in Push-Pull mode
+await client.sync(doc, SyncMode.PushPull);
 ```
 
 #### Editing the Document
@@ -151,7 +177,7 @@ doc.update((root) => {
   root.todos = [];
   root.todos.push('todo-1');
   root.obj = {
-    name: 'josh',
+    name: 'yorkie',
     age: 14,
   };
   root.counter = new yorkie.Counter(yorkie.IntType, 0);
@@ -166,17 +192,27 @@ You can get the contents of the Document using `document.getRoot()`.
 ```javascript
 const root = doc.getRoot();
 console.log(root.todos);    // ["todo-1"]
-console.log(root.obj);      // {"name":"josh","age":14}
-console.log(root.obj.name); // "josh"
+console.log(root.obj);      // {"name":"yorkie","age":14}
+console.log(root.obj.name); // "yorkie"
 console.log(root.counter.getValue()); // 1
 ```
 
 #### Subscribing to Document events
 
-A Document is modified by changes generated remotely or locally in Yorkie. When the Document is modified, change events occur, to which we can subscribe using `document.subscribe`.
+A Document can be modified by changes generated remotely or locally in Yorkie.
+
+Whenever the Document is modified, change events are triggered and we can subscribe to these events using the `document.subscribe(callback)`.
+
+The callback is called with an event object, and the `event.type` property indicates the source of the change, which can be one of the following values: `local-change`, `remote-change`, or `snapshot`.
+
+When the `event.type` is `local-change` or `remote-change`, the `event.value` is a list of changeInfo.
+Each changeInfo is an `{operations, message}` object.
+
+For more information about changeInfo for document events, please refer to the [ChangeInfo](https://yorkie.dev/yorkie-js-sdk/api-reference/yorkie-js-sdk.remotechangeevent.html).
+
 
 ```javascript
-doc.subscribe((event) => {
+const unsubscribe = doc.subscribe((event) => {
   if (event.type === 'local-change') {
     console.log(event);
   } else if (event.type === 'remote-change') {
@@ -196,12 +232,11 @@ doc.subscribe((event) => {
 });
 ```
 
-If you want to know more about changeInfo for document events, please refer to the [ChangeInfo](https://yorkie.dev/yorkie-js-sdk/api-reference/yorkie-js-sdk.remotechangeevent.html).
-
-Additionally, you can subscribe to changes for a specific path, such as `$.todos`, where the `$` sign indicates the root of the document.
+Additionally, you can subscribe to changes for a specific path in the Document using `doc.subscribe(path, callback)` with a path argument, such as `$.todos`, where the `$` sign indicates the root of the document.
+The callback function is called when the target path and its nested values are changed.
 
 ```javascript
-doc.subscribe('$.todos', (event) => { 
+const unsubscribe = doc.subscribe('$.todos', (event) => { 
   // The callback will be called when the root.todos or any of its nested values change.
   const target = doc.getValueByPath('$.todos') // you can get the value by path 
   // Do something...
