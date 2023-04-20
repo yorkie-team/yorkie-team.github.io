@@ -71,7 +71,12 @@ The created document is initially an empty object. You can create or update a ke
 
 ```js
 doc.update((root) => {
-  root['key'] = 'value'; // {"key":"value"}
+  root.todos = [];           // {"todos":[]}
+  root.todos.push('todo-1'); // {"todos":["todo-1"]}
+  root.obj = {               // {"todos":["todo-1"], "obj":{"name":"yorkie","age":14}}
+    name: 'yorkie',
+    age: 14,
+  };
 });
 ```
 
@@ -88,7 +93,7 @@ console.log(doc.getRoot().sharedMessage); // "Hello World!";
 
 #### 5. Subscribing to the changes that happen in the Document
 
-Clients sharing the same document can subscribe to the changes that happen in the Document using `doc.subscribe()`
+Clients sharing the same document can subscribe to the changes that happen in the Document using `doc.subscribe()`.
 
 ```js
 doc.subscribe((event) => {
@@ -98,6 +103,8 @@ doc.subscribe((event) => {
 
 You can execute different actions depending on the source of change. The source can be accessed from `event.type`.
 
+The value can be: `local-change`, `remote-change` or `snapshot`.
+
 ```js
 doc.subscribe((event) => {
   if (event.type === 'remote-change') {
@@ -106,19 +113,16 @@ doc.subscribe((event) => {
 });
 ```
 
-Accessing certain document properties when a specific property in the document is changed is the key to creating a collaborative application. You can perform different actions based on which property has changed in the document by examining `paths` array that exists in `event.value` array.
+To subscribe to changes for a specific path in the document, you can use the `doc.subscribe(path, callback)` with a path argument, such as `$.todos`, where the `$` sign indicates the root of the document.
+The callback function is called when the target path and its nested values are changed.
+
+With this feature, you can easily subscribe to changes for a specific part of the document and perform different actions based on the updated values.
 
 ```js
-doc.subscribe((event) => {
- if (event.type === 'remote-change') {
-    for (const changeInfo of event.value) {
-      for (const path of changeInfo.paths) {
-        if (path.startsWith('$.sharedMessage') {
-          console.log(`One of your peers has changed the message to ${doc.getRoot().sharedMessage}`)
-        }
-      }
-    }
-  }
+doc.subscribe('$.todos', (event) => {
+  // The callback will be called when the root.todos or its nested values change.
+  const target = doc.getValueByPath('$.todos'); // You can get the value by path.
+  // Do something...
 });
 ```
 
