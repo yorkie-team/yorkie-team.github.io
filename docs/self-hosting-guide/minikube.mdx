@@ -7,8 +7,8 @@ order: 71
 
 Minikube is a tool that makes it easy to run Kubernetes locally.
 
-In this guide, you will install Yorkie cluster on your local machine using Helm in Minikube.
-Then, you will test Yorkie cluster with a simple example.
+In this guide, you will install Yorkie cluster on minikube using Helm.
+Then, you will test Yorkie cluster with a CodePair, a collaborative code editor.
 
 ### Prerequities
 
@@ -82,6 +82,7 @@ Making this installation the default for injection and validation.
 
 Thank you for installing Istio 1.17.  Please take a few minutes to tell us about your install/upgrade experience!  https://forms.gle/hMHGiwZHPU7UQRWe9
 ```
+
 ### Add yorkie-team Helm chart in your local repository
 
 After Istio is installed, add yorkie-team Helm chart repository in your local repository with the following command:
@@ -182,7 +183,7 @@ Keep in mind that you need to keep Minikube tunnel running while you are using Y
 
 ### Test Yorkie cluster
 
-Now that you have Yorkie cluster installed and exposed, you can test Yorkie cluster with a simple example.
+Now that you have Yorkie cluster installed and exposed, you can test Yorkie cluster with CodePair, which is a collaborative editing tool.
 
 Here, we will use [CodePair](https://github.com/yorkie-team/codepair).
 Clone CodePair repository with the following command:
@@ -198,7 +199,7 @@ $ cd codepair
 $ npm install
 ```
 
-After dependencies are installed, change `VITE_APP_YORKIE_RPC_ADDR` in `.env.development` file.
+After dependencies are installed, change `VITE_APP_YORKIE_RPC_ADDR` in `.env.development` file to your minikube IP address.
 
 ```
 $ vi .env.development
@@ -273,3 +274,4 @@ $ minikube delete
 You can also install Yorkie Cluster Addons to monitor metrics and perform GitOps on Yorkie cluster.
 
 For more information, see [Self-Hosting Guide: Cluster Addons Installation](/docs/self-hosting-guide/cluster-addons).
+For more information about Yorkie cluster design, follow: [Yorkie Cluster Design](https://github.com/yorkie-team/yorkie/blob/main/design/sharded-cluster-mode.md)

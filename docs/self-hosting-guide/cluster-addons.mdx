@@ -5,36 +5,195 @@ order: 73
 
 ## Self-Hosting Guide: Cluster Addons Installation
 
-Lorem Ipsum
+Yorkie provides a set of cluster addons to help you monitor and manage Yorkie cluster.
+This guide will walk you through the process of installing Yorkie cluster addons on your Kubernetes cluster.
+
+Currently, Yorkie addons include:
+
+- [Prometheus](https://prometheus.io/): For collecting metrics from Yorkie cluster.
+- [Grafana](https://grafana.com/): For monitoring Yorkie cluster via Grafana dashboard.
+- [Loki](https://grafana.com/oss/loki/): For logging aggregation.
+- [ArgoCD](https://argoproj.github.io/argo-cd/): For managing Yorkie cluster via GitOps.
 
 ### Prerequities
 
-Lorem Ipsum
+This guide assumes that you have installed Yorkie cluster on your Kubernetes cluster with Helm chart.
+If you haven't installed Yorkie cluster, follow guides for deploying Yorkie cluster on Kubernetes with Helm Charts on various platforms.
 
-### Setup Yorkie Cluster
-
-Lorem Ipsum
+- [Minikube Installation](/docs/self-hosting-guide/minikube): Guide to install Yorkie cluster on Minikube.
+- [AWS EKS Installation](/docs/self-hosting-guide/aws-eks): Guide to install Yorkie cluster on AWS EKS.
 
 ### Install Yorkie Monitoring with Helm chart
 
-Lorem Ipsum
+Install Yorkie monitoring addon with the following command:
+
+```
+$ helm install yorkie-monitoring yorkie-team/yorkie-monitoring -n monitoring --create-namespace
+```
+
+If you are using AWS EKS, use the following command instead:
+
+```
+$ helm install yorkie-monitoring yorkie-team/yorkie-monitoring -n monitoring --create-namespace \
+    --set inngress.ingressClassName=alb \
+    --set ingress.hosts.enabled=true \
+    --set ingress.hosts.apiHost={YOUR_API_DOMAIN_NAME} \
+    --set ingress.hosts.alb.enabled=true \
+    --set ingress.alb.certArn={YOUR_CERTIFICATE_ARN}
+```
+
+Replace `{YOUR_API_DOMAIN_NAME}` and `{YOUR_ADMIN_DOMAIN_NAME}` with your domain name.
+Also, replace `{YOUR_CERTIFICATE_ARN}` with your certificate ARN.
+
+This will install `yorkie-monitoring` release.
+
+After Yorkie monitoring is installed, you will see the following output:
+
+```
+...
+```
+
+Now you have Yorkie monitoring installed.
+It will take a few minutes for pods to be ready, so wait until all pods are ready.
+You can check the status of pods with the following command:
+
+```
+$ kubectl get pods -n monitoring --watch
+```
+
+After all pods are ready, you will see the following output:
+
+```
+NAME                      READY   STATUS    RESTARTS      AGE
+...
+```
 
 ### View Yorkie metrics on Grafana dashboard
 
-Lorem Ipsum
+You can access Grafana dashboard with following url:
+
+- Minikube: http://`YOUR_MINIKUBE_IP`/grafana/
+- AWS EKS: http://`YOUR_API_DOMAIN_NAME`/grafana/
+
+The default username and password are `admin` and `yorkie`.
+
+![grafana-image](/assets/images/docs/garbage-collection-1.png 'caption')
+
+There are two dashboards available:
+
+- Yorkie Dashboard: For monitoring Yorkie cluster.
+    ![yorkie-dashboard-image](/assets/images/docs/garbage-collection-1.png 'caption')
+- Loki Dashboard: For monitoring Yorkie's log.
+    ![loki-dashboard-image](/assets/images/docs/garbage-collection-1.png 'caption')
 
 ### Install Yorkie ArgoCD with Helm chart
 
-Lorem Ipsum
+Install Yorkie ArgoCD addon with the following command:
 
-### View Yorkie GitOps on ArgoCD web ui
+```
+$ helm install yorkie-argocd yorkie-team/yorkie-argocd -n argocd --create-namespace
+```
 
-Lorem Ipsum
+If you are using AWS EKS, use the following command instead:
+
+```
+$ helm install yorkie-argocd yorkie-team/yorkie-argocd -n argocd --create-namespace \
+    --set ingress.hosts..ingressClassName=alb \
+	--set ingress.hosts.enabled=true \
+    --set ingres.hosts.apiHost={YOUR_API_DOMAIN_NAME} \
+    --set ingress.alb.enabled=true \
+    --set ingress.alb.certArn={YOUR_CERTIFICATE_ARN}
+```
+
+Replace `{YOUR_API_DOMAIN_NAME}` and `{YOUR_ADMIN_DOMAIN_NAME}` with your domain name.
+Also, replace `{YOUR_CERTIFICATE_ARN}` with your certificate ARN.
+
+This will install `yorkie-argocd` release.
+
+After Yorkie argocd is installed, you will see the following output:
+
+```
+...
+```
+
+Then, you need to set up the admin password for ArgoCD.
+
+```
+# Set the initial password for the admin user
+$ kubectl -n argocd patch secret argocd-secret \
+  -p '{"stringData": {
+    "admin.password": "$2a$12$fJoZj9CnNyD5Yfi02nZh7.XcH4Ds9M.oftQOQDP5oytyra9cP6Dny",
+    "admin.passwordMtime": "'$(date +%FT%T%Z)'"
+}}'
+
+# Restart the ArgoCD server to apply the new password
+$ kubectl -n argocd get pod --no-headers=true | awk '/argocd-server/{print $1}'| xargs kubectl delete -n argocd pod
+```
+
+Now you have Yorkie argocd installed.
+
+It will take a few minutes for pods to be ready, so wait until all pods are ready.
+You can check the status of pods with the following command:
+
+```
+$ kubectl get pods -n argocd --watch
+```
+
+After all pods are ready, you will see the following output:
+
+```
+NAME                      READY   STATUS    RESTARTS      AGE
+...
+```
+
+### View Yorkie GitOps on ArgoCD web UI
+
+You can access ArgoCD web UI with following url:
+
+- Minikube: http://`YOUR_MINIKUBE_IP`/argocd/
+- AWS EKS: http://`YOUR_API_DOMAIN_NAME`/argocd/
+
+The default username and password are `admin` and `yorkie`.
+
+![argocd-web-ui-image](/assets/images/docs/garbage-collection-1.png 'caption')
+
+There are two repositories available:
+
+- yorkie-cluster: For managing Yorkie cluster.
+- yorkie-monitoring: For managing Yorkie monitoring.
+
+You need to configure repository configurations for each repository.
+For more information, see [ArgoCD Helm documentation](https://argo-cd.readthedocs.io/en/stable/user-guide/helm/).
 
 ### Clean up cluster addons
 
-Lorem Ipsum
+You have now installed Yorkie monitoring and argocd, and viewed Yorkie metrics on Grafana dashboard and Yorkie GitOps on ArgoCD web UI.
+
+To learn about how to configure Yorkie Monitoring and Yorkie ArgoCD in Helm Chart, see [Yorkie Cluster Helm Chart Repository](https://github.com/yorkie-team/yorkie/tree/main/build/charts/yorkie-cluster).
+
+First, uninstall Yorkie argocd with the following command:
+
+```
+# Uninstall Yorkie argocd helm chart release
+$ helm uninstall yorkie-argocd -n argocd
+
+# Delete argocd CRDs
+$ kubectl get crd -oname | grep --color=never 'argoproj.io' | xargs kubectl delete
+```
+
+Then, uninstall Yorkie monitoring with the following command:
+
+```
+# Uninstall Yorkie monitoring helm chart release
+$ helm uninstall yorkie-monitoring -n monitoring
+
+# Delete monitoring CRDs
+$ kubectl get crd -oname | grep --color=never 'monitoring.coreos.com' | xargs kubectl delete
+
+# Delete monitoring service accounts
+$ kubectl delete serviceaccounts --all -n monitoring
+```
 
 ### Next Steps
 
-Lorem Ipsum
+For more information about Yorkie cluster design, follow: [Yorkie Cluster Design](https://github.com/yorkie-team/yorkie/blob/main/design/sharded-cluster-mode.md)
