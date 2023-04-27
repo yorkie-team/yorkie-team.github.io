@@ -152,21 +152,25 @@ Yorkie provides a sharded cluster mode in Kubernetes environments to support pro
 This page describes how to set up sharded cluster. An example of the sharded cluster is as follows:
 
 ```
-                        ┌───────────┐
-                        │  ┌──────┐ │
-                      ┌─┼─►│Server│ │    ┌───────┐
-                      │ │  └──▲───┘ │ ┌─►│MongoDB│
-┌──────┐  ┌────────┐  │ │     │     │ │  └───────┘
-│Client├─►│Load    ├──┤ │ Broadcast ├─┤
-└──────┘  │Balancer│  │ │ DocEvents │ │  ┌────┐
-          └────────┘  │ │     │     │ └─►│etcd│
-                      │ │  ┌──▼───┐ │    └────┘
-                      └─┼─►│Server│ │
-                        │  └──────┘ │
-                        └───────────┘
+                               ┌────────────┐
+                               │            │
+                               │  ┌──────┐  │
+                           ┌───┼─►│Server│  │
+                           │   │  └──────┘  │
+                           │   │            │
+┌──────┐      ┌────────┐   │   │  ┌──────┐  │    ┌───────┐
+│Client├──────┤L7 Load ├───┼───┼─►│Server│  ├───►│MongoDB│
+└──────┘      │Balancer│   │   │  └──────┘  │    └───────┘
+              └────────┘   │   │            │
+                   ▲       │   │  ┌──────┐  │
+                   │       └───┼─►│Server│  │
+              ┌────┴───┐       │  └──────┘  │
+              │Service │◄──────┤            │
+              │Registry│       └────────────┘
+              └────────┘
 ```
 
-- L7 Proxy Router: It is responsible for routing requests to servers based on the computed request’s hash key and consistent hashing algorithm.
+- L7 Load Balancer: It is responsible for routing requests to servers based on the computed request’s hash key and consistent hashing algorithm.
 - Service Registry: It is responsible for storing metadata and configuration settings for Yorkie servers.
 - MongoDB: It stores the data of Yorkie. It can be configued to use sharding, just like Yorkie sharded cluster.
 
@@ -186,4 +190,4 @@ Yorkie cluster addons include:
 
 Below is guide for deploying Yorkie cluster addons on Kubernetes with Helm Charts.
 
-- [Yorkie Cluster Addons Installation](/docs/self-hosting-guide/cluster-addons): Guide to install Yorkie cluster addons on Kubernetes.
+- [Cluster Addons Installation](/docs/self-hosting-guide/cluster-addons): Guide to install Yorkie cluster addons on Kubernetes.

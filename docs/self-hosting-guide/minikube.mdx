@@ -5,32 +5,271 @@ order: 71
 
 ## Self-Hosting Guide: Minikube Installation
 
-Lorem Ipsum
+Minikube is a tool that makes it easy to run Kubernetes locally.
+
+In this guide, you will install Yorkie cluster on your local machine using Helm in Minikube.
+Then, you will test Yorkie cluster with a simple example.
 
 ### Prerequities
 
-Lorem Ipsum
+This tutorial assumes that you are familiar with Kubernetes and `kubectl`.
+
+For this tutorial, you will need:
+
+- [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) v1.2.40+.
+- [Helm](https://helm.sh/docs/intro/install/) v3.0+.
+- [istioctl](https://istio.io/latest/docs/setup/getting-started/#download) v1.17+, installed on your machine.
+- [Minikube](https://minikube.sigs.k8s.io/docs/start/) v1.30+ installed on your machine.
 
 ### Setup minikube on your machine
 
-Lorem Ipsum
+First, start Minikube with the following command:
+
+```
+$ minikube start
+```
+
+After Minikube is started, you will see the following output:
+
+```
+...
+🔎  Verifying Kubernetes components...
+🌟  Enabled addons: default-storageclass, storage-provisioner
+🏄  Done! kubectl is now configured to use "minikube" cluster and "default" namespace by default
+```
+
+Then, enable ingress addons with the following command:
+
+```
+$ minikube addons enable ingress
+```
+
+After ingress addons is enabled, you will see the following output:
+
+```
+...
+🔎  Verifying ingress addon...
+🌟  The 'ingress' addon is enabled
+```
 
 ### Install Istio with istioctl
 
-Lorem Ipsum
+After Minikube is configured, install Istio with the following command:
+
+```
+$ istioctl install -f <(curl -s https://raw.githubusercontent.com/yorkie-team/yorkie/main/build/charts/yorkie-cluster/istio-operator.yaml)
+```
+
+This will install Istio with [Istio Operator](https://istio.io/latest/docs/setup/install/operator/) configuration file.
+You can find the configuration file [here](https://raw.githubusercontent.com/yorkie-team/yorkie/main/build/charts/yorkie-cluster/istio-operator.yaml).
+
+When installing Istio, you will see the following output:
+
+```
+This will install the Istio 1.17.1 default profile with ["Istio core" "Istiod" "Ingress gateways"] components into the cluster. Proceed? (y/N)
+```
+
+Type `y` and press `Enter` to continue.
+
+After Istio is installed, you will see the following output:
+
+```
+✔ Istio core installed
+✔ Istiod installed
+✔ Ingress gateways installed
+✔ Installation complete                                                                                             
+Making this installation the default for injection and validation.
+
+Thank you for installing Istio 1.17.  Please take a few minutes to tell us about your install/upgrade experience!  https://forms.gle/hMHGiwZHPU7UQRWe9
+```
+### Add yorkie-team Helm chart in your local repository
+
+After Istio is installed, add yorkie-team Helm chart repository in your local repository with the following command:
+
+```
+$ helm repo add yorkie-team https://yorkie-team.github.io/yorkie/helm-charts
+```
+
+Then, update your local repository with the following command:
+
+```
+$ helm repo update
+```
 
 ### Install Yorkie cluster with Helm chart
 
-Lorem Ipsum
+After yorkie-team Helm chart repository is added, install Yorkie cluster with the following command:
+
+```
+$ helm install yorkie-cluster yorkie-team/yorkie-cluster
+```
+
+This will install `yorkie-cluster` release in minikube cluster.
+
+After Yorkie cluster is installed, you will see the following output:
+
+```
+NAME: yorkie-cluster
+LAST DEPLOYED: Thu Apr 27 21:49:06 2023
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+NOTES:
+--- Install Complete ---
+yorkie-cluster successfully installed!
+
+For next steps, follow:
+  $ curl https://github.com/yorkie-team/yorkie/tree/main/charts/yorkie-cluster
+
+To learn more about the release, try:
+  $ helm status yorkie-cluster
+  $ helm get all yorkie-cluster
+```
+
+Now you have Yorkie cluster installed in your local machine.
+It will take a few minutes for pods to be ready, so wait until all pods are ready.
+You can check the status of pods with the following command:
+
+```
+$ kubectl get pods -n yorkie --watch
+```
+
+After all pods are ready, you will see the following output:
+
+```
+NAME                      READY   STATUS    RESTARTS      AGE
+mongodb-0                 1/1     Running   0             76s
+yorkie-74969cc796-46s47   1/1     Running   2 (54s ago)   76s
+yorkie-74969cc796-c8zpt   1/1     Running   2 (50s ago)   76s
+yorkie-74969cc796-n9jtr   1/1     Running   2 (52s ago)   76s
+```
+
+### Expose Yorkie cluster with Minikube tunnel
+
+After you have installed Yorkie cluster, expose Yorkie cluster with Minikube tunnel with the following command:
+
+```
+$ minikube tunnel
+```
+
+When Minikube tunnel is started, you will see the following output:
+
+```
+✅  Tunnel successfully started
+
+📌  NOTE: Please do not close this terminal as this process must stay alive for the tunnel to be accessible ...
+
+❗  The service/ingress yorkie requires privileged ports to be exposed: [80 443]
+🔑  sudo permission will be asked for it.
+❗  The service/ingress yorkie-admin requires privileged ports to be exposed: [80 443]
+🔑  sudo permission will be asked for it.
+🏃  Starting tunnel for service yorkie.
+🏃  Starting tunnel for service yorkie-admin.
+Password:
+```
+
+Enter your password and press `Enter` to continue.
+
+This will expose Yorkie cluster via minikube cluster's IP address.
+You can check the IP address with the following command:
+
+```
+$ minikube ip
+```
+
+Keep in mind that you need to keep Minikube tunnel running while you are using Yorkie cluster.
 
 ### Test Yorkie cluster
 
-Lorem Ipsum
+Now that you have Yorkie cluster installed and exposed, you can test Yorkie cluster with a simple example.
+
+Here, we will use [CodePair](https://github.com/yorkie-team/codepair).
+Clone CodePair repository with the following command:
+
+```
+$ git clone https://github.com/yorkie-team/codepair
+```
+
+Then, install dependencies with the following command:
+
+```
+$ cd codepair
+$ npm install
+```
+
+After dependencies are installed, change `VITE_APP_YORKIE_RPC_ADDR` in `.env.development` file.
+
+```
+$ vi .env.development
+
+VITE_APP_YORKIE_RPC_ADDR=http://<minikube-ip>
+# If you are using macOS, you should get your minikube-ip to localhost
+# VITE_APP_YORKIE_RPC_ADDR=http://localhost
+```
+
+Then, start CodePair with the following command:
+
+```
+$ npm run dev
+```
+
+You can open another web browser and access `http://localhost:3000` to test collaborative editing with CodePair.
 
 ### Clean up Yorkie cluster
 
-Lorem Ipsum
+You have now installed Yorkie cluster in your local machine, and tested collaborative editing with CodePair.
+
+To learn about how to configure Yorkie Cluster in Helm Chart, see [Yorkie Cluster Helm Chart Repository](https://github.com/yorkie-team/yorkie/tree/main/build/charts/yorkie-cluster).
+
+First, stop minikube tunnel in running terminal.
+Use `Ctrl + C` to stop minikube tunnel.
+
+```
+🏃  Starting tunnel for service yorkie.
+🏃  Starting tunnel for service yorkie-admin.
+Password:
+$ ^C
+```
+
+Then, uninstall Yorkie cluster with the following command:
+
+```
+$ helm uninstall yorkie-cluster
+release "yorkie-cluster" uninstalled
+```
+
+Then Uninstall Istio with the following command:
+
+```
+$ istioctl uninstall --purge
+All Istio resources will be pruned from the cluster
+Proceed? (y/N) y
+...
+✔ Uninstall complete
+```
+
+After that you can stop minikube with the following command:
+
+```
+$ minikube stop
+✋  Stopping node "minikube"  ...
+🛑  Powering off "minikube" via SSH ...
+🛑  1 node stopped.
+```
+
+You can delete minikube cluster with the following command:
+
+```
+$ minikube delete
+🔥  Deleting "minikube" in docker ...
+🔥  Deleting container "minikube" ...
+🔥  Removing /Users/yorkie/.minikube/machines/minikube ...
+💀  Removed all traces of the "minikube" cluster.
+```
 
 ### Next Steps
 
-Lorem Ipsum
+You can also install Yorkie Cluster Addons to monitor metrics and perform GitOps on Yorkie cluster.
+
+For more information, see [Self-Hosting Guide: Cluster Addons Installation](/docs/self-hosting-guide/cluster-addons).
