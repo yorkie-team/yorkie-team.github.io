@@ -1,0 +1,255 @@
+---
+title: 'AWS EKS Installation'
+order: 72
+---
+
+## AWS EKS Installation
+
+AWS's Elastic Kubernetes Service (EKS) is a managed service that lets you deploy, manage, and scale containerized applications on Kubernetes.
+
+In this guide, you will install Yorkie cluster on AWS EKS using Helm.
+Then, you will test Yorkie cluster with CodePair, a collaborative code editor.
+
+<Alert status="danger">[AWS EKS clusters cost $0.10 per hour](https://aws.amazon.com/eks/pricing/), so you may incur charges by running this tutorial. The cost should be a few dollars at most, but be sure to delete your infrastructure promptly to avoid additional charges. We are not responsible for any charges you may incur.</Alert>
+
+### Prerequities
+
+This tutorial assumes that you are familiar with Kubernetes and `kubectl`.
+
+For this tutorial, you will need:
+
+- [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) v1.2.40+.
+- [Helm](https://helm.sh/docs/intro/install/) v3.0+.
+- [istioctl](https://istio.io/latest/docs/setup/getting-started/#download) v1.17+, installed on your machine.
+
+### Setup AWS EKS cluster
+
+First, you need to setup AWS EKS cluster and addons to deploy Yorkie cluster.
+
+Below are the list of resources you need to provision:
+
+1. [AWS EKS cluster](https://docs.aws.amazon.com/eks/latest/userguide/getting-started.html) to provision Kubernetes cluster.
+2. [EBS CSI driver](https://docs.aws.amazon.com/eks/latest/userguide/ebs-csi.html) to provision EBS volumes attached to Kubernetes volumes.
+3. [ALB ingress controller](https://docs.aws.amazon.com/eks/latest/userguide/alb-ingress.html) to provision ALB ingress controller.
+4. [Domain Name](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/domain-register.html) to access Yorkie cluster with domain name.
+5. [Certificate](https://docs.aws.amazon.com/acm/latest/userguide/gs-acm-request-public.html) to access Yorkie cluster with HTTPS.
+
+If you did not provision resources above in your AWS account, follow the links above to provision them.
+
+After provisioning AWS EKS cluster, verify that the cluster is ready:
+
+```bash
+$ kubectl cluster-info
+Kubernetes control plane is running at https://12341234123412341234.gr7.ap-northeast-2.eks.amazonaws.com
+CoreDNS is running at https://12341234123412341234.gr7.ap-northeast-2.eks.amazonaws.com/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
+
+To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'. 
+```
+
+### Install Istio with istioctl
+
+After AWS EKS is configured, you need to install Istio for Yorkie cluster.
+Yorkie cluster uses Istio for L7 load balancing and traffic management.
+
+Install Istio with the following command:
+
+```bash
+$ istioctl install -f <(curl -s https://raw.githubusercontent.com/yorkie-team/yorkie/main/build/charts/yorkie-cluster/istio-operator.yaml)
+```
+
+This will install Istio with [Istio Operator](https://istio.io/latest/docs/setup/install/operator/) configuration file.
+You can find the configuration file [here](https://raw.githubusercontent.com/yorkie-team/yorkie/main/build/charts/yorkie-cluster/istio-operator.yaml).
+
+When installing Istio, you will see the following output:
+
+```bash
+This will install the Istio 1.17.1 default profile with ["Istio core" "Istiod" "Ingress gateways"] components into the cluster. Proceed? (y/N)
+```
+
+Type `y` and press `Enter` to continue.
+
+After Istio is installed, you will see the following output:
+
+```bash
+✔ Istio core installed
+✔ Istiod installed
+✔ Ingress gateways installed
+✔ Installation complete                                                                                             
+Making this installation the default for injection and validation.
+
+Thank you for installing Istio 1.17.  Please take a few minutes to tell us about your install/upgrade experience!  https://forms.gle/hMHGiwZHPU7UQRWe9
+```
+
+### Add yorkie-team Helm chart in your local repository
+
+After Istio is installed, yuo need to add yorkie-team Helm chart repository in your local repository to install Yorkie cluster.
+
+Add yorkie-team Helm chart repository in your local repository with the following command:
+
+```bash
+$ helm repo add yorkie-team https://yorkie-team.github.io/yorkie/helm-charts
+```
+
+Then, update your local repository with the following command:
+
+```bash
+$ helm repo update
+```
+
+### Install Yorkie cluster with Helm chart
+
+Now you have added yorkie-team Helm chart repository in your local repository, you can install Yorkie cluster with Helm chart.
+
+Install Yorkie cluster with the following command:
+
+```bash
+$ helm install yorkie-cluster yorkie-team/yorkie-cluster \
+	--set ingress.ingressClassName=alb \
+	--set ingress.hosts.enabled=true \
+    --set ingress.hosts.apiHost={YOUR_API_DOMAIN_NAME} \
+    --set ingress.hosts.adminHost={YOUR_ADMIN_DOMAIN_NAME} \
+    --set ingress.alb.enabled=true \
+    --set ingress.alb.certArn={YOUR_CERTIFICATE_ARN}
+
+# For example, for domain name `yorkie.dev` and certificate ARN 
+# `arn:aws:acm:ap-northeast-2:123412341234:certificate/12341234-1234-1234-1234-123412341234`, run the following command:
+$ helm install yorkie-cluster yorkie-team/yorkie-cluster \
+	--set ingress.ingressClassName=alb \
+	--set ingress.hosts.enabled=true \
+    --set ingress.hosts.apiHost=api.yorkie.dev \
+    --set ingress.hosts.adminHost=admin.yorkie.dev \
+    --set ingress.alb.enabled=true \
+    --set ingress.alb.certArn=arn:aws:acm:ap-northeast-2:123412341234:certificate/12341234-1234-1234-1234-123412341234
+```
+
+Replace `{YOUR_API_DOMAIN_NAME}` and `{YOUR_ADMIN_DOMAIN_NAME}` with your domain name. Also, replace `{YOUR_CERTIFICATE_ARN}` with your certificate ARN.
+
+This will install `yorkie-cluster` release in AWS EKS, which can publicly accessible via `{YOUR_API_DOMAIN_NAME}` and `{YOUR_ADMIN_DOMAIN_NAME}` with HTTPS
+by provising external AWS ALB in front of Yorkie cluster.
+
+<Alert status="info">You can also set other Helm chart configuration options. For more information about Helm chart configuration, see [Yorkie Cluster Helm Chart Configuration](https://github.com/yorkie-team/yorkie/tree/main/build/charts/yorkie-cluster#configuration).</Alert>
+
+After Yorkie cluster is installed, you will see the following output:
+
+```bash
+NAME: yorkie-cluster
+LAST DEPLOYED: Thu Apr 27 21:49:06 2023
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+NOTES:
+--- Install Complete ---
+yorkie-cluster successfully installed!
+
+For next steps, follow:
+  $ curl https://github.com/yorkie-team/yorkie/tree/main/charts/yorkie-cluster
+
+To learn more about the release, try:
+  $ helm status yorkie-cluster
+  $ helm get all yorkie-cluster
+```
+
+Now you have Yorkie cluster installed in AWS EKS.
+It will take a few minutes for pods to be ready, so wait until all pods are ready.
+You can check the status of pods with the following command:
+
+```
+$ kubectl get pods -n yorkie --watch
+```
+
+After all pods are ready, you will see the following output:
+
+```
+NAME                      READY   STATUS    RESTARTS      AGE
+mongodb-0                 1/1     Running   0             76s
+yorkie-74969cc796-46s47   1/1     Running   2 (54s ago)   76s
+yorkie-74969cc796-c8zpt   1/1     Running   2 (50s ago)   76s
+yorkie-74969cc796-n9jtr   1/1     Running   2 (52s ago)   76s
+```
+
+### Test Yorkie cluster
+
+Now that you have Yorkie cluster installed and exposed, you can test Yorkie cluster with [CodePair](https://github.com/yorkie-team/codepair), a collaborative editing tool powered by Yorkie.
+
+Clone CodePair repository with the following command:
+
+```bash
+$ git clone https://github.com/yorkie-team/codepair
+```
+
+Then, change directory to codepiar folder and install dependencies with the following command:
+
+```bash
+$ cd codepair
+$ npm install
+```
+
+After dependencies are installed, change `VITE_APP_YORKIE_RPC_ADDR` in `.env.development` file to API Domain of Yorkie cluster you have configured above.
+
+```bash
+$ vi .env.development
+
+VITE_APP_YORKIE_RPC_ADDR=http://{YOUR_API_DOMAIN_NAME}
+```
+
+Then, start CodePair with the following command:
+
+```bash
+$ npm run dev
+
+> codepair@1.0.0 dev
+> vite --config ./config/vite.config.development.ts
+
+
+  VITE v4.3.0  ready in 257 ms
+
+  ➜  Local:   http://localhost:3000/
+  ➜  Network: use --host to expose
+  ➜  press h to show help
+```
+
+You can open several web browsers and access `http://localhost:3000` to test collaborative editing with CodePair.
+
+### Clean up Yorkie cluster
+
+You have now installed Yorkie cluster in AWS EKS, and tested collaborative editing with CodePair.
+
+<Alert status="info">To learn about how to configure Yorkie Cluster in Helm Chart, see [Yorkie Cluster Helm Chart Repository](https://github.com/yorkie-team/yorkie/tree/main/build/charts/yorkie-cluster).</Alert>
+
+First, uninstall Yorkie cluster with the following command:
+
+```bash
+$ helm uninstall yorkie-cluster
+release "yorkie-cluster" uninstalled
+```
+
+Then Uninstall Istio with the following command:
+
+```bash
+$ istioctl uninstall --purge
+All Istio resources will be pruned from the cluster
+Proceed? (y/N) y
+...
+✔ Uninstall complete
+
+# (Optional) Remove istio-system namespace
+$ kubectl delete namespace istio-system
+```
+
+(Optional) Then, delete EKS cluster via AWS Console or AWS CLI.
+
+```bash
+# AWS Console
+$ https://{YOUR_REGION}.console.aws.amazon.com/eks/home?region={YOUR_REGION}/clusters
+
+# AWS CLI
+$ aws eks delete-cluster --name {YOUR_CLUSTER_NAME}
+```
+
+### Next Steps
+
+You can also install Yorkie Cluster addons to monitor metrics and perform GitOps on Yorkie cluster.
+
+- For more information, see [Self-Hosting Guide: Cluster Addons Installation](/docs/self-hosted-server/cluster-addons).
+- For more information about Yorkie cluster design, follow: [Yorkie Cluster Design](https://github.com/yorkie-team/yorkie/blob/main/design/sharded-cluster-mode.md)

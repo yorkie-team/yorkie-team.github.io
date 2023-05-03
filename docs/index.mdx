@@ -17,7 +17,7 @@ Yorkie consists of three main components: Clients, Documents, and Server.
 
 - [Client](/docs/js-sdk#client)s are the entities that communicate with the server. Changes made by documents can be synchronized with the server, allowing for real-time collaboration.
 - [Document](/docs/js-sdk#document)s are the core data structures of Yorkie, and are based on Conflict-free Replicated Data Types(CRDTs). This allows for seamless collaboration on a document, even when clients are offline.
-- [Server](/docs/server) is the central hub of the Yorkie, receiving changes from clients, storing them in the database, and propagating them to other clients who are subscribed to the same documents.
+- [Server](/docs/self-hosted-server) is the central hub of the Yorkie, receiving changes from clients, storing them in the database, and propagating them to other clients who are subscribed to the same documents.
 
 In addition, [Project](/docs/cli#project)s in Yorkie represent separate services or applications within the system. This allows for multiple independent projects to coexist within a single Yorkie installation.
 

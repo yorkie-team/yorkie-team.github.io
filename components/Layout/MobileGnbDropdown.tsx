@@ -119,7 +119,7 @@ export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
                   </li>
                   <li className="navigator_group">
                     <Link
-                      href="/docs/server"
+                      href="/docs/self-hosted-server"
                       className={classNames('navigator_item', 'add_icon', {
                         is_active: asPath.startsWith(`/docs/server`),
                       })}

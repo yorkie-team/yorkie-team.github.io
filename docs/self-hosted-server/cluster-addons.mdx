@@ -1,0 +1,345 @@
+---
+title: 'Cluster Addons Installation'
+order: 73
+---
+
+## Cluster Addons Installation
+
+Yorkie provides a set of cluster addons to help you monitor and manage Yorkie cluster.
+
+This guide will walk you through the process of installing Yorkie cluster addons on your Kubernetes cluster.
+
+Currently, Yorkie addons include:
+
+- [Prometheus](https://prometheus.io/) for collecting metrics from Yorkie cluster.
+- [Grafana](https://grafana.com/) for monitoring Yorkie cluster via Grafana dashboard.
+- [Loki](https://grafana.com/oss/loki/) for logging aggregation.
+- [ArgoCD](https://argoproj.github.io/argo-cd/) for managing Yorkie cluster via GitOps.
+
+### Prerequities
+
+This guide assumes that you have installed Yorkie cluster on your Kubernetes cluster with Helm chart.
+If you haven't installed Yorkie cluster, follow guides for deploying Yorkie cluster on Kubernetes with Helm Charts on various platforms.
+
+- [Minikube Installation](/docs/self-hosted-server/minikube): Guide to install Yorkie cluster on Minikube.
+- [AWS EKS Installation](/docs/self-hosted-server/aws-eks): Guide to install Yorkie cluster on AWS EKS.
+
+### Install Yorkie Monitoring with Helm chart
+
+You can install Yorkie monitoring addon to collect and monitor Yorkie metrics and logs.
+Yorkie monitoring addons include Prometheus, Grafana, and Loki to collect metrics and logs from Yorkie cluster.
+
+Install Yorkie monitoring addon with the following command:
+
+```bash
+$ helm install yorkie-monitoring yorkie-team/yorkie-monitoring -n monitoring --create-namespace
+```
+
+If you are using AWS EKS, use the following command instead:
+
+```bash
+$ helm install yorkie-monitoring yorkie-team/yorkie-monitoring -n monitoring --create-namespace \
+    --set inngress.ingressClassName=alb \
+    --set ingress.hosts.enabled=true \
+    --set ingress.hosts.apiHost={YOUR_API_DOMAIN_NAME} \
+    --set ingress.hosts.alb.enabled=true \
+    --set ingress.alb.certArn={YOUR_CERTIFICATE_ARN}
+```
+
+Replace `{YOUR_API_DOMAIN_NAME}` and `{YOUR_ADMIN_DOMAIN_NAME}` with your domain name.
+Also, replace `{YOUR_CERTIFICATE_ARN}` with your certificate ARN.
+
+This will install `yorkie-monitoring` release.
+
+<Alert status="info">You can also set other Helm chart configuration options. For more information about Helm chart configuration, see [Yorkie Monitoring Helm Chart Configuration](https://github.com/yorkie-team/yorkie/tree/main/build/charts/yorkie-monitoring#configuration).</Alert>
+
+After Yorkie monitoring is installed, you will see the following output:
+
+```bash
+NAME: yorkie-monitoring
+LAST DEPLOYED: Tue May  2 15:13:00 2023
+NAMESPACE: monitoring
+STATUS: deployed
+REVISION: 1
+NOTES:
+--- Install Complete ---
+yorkie-monitoring successfully installed!
+
+For next steps, follow:
+  $ curl https://github.com/yorkie-team/yorkie/tree/main/charts/yorkie-monitoring
+
+To learn more about the release, try:
+  $ helm status yorkie-monitoring -n monitoring
+  $ helm get all yorkie-monitoring -n monitoring
+```
+
+Now you have Yorkie monitoring installed.
+It will take a few minutes for pods to be ready, so wait until all pods are ready.
+You can check the status of pods with the following command:
+
+```bash
+$ kubectl get pods -n monitoring --watch
+```
+
+After all pods are ready, you will see the following output:
+
+```bash
+NAME                                               READY   STATUS    RESTARTS   AGE
+prometheus-yorkie-monitoring-prometheus-0          2/2     Running   0          14m
+yorkie-monitoring-grafana-59d4565948-pfstz         3/3     Running   0          14m
+yorkie-monitoring-loki-0                           1/1     Running   0          14m
+yorkie-monitoring-operator-78f75648c-rvjk9         1/1     Running   0          14m
+yorkie-monitoring-prometheus-node-exporter-gr4bn   1/1     Running   0          14m
+yorkie-monitoring-promtail-bwc9g                   1/1     Running   0          14m
+```
+
+### View Yorkie Metrics and Loki Logs on Grafana dashboard
+
+Now you have Yorkie monitoring installed, you can access Grafana dashboard to view Yorkie metrics and Loki logs.
+
+Access Grafana dashboard with following url:
+
+- Minikube: http://`YOUR_MINIKUBE_IP`/grafana/
+- AWS EKS: http://`YOUR_API_DOMAIN_NAME`/grafana/
+
+<Alert status="info">The default username and password are `admin` and `yorkie`.</Alert>
+
+Once you are logged in, you will see the following dashboard:
+
+<ImageWrap>
+  <ImageWrap.Box>
+    <ImageWrap.Image
+      src="/assets/images/docs/yorkie-monitoring-grafana-dashboards.png"
+      alt="Grafana Dashboards"
+      title="Grafana Dashboards"
+      width={600}
+      height={400}
+    />
+    <ImageWrap.Caption>Grafana contains two default dashboards: Loki Dashboard and Yorkie Dashboard</ImageWrap.Caption>
+  </ImageWrap.Box>
+  <ImageWrap.Box>
+    <ImageWrap.Image
+      src="/assets/images/docs/yorkie-monitoring-grafana-datasources.png"
+      alt="Grafana Datasources"
+      title="Grafana Datasources"
+      width={600}
+      height={400}
+    />
+    <ImageWrap.Caption>You can see there are two datasources attached: Prometheus and Loki</ImageWrap.Caption>
+  </ImageWrap.Box>
+</ImageWrap>
+
+<ImageWrap>
+  <ImageWrap.Box>
+    <ImageWrap.Image
+      src="/assets/images/docs/yorkie-monitoring-grafana-yorkie-dashboard.png"
+      alt="Yorkie Dashboard"
+      title="Yorkie Dashboard"
+      width={600}
+      height={400}
+    />
+    <ImageWrap.Caption>In Yorkie dashboard, you can view various metrics that Yorkie servers provide</ImageWrap.Caption>
+  </ImageWrap.Box>
+  <ImageWrap.Box>
+    <ImageWrap.Image
+      src="/assets/images/docs/yorkie-monitoring-grafana-loki-dashboard.png"
+      alt="Loki Dashboard"
+      title="Loki Dashboard"
+      width={600}
+      height={400}
+    />
+    <ImageWrap.Caption>In Loki dashboard, you can view logs from Yorkie servers, as well as querying specific logs</ImageWrap.Caption>
+  </ImageWrap.Box>
+</ImageWrap>
+<p></p>
+
+<Alert status="warning">You need to set `namespace` and `workload` to `yorkie` to see Yorkie logs in Loki dashboard.</Alert>
+
+You can add more dashboards like [Go Processes](https://grafana.com/grafana/dashboards/6671-go-processes/) in Grafana dashboard.
+
+### Install Yorkie ArgoCD with Helm chart
+
+You can install Yorkie Argocd addon to perform continuous delivery of Yorkie cluster with GitOps.
+Yorkie ArgoCD addon includes ArgoCD to perform continuous delivery of Yorkie cluster.
+
+Install Yorkie ArgoCD addon with the following command:
+
+```bash
+$ helm install yorkie-argocd yorkie-team/yorkie-argocd -n argocd --create-namespace
+```
+
+If you are using AWS EKS, use the following command instead:
+
+```bash
+$ helm install yorkie-argocd yorkie-team/yorkie-argocd -n argocd --create-namespace \
+    --set ingress.hosts..ingressClassName=alb \
+	--set ingress.hosts.enabled=true \
+    --set ingres.hosts.apiHost={YOUR_API_DOMAIN_NAME} \
+    --set ingress.alb.enabled=true \
+    --set ingress.alb.certArn={YOUR_CERTIFICATE_ARN}
+```
+
+Replace `{YOUR_API_DOMAIN_NAME}` and `{YOUR_ADMIN_DOMAIN_NAME}` with your domain name.
+Also, replace `{YOUR_CERTIFICATE_ARN}` with your certificate ARN.
+
+This will install `yorkie-argocd` release.
+
+<Alert status="info">You can also set other Helm chart configuration options. For more information about Helm chart configuration, see [Yorkie ArgoCD Helm Chart Configuration](https://github.com/yorkie-team/yorkie/tree/main/build/charts/yorkie-argocd#configuration).</Alert>
+
+After Yorkie ArgoCD is installed, you will see the following output:
+
+```bash
+NAME: yorkie-argocd
+LAST DEPLOYED: Tue May  2 16:06:03 2023
+NAMESPACE: argocd
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+NOTES:
+--- Install Complete ---
+yorkie-argocd successfully installed!
+
+For next steps, follow:
+  $ curl https://github.com/yorkie-team/yorkie/tree/main/charts/yorkie-argocd
+
+To learn more about the release, try:
+  $ helm status yorkie-argocd -n argocd
+  $ helm get all yorkie-argocd -n argocd
+```
+
+Then, you need to set up the admin password for ArgoCD.
+
+```bash
+# Set the initial password for the admin user
+$ kubectl -n argocd patch secret argocd-secret \
+  -p '{"stringData": {
+    "admin.password": "$2a$12$fJoZj9CnNyD5Yfi02nZh7.XcH4Ds9M.oftQOQDP5oytyra9cP6Dny",
+    "admin.passwordMtime": "'$(date +%FT%T%Z)'"
+}}'
+
+# Restart the ArgoCD server to apply the new password
+$ kubectl -n argocd get pod --no-headers=true | awk '/argocd-server/{print $1}'| xargs kubectl delete -n argocd pod
+```
+
+Now you have Yorkie ArgoCD installed.
+
+It will take a few minutes for pods to be ready, so wait until all pods are ready.
+You can check the status of pods with the following command:
+
+```bash
+$ kubectl get pods -n argocd --watch
+```
+
+After all pods are ready, you will see the following output:
+
+```bash
+NAME                                                READY   STATUS    RESTARTS   AGE
+argocd-application-controller-0                     1/1     Running   0          2m53s
+argocd-applicationset-controller-75cb58f45c-vxzv8   1/1     Running   0          2m53s
+argocd-dex-server-67df64dd59-9shpk                  1/1     Running   0          2m53s
+argocd-notifications-controller-65fbf675f4-rjpvw    1/1     Running   0          2m53s
+argocd-redis-75b645466f-r2jgn                       1/1     Running   0          2m53s
+argocd-repo-server-57df48bf86-h4pwd                 1/1     Running   0          2m53s
+argocd-server-6bd555f4c6-7sh8l                      1/1     Running   0          57s
+```
+
+### View Yorkie GitOps on ArgoCD web UI
+
+Now you have Yorkie ArgoCD installed, you can access ArgoCD web UI to view deployment status of Yorkie cluster.
+
+Access ArgoCD web UI with following url:
+
+- Minikube: http://`YOUR_MINIKUBE_IP`/argocd/
+- AWS EKS: http://`YOUR_API_DOMAIN_NAME`/argocd/
+
+<Alert status="info">The default username and password are `admin` and `yorkie`.</Alert>
+
+Once you are logged in, you will see the following dashboard:
+
+<ImageWrap>
+  <ImageWrap.Box>
+    <ImageWrap.Image
+      src="/assets/images/docs/yorkie-argocd-argocd-applications.png"
+      alt="ArgoCD Dashboards"
+      title="ArgoCD Dashboards"
+      width={600}
+      height={400}
+    />
+    <ImageWrap.Caption>ArgoCD contains two default applications: Yorkie Cluster and Yorkie Monitoring</ImageWrap.Caption>
+  </ImageWrap.Box>
+  <ImageWrap.Box>
+    <ImageWrap.Image
+      src="/assets/images/docs/yorkie-argocd-argocd-settings.png"
+      alt="ArgoCD Settings"
+      title="ArgoCD Settings"
+      width={600}
+      height={400}
+    />
+    <ImageWrap.Caption>You need to set your own devops repository to use ArgoCD</ImageWrap.Caption>
+  </ImageWrap.Box>
+</ImageWrap>
+
+<ImageWrap>
+  <ImageWrap.Box>
+    <ImageWrap.Image
+      src="/assets/images/docs/yorkie-argocd-argocd-yorkie-cluster-application.png"
+      alt="Yorkie Cluster Dashboard"
+      title="Yorkie Cluster Dashboard"
+      width={600}
+      height={400}
+    />
+    <ImageWrap.Caption>In Yorkie Cluster dashboard, you can view Yorkie cluster deployment status, as well as deploying Yorkie cluster</ImageWrap.Caption>
+  </ImageWrap.Box>
+  <ImageWrap.Box>
+    <ImageWrap.Image
+      src="/assets/images/docs/yorkie-argocd-argocd-yorkie-monitoring-application.png"
+      alt="Loki Dashboard"
+      title="Loki Dashboard"
+      width={600}
+      height={400}
+    />
+    <ImageWrap.Caption>In Yorkie Monitoring dashboard, you can view Yorkie monitoring deployment status, as well as deploying Yorkie monitoring</ImageWrap.Caption>
+  </ImageWrap.Box>
+</ImageWrap>
+<p></p>
+
+<Alert status="warning">You need to configure your own devops repository to use ArgoCD. For more information, see [ArgoCD Helm documentation](https://argo-cd.readthedocs.io/en/stable/user-guide/helm/).</Alert>
+
+### Clean up cluster addons
+
+You have now installed Yorkie monitoring and ArgoCD, and viewed Yorkie metrics on Grafana dashboard and Yorkie GitOps on ArgoCD web UI.
+
+To learn about how to configure Yorkie Monitoring and Yorkie ArgoCD in Helm Chart, see [Yorkie Chart Repository](https://github.com/yorkie-team/yorkie/tree/main/build/charts/).
+
+First, uninstall Yorkie ArgoCD with the following command:
+
+```bash
+# Uninstall Yorkie ArgoCD helm chart release
+$ helm uninstall yorkie-argocd -n argocd
+
+# Delete ArgoCD CRDs
+$ kubectl get crd -oname | grep --color=never 'argoproj.io' | xargs kubectl delete
+
+# (Optional) Delete ArgoCD namespace
+$ kubectl delete namespace argocd
+```
+
+Then, uninstall Yorkie monitoring with the following command:
+
+```bash
+# Uninstall Yorkie monitoring helm chart release
+$ helm uninstall yorkie-monitoring -n monitoring
+
+# Delete monitoring CRDs
+$ kubectl get crd -oname | grep --color=never 'monitoring.coreos.com' | xargs kubectl delete
+
+# Delete monitoring service accounts
+$ kubectl delete serviceaccounts --all -n monitoring
+
+# (Optional) Delete monitoring namespace
+$ kubectl delete namespace monitoring
+```
+
+### Next Steps
+
+For more information about Yorkie cluster design, follow: [Yorkie Cluster Design](https://github.com/yorkie-team/yorkie/blob/main/design/sharded-cluster-mode.md)
