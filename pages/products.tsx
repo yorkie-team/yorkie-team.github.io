@@ -249,7 +249,7 @@ const Products: NextPage = () => {
                 Yorkie open-source package
               </strong>
             </div>
-            <Link href="/docs/server" className="btn gray800">
+            <Link href="/docs/self-hosted-server" className="btn gray800">
               <Icon type="book" />
               <span className="text">How to build self-hosted server</span>
             </Link>
