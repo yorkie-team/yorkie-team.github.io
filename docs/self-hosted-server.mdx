@@ -19,7 +19,6 @@ Let's start a Server with the CLI. You can start a Server with the following com
 $ yorkie server
 
 backend created: id: c6ljcdl94818baveba8g, rpc: localhost:11101: db: memory
-serving admin on 11103
 serving RPC on 11101
 serving profiling on 11102
 ```
@@ -75,17 +74,15 @@ This will launch Yorkie(Server) and envoy containers on your environment.
 $ docker ps
 
 IMAGE                      COMMAND                  PORTS                                  NAMES
-grpcweb:envoy              "/usr/local/bin/envo…"   0.0.0.0:8080->9090/tcp                 envoy
-yorkieteam/yorkie:latest   "yorkie server --ena…"   0.0.0.0:11101-11103->11101-11103/tcp   yorkie
+grpcweb:envoy              "/usr/local/bin/envo…"   0.0.0.0:8080->8080/tcp                 envoy
+yorkieteam/yorkie:latest   "yorkie server --ena…"   0.0.0.0:11101-11102->11101-11102/tcp   yorkie
 ```
 
 Then, the ports of the services are bound to the host environment.
 
-- 8080: gRPC-web port for SDK
-- 9090: gRPC-web port for Admin Server is used by Dashboard([Dashboard](https://github.com/yorkie-team/dashboard)) or CLI
-- 11101: gRPC port for SDK
+- 8080: gRPC-web port for RPC Server, including SDK and Admin
+- 11101: gRPC port for RPC Server, including SDK and Admin
 - 11102: HTML port for Profiling Server
-- 11103: gRPC port for Admin Server
 
 <Alert status="warning">Server stores its data using an in-memory DB, which does not provide durability. If you want to store data permanently, please refer to [Running Server With MongoDB](/docs/self-hosted-server#running-server-with-mongodb)</Alert>
 

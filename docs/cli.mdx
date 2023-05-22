@@ -70,7 +70,6 @@ Usage:
   yorkie server [options] [flags]
 
 Flags:
-      --admin-port int                                  Admin port (default 11103)
       --auth-webhook-cache-auth-ttl duration            TTL value to set when caching authorized webhook response. (default 10s)
       --auth-webhook-cache-size int                     The cache size of the authorization webhook. (default 5000)
       --auth-webhook-cache-unauth-ttl duration          TTL value to set when caching unauthorized webhook response. (default 10s)
@@ -113,7 +112,7 @@ Flags:
 To use admin commands, you need to log in to the server. You can log in to the server using the `login` subcommand:
 
 ```bash
-$ yorkie login --admin-addr <admin address> -u <username> -p <password>
+$ yorkie login -u <username> -p <password>
 ```
 
 Username and password are the same as the ones you used to log in to the [dashboard](/dashboard).
