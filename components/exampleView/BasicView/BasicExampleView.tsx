@@ -40,10 +40,9 @@ export function BasicExampleView({
       setDocChangeInfos((prev) => [...prev, { type: 'initialize', content: 'Connection has been established!' }]);
       unsubscribeDoc = doc.subscribe((event) => {
         if (event.type === 'remote-change') {
-          for (const changeInfo of event.value) {
-            for (const op of changeInfo.operations) {
-              setDocChangeInfos((prev) => [...prev, { type: 'update', content: op.path }]);
-            }
+          const { operations } =  event.value;
+          for (const op of operations) {
+            setDocChangeInfos((prev) => [...prev, { type: 'update', content: op.path }]);
           }
         }
       });
