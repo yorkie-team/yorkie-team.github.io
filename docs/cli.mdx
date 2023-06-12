@@ -199,6 +199,102 @@ $ yorkie project update test-project --name new-test-project
 {"id":"63fdc721b48d9fd33996b38b","name":"new-test-project","owner":"","auth_webhook_url":"","auth_webhook_methods":null,"ClientDeactivateThreshold":"24h","public_key":"cfuse8a6qdop9v48o100","secret_key":"cfuse8a6qdop9v48o10g","created_at":"2023-02-28T09:19:29.269875Z","updated_at":"2023-02-28T09:27:06.0588974Z"}
 ```
 
+### Document
+
+Document is a data structure that can be synchronized between multiple clients. With document commands, you can manage documents in the project.
+
+```bash
+$ yorkie document
+Manage documents
+
+Usage:
+  yorkie document [command]
+
+Available Commands:
+  ls          List all documents in the project
+  remove      Remove documents in the project
+
+Flags:
+  -h, --help   help for document
+
+Use "yorkie document [command] --help" for more information about a command.
+```
+
+#### Listing Documents
+
+You can list documents in the project using `ls`.
+
+```
+Usage:
+  yorkie document ls [project name] [flags]
+
+Flags:
+      --forward              Whether to search forward or backward
+  -h, --help                 help for ls
+      --previous-id string   The previous document ID to start from
+      --size int32           The number of document to output per page
+```
+
+```bash
+$ yorkie document ls test-project 
+ ID                        KEY              CREATED AT  ACCESSED AT  UPDATED AT  SNAPSHOT       
+ 6482cea1c38d5a06529bbaa7  test-document-5  ...         ...          ...         ...
+ 6482cea0c38d5a06529bba96  test-document-4  ...         ...          ...         ...
+ 6482ce9fc38d5a06529bba85  test-document-3  ...         ...          ...         ...
+ 6482ce9dc38d5a06529bba69  test-document-2  ...         ...          ...         ...
+ 6482ce97c38d5a06529bba1b  test-document-1  ...         ...          ...         ...
+```
+
+There are several flags to control the output of the command. With the flags you can paginate the output.
+
+You can use `--size` flag to limit the number of documents to output per page.
+
+```bash
+$ yorkie document ls default --size 1
+ ID                        KEY              CREATED AT  ACCESSED AT  UPDATED AT  SNAPSHOT       
+ 6482cea1c38d5a06529bbaa7  test-document-5  ...         ...          ...         ...
+```
+
+You can use `--previous-id` flag to start after a specific document.
+
+```bash
+$ yorkie document ls default --previous-id 6482ce9fc38d5a06529bba85
+ ID                        KEY              CREATED AT  ACCESSED AT  UPDATED AT  SNAPSHOT       
+ 6482ce9dc38d5a06529bba69  test-document-2  ...         ...          ...         ...
+ 6482ce97c38d5a06529bba1b  test-document-1  ...         ...          ...         ...
+```
+
+You can use `--forward` flag to search forward or backward.
+
+```bash
+$ yorkie document ls default --forward
+ ID                        KEY              CREATED AT  ACCESSED AT  UPDATED AT  SNAPSHOT       
+ 6482ce97c38d5a06529bba1b  test-document-1  ...         ...          ...         ...
+ 6482ce9dc38d5a06529bba69  test-document-2  ...         ...          ...         ...
+ 6482ce9fc38d5a06529bba85  test-document-3  ...         ...          ...         ...
+ 6482cea0c38d5a06529bba96  test-document-4  ...         ...          ...         ...
+ 6482cea1c38d5a06529bbaa7  test-document-5  ...         ...          ...         ...
+```
+
+#### Removing a Document
+
+You can remove a document from the project using `remove`.
+
+```
+Usage:
+  yorkie document remove [project name] [document key] [flags]
+
+Examples:
+yorkie document remove sample-project sample-document [options]
+
+Flags:
+  -h, --help    help for remove
+```
+
+```bash
+$ yorkie document remove test-project test-document-1
+```
+
 #### Auth Webhook
 
 A webhook is an HTTP POST that is called when something happens. If the Auth Webhook has been configured, when a Server receives a request from a Client, the Server checks if the Client has been authorized for a certain Document by asking an outside service with a REST request.
