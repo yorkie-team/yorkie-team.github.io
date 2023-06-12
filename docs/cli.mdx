@@ -201,7 +201,7 @@ $ yorkie project update test-project --name new-test-project
 
 ### Document
 
-Document represents a document accessible to the user. You can create, update and delete documents in the project.
+Document is a data structure that can be synchronized between multiple clients. With document commands, you can manage documents in the project.
 
 ```bash
 $ yorkie document
@@ -245,6 +245,8 @@ $ yorkie document ls test-project
  6482ce97c38d5a06529bba1b  test-document-1  ...         ...          ...         ...
 ```
 
+There are several flags to control the output of the command. With the flags you can paginate the output.
+
 You can use `--size` flag to limit the number of documents to output per page.
 
 ```bash
@@ -286,21 +288,11 @@ Examples:
 yorkie document remove sample-project sample-document [options]
 
 Flags:
-      --force   force remove a document even if attached in clients
   -h, --help    help for remove
 ```
 
 ```bash
 $ yorkie document remove test-project test-document-1
-```
-
-If the document is attached to any client, you cannot remove it. You can use the `--force' flag to force a document to be removed.
-
-```bash
-$ yorkie document remove test-project test-document-1
-Error: rpc error: ... remove document: document is attached
-
-$ yorkie document remove test-project test-document-1 --force
 ```
 
 #### Auth Webhook
