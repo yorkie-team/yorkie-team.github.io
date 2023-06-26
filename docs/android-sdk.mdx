@@ -18,7 +18,7 @@ If you want to install the SDK, refer to the [Getting Started with Android SDK](
 We can create a Client using `Client(context: Context, rpcHost: String, rpcPort: Int, usePlainText: Boolean, options: Options)`. After the Client has been activated, it is connected to the server and ready to use.
 
 ```kotlin
-val client = Client(context, "{{API_HOST}}", {{API_PORT}}, false, Options(apiKey = "xxxxx"))
+val client = Client(context, "{{API_HOST}}", {{API_PORT}}, Options(apiKey = "xxxxx"), false)
 // Declare your own CoroutineScope
 scope.launch {
   client.activateAsync().await	
@@ -56,7 +56,7 @@ If you want to know about other client events, please refer to [Client.Event](ht
 Presence is a feature that allows you to display information about users who are currently using a collaborative application. Presence is often used in collaborative applications such as document editors, chat apps, and other real-time applications.
 
 ```kotlin
-val optionA = Client.Options(presence = PresenceInfo(0, mapOf("username" to "alice", "color" to "blue")))
+val optionA = Client.Options(presence = Presence(mapOf("username" to "alice", "color" to "blue")))
 val clientA = Client(context, "api.yorkie.dev", 443, optionA)
 val documentA = Document(Document.Key("doc-1"))
 // Declare your own CoroutineScope
@@ -70,7 +70,7 @@ scope.launch {
 Then, another Client is created and attaches a Document with the same name as before.
 
 ```kotlin
-val optionB = Client.Options(presence = PresenceInfo(0, mapOf("username" to "bob", "color" to "red")))
+val optionB = Client.Options(presence = Presence(mapOf("username" to "bob", "color" to "red")))
 val clientB = Client(context, "api.yorkie.dev", 443, optionB)
 val documentB = Document(Document.Key("doc-1"))
 // Declare your own CoroutineScope
@@ -137,18 +137,47 @@ scope.launch {
 
 After attaching the Document to the Client, all changes to the Document are automatically synchronized with remote peers.
 
-#### Changing Syncronization Mode
+#### Changing Syncronization Setting
 
-If you want to change synchronization mode, you can use `Client.pause(document)` and `Client.resume(document)`.
+To change the synchronization setting for a document, you can use `Client.pause(document)` and `Client.resume(document)`.
+
+When you pause a document, the synchronization process will no longer occur in realtime, and you will need to manually execute the synchronization to ensure that the changes are propagated to other clients.
+
+To resume the realtime synchronization, you can call `Client.resume(document)`.
 
 ```kotlin
-// Pause real-time sync.
+// Pause real-time sync
 client.pause(document)
 
-// Resume real-time sync.
+// Resume real-time sync
 client.resume(document)
 
 ```
+
+#### Changing Syncronization Mode
+
+By default, Yorkie synchronizes a document in `PushPull` mode, where local changes are pushed to the server, and remote changes are pulled from the server.
+
+If you only want to send your changes and not receive remote changes, you can use `PushOnly` mode.
+
+For realtime synchronization, you can use `Client.pauseRemoteChanges(document)` and `Client.resumeRemoteChanges(document)`.
+
+ For manual synchronization, you can pass the desired sync mode to `Client.syncAsync(document, syncMode)`.
+
+```kotlin
+ // Pause remote changes for realtime sync
+ client.pauseRemoteChanges(document);
+ // Resume remote changes for realtime sync
+ client.resumeRemoteChanges(document);
+
+ // Declare your own CoroutineScope
+ scope.launch {
+   // Manual sync in Push-Only mode
+   client.syncAsync(doc, SyncMode.PushOnly).await();
+   // Manual sync in Push-Pull mode
+   client.syncAsync(doc, SyncMode.PushPull).await();
+ }
+ ```
 
 #### Editing the Document
 
@@ -184,27 +213,46 @@ println(root.getAs<JsonObject>("obj")["arr"]) // [1,2]
 
 #### Subscribing to Document events
 
-A Document is modified by changes generated remotely or locally in Yorkie. When the Document is modified, change events occur, to which we can subscribe. Here, we can do post-processing in the application using the `path` of the change events.
+A Document can be modified by changes generated remotely or locally in Yorkie.
+
+Whenever the Document is modified, change events are triggered and we can subscribe to these events using the `document.events`.
+
+The events are triggered with an event object, and the event type indicates the source of the change, which can be one of the following values: `LocalChange`, `RemoteChange`, or `Snapshot`.
+
+ When the type of the event is `LocalChange` or `RemoteChange`, it has `ChangeInfo` as value.
+
+ For more information about changeInfo for document events, please refer to the [ChangeInfo](https://yorkie.dev/yorkie-android-sdk/yorkie/dev.yorkie.document/-document/-event/-change-info/index.html).
 
 ```kotlin
 // Declare your own CoroutineScope
 scope.launch {
-  document.collect { event ->
+  document.events.collect { event ->
     if (event is Document.Event.LocalChange) {
       println(event)
     } else if (event is Document.Event.RemoteChange) {
-      event.changeInfos.forEach { changeInfo ->
-        changeInfo.paths.forEach { path ->
-          if (path.startsWith("$.obj.num")) {
-            // root.obj.num is changed
-          } else if (path.startsWith("$.obj")) {
-            // root.obj is changed
-          }
+      event.changeInfo.operations.forEach { op ->
+        when (op) {
+          is OperationInfo.IncreaseOpInfo -> { // Do something... }
+          else -> { return@collect }
         }
       }
     }
   }
 }
+```
+
+Additionally, you can subscribe to changes for a specific path in the Document using `document.events(path)` with a path argument, such as `$.todos`, where the `$` sign indicates the root of the document.
+ The events are delivered when the target path and its nested values are changed.
+
+```kotlin
+// Declare your own CoroutineScope
+scope.launch {
+  document.events("$.todos").collect { event ->
+    // Events will be delivered when the root.todos or its nested values change.
+    val target = document.getValueByPath("$.todos")
+    // Do something...
+  }
+
 ```
 
 #### Detaching the Document
