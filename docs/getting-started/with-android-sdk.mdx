@@ -42,7 +42,7 @@ Add a dependency to the `<dependencies>` element.
 First, create a Client instance with API key and connect it to the yorkie server.
 
 ```kotlin
-val client = Client(context, "{{API_HOST}}", {{API_PORT}}, false, Options(apiKey = "xxxxxxxxxxxxxxxxxxxx"))
+val client = Client(context, "{{API_HOST}}", {{API_PORT}}, Options(apiKey = "xxxxxxxxxxxxxxxxxxxx"))
 
 // Declare your own CoroutineScope
 scope.launch {
@@ -101,18 +101,19 @@ Clients sharing the same document can subscribe to the changes that happen in th
 ```kotlin
 // Declare your own CoroutineScope
 scope.launch {
-  document.collect { event ->
+  document.events.collect { event ->
     println("A change event occured in the Document!")
   }
 }
 ```
 
-You can execute different actions depending on the source of change. 
+You can execute different actions depending on the source of change.
+ 
 
 ```kotlin
 // Declare your own CoroutineScope
 scope.launch {
-  document.collect { event ->
+  document.events.collect { event ->
     if (event is Document.Event.RemoteChange) {
       println("A peer has changed the Document!")
     }
@@ -120,23 +121,19 @@ scope.launch {
 }
 ```
 
-To create a collaborative application, it is important to be able to access certain document properties when a specific property in the document is modified. By examining the `paths`, you can determine which property has been changed and perform different actions based on that information. 
+To subscribe to changes for a specific path in the document, you can use the `document.events(path)` with a path argument, such as `$.todos`, where the `$` sign indicates the root of the document.
+
+ With this feature, you can easily subscribe to changes for a specific part of the document and perform different actions based on the updated values.
 
 ```kotlin
 // Declare your own CoroutineScope
 scope.launch {
-  document.collect { event ->
-    if (event is Document.Event.RemoteChange) {
-      event.changeInfos.forEach { changeInfo ->
-        changeInfo.paths.forEach { path ->
-          if (path.startsWith("$.sharedMessage")) {
-            println("One of your peers has changed the message to ${document.getRoot()["sharedMessage"]}")
-          }
-        }
-      }
-    }
+  document.events("$.todos").collect { event ->
+    // Events will be delivered when the root.todos or its nested values change.
+    val target = document.getValueByPath("$.todos")
+    // Do something...
   }
-}
+
 ```
 
 #### 6. Viewing the presence of other peers
