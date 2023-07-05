@@ -1,0 +1,44 @@
+name: Detect Package Manager
+description: Detects the package manager used by the project
+
+inputs:
+  path:
+    description: The path where the package manager should be detected
+    required: false
+    default: ${{ github.workspace }}
+
+outputs:
+  manager:
+    description: The package manager used by the project
+    value: ${{ steps.detect-package-manager.outputs.manager }}
+  command:
+    description: The command to run to install dependencies
+    value: ${{ steps.detect-package-manager.outputs.command }}
+  runner:
+    description: The command to run to execute a script
+    value: ${{ steps.detect-package-manager.outputs.runner }}
+
+runs:
+  using: composite
+
+  steps:
+    - name: Detect Package Manager
+      id: detect-package-manager
+      shell: bash
+      env:
+        PROJECT_PATH: ${{ inputs.path }}
+      run: |
+        if [ -f "$PROJECT_PATH/yarn.lock" ]; then
+          echo "manager=yarn" >> $GITHUB_OUTPUT
+          echo "command=install" >> $GITHUB_OUTPUT
+          echo "runner=yarn" >> $GITHUB_OUTPUT
+          exit 0
+        elif [ -f "$PROJECT_PATH/package-lock.json" ]; then
+          echo "manager=npm" >> $GITHUB_OUTPUT
+          echo "command=ci" >> $GITHUB_OUTPUT
+          echo "runner=npx --no-install" >> $GITHUB_OUTPUT
+          exit 0
+        else
+          echo "Unable to determine packager manager at $PROJECT_PATH"
+          exit 1
+        fi
