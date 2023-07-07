@@ -122,6 +122,11 @@ export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement
                   tldraw
                 </Link>
               </li>
+              <li className="site_item">
+                <Link href="/examples/quill" className="link">
+                  Quill
+                </Link>
+              </li>
             </ul>
           </div>
           <div className="site">
