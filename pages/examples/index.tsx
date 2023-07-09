@@ -202,6 +202,19 @@ const Examples: NextPage = () => {
                 </div>
               </Link>
             </li>
+            <li className="grid_item">
+              <Link href="/examples/quill" className="grid_card">
+                <div className="grid_thumbnail">
+                  <ExampleThumbnailImage fileName="vanilla-quill.jpg" alt="vanilla-quill" />
+                </div>
+                <div className="grid_card_info">
+                  <strong className="title">Quill</strong>
+                  <p className="desc">
+                    This demo shows the real-time collaborative version of the Quill editor with Yorkie and Vite.
+                  </p>
+                </div>
+              </Link>
+            </li>
           </ul>
         </div>
       </div>
