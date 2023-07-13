@@ -64,25 +64,38 @@ let value = await doc.getRoot().get("key") as? String
 
 #### 5. Subscribing to the changes that happen in the Document
 
-Clients sharing the same document can subscribe to the changes that happen in the Document.
+Clients sharing the same document can subscribe to the changes that happen in the Document using `doc.subscribe()`.
 
 ```swift
-await doc.eventStream.sink { event in
-    switch event {
-    case let event as LocalChangeEvent:
-        print(event)
-    case let event as RemoteChangeEvent:
-        for changeInfo in event.value {
-            print(changeInfo.change.message)
-            for path in changeInfo.paths {
-                if path.starts(with: "$.obj.num") {
-                    // root.obj.num is changed
-                } else if path.starts(with: "$.obj") {
-                    // root.obj is changed
-                }
-            }
-        }
-    }
+await doc.subscribe { event in
+  print("A change event occurred in the Document!")
+}
+```
+
+You can execute different actions depending on the source of change. The source can be accessed from `event.type`.
+
+The value can be: `localChange`, `remoteChange` or `snapshot`.
+
+```swift
+await doc.subscribe { event in
+  if event.type == .remoteChange {
+    print("A peer has changed the Document!")
+  }
+}
+```
+
+To subscribe to changes for a specific path in the document, you can use the `doc.subscribe(targetPath, callback)` with a path argument, such as `$.todos`, where the `$` sign indicates the root of the document.
+The callback function is called when the target path and its nested values are changed.
+
+With this feature, you can easily subscribe to changes for a specific part of the document and perform different actions based on the updated values.
+
+```swift
+await doc.subscribe(targetPath: "$.todos") { event in 
+  // The callback will be called when the root.todos or its nested values change.
+  Task {
+    let target = try? await target.getValueByPath(path: "$.todos") // You can get the value by path.
+  }
+  // Do something...
 }
 ```
 
