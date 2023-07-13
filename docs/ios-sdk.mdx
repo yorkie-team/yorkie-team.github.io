@@ -161,25 +161,47 @@ print(obj.arr!)  // [1,2]
 
 #### Subscribing to Document events
 
-A Document is modified by changes generated remotely or locally in Yorkie. When the Document is modified, change events occur, to which we can subscribe using `document.subscribe`. Here, we can do post-processing such as repaint in the application using the `path` of the change events.
+A Document can be modified by changes generated remotely or locally in Yorkie.
+
+Whenever the Document is modified, change events are triggered and we can subscribe to these events using the `document.subscribe(callback)`.
+
+The callback is called with an event object, and the `event.type` property indicates the source of the change, which can be one of the following values: `localChange`, `remoteChange` or `snapshot`.
+
+When the `event.type` is `localChange` or `remoteChange`, the `event.value` is a ChangeInfo, which has `message`, `operatons` and `actorID` properties.
+
+For more information about changeInfo for document events, please refer to the [ChangeInfo](https://yorkie.dev/yorkie-ios-sdk/documentation/yorkie/changeinfo).
+
 
 ```swift
-await target.eventStream.sink { event in
-    switch event {
-    case let event as LocalChangeEvent:
+await self.doc.subscribe { event in
+    if event.type == .localChange {
         print(event)
-    case let event as RemoteChangeEvent:
-        for changeInfo in event.value {
-            print(changeInfo.change.message)
-            for path in changeInfo.paths {
-                if path.starts(with: "$.obj.num") {
-                    // root.obj.num is changed
-                } else if path.starts(with: "$.obj") {
-                    // root.obj is changed
-                }
+    } else if let event = event as? RemoteChangeEvent {
+        let changeInfo = event.value
+        
+        changeInfo.operations.forEach { op in
+            switch (op.type) {
+            case .increase:
+                // Do something...
+                break
+            default:
+                break
             }
         }
     }
+}
+```
+
+Additionally, you can subscribe to changes for a specific path in the Document using `doc.subscribe(targetPath, callback)` with a path argument, such as `$.todos`, where the `$` sign indicates the root of the document.
+The callback function is called when the target path and its nested values are changed.
+
+```swift
+await doc.subscribe(targetPath: "$.todos") { event in 
+  // The callback will be called when the root.todos or its nested values change.
+  Task {
+    let target = try? await target.getValueByPath(path: "$.todos") // You can get the value by path.
+  }
+  // Do something...
 }
 ```
 
