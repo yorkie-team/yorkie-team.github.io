@@ -9,7 +9,7 @@ import { ThemeOption, useTheme } from '@/hooks/useTheme';
 function MyApp({ Component, pageProps }: AppProps) {
   const { setTheme } = useTheme();
   useEffect(() => {
-    const themeOption = (window.localStorage.getItem('theme') || 'light') as ThemeOption;
+    const themeOption = (window.localStorage.getItem('theme') || 'system') as ThemeOption;
     setTheme(themeOption);
   }, [setTheme]);
 
@@ -37,10 +37,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           content="Easily add collaboration to your apps with our API-based services."
         />
       </Head>
-      <Script
-        src="https://www.googletagmanager.com/gtag/js?id=G-7KXWLDH8CH"
-        strategy="afterInteractive"
-      />
+      <Script src="https://www.googletagmanager.com/gtag/js?id=G-7KXWLDH8CH" strategy="afterInteractive" />
       <Script id="google-analytics" strategy="afterInteractive">
         {`
           window.dataLayer = window.dataLayer || [];
