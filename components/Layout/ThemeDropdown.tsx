@@ -5,11 +5,11 @@ import { ThemeOption, useTheme } from '@/hooks/useTheme';
 
 export function ThemeDropdown() {
   const [dropdownOpened, setDropdownOpened] = useState(false);
-  const [themeOption, setThemeOption] = useState<ThemeOption>('light');
+  const [themeOption, setThemeOption] = useState<ThemeOption>('system');
   const { setTheme } = useTheme();
 
   useEffect(() => {
-    const themeOption = (window.localStorage.getItem('theme') || 'light') as ThemeOption;
+    const themeOption = (window.localStorage.getItem('theme') || 'system') as ThemeOption;
     setThemeOption(themeOption);
   }, [setTheme]);
 
