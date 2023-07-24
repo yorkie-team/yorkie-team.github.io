@@ -4,30 +4,7 @@ import Head from 'next/head';
 import { ExampleLayout, Accordion, CodeBlock } from '@/components';
 import { Sidebar, FullView, ShowView, GridView, DualView } from '@/components/exampleView';
 
-const sampleCode = `
-<div>There are currently <span id='peersCount'></span> peers!</div>
-
-<!-- include yorkie js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/yorkie-js-sdk/0.2.16/yorkie-js-sdk.js"></script>
-<script>
-  async function main() {
-    const client = new yorkie.Client('${process.env.NEXT_PUBLIC_API_ADDR}', {
-      apiKey: 'MY_API_KEY',
-    });
-    await client.activate();
-
-    const doc = new yorkie.Document('my-first-document');
-    await client.attach(doc);
-
-    client.subscribe((event) => {
-      if (event.type === 'peers-changed') {
-        const peers = event.value[doc.getKey()];
-        document.getElementById('peersCount').innerHTML = Object.entries(peers).length;
-      }
-    });
-  }
-  main();
-</script>`;
+const sampleCode = `sample code`;
 
 const ExamplesView: NextPage = () => {
   const [activeTab, setActiveTab] = useState<string | null>('about');

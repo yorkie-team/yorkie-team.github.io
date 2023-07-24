@@ -29,7 +29,6 @@ export function BasicExampleView({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     let unsubscribeDoc: Function;
-    let unsubscribePresence: Function;
 
     const activate = async () => {
       const client = new yorkie.Client(rpcAddr, { apiKey });
@@ -40,17 +39,10 @@ export function BasicExampleView({
       setDocChangeInfos((prev) => [...prev, { type: 'initialize', content: 'Connection has been established!' }]);
       unsubscribeDoc = doc.subscribe((event) => {
         if (event.type === 'remote-change') {
-          const { operations } =  event.value;
+          const { operations } = event.value;
           for (const op of operations) {
             setDocChangeInfos((prev) => [...prev, { type: 'update', content: op.path }]);
           }
-        }
-      });
-      unsubscribePresence = client.subscribe((event) => {
-        if (event.type === 'peers-changed') {
-          // const documentKey = doc.getKey();
-          // const changedPeers = event.value[documentKey];
-          // setDocChangeInfos((prev) => [...prev, { type: 'presence', content: 'presence change has occurred!' }]);
         }
       });
     };
@@ -58,7 +50,6 @@ export function BasicExampleView({
 
     return () => {
       if (unsubscribeDoc) unsubscribeDoc();
-      if (unsubscribePresence) unsubscribePresence();
     };
   }, [rpcAddr, documentKey, apiKey]);
 

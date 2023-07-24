@@ -28,7 +28,7 @@ await client.activate();
 
 #### Subscribing to Client events
 
-We can use `client.subscribe` to subscribe to client-based events, such as `status-changed`, `stream-connection-status-changed` and `peer-changed`.
+We can use `client.subscribe` to subscribe to client-based events, such as `status-changed`, `stream-connection-status-changed`.
 
 ```javascript
 const unsubscribe = client.subscribe((event) => {
@@ -44,77 +44,10 @@ By using the value of the `stream-connection-status-changed` event, it is possib
 
 If you want to know about other client events, please refer to the [ClientEvent](https://yorkie.dev/yorkie-js-sdk/api-reference/yorkie-js-sdk.clientevent), and [ClientEventType](https://yorkie.dev/yorkie-js-sdk/api-reference/yorkie-js-sdk.clienteventtype).
 
-#### Presence
-
-Presence is a feature that allows you to display information about users who are currently using a collaborative application. Presence is often used in collaborative applications such as document editors, chat apps, and other real-time applications.
-
-```javascript
-const clientA = new yorkie.Client('{{API_ADDR}}', {
-  presence: {
-    username: 'alice',
-    color: 'blue',
-  },
-});
-await clientA.activate();
-
-const docA = new yorkie.Document('doc-1');
-await clientA.attach(docA);
-```
-
-Then, another Client is created and attaches a Document with the same name as before.
-
-```javascript
-const clientB = new yorkie.Client('{{API_ADDR}}', {
-  presence: {
-    username: 'bob',
-    color: 'red',
-  },
-});
-await clientB.activate();
-
-const docB = new yorkie.Document('doc-1');
-await clientB.attach(docB);
-```
-
-When a new peer registers or leaves, the `peers-changed` event is fired, and the other peer's clientID and presence can be obtained from the event.
-
-```javascript
-const unsubscribe = clientA.subscribe((event) => {
-  if (event.type === 'peers-changed') {
-    const peers = event.value.peers[doc.getKey()];
-    switch (event.value.type) {
-      case 'initialized':
-        displayPeers(peers);
-        break;
-      case 'watched':
-        peers.forEach((peer) => addPeer(peer));
-        // peer as follows:
-        // {
-        //   clientID: 'xxxxxxxxxxxxxxxxxxxx',
-        //   presence: {username: 'bob', color: 'red'}
-        // }
-        break;
-      case 'unwatched':
-        peers.forEach((peer) => removePeer(peer));
-        break;
-      case 'presence-changed':
-        peers.forEach((peer) => updatePeer(peer));
-        break;
-      default:
-        break;
-    }
-  }
-});
-```
-
-In the code above, `clientA` receives a `watched` event from `clientB` because `clientB` attached the Document with the key `doc-1`.
-
-Presence can include their names, colors, and other identifying details. Here is an example of how Presence might be used in a collaborative document editor:
-- [Profile Stack](/examples/profile-stack)
-
 ### Document
 
-`Document` is a primary data type in Yorkie, which provides a JSON-like updating experience that makes it easy to represent your application's model. A `Document` can be updated without being attached to the client, and its changes are automatically propagated to other peers when the `Document` is attached to the `Client` or when the network is restored.
+`Document` is a primary data type in Yorkie, which provides a JSON-like updating experience that makes it easy to represent your application's model.
+A `Document` can be updated without being attached to the client, and its changes are automatically propagated to other clients when the `Document` is attached to the `Client` or when the network is restored.
 
 #### Creating a Document
 
@@ -122,49 +55,140 @@ We can create a Document using `yorkie.Document()`. Let's create a Document with
 
 ```javascript
 const doc = new yorkie.Document('doc-1');
-await client.attach(doc);
 ```
 
-> The document key is used to identify the Document in Yorkie. It is a string that can be freely defined by the user. However, it is allowed to use only `a-z`, `A-Z`, `0-9`, `-`, `.`, `_`, `~` and must be less than 120 characters.
+> The document key is used to identify the Document in Yorkie. It is a string that can be freely defined by the user.
+> However, it is allowed to use only `a-z`, `A-Z`, `0-9`, `-`, `.`, `_`, `~` and must be less than 120 characters.
 
-After attaching the Document to the Client, all changes to the Document are automatically synchronized with remote peers.
 
-#### Changing Syncronization Setting
+#### Attaching the Document
 
-To change the synchronization setting for a document, you can use `client.pause(doc)` and `client.resume(doc)`.
+When you attach, the client notifies the server that it is subscribing to this document.
+If the document does not exist on the server, it will be created, and any local changes that occurred will be updated to the server's document.
+If the server already has a document associated with the provided key, it sends the existing changes to the client, which are then applied to synchronize the document.
 
-When you pause a document, the synchronization process will no longer occur in realtime, and you will need to manually execute the synchronization to ensure that the changes are propagated to other clients.
+Once attached, the document becomes synchronized with other clients.
+This ensures that any modifications made by one client are instantly propagated to other clients collaborating on the same document.
 
-To resume the realtime synchronization, you can call `client.resume(doc)`.
+The second argument is options.
+- `initialPresence`: Sets the initial presence of the client that attaches the document. The presence is shared with other users participating in the document. It must be serializable to JSON.
+- `isRealtimeSync`(Optional): Specifies whether to enable real-time synchronization. The default value is `true`, which means synchronization occurs automatically. If set to `false`, you should manually control the synchronization.
 
 ```javascript
-// Pause real-time sync
-await client.pause(doc);
-
-// Resume real-time sync
-await client.resume(doc);
+await client.attach(doc, {
+  initialPresence: { color: 'blue', cursor: { x: 0, y: 0 } },
+  isRealtimeSync: true,
+});
 ```
 
-#### Changing Syncronization Mode
+#### Updating presence
 
-By default, Yorkie synchronizes a document in `push-pull` mode, where local changes are pushed to the server, and remote changes are pulled from the server.
-
-If you only want to send your changes and not receive remote changes, you can use `push-only` mode.
-
-For realtime synchronization, you can use `client.pauseRemoteChanges(doc)` and `client.resumeRemoteChanges(doc)`.
-
-For manual synchronization, you can pass the desired sync mode to `client.sync(doc, syncMode)`.
+The `Document.update()` method allows you to update the presence of the current user.
+You only need to provide the specific properties that you want to change.
+The existing presence object will be updated by merging the new changes, and any properties not specified in the update function will remain unchanged.
 
 ```javascript
-// Pause remote changes for realtime sync
-client.pauseRemoteChanges(doc);
-// Resume remote changes for realtime sync
-client.resumeRemoteChanges(doc);
+doc.update((root, presence) => {
+  presence.set({ cursor: { x: 1, y: 1 } });
+});
+```
 
-// Manual sync in Push-Only mode
-await client.sync(doc, SyncMode.PushOnly);
-// Manual sync in Push-Pull mode
-await client.sync(doc, SyncMode.PushPull);
+#### Getting presence 
+
+##### Document.getPresence(clientID) 
+
+It returns the presence of a specific client.
+
+```javascript
+doc.getPresence(client.getID()); // { color: 'blue', cursor: { x: 1, y: 1 } }
+```
+
+##### Document.getMyPresence() 
+
+ It returns the presence of the current client that has attached to the document.
+
+```javascript
+doc.getMyPresence(); // { color: 'blue', cursor: { x: 1, y: 1 } }
+```
+
+##### Document.getPresences() 
+
+It returns an array about all clients currently participating in the document.
+Each entry in the array includes the client's id and presence.
+
+```javascript
+const users = doc.getPresences();
+for (const { clientID, presence } of users ) {
+  // Do something
+}
+```
+
+#### Displaying users
+
+Here is an example of showing a list of users participating in the collaborative application.
+- [Profile Stack](/examples/profile-stack)
+
+##### Document.subscribe("presence")
+
+This method allows you to subscribe to all presence-related changes.
+By subscribing to these events, you can be notified when specific changes occur within the document, such as clients attaching, detaching, or modifying their presence.
+
+```javascript
+const unsubscribe = client.subscribe("presence", (event) => {
+  if (event.type === "initialized") {
+    // Array of other users currently participating in the document
+    // event.value;
+  }
+
+  if (event.type === "watched") {
+    // A user has joined the document editing in online
+    // event.value;
+  }
+
+  if (event.type === "unwatched") {
+    // A user has left the document editing
+    // event.value;
+  }
+
+  if (event.type === "presence-changed") {
+    // A user has updated their presence 
+    // event.value;
+  }
+});
+```
+
+##### Document.subscribe("my-presence")
+
+This method is specifically for subscribing to changes in the presence of the current client that has attached to the document.
+
+The possible event.type are: `initialized`, `presence-changed`.
+
+```javascript
+const unsubscribe = client.subscribe("my-presence", (event) => {
+  // Do something
+});
+```
+
+##### Document.subscribe("others")
+
+This method enables you to subscribe to changes in the presence of other clients participating in the document.
+
+The possible event.type are: `watched`, `unwatched`, `presence-changed.
+
+```javascript
+const unsubscribe = client.subscribe("others", (event) => {
+  if (event.type === "watched") {
+    addUser(event.value);
+  }
+
+  if (event.type === "unwatched") {
+    removeUser(event.value);
+  }
+
+  if (event.type === "presence-changed") {
+    updateUser(event.value);
+  }
+});
 ```
 
 #### Editing the Document
@@ -197,7 +221,9 @@ console.log(root.obj.name); // "yorkie"
 console.log(root.counter.getValue()); // 1
 ```
 
-#### Subscribing to Document events
+#### Subscribing to Document
+
+##### Document.subscribe()
 
 A Document can be modified by changes generated remotely or locally in Yorkie.
 
@@ -230,8 +256,12 @@ const unsubscribe = doc.subscribe((event) => {
 });
 ```
 
+##### Document.subscribe("$.path")
+
 Additionally, you can subscribe to changes for a specific path in the Document using `doc.subscribe(path, callback)` with a path argument, such as `$.todos`, where the `$` sign indicates the root of the document.
 The callback function is called when the target path and its nested values are changed.
+
+With this feature, you can easily subscribe to changes for a specific part of the document and perform different actions based on the updated values.
 
 ```javascript
 const unsubscribe = doc.subscribe('$.todos', (event) => { 
@@ -239,6 +269,45 @@ const unsubscribe = doc.subscribe('$.todos', (event) => {
   const target = doc.getValueByPath('$.todos') // you can get the value by path 
   // Do something...
 });
+```
+
+#### Changing Syncronization Setting
+
+To change the synchronization setting for a document, you can use `client.pause(doc)` and `client.resume(doc)`.
+
+When you pause a document, the synchronization process will no longer occur in realtime, and you will need to manually execute the synchronization to ensure that the changes are propagated to other clients.
+
+To resume the realtime synchronization, you can call `client.resume(doc)`.
+
+```javascript
+// 1. Pause real-time sync
+await client.pause(doc);
+await client.sync(doc); // To perform synchronization, you need to manually call the sync function
+
+// 2. Resume real-time sync
+await client.resume(doc);
+```
+
+#### Changing Syncronization Mode
+
+By default, Yorkie synchronizes a document in `push-pull` mode, where local changes are pushed to the server, and remote changes are pulled from the server.
+
+If you only want to send your changes and not receive remote changes, you can use `push-only` mode.
+
+For realtime synchronization, you can use `client.pauseRemoteChanges(doc)` and `client.resumeRemoteChanges(doc)`.
+
+For manual synchronization, you can pass the desired sync mode to `client.sync(doc, syncMode)`.
+
+```javascript
+// Pause remote changes for realtime sync
+client.pauseRemoteChanges(doc);
+// Resume remote changes for realtime sync
+client.resumeRemoteChanges(doc);
+
+// Manual sync in Push-Only mode
+await client.sync(doc, SyncMode.PushOnly);
+// Manual sync in Push-Pull mode
+await client.sync(doc, SyncMode.PushPull);
 ```
 
 #### Detaching the Document
@@ -255,21 +324,69 @@ Custom CRDT types are data types that can be used for special applications such 
 
 #### Text
 
-`Text` provides supports for collaborative text editing. `Text` has selection information for sharing the cursor position. In addition, contents in `Text` can have attributes; for example, characters can be bold, italic, or underlined.
+`Text` provides supports for collaborative text editing. In addition, contents in `Text` can have attributes; for example, characters can be bold, italic, or underlined.
 
 ```javascript
 doc.update((root) => {
   root.text = new yorkie.Text();            // {"text":""}
   root.text.edit(0, 0, 'hello');            // {"text":"hello"}
   root.text.edit(0, 1, 'H');                // {"text":"Hello"}
-  root.text.select(0, 1);                   // {"text":"^H^ello"}
   root.text.setStyle(0, 1, { bold: true }); // {"text":"<b>H</b>ello"}
 });
 ```
 
-An example of Text co-editing with CodeMirror: [CodeMirror example](https://github.com/yorkie-team/yorkie-js-sdk/blob/main/examples/vanilla-codemirror6)
+##### Selection using presence
 
-An example of Text co-editing with Quill: [Quill example](https://github.com/yorkie-team/yorkie-js-sdk/blob/main/examples/vanilla-quill)
+The temporary client information, such as text selection, does not need to be stored in the document permanently.
+Instead, it can be effectively shared using `presence`.
+
+When transmitting text selection information, it is essential to convert the `index`, which can vary based on the text state, into the `position` used by `Yorkie.Text`.
+This converted position selection can then be sent and applied through presence.
+
+Here is an example where presence is used to share text selection between users in CodeMirror editor.
+
+- When the text selection is changed:
+
+```javascript
+// Update selection through text editing
+codemirror.on('beforeChange', (cm, change) => {
+  doc.update((root, presence) => {
+    const range = root.content.edit(from, to, content); // return updated index range
+    presence.set({
+      selection: root.content.indexRangeToPosRange(range), // update presence
+    });
+  });
+});
+
+// Update selection using mouse or keyboard
+codemirror.on('beforeSelectionChange', (cm, change) => {
+  const fromIdx = cm.indexFromPos(change.ranges[0].anchor);
+  const toIdx = cm.indexFromPos(change.ranges[0].head);
+  doc.update((root, presence) => {
+    presence.set({
+      selection: root.content.indexRangeToPosRange([fromIdx, toIdx]), // update presence
+    });
+  });
+});
+```
+
+- When applying other user's selection changes:
+
+```javascript
+doc.subscribe('others', (event) => {
+  if (event.type === 'presence-changed') {
+    const { clientID, presence } = event.value;
+    const range = doc.getRoot().content.posRangeToIndexRange(presence.selection);
+    // Handle the updated selection in the editor
+  }
+});
+```
+
+Text selection can be efficiently shared using presence.
+Please refer to the following example for a complete code:
+
+- An example of Text co-editing with CodeMirror: [CodeMirror example](https://github.com/yorkie-team/yorkie-js-sdk/blob/main/examples/vanilla-codemirror6)
+- An example of Text co-editing with Quill: [Quill example](https://github.com/yorkie-team/yorkie-js-sdk/blob/main/examples/vanilla-quill)
 
 #### Counter
 
@@ -289,15 +406,27 @@ doc.update((root) => {
 To use the Document more strictly, we can use [type variable](https://www.typescriptlang.org/docs/handbook/2/generics.html) in TypeScript when creating a Document.
 
 ```typescript
+import yorkie, { JSONArray } from 'yorkie-js-sdk';
 type DocType = {
-  list: Array<number>;
+  list: JSONArray<number>;
   text: yorkie.Text;
 };
+type PresenceType = {
+  username: string;
+  color: string;
+};
 
-const doc = new yorkie.Document<DocType>('key');
-doc.update((root) => {
+const doc = new yorkie.Document<DocType, PresenceType>('key');
+await client.attach(doc, {
+  initialPresence: {
+    username: 'alice',
+    color: 'blue',
+  },
+});
+doc.update((root, presence) => {
   root.list = [1, 2, 3];
   root.text = new yorkie.Text();
+  presence.set({ color: 'red' });
 });
 ```
 
