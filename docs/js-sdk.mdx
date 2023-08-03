@@ -84,42 +84,42 @@ await client.attach(doc, {
 #### Updating presence
 
 The `Document.update()` method allows you to make changes to the state of the current user's presence.
-Specific properties provided will be changed.
-Note, this means that the specific properties provided will be replaced entirely and not merely updated.
+
+Specific properties provided will be changed. The existing presence object will be updated by merging the new changes. In other words, properties not specified in the update function will remain unchanged. 
+
+```javascript
+doc.update((root, presence) => {
+  presence.set({ cursor: { x: 1, y: 1 } });
+});
+
+// final state
+// presence = { color: 'blue', cursor: { x: 1, y: 1 } }
+// we can see that the changes made were merged and the final state of the current user's presence is as we desire
+```
+
+<Alert status="warning">
+Note, the properties provided will be replaced entirely and not merely updated.
+
 For example:
 
 ```javascript
-// initial
-// { cursor: { x: 0, y: 0, name: 'Jill' } }
-```
-```javascript
-doc.update((root, presence) => {
-  presence.set({ cursor: { x: 1, y: 1 } });
+await client.attach(doc, {
+  // let's say 'color' is a property of cursor
+  initialPresence: {cursor: { x: 0, y: 0, color: 'red'}}, 
 });
-```
-```javascript
-// final
-// { cursor: { x: 1, y: 1 } }
 
-// the specified property was 'cursor', thus, its value was replaced with what was given
-```
-
-
-The existing presence object will be updated by merging the new changes. In other words, properties not specified in the update function will remain unchanged. 
-
-```javascript
-// initial
-// { name: 'Jill', cursor: { x: 0, y: 0 } }
-```
-```javascript
 doc.update((root, presence) => {
-  presence.set({ cursor: { x: 1, y: 1 } });
+  // we want to change the x y coordinates of our cursor
+  presence.set({ cursor: { x: 1, y: 1 } }); 
 });
+
+
+// final state
+// presence = { cursor: { x: 1, y: 1 } } 
+// we can see that all properties inside cursor get replaced (i.e. we lose the property 'color')
 ```
-```javascript
-// final
-// { name: 'Jill', cursor: { x: 1, y: 1 } }
-```
+</Alert>
+
 
 #### Getting presence 
 
