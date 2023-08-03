@@ -83,14 +83,42 @@ await client.attach(doc, {
 
 #### Updating presence
 
-The `Document.update()` method allows you to update the presence of the current user.
-You only need to provide the specific properties that you want to change.
-The existing presence object will be updated by merging the new changes, and any properties not specified in the update function will remain unchanged.
+The `Document.update()` method allows you to make changes to the state of the current user's presence.
+Specific properties provided will be changed.
+Note, this means that the specific properties provided will be replaced entirely and not merely updated.
+For example:
 
+```javascript
+// initial
+// { cursor: { x: 0, y: 0, name: 'Jill' } }
+```
 ```javascript
 doc.update((root, presence) => {
   presence.set({ cursor: { x: 1, y: 1 } });
 });
+```
+```javascript
+// final
+// { cursor: { x: 1, y: 1 } }
+
+// the specified property was 'cursor', thus, its value was replaced with what was given
+```
+
+
+The existing presence object will be updated by merging the new changes. In other words, properties not specified in the update function will remain unchanged. 
+
+```javascript
+// initial
+// { name: 'Jill', cursor: { x: 0, y: 0 } }
+```
+```javascript
+doc.update((root, presence) => {
+  presence.set({ cursor: { x: 1, y: 1 } });
+});
+```
+```javascript
+// final
+// { name: 'Jill', cursor: { x: 1, y: 1 } }
 ```
 
 #### Getting presence 
