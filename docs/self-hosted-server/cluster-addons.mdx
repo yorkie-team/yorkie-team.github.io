@@ -39,7 +39,7 @@ If you are using AWS EKS, use the following command instead:
 
 ```bash
 $ helm install yorkie-monitoring yorkie-team/yorkie-monitoring -n monitoring --create-namespace \
-    --set inngress.ingressClassName=alb \
+    --set ingress.ingressClassName=alb \
     --set ingress.hosts.enabled=true \
     --set ingress.hosts.apiHost={YOUR_API_DOMAIN_NAME} \
     --set ingress.hosts.alb.enabled=true \
