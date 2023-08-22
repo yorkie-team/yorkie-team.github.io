@@ -1,9 +1,9 @@
+import { Button, Icon, Layout } from '@/components';
+import { ExampleThumbnailImage } from '@/components/exampleView';
+import ExampleBannerSVG from '@/public/assets/images/banner/img_example_banner.svg';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
-import { Button, Icon, Layout } from '@/components';
-import ExampleBannerSVG from '@/public/assets/images/banner/img_example_banner.svg';
-import { ExampleThumbnailImage } from '@/components/exampleView';
 
 const Examples: NextPage = () => {
   return (
@@ -68,7 +68,7 @@ const Examples: NextPage = () => {
               </li>
               <li className="navigator_group  ">
                 <a className="navigator_item add_icon">
-                  <Icon type="secenario" />
+                  <Icon type="scenario" />
                   Scenario examples
                 </a>
               </li>
@@ -81,7 +81,7 @@ const Examples: NextPage = () => {
                 <button type="button" className="btn btn_small filter_desc">
                   <span className="filter_title">Examples:</span>
                   <span className="text">All examples</span>
-                  <Icon type="secenario" className="icon_arrow" />
+                  <Icon type="scenario" className="icon_arrow" />
                 </button>
                 <div className="dropdown " style={{ display: 'none' }}>
                   <ul className="dropdown_list">

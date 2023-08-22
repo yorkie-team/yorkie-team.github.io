@@ -1,12 +1,12 @@
 import { Icon, Image } from '@/components';
-import ImgExampleWebtoonSVG from '@/public/assets/images/@tmp/img_example_webtoon.svg';
-import SystemUserGreenSVG from '@/public/assets/icons/icon_system_user_green.svg';
-import SystemUserPurpleSVG from '@/public/assets/icons/icon_system_user_purple.svg';
-import SystemUserPinkSVG from '@/public/assets/icons/icon_system_user_pink.svg';
 import DashboardUserGreenSVG from '@/public/assets/icons/icon_dashboard_user_green.svg';
 import DashboardUserPurpleSVG from '@/public/assets/icons/icon_dashboard_user_purple.svg';
 import DashboardUserRedSVG from '@/public/assets/icons/icon_dashboard_user_red.svg';
 import DashboardUserYellowSVG from '@/public/assets/icons/icon_dashboard_user_yellow.svg';
+import SystemUserGreenSVG from '@/public/assets/icons/icon_system_user_green.svg';
+import SystemUserPinkSVG from '@/public/assets/icons/icon_system_user_pink.svg';
+import SystemUserPurpleSVG from '@/public/assets/icons/icon_system_user_purple.svg';
+import ImgExampleWebtoonSVG from '@/public/assets/images/@tmp/img_example_webtoon.svg';
 
 const ExampleContent = () => {
   return (
@@ -23,7 +23,7 @@ const ExampleContent = () => {
           </label>
         </div>
         <div className="comment_box">
-          <ol className="commnet_list">
+          <ol className="comment_list">
             <li className="comment_item">
               <p className="desc">
                 웹툰 제목과 작가 이름이 들어간 표지. 파랑이, 초록이, 빨강이의 얼굴이 크게 줌인. 파랑이 기쁜 표정.
