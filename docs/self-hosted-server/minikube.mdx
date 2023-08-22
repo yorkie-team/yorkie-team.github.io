@@ -10,7 +10,7 @@ Minikube is a tool that makes it easy to run Kubernetes locally.
 In this guide, you will install Yorkie cluster on minikube using Helm.
 Then, you will test Yorkie cluster with CodePair, a collaborative code editor.
 
-### Prerequities
+### Prerequisites
 
 This tutorial assumes that you are familiar with Kubernetes and `kubectl`.
 
@@ -49,7 +49,7 @@ Enable ingress addons with the following command:
 $ minikube addons enable ingress
 ```
 
-After ingress addons is enabled, you will see the following output:
+After ingress addons are enabled, you will see the following output:
 
 ```bash
 ...
@@ -93,7 +93,7 @@ Thank you for installing Istio 1.17.  Please take a few minutes to tell us about
 
 ### Add yorkie-team Helm chart in your local repository
 
-After Istio is installed, yuo need to add yorkie-team Helm chart repository in your local repository to install Yorkie cluster.
+After Istio is installed, you need to add yorkie-team Helm chart repository in your local repository to install Yorkie cluster.
 
 Add yorkie-team Helm chart repository in your local repository with the following command:
 
@@ -134,7 +134,7 @@ NOTES:
 --- Install Complete ---
 yorkie-cluster successfully installed!
 
-For next steps, follow:
+For the next steps, follow:
   $ curl https://github.com/yorkie-team/yorkie/tree/main/charts/yorkie-cluster
 
 To learn more about the release, try:
@@ -142,7 +142,7 @@ To learn more about the release, try:
   $ helm get all yorkie-cluster
 ```
 
-Now you have Yorkie cluster installed in your local machine.
+Now you have Yorkie cluster installed on your local machine.
 
 It will take a few minutes for pods to be ready, so wait until all pods are ready.
 You can check the status of pods with the following command:
@@ -205,7 +205,7 @@ Clone CodePair repository with the following command:
 $ git clone https://github.com/yorkie-team/codepair
 ```
 
-Then, change directory to codepiar folder and install dependencies with the following command:
+Then, change directory to codepair folder and install dependencies with the following command:
 
 ```bash
 $ cd codepair
@@ -244,7 +244,7 @@ You can open several web browsers and access `http://localhost:3000` to test col
 
 ### Clean up Yorkie cluster
 
-You have now installed Yorkie cluster in your local machine, and tested collaborative editing with CodePair.
+You have now installed Yorkie cluster on your local machine, and tested collaborative editing with CodePair.
 
 <Alert status="info">To learn about how to configure Yorkie Cluster in Helm Chart, see [Yorkie Cluster Helm Chart Repository](https://github.com/yorkie-team/yorkie/tree/main/build/charts/yorkie-cluster).</Alert>
 

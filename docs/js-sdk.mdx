@@ -11,7 +11,7 @@ If you want to install the SDK, refer to the [Getting Started with JS SDK](/docs
 
 ### Client
 
-`Client` is a normal client that can communicate with the server. It has documents and sends changes of the document from local to the server to synchronize with other replicas in remote.
+`Client` is a normal client that can communicate with the server. It has documents and sends changes of the document from local to the server to synchronize with other replicas remotely.
 
 #### Creating a Client
 
@@ -129,7 +129,7 @@ await client.attach(doc);
 
 After attaching the Document to the Client, all changes to the Document are automatically synchronized with remote peers.
 
-#### Changing Syncronization Setting
+#### Changing Synchronization Setting
 
 To change the synchronization setting for a document, you can use `client.pause(doc)` and `client.resume(doc)`.
 
@@ -145,7 +145,7 @@ await client.pause(doc);
 await client.resume(doc);
 ```
 
-#### Changing Syncronization Mode
+#### Changing Synchronization Mode
 
 By default, Yorkie synchronizes a document in `push-pull` mode, where local changes are pushed to the server, and remote changes are pulled from the server.
 

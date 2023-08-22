@@ -11,7 +11,7 @@ If you want to install the SDK, refer to the [Getting Started with iOS SDK](/doc
 
 ### Client
 
-`Client` is a normal client that can communicate with the server. It has Documents and sends changes of the Document from local to the server to synchronize with other replicas in remote.
+`Client` is a normal client that can communicate with the server. It has Documents and sends changes of the Document from local to the server to synchronize with other replicas remotely.
 
 #### Creating a Client
 
@@ -119,9 +119,9 @@ try await client.attach(doc);
 
 After attaching the Document to the Client, all changes to the Document are automatically synchronized with remote peers.
 
-#### Changing Syncronization Mode
+#### Changing Synchronization Mode
 
-If you want to change syncronization mode, you can use `client.pause(doc)` and `client.resume(doc)`.
+If you want to change synchronization mode, you can use `client.pause(doc)` and `client.resume(doc)`.
 
 ```swift
 // Pause real-time sync.
@@ -167,7 +167,7 @@ Whenever the Document is modified, change events are triggered and we can subscr
 
 The callback is called with an event object, and the `event.type` property indicates the source of the change, which can be one of the following values: `localChange`, `remoteChange` or `snapshot`.
 
-When the `event.type` is `localChange` or `remoteChange`, the `event.value` is a ChangeInfo, which has `message`, `operatons` and `actorID` properties.
+When the `event.type` is `localChange` or `remoteChange`, the `event.value` is a ChangeInfo, which has `message`, `operations` and `actorID` properties.
 
 For more information about changeInfo for document events, please refer to the [ChangeInfo](https://yorkie.dev/yorkie-ios-sdk/documentation/yorkie/changeinfo).
 
