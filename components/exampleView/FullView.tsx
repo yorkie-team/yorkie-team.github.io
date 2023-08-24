@@ -18,7 +18,7 @@ const ExampleContent = () => {
           </label>
         </div>
         <div className="comment_box">
-          <ol className="comment_list">
+          <ol className="commnet_list">
             <li className="comment_item">
               <p className="desc">
                 웹툰 제목과 작가 이름이 들어간 표지. 파랑이, 초록이, 빨강이의 얼굴이 크게 줌인. 파랑이 기쁜 표정.

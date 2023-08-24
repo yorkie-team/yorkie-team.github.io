@@ -123,7 +123,7 @@ $ helm install yorkie-cluster yorkie-team/yorkie-cluster \
 Replace `{YOUR_API_DOMAIN_NAME}` with your domain name. Also, replace `{YOUR_CERTIFICATE_ARN}` with your certificate ARN.
 
 This will install `yorkie-cluster` release in AWS EKS, which can be publicly accessible via `{YOUR_API_DOMAIN_NAME}` with HTTPS
-by providing external AWS ALB in front of Yorkie cluster.
+by provisioning external AWS ALB in front of Yorkie cluster.
 
 <Alert status="info">You can also set other Helm chart configuration options. For more information about Helm chart configuration, see [Yorkie Cluster Helm Chart Configuration](https://github.com/yorkie-team/yorkie/tree/main/build/charts/yorkie-cluster#configuration).</Alert>
 
