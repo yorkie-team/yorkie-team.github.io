@@ -4,26 +4,26 @@ import yorkie from 'yorkie-js-sdk';
 async function main() {
   const client = new yorkie.Client('${process.env.NEXT_PUBLIC_API_ADDR}', {
     apiKey: 'MY_API_KEY',
-    // set the client's name and color to presence.
-    presence: {
-      name: getRandomName(),
-      color: getRandomColor(),
-    },
   });
   await client.activate();
 
   const doc = new yorkie.Document('profile-stack');
-  await client.attach(doc);
-
-  client.subscribe((event) => {
-    if (event.type === 'peers-changed') {
-      // get all clients connected to the Document.
+  doc.subscribe('presence', (event) => {
+    if (event.type !== 'presence-changed') { // initialized, watched, unwatched event
+      // get all users connected to the Document.
       // [ {clientID: string, presence: {name: string, color: string}}, ... ]
-      const peers = client.getPeersByDocKey(doc.getKey());
+      const users = doc.getPresences();
       
-      // show peer list
-      updatePeerList(peers);
+      // show user list
+      updateUserList(users);
     }
+  });
+  await client.attach(doc, {
+    // set the initial presence.
+    initialPresence: {
+      name: getRandomName(),
+      color: getRandomColor(),
+    },
   });
 }
 main();
@@ -39,26 +39,28 @@ async function main() {
   await client.activate();
 
   const doc = new yorkie.Document('multi-cursor');
-  await client.attach(doc);
-
-  client.subscribe((event) => {
-    if (event.type === 'peers-changed') {
-      // get all clients connected to the Document.
-      // [ {clientID: string, presence: {cursor: {x: number, y: number}}}, ... ]
-      const peers = client.getPeersByDocKey(doc.getKey());
-      
-      // show peer cursors
-      updatePeerCursors(peers);
+  doc.subscribe('others', (event) => {
+    if (event.type === 'presence-changed') {
+      updatePeerCursor(event.value); // {clientID: string, presence: {cursor: {x: number, y: number}}}
     }
+  });
+  await client.attach(doc, {
+    initialPresence: {
+      cursor: null,
+    },
   });
 
   document.body.addEventListener('mousemove', (e) => {
     // set the cursor position to presence.
     // Presence will be shared with other clients.
-    client.updatePresence('cursor', {
-      x: e.clientX,
-      y: e.clientY,
-    })
+    doc.update((root, presence) => {
+      presence.set({
+        cursor: {
+          x: e.clientX,
+          y: e.clientY,
+        },
+      });
+    });
   });
 }
 main();

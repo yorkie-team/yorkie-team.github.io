@@ -47,13 +47,7 @@ const ExampleContent = ({ user }: { user: 'user1' | 'user2' | 'user3' | 'user4' 
         </ul>
       </div>
       <div className="dashboard_content">
-        <iframe
-          title="Example"
-          frameBorder={0}
-          src="https://toonie.yorkie.dev/NhYg45F"
-          width="100%"
-          height="100%"
-        ></iframe>
+        <iframe title="Example" frameBorder={0} src="https://yorkie.dev" width="100%" height="100%"></iframe>
       </div>
     </>
   );
