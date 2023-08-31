@@ -39,10 +39,10 @@ Then create a Document.
 
 ```swift
 let doc = Document(key: docKey)
-try await client.attach(doc);
+try await client.attach(doc, [:])
 ```
 
-The created document should be attached to the client to automatically synchronize the document between the client and peers.
+The document should be attached to the client in order to automatically synchronize it between the users participating the document.
 
 #### 3. Updating the Document
 
@@ -84,34 +84,17 @@ await doc.subscribe { event in
 }
 ```
 
-To subscribe to changes for a specific path in the document, you can use the `doc.subscribe(targetPath, callback)` with a path argument, such as `$.todos`, where the `$` sign indicates the root of the document.
-The callback function is called when the target path and its nested values are changed.
+#### 6. Viewing the presence of users
 
-With this feature, you can easily subscribe to changes for a specific part of the document and perform different actions based on the updated values.
+You can also subscribe to the presence of users participating in the document using `doc.subscribePresence(.presence)`. 
+You can use `doc.getPresences()` to get the list of users who are currently involved in the document.
 
 ```swift
-await doc.subscribe(targetPath: "$.todos") { event in 
-  // The callback will be called when the root.todos or its nested values change.
-  Task {
-    let target = try? await target.getValueByPath(path: "$.todos") // You can get the value by path.
-  }
-  // Do something...
+await doc.subscribePresnece { event in 
+  // get all users connected to the Document.
+  let users = doc.getPresences() // [ (clientID: string, presence: [key: value]), ... ]
+  print("There are currently \(users.count) users online")
 }
-```
-
-#### 6. Viewing the presence of other peers
-
-Other peers' activities can be accessed by subscribing to the client.
-
-```swift
-client.eventStream.sink { event in
-    switch event {
-    case let event as PeerChangedEvent:
-        print("#### c1 \(event)")
-    default:
-        break
-    }
-}.store(in: &self.cancellables)
 ```
 
 Next, let's take a look at the [iOS SDK](/docs/ios-sdk).
