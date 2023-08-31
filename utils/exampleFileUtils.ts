@@ -1,5 +1,5 @@
-import minimatch from 'minimatch';
 import cloneDeep from 'lodash.clonedeep';
+import minimatch from 'minimatch';
 
 export type FileInfo = {
   isFile: true;
@@ -65,10 +65,10 @@ export const filterIgnoreFiles = (directoryInfo: DirectoryInfo, ignoreFiles: str
 
 const _setFirstFileOpen = (
   directoryInfo: DirectoryInfo,
-  hasOpenFlie: boolean = false,
+  hasOpenFile: boolean = false,
 ): [DirectoryInfo, boolean, FileInfo | null] => {
   const cloneDirectoryInfo = cloneDeep(directoryInfo);
-  let _hasOpenFile = hasOpenFlie;
+  let _hasOpenFile = hasOpenFile;
   let _openedFileInfo: FileInfo | null = null;
   cloneDirectoryInfo.children.forEach((child, i) => {
     if (child.isFile) {

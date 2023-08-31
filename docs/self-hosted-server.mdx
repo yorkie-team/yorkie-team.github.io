@@ -59,7 +59,7 @@ Configuring Envoy by hand with its config file is cumbersome, but using [Docker 
 
 <Alert status="warning">If docker compose is not installed, install it : [Install Docker Compose](https://docs.docker.com/compose/install/)</Alert>
 
-First, download all manifests files from [docker folder](https://github.com/yorkie-team/yorkie-team.github.io/tree/main/docker). Then, execute the following command in the folder containing the downloaded file.
+First, download all manifest files from [docker folder](https://github.com/yorkie-team/yorkie-team.github.io/tree/main/docker). Then, execute the following command in the folder containing the downloaded file.
 
 ```bash
 $ docker-compose up --build -d
@@ -114,7 +114,7 @@ This metrics can be collected from [Prometheus](https://prometheus.io/).
 
 Running [Prometheus](https://prometheus.io/) and [Grafana](https://grafana.com/oss/grafana/) is the easiest way to monitor Server's metrics.
 
-First, download all manifests files from [docker folder](https://github.com/yorkie-team/yorkie-team.github.io/tree/main/docker). Then, start the applications with `docker-compose`:
+First, download all manifest files from [docker folder](https://github.com/yorkie-team/yorkie-team.github.io/tree/main/docker). Then, start the applications with `docker-compose`:
 
 ```bash
 $ docker-compose -f docker-compose-monitoring.yml up --build -d
@@ -170,7 +170,7 @@ Sharded Cluster
 
 - L7 Load Balancer: It is responsible for routing requests to servers based on the computed request’s hash key and consistent hashing algorithm.
 - Service Registry: It is responsible for storing metadata and configuration settings for Yorkie servers.
-- MongoDB: It stores the data of Yorkie. It can be configued to use sharding, just like Yorkie sharded cluster.
+- MongoDB: It stores the data of Yorkie. It can be configured to use sharding, just like Yorkie sharded cluster.
 
 Yorkie provides Helm Chart, which is a package manager for Kubernetes, to easily deploy Yorkie cluster on Kubernetes with above components configured.
 
@@ -179,12 +179,12 @@ Below are guides for deploying Yorkie cluster on Kubernetes with Helm Charts on 
 - [Minikube Installation](/docs/self-hosted-server/minikube): Guide to install Yorkie cluster on Minikube.
 - [AWS EKS Installation](/docs/self-hosted-server/aws-eks): Guide to install Yorkie cluster on AWS EKS.
 
-Also, you can additonally deploy Yorkie cluster addons on Kubernetes with Helm Charts on your own environment.
+Also, you can additionally deploy Yorkie cluster addons on Kubernetes with Helm Charts on your own environment.
 
 Yorkie cluster addons include:
 
 - Monitoring: Provides Yorkie metrics and logging via Grafana dashboard.
-- GitOps: Provides Yorkie Continous Delivery via ArgoCD.
+- GitOps: Provides Yorkie Continuous Delivery via ArgoCD.
 
 Below is guide for deploying Yorkie cluster addons on Kubernetes with Helm Charts.
 

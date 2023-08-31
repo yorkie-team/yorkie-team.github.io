@@ -12,7 +12,7 @@ Then, you will test Yorkie cluster with CodePair, a collaborative code editor.
 
 <Alert status="danger">[AWS EKS clusters cost $0.10 per hour](https://aws.amazon.com/eks/pricing/), so you may incur charges by running this tutorial. The cost should be a few dollars at most, but be sure to delete your infrastructure promptly to avoid additional charges. We are not responsible for any charges you may incur.</Alert>
 
-### Prerequities
+### Prerequisites
 
 This tutorial assumes that you are familiar with Kubernetes and `kubectl`.
 
@@ -82,7 +82,7 @@ Thank you for installing Istio 1.17.  Please take a few minutes to tell us about
 
 ### Add yorkie-team Helm chart in your local repository
 
-After Istio is installed, yuo need to add yorkie-team Helm chart repository in your local repository to install Yorkie cluster.
+After Istio is installed, you need to add yorkie-team Helm chart repository in your local repository to install Yorkie cluster.
 
 Add yorkie-team Helm chart repository in your local repository with the following command:
 
@@ -122,8 +122,8 @@ $ helm install yorkie-cluster yorkie-team/yorkie-cluster \
 
 Replace `{YOUR_API_DOMAIN_NAME}` with your domain name. Also, replace `{YOUR_CERTIFICATE_ARN}` with your certificate ARN.
 
-This will install `yorkie-cluster` release in AWS EKS, which can publicly accessible via `{YOUR_API_DOMAIN_NAME}` with HTTPS
-by provising external AWS ALB in front of Yorkie cluster.
+This will install `yorkie-cluster` release in AWS EKS, which can be publicly accessible via `{YOUR_API_DOMAIN_NAME}` with HTTPS
+by provisioning external AWS ALB in front of Yorkie cluster.
 
 <Alert status="info">You can also set other Helm chart configuration options. For more information about Helm chart configuration, see [Yorkie Cluster Helm Chart Configuration](https://github.com/yorkie-team/yorkie/tree/main/build/charts/yorkie-cluster#configuration).</Alert>
 
@@ -176,7 +176,7 @@ Clone CodePair repository with the following command:
 $ git clone https://github.com/yorkie-team/codepair
 ```
 
-Then, change directory to codepiar folder and install dependencies with the following command:
+Then, change directory to codepair folder and install dependencies with the following command:
 
 ```bash
 $ cd codepair

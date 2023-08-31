@@ -16,7 +16,7 @@ Currently, Yorkie addons include:
 - [Loki](https://grafana.com/oss/loki/) for logging aggregation.
 - [ArgoCD](https://argoproj.github.io/argo-cd/) for managing Yorkie cluster via GitOps.
 
-### Prerequities
+### Prerequisites
 
 This guide assumes that you have installed Yorkie cluster on your Kubernetes cluster with Helm chart.
 If you haven't installed Yorkie cluster, follow guides for deploying Yorkie cluster on Kubernetes with Helm Charts on various platforms.
@@ -39,7 +39,7 @@ If you are using AWS EKS, use the following command instead:
 
 ```bash
 $ helm install yorkie-monitoring yorkie-team/yorkie-monitoring -n monitoring --create-namespace \
-    --set inngress.ingressClassName=alb \
+    --set ingress.ingressClassName=alb \
     --set ingress.hosts.enabled=true \
     --set ingress.hosts.apiHost={YOUR_API_DOMAIN_NAME} \
     --set ingress.hosts.alb.enabled=true \
@@ -159,7 +159,7 @@ You can add more dashboards like [Go Processes](https://grafana.com/grafana/dash
 
 ### Install Yorkie ArgoCD with Helm chart
 
-You can install Yorkie Argocd addon to perform continuous delivery of Yorkie cluster with GitOps.
+You can install Yorkie ArgoCD addon to perform continuous delivery of Yorkie cluster with GitOps.
 Yorkie ArgoCD addon includes ArgoCD to perform continuous delivery of Yorkie cluster.
 
 Install Yorkie ArgoCD addon with the following command:

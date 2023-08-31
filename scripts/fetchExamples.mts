@@ -77,7 +77,7 @@ const getFileContent = (filePath: string): string => {
   return readFile(filePath);
 };
 
-const getAbsoultePath = (fullPath: string, basePath: string): string => {
+const getAbsolutePath = (fullPath: string, basePath: string): string => {
   return fullPath.replace(basePath, '') || '/';
 };
 
@@ -86,7 +86,7 @@ const getDirectoryInfo = (dirPath: string, basePath?: string): DirectoryInfo => 
   const directoryInfo: DirectoryInfo = {
     isFile: false,
     name: dirPath.split('/').pop()!,
-    path: getAbsoultePath(dirPath, _basePath),
+    path: getAbsolutePath(dirPath, _basePath),
     children: [] as (FileInfo | DirectoryInfo)[],
   };
   fs.readdirSync(dirPath, { withFileTypes: true }) //
@@ -101,7 +101,7 @@ const getDirectoryInfo = (dirPath: string, basePath?: string): DirectoryInfo => 
           isOpen: false,
           language: getFileLanguage(file.name),
           name: file.name,
-          path: getAbsoultePath(path, _basePath),
+          path: getAbsolutePath(path, _basePath),
           content: getFileContent(path),
         };
         directoryInfo.children.push(childInfo);

@@ -1,7 +1,7 @@
-import classNames from 'classnames';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import yorkie from 'yorkie-js-sdk';
 import { Icon } from '@/components';
+import classNames from 'classnames';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import yorkie from 'yorkie-js-sdk';
 import UserContent from './UserContent';
 
 interface DocChangeInfo {
@@ -131,7 +131,7 @@ export function BasicExampleView({
             {docChangeInfos.map((changeInfo, index) => (
               <div className="log_desc" key={index}>
                 <span style={{ fontWeight: 'bold' }}>event</span> -
-                {changeInfo.type === 'update' && <span style={{ opacity: 0.5 }}>modification occured at </span>}
+                {changeInfo.type === 'update' && <span style={{ opacity: 0.5 }}>modification occurred at </span>}
                 <span>{changeInfo.content}</span>
               </div>
             ))}

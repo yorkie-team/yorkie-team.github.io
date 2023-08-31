@@ -16,7 +16,7 @@ import MessageSquareSVG from '@/public/assets/icons/icon_message_square.svg';
 import MessageSmileSVG from '@/public/assets/icons/icon_message_smile.svg';
 import SmileSVG from '@/public/assets/icons/icon_smile.svg';
 import CheckCircleSVG from '@/public/assets/icons/icon_check_circle.svg';
-import SecenarioSVG from '@/public/assets/icons/icon_secenario.svg';
+import ScenarioSVG from '@/public/assets/icons/icon_scenario.svg';
 import ArrowSVG from '@/public/assets/icons/icon_arrow.svg';
 import RecorderSVG from '@/public/assets/icons/icon_recorder.svg';
 import BulbSVG from '@/public/assets/icons/icon_bulb.svg';
@@ -59,7 +59,7 @@ const svgMap = {
   messageSmile: <MessageSmileSVG />,
   smile: <SmileSVG />,
   checkCircle: <CheckCircleSVG />,
-  secenario: <SecenarioSVG />,
+  scenario: <ScenarioSVG />,
   arrow: <ArrowSVG />,
   recorder: <RecorderSVG />,
   bulb: <BulbSVG />,

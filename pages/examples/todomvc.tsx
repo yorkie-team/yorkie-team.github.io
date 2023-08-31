@@ -1,15 +1,15 @@
-import { NextPage } from 'next';
-import Head from 'next/head';
 import { ExampleLayout } from '@/components';
 import {
-  Sidebar,
   BasicExampleView,
-  ProjectCodes,
   COMMON_IGNORE_FILES,
   EXAMPLE_CODE_URL,
   EXAMPLE_PREVIEW_URL,
+  ProjectCodes,
+  Sidebar,
 } from '@/components/exampleView';
 import { FILE_INFO } from '@/examples/react-todomvc/fileInfo';
+import { NextPage } from 'next';
+import Head from 'next/head';
 
 const exampleKey = 'react-todomvc';
 const exampleTitle = 'TodoMVC';
@@ -42,7 +42,7 @@ const TodoListExampleView: NextPage = () => {
                     target="_blank"
                     rel="noreferrer"
                   >
-                    CreatReactApp
+                    CreateReactApp
                   </a>{' '}
                   and{' '}
                   <a
