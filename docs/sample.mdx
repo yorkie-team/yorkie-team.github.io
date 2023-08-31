@@ -121,12 +121,10 @@ table align sample
 </CodeBlockHeader>
 <CodeBlock 
     code={`// Text provides supports for collaborative plain text editing.
-// It also has selection information for sharing the cursor position.
 doc.update((root) => {
   root.text = new yorkie.Text();  // {"text":""}
   root.text.edit(0, 0, 'hello');  // {"text":"hello"}
   root.text.edit(0, 1, 'H');      // {"text":"Hello"}
-  root.text.select(0, 1);         // {"text":"^H^ello"}
 });
 
 // Counter supports numeric types that change with addition and subtraction.
@@ -222,13 +220,6 @@ async function main() {
 
   const doc = new yorkie.Document('my-first-document');
   await client.attach(doc);
-
-  client.subscribe((event) => {
-    if (event.type === 'peers-changed') {
-      const peers = event.value[doc.getKey()];
-      document.getElementById('peersCount').innerHTML = Object.entries(peers).length;
-    }
-  });
 }
 main();`} language="javascript" withCopyButton/>
 </div>

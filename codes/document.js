@@ -1,5 +1,5 @@
 const COMMON_CODE = `
-// You can use a key-value pair to share data with peers.
+// You can use a key-value pair to share data with users.
 // The key is a string, and the value should be serializable - objects, arrays, and primitives.
 doc.update((root) => {
   root.num = 1;           // {"num":1}
@@ -10,12 +10,10 @@ doc.update((root) => {
 
 const TEXT_CODE = ` 
 // Text provides supports for collaborative plain text editing.
-// It also has selection information for sharing the cursor position.
 doc.update((root) => {
   root.text = new yorkie.Text();  // {"text":""}
   root.text.edit(0, 0, 'hello');  // {"text":"hello"}
   root.text.edit(0, 1, 'H');      // {"text":"Hello"}
-  root.text.select(0, 1);         // {"text":"^H^ello"}
 });
 `;
 

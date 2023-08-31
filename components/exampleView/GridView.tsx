@@ -36,7 +36,7 @@ export function GridView() {
               </ul>
             </div>
             <div className="dashboard_content">
-              <iframe title="Example" src="https://toonie.yorkie.dev/NhYg45F" width="100%" height="100%"></iframe>
+              <iframe title="Example" src="https://yorkie.dev" width="100%" height="100%"></iframe>
             </div>
           </div>
         </li>
@@ -68,7 +68,7 @@ export function GridView() {
               </ul>
             </div>
             <div className="dashboard_content">
-              <iframe title="Example" src="https://toonie.yorkie.dev/NhYg45F" width="100%" height="100%"></iframe>
+              <iframe title="Example" src="https://yorkie.dev" width="100%" height="100%"></iframe>
               <div className="btn_box">
                 <button type="button" className="btn btn_expand blue_0">
                   <Icon type="expand" />
@@ -106,7 +106,7 @@ export function GridView() {
               </ul>
             </div>
             <div className="dashboard_content">
-              <iframe title="Example" src="https://toonie.yorkie.dev/NhYg45F" width="100%" height="100%"></iframe>
+              <iframe title="Example" src="https://yorkie.dev" width="100%" height="100%"></iframe>
               <div className="btn_box">
                 <button type="button" className="btn btn_expand blue_0">
                   <Icon type="expand" />

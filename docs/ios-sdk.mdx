@@ -26,7 +26,7 @@ try await client.activate()
 
 #### Subscribing to Client events
 
-We can use `client.eventStream` to subscribe to client-based events, such as `status-changed`, `stream-connection-status-changed` and `peer-changed`.
+We can use `client.eventStream` to subscribe to client-based events, such as `status-changed`, `stream-connection-status-changed`.
 
 ```swift
 target.eventStream.sink { event in
@@ -45,90 +45,166 @@ By using the value of the `stream-connection-status-changed` event, it is possib
 
 If you want to know about other ClientEvents, please refer to the [ClientEventType](https://yorkie.dev/yorkie-ios-sdk/documentation/yorkie/clienteventtype).
 
-#### Presence
+#### Document
 
-Presence is a feature that allows you to display information about users who are currently using a collaborative application. Presence is often used in collaborative applications such as document editors, chat apps, and other real-time applications.
+`Document` is a primary data type in Yorkie, which provides a JSON-like updating experience that makes it easy to represent your application's model.
+A `Document` can be updated without being attached to the client, and its changes are automatically propagated to other clients when the `Document` is attached to the `Client` or when the network is restored.
+
+#### Creating a Document
+
+We can create a Document using `Document(key:)`. Let's create a Document with a key and attach it to the Client.
 
 ```swift
-var optionA = ClientOptions()
-optionA.presence = ["username": "alice", "color": "blue"]
-
-let clientA = Client(rpcAddress: rpcAddress, options: optionA)
-try await clientA.activate()
-
-let docA = Document(key: "doc-1")
-try await clientA.attach(docA)
+let doc = Document(key: "doc-1")
 ```
 
-Then, another Client is created and attaches a Document with the same name as before.
+The document key is used to identify the Document in Yorkie. It is a string that can be freely defined by the user.
+> However, it is allowed to use only `a-z`, `A-Z`, `0-9`, `-`, `.`, `_`, `~` and must be less than 120 characters.
+
+
+#### Attaching the Document
+
+When you attach, the client notifies the server that it is subscribing to this document.
+If the document does not exist on the server, it will be created, and any local changes that occurred will be updated to the server's document.
+If the server already has a document associated with the provided key, it sends the existing changes to the client, which are then applied to synchronize the document.
+
+Once attached, the document becomes synchronized with other clients.
+This ensures that any modifications made by one client are instantly propagated to other clients collaborating on the same document.
+
+The second and third arguments are belows.
+- `initialPresence`(Optional): Sets the initial presence of the client that attaches the document. The presence is shared with other users participating in the document. It must be Codable.
+- `isRealtimeSync`(Optional): Specifies whether to enable real-time synchronization. The default value is `true`, which means synchronization occurs automatically. If set to `false`, you should manually control the synchronization.
 
 ```swift
-var optionB = ClientOptions()
-optionB.presence = ["username": "alice", "color": "blue"]
-
-let clientB = Client(rpcAddress: rpcAddress, options: optionA)
-try await clientB.activate()
-
-let docB = Document(key: "doc-1")
-try await clientB.attach(docB)
+try await clientA.attach(doc, ["color: "blue", "cursor": ["x": 0, "y": 0]], true)
 ```
 
-When a new peer registers or leaves, the `peers-changed` event is fired, and the other peer's clientID and presence can be obtained from the event.
+#### Updating presence
+
+The `Document.update()` method allows you to make changes to the state of the current user's presence.
+
+Specific properties provided will be changed. The existing presence object will be updated by merging the new changes. In other words, properties not specified in the update function will remain unchanged. 
 
 ```swift
-clientA.eventStream.sink { event in
-    if let event = event as? PeerChangedEvent {
-        let peers = event.value.peers["doc-1"]
-        switch event.value.type {
-        case .initialized:
-            displayPeers(peers)
-        case .watched:
-            peers.forEach { addPeer($0) }
-            // peer as follows:
-            // {
-            //   clientID: 'xxxxxxxxxxxxxxxxxxxx',
-            //   presence: ["username": "bob", "color": "red"]
-            // }
-        case .unwatched:
-            peers.forEach { removePeer($0) }
-        case .presenceChanged:
-            peers.forEach { updatePeer($0) }
-        }
+try await doc.update { root, presence in
+  presence.set(["cursor": ["x": 1, "y": 1]])
+}
+// final state
+// presence = { color: 'blue', cursor: { x: 1, y: 1 } }
+// we can see that the changes made were merged and the final state of the current user's presence is as we desire
+```
+
+<Alert status="warning">
+Note, the properties provided will be replaced entirely and not merely updated.
+
+For example:
+
+```swift
+// let's say 'color' is a property of cursor
+try await client.attach(doc, ["cursor": ["x": 0, "y": 0, "color": "red"]])
+
+try await doc.update { root, presence in 
+  // we want to change the x y coordinates of our cursor
+    presence.set(["cursor": ["x": 1, "y": 1]])
+}
+
+// final state
+// presence = { cursor: { x: 1, y: 1 } } 
+// we can see that all properties inside cursor get replaced (i.e. we lose the property 'color')
+```
+</Alert>
+
+#### Getting presence
+
+##### Document.getPresence(clientID) 
+
+It returns the presence of a specific client.
+
+```swift
+await doc.getPresence(client.id!) // ["color": "blue", "cursor": ["x": 1, "y": 1]]
+```
+
+##### Document.getMyPresence() 
+
+ It returns the presence of the current client that has attached to the document.
+
+```swift
+await doc.getMyPresence() // ["color": "blue", "cursor": ["x": 1, "y": 1]]
+```
+
+##### Document.getPresences() 
+
+It returns an array about all clients currently participating in the document.
+Each entry in the array includes the client's id and presence.
+
+```swift
+let users = await doc.getPresences()
+for (clientID, presence) in users {
+    // Do somethins
+}
+```
+
+##### Document.subscribePresence(.presence)
+
+This method allows you to subscribe to all presence-related changes.
+By subscribing to these events, you can be notified when specific changes occur within the document, such as clients attaching, detaching, or modifying their presence.
+
+```swift
+await doc.subscribePresence { event in
+    if event.type == .initialized {
+        // Array of other users currently participating in the document
+        // event.value;
+    }
+    
+    if event.type == .watched {
+        // A user has joined the document editing in online
+        // event.value;
+    }
+    
+    if event.type == .unwatched {
+        // A user has left the document editing
+        // event.value;
+    }
+    
+    if event.type == .presenceChanged {
+        // A user has updated their presence
+        // event.value;
     }
 }
 ```
 
-In the code above, `clientA` receives a `watched` event from `clientB` because `clientB` attached the Document with the key `doc-1`.
+##### Document.subscribePresence(.myPresence)
 
-Presence can include their names, colors, and other identifying details.
+This method is specifically for subscribing to changes in the presence of the current client that has attached to the document.
 
-### Document
-
-`Document` is a primary data type in Yorkie, which provides a JSON-like updating experience that makes it easy to represent your application's model. A `Document` can be updated without being attached to the client, and its changes are automatically propagated to other peers when the `Document` is attached to the `Client` or when the network is restored.
-
-#### Creating a Document
-
-We can create a Document using `Document(key: "doc-key")`. Let's create a Document with a key and attach it to the Client.
+The possible event.type are: `initialized`, `presenceChanged`.
 
 ```swift
-let doc = Document(key: docKey)
-try await client.attach(doc);
+await doc.subscribePresence(.myPresence) { event in
+    // Do something
+}
 ```
 
-> The document key is used to identify the Document in Yorkie. It is a string that can be freely defined by the user. However, it is allowed to use only `a-z`, `A-Z`, `0-9`, `-`, `.`, `_`, `~` and must be less than 120 characters.
+##### Document.subscribePresence(.others)
 
-After attaching the Document to the Client, all changes to the Document are automatically synchronized with remote peers.
+This method enables you to subscribe to changes in the presence of other clients participating in the document.
 
-#### Changing Synchronization Mode
-
-If you want to change synchronization mode, you can use `client.pause(doc)` and `client.resume(doc)`.
+The possible event.type are: `watched`, `unwatched`, `presenceChanged`.
 
 ```swift
-// Pause real-time sync.
-await client.pause(doc);
+await doc.subscribePresence(.others) { event in
+    if event.type == .watched {
+        addUser(event.value)
+    }
+    
+    if event.type == .unwatched {
+        removeUser(event.value)
+    }
 
-// Resume real-time sync.
-await client.resume(doc);
+    if event.type == .presenceChanged {
+        updateUser(event.value)
+    }
+}
 ```
 
 #### Editing the Document
@@ -159,7 +235,9 @@ print(obj.obj!)  // {"str":"a"}
 print(obj.arr!)  // [1,2]
 ```
 
-#### Subscribing to Document events
+#### Subscribing to Document
+
+##### Document.subscribe()
 
 A Document can be modified by changes generated remotely or locally in Yorkie.
 
@@ -192,17 +270,60 @@ await self.doc.subscribe { event in
 }
 ```
 
+##### Document.subscribe("$.path")
+
 Additionally, you can subscribe to changes for a specific path in the Document using `doc.subscribe(targetPath, callback)` with a path argument, such as `$.todos`, where the `$` sign indicates the root of the document.
 The callback function is called when the target path and its nested values are changed.
 
+With this feature, you can easily subscribe to changes for a specific part of the document and perform different actions based on the updated values.
+
 ```swift
-await doc.subscribe(targetPath: "$.todos") { event in 
+await doc.subscribe("$.todos") { event in 
   // The callback will be called when the root.todos or its nested values change.
   Task {
     let target = try? await target.getValueByPath(path: "$.todos") // You can get the value by path.
   }
   // Do something...
 }
+```
+
+#### Changing Synchronization Setting
+
+To change the synchronization setting for a document, you can use `client.pause(doc)` and `client.resume(doc)`.
+
+When you pause a document, the synchronization process will no longer occur in realtime, and you will need to manually execute the synchronization to ensure that the changes are propagated to other clients.
+
+To resume the realtime synchronization, you can call `client.resume(doc)`.
+
+```swift
+// 1. Pause real-time sync
+try await client.pause(doc)
+try await client.sync(doc) // To perform synchronization, you need to manually call the sync function
+
+// 2. Resume real-time sync
+try await client.resume(doc)
+```
+
+#### Changing Synchronization Mode
+
+By default, Yorkie synchronizes a document in `push-pull` mode, where local changes are pushed to the server, and remote changes are pulled from the server.
+
+If you only want to send your changes and not receive remote changes, you can use `push-only` mode.
+
+For realtime synchronization, you can use `client.pauseRemoteChanges(doc)` and `client.resumeRemoteChanges(doc)`.
+
+For manual synchronization, you can pass the desired sync mode to `client.sync(doc, syncMode)`.
+
+```swift
+// Pause remote changes for realtime sync
+try await client.pauseRemoteChanges(doc)
+// Resume remote changes for realtime sync
+try await client.resumeRemoteChanges(doc)
+
+// Manual sync in Push-Only mode
+try await client.sync(doc, .pushOnly)
+// Manual sync in Push-Pull mode
+try await client.sync(doc, .pushPull)
 ```
 
 #### Detaching the Document
@@ -219,17 +340,69 @@ Custom CRDT types are data types that can be used for special applications such 
 
 #### JSONText
 
-`JSONText` provides supports for collaborative text editing. `JSONText` has selection information for sharing the cursor position. In addition, contents in `Text` can have attributes; for example, characters can be bold, italic, or underlined.
+`JSONText` provides supports for collaborative text editing. In addition, contents in `JSONText` can have attributes; for example, characters can be bold, italic, or underlined.
 
 ```swift
 try await doc.update{ root in
     root.text = JSONText() // {"text":[]}
     (root.text as? JSONText)?.edit(0, 0, "hello")               // {"text":[{"val":"hello"}]}
     (root.text as? JSONText)?.edit(0, 1, "H")                   // {"text":[{"val":"H"},{"val":"ello"}]}
-    (root.text as? JSONText)?.select(0, 1)
     (root.text as? JSONText)?.setStyle(fromIdx: 0, toIdx: 1, attributes: ["bold": true])    // {"text":[{"attrs":{"bold":"true"},"val":"H"},{"val":"ello"}]}
 }
 ```
+
+##### Selection using presence
+
+The temporary client information, such as text selection, does not need to be stored in the document permanently.
+Instead, it can be effectively shared using `presence`.
+
+When transmitting text selection information, it is essential to convert the `index`, which can vary based on the text state, into the `position` used by `Yorkie.JSONText`.
+This converted position selection can then be sent and applied through presence.
+
+Here is an example where presence is used to share text selection between users in CodeMirror editor.
+
+- When the text selection is changed:
+
+```swift
+let range: NSRange  // eg. selected range converted from selectedTextRange of UITextView
+
+let fromIdx = range.location
+let toIdx = range.location + range.length
+
+try await doc.update { root, presence in
+    if let range = try? (root.content as? JSONText)?.indexRangeToPosRange((fromIdx, toIdx)) {
+        presence.set(["from": range.0, "to": range.1])
+    }
+}
+```
+
+- When applying other user's selection changes:
+
+```swift
+await doc.subscribePresence(.others) { event in 
+    if let event = event as? PresenceChangedEvent {
+        if let fromPos: TextPosStruct = decodePresence(event.value["from"]),
+            let toPos: TextPosStruct = decodePresence(event.value["to"]) {
+            if let (fromIdx, toIdx) = try? await(document.getRoot().content as? JSONText)?.posRangeToIndexRange((fromPos, toPos)) {
+                // Handle the updated selection in the editor
+            }
+        }
+    }
+}
+
+private func decodePresence<T: Decodable>(_ dictionary: Any?) -> T? {
+    guard let dictionary = dictionary as? [String: Any],
+            let data = try? JSONSerialization.data(withJSONObject: dictionary, options: [])
+    else {
+        return nil
+    }
+
+    return try? JSONDecoder().decode(T.self, from: data)
+}
+```
+
+Text selection can be efficiently shared using presence.
+Please refer to the following example for a complete code:
 
 An example of Text Editor: [Text Editor example](https://github.com/yorkie-team/yorkie-ios-sdk/tree/main/Examples/TextEditorApp)
 

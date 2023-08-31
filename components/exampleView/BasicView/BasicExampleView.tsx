@@ -29,7 +29,6 @@ export function BasicExampleView({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     let unsubscribeDoc: Function;
-    let unsubscribePresence: Function;
 
     const activate = async () => {
       const client = new yorkie.Client(rpcAddr, { apiKey });
@@ -46,19 +45,11 @@ export function BasicExampleView({
           }
         }
       });
-      unsubscribePresence = client.subscribe((event) => {
-        if (event.type === 'peers-changed') {
-          // const documentKey = doc.getKey();
-          // const changedPeers = event.value[documentKey];
-          // setDocChangeInfos((prev) => [...prev, { type: 'presence', content: 'presence change has occurred!' }]);
-        }
-      });
     };
     activate();
 
     return () => {
       if (unsubscribeDoc) unsubscribeDoc();
-      if (unsubscribePresence) unsubscribePresence();
     };
   }, [rpcAddr, documentKey, apiKey]);
 
