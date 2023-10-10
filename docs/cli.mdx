@@ -112,12 +112,33 @@ Flags:
 To use admin commands, you need to log in to the server. You can log in to the server using the `login` subcommand:
 
 ```bash
-$ yorkie login -u <username> -p <password>
+$ yorkie login -u <username> -p <password> --rpc-addr api.yorkie.dev:443
 ```
 
 Username and password are the same as the ones you used to log in to the [dashboard](/dashboard).
 
 > If you are using the [self-hosted server](/docs/self-hosted-server), default username and password are `admin` and `admin`.
+> You can log in to the server using `yorkie login -u admin -p admin --insecure`.
+
+Once you log in to the server, the CLI stores the access token in the `~/.yorkie/config.json` file.
+You can check the context of the CLI using the `context` subcommand:
+
+```bash
+$ yorkie context ls
+ CURRENT  RPC ADDR            INSECURE  TOKEN                   
+          api.yorkie.dev:443  false     eyJhbGciOi...DuhaUgofYg 
+ *        localhost:11101     true      eyJhbGciOi...FUT3js73Mw 
+```
+
+If you want to log out from the server, you can use the `logout` subcommand:
+
+```bash
+$ yorkie logout
+$ yorkie context ls
+ CURRENT  RPC ADDR            INSECURE  TOKEN                   
+ *        api.yorkie.dev:443  false     eyJhbGciOi...DuhaUgofYg 
+
+```
 
 ### Project
 
