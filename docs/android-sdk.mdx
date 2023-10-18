@@ -29,9 +29,9 @@ scope.launch {
 > usePlainText should be set false unless you use it for testing. For more information, please refer to [usePlainText](https://grpc.github.io/grpc-java/javadoc/io/grpc/ManagedChannelBuilder.html#usePlaintext--).
 
 
-#### Subscribing to Client status changes
+#### Subscribing to Client events
 
-We can observe various Client status such as `status`, `streamConnectionStatus`, and `peerStatus`. 
+We can use `client.events` to subscribe to client based events, such as `status`, `streamConnectionStatus`, and `peerStatus`. 
 
 ```kotlin
 // Declare your own CoroutineScope
@@ -51,133 +51,122 @@ By using the value of the `streamConnectionStatus`, it is possible to determine 
 
 If you want to know about other client events, please refer to [Client.Event](https://yorkie.dev/yorkie-android-sdk/yorkie/dev.yorkie.core/-client/-event/index.html).
 
-#### Presence
-
-Presence is a feature that allows you to display information about users who are currently using a collaborative application. Presence is often used in collaborative applications such as document editors, chat apps, and other real-time applications.
-
-```kotlin
-val optionA = Client.Options(presence = Presence(mapOf("username" to "alice", "color" to "blue")))
-val clientA = Client(context, "api.yorkie.dev", 443, optionA)
-val documentA = Document(Document.Key("doc-1"))
-// Declare your own CoroutineScope
-scope.launch { 
-  clientA.activateAsync().await()
-  clientA.attachAsync(documentA).await()
-}
-
-```
-
-Then, another Client is created and attaches a Document with the same name as before.
-
-```kotlin
-val optionB = Client.Options(presence = Presence(mapOf("username" to "bob", "color" to "red")))
-val clientB = Client(context, "api.yorkie.dev", 443, optionB)
-val documentB = Document(Document.Key("doc-1"))
-// Declare your own CoroutineScope
-scope.launch {
-  clientB.activateAsync().await()
-  clientB.attachAsync(documentB).await()
-}
-```
-
-When a new peer registers or leaves, the `PeersChanged` event is fired, and the other peer's clientID and presence can be obtained from the event.
-
-```kotlin
-// Declare your own CoroutineScope
-scope.launch {
-  clientA.events.filterIsInstance<Client.Event.PeersChanged>()
-    .collect { event ->
-      val peers = clientA.peerStatus.value[Document.Key("doc-1")]
-      when (event.result) {
-        is Client.PeersChangedResult.Initialized -> {
-          peers?.let(::displayPeers)
-        }
-        is Client.PeersChangedResult.Watched -> {
-          peers?.forEach { peer -> addPeer(peer) }
-          // peer as follows:
-          // {
-          //   clientID: 'xxxxxxxxxxxxxxxxxxxx',
-          //   presence: {username: 'bob', color: 'red'}
-          // }
-        }
-        is Client.PeersChangedResult.Unwatched -> {
-          peers?.forEach { peer -> removePeer(peer) }
-        }
-        is Client.PeersChangedResult.PresenceChanged -> {
-          peers?.forEach { peer -> updatePeer(peer) }
-        }
-      }	
-    }
-}
-```
-
-In the code above, `clientA` receives a `PeersChangedResult.Watched` from `clientB` because `clientB` attached the Document with the key `doc-1`.
-
-Presence can include their names, colors, and other identifying details.
-
 ### Document
 
-`Document` is a primary data type in Yorkie, which provides a JSON-like updating experience that makes it easy to represent your application's model. A `Document` can be updated without being attached to the client, and its changes are automatically propagated to other peers when the Document is attached to the Client or when the network is restored.
+`Document` is a primary data type in Yorkie, which provides a JSON-like updating experience that makes it easy to represent your application's model.
+A `Document` can be updated without being attached to the client, and its changes are automatically propagated to other clients when the `Document` is attached to the `Client` or when the network is restored.
 
 #### Creating a Document
 
-We can create a Document using `Document(key: Key)`. Let's create a Document with a key and attach it to the Client.
+We can create a Document using `Document()`. Let's create a Document with a key and attach it to the Client.
 
 ```kotlin
-val document = Document(Key("doc-1"))
+val document = Document(Document.Key("doc-1"))
+```
 
+> The document key is used to identify the Document in Yorkie. It is a string that can be freely defined by the user.
+ > However, it is allowed to use only `a-z`, `A-Z`, `0-9`, `-`, `.`, `_`, `~` and must be less than 120 characters.
+
+
+#### Attaching the document
+
+When you attach, the client notifies the server that it is subscribing to this document.
+If the document does not exist on the server, it will be created, and any local changes that occurred will be updated to the server's document.
+If the server already has a document associated with the provided key, it sends the existing changes to the client, which are then applied to synchronize the document.
+
+Once attached, the document becomes synchronized with other clients.
+This ensures that any modifications made by one client are instantly propagated to other clients collaborating on the same document.
+
+ The second argument is options.
+ - `initialPresence`: Sets the initial presence of the client that attaches the document. The presence is shared with other users participating in the document. It must be serializable to JSON.
+ - `isRealtimeSync`(Optional): Specifies whether to enable real-time synchronization. The default value is `true`, which means synchronization occurs automatically. If set to `false`, you should manually control the synchronization.
+
+```kotlin
 // Declare your own CoroutineScope
 scope.launch {
-  client.attachAsync(document).await()
+  client.attachAsync(
+    document,
+    initialPresences = mapOf("name" to "a"),
+    isRealtimeSync = true,
+  )
 }
 ```
 
-> The document key is used to identify the Document in Yorkie. It is a string that can be freely defined by the user. However, it is allowed to use only `a-z`, `A-Z`, `0-9`, `-`, `.`, `_`, `~` and must be less than 120 characters.
+#### Updating presesnce
 
+The `Document.update()` method allows you to make changes to the state of the current user's presence.
 
-After attaching the Document to the Client, all changes to the Document are automatically synchronized with remote peers.
-
-#### Changing Synchronization Setting
-
-To change the synchronization setting for a document, you can use `Client.pause(document)` and `Client.resume(document)`.
-
-When you pause a document, the synchronization process will no longer occur in realtime, and you will need to manually execute the synchronization to ensure that the changes are propagated to other clients.
-
-To resume the realtime synchronization, you can call `Client.resume(document)`.
+Specific properties provided will be changed. The existing presence object will be updated by merging the new changes. In other words, properties not specified in the update function will remain unchanged. 
 
 ```kotlin
-// Pause real-time sync
-client.pause(document)
+// Declare your own CoroutineScope
+scope.launch {
+  document.updateAsync { _, presence ->
+    presence.put(mapOf("name" to "b"))
+  }.await()
+}
+// final state
+// presence = { "name": "b" }
+// we can see that the changes made were merged and the final state of the current user's presence is as we desire
+```
+<Alert status="warning">
+Note, the properties provided will be replaced entirely and not merely updated.
 
-// Resume real-time sync
-client.resume(document)
+For example:
+```kotlin
+// Declare your own CoroutineScope
+scope.launch {
+  client.attachAsync(
+  	document,
+    initialPresences = mapOf("name" to "a")
+  ).await()
 
+  document.updateAsync { _, presence ->
+    presence.put(mapOf("age" to "10"))
+  }.await()
+}
+
+// final state
+// presence = { "age": "10" }
+// we can see that the changes made were merged and the final state of the current user's presence is as we desire
+```
+</Alert>
+
+#### Getting Presence
+
+##### Document.presences
+
+It returns `StateFlow` emitting all the clients currently particiting in the document and their presences.
+
+```kotlin
+document.presences.value.forEach { (clientID, presence) ->
+	// Do something
+}
 ```
 
-#### Changing Synchronization Mode
+##### Document.Event.PresenceChange
 
-By default, Yorkie synchronizes a document in `PushPull` mode, where local changes are pushed to the server, and remote changes are pulled from the server.
+It includes all the presence-related events.
+By subscribing to it, you can be notified when specific changes occur within the document, such as clients attaching, detaching, or modifying their presence.
 
-If you only want to send your changes and not receive remote changes, you can use `PushOnly` mode.
+```Kotlin
+// Declare your own CoroutineScope
+scope.launch {
+  document.events.filterIsInstance<PresenceChange>().collect { event ->
+    when (event) {
+      is MyPresence.Initialized -> { // users currently participating in the document }
+      is Others.Watched -> { // a user has joined the document editing in online }
+      is Others.Unwatched -> { // a user has left the document editing }
+      is Others.PresenceChanged -> { // a user has updated the presence }
+    }
+  }
+}
+```
 
-For realtime synchronization, you can use `Client.pauseRemoteChanges(document)` and `Client.resumeRemoteChanges(document)`.
+You can also subscribe to specific types of presence changes.
 
- For manual synchronization, you can pass the desired sync mode to `Client.syncAsync(document, syncMode)`.
-
-```kotlin
- // Pause remote changes for realtime sync
- client.pauseRemoteChanges(document);
- // Resume remote changes for realtime sync
- client.resumeRemoteChanges(document);
-
- // Declare your own CoroutineScope
- scope.launch {
-   // Manual sync in Push-Only mode
-   client.syncAsync(doc, SyncMode.PushOnly).await();
-   // Manual sync in Push-Pull mode
-   client.syncAsync(doc, SyncMode.PushPull).await();
- }
- ```
+- `document.event.filterIsInstance<PresenceChange.MyPresnece>`: `Initialized`, `PresenceChanged`
+- `document.event.filterIsInstance<PresenceChange.Others>`: `Watched`, `Unwatched`, `PresenceChanged`
 
 #### Editing the Document
 
@@ -211,7 +200,7 @@ println(root.getAs<JsonObject>("obj")["obj"]) // {"str":"a"}
 println(root.getAs<JsonObject>("obj")["arr"]) // [1,2]
 ```
 
-#### Subscribing to Document events
+#### Subscribing to Document
 
 A Document can be modified by changes generated remotely or locally in Yorkie.
 
@@ -219,9 +208,9 @@ Whenever the Document is modified, change events are triggered and we can subscr
 
 The events are triggered with an event object, and the event type indicates the source of the change, which can be one of the following values: `LocalChange`, `RemoteChange`, or `Snapshot`.
 
- When the type of the event is `LocalChange` or `RemoteChange`, it has `ChangeInfo` as value.
+When the type of the event is `LocalChange` or `RemoteChange`, it has `ChangeInfo` as value.
 
- For more information about changeInfo for document events, please refer to the [ChangeInfo](https://yorkie.dev/yorkie-android-sdk/yorkie/dev.yorkie.document/-document/-event/-change-info/index.html).
+For more information about changeInfo for document events, please refer to the [ChangeInfo](https://yorkie.dev/yorkie-android-sdk/yorkie/dev.yorkie.document/-document/-event/-change-info/index.html).
 
 ```kotlin
 // Declare your own CoroutineScope
@@ -242,7 +231,9 @@ scope.launch {
 ```
 
 Additionally, you can subscribe to changes for a specific path in the Document using `document.events(path)` with a path argument, such as `$.todos`, where the `$` sign indicates the root of the document.
- The events are delivered when the target path and its nested values are changed.
+The events are delivered when the target path and its nested values are changed.
+
+With this feature, you can easily subscribe to changes for a specific part of the document and perform different actions based on the updated values.
 
 ```kotlin
 // Declare your own CoroutineScope
@@ -254,6 +245,48 @@ scope.launch {
   }
 
 ```
+
+#### Changing Synchronization Setting
+
+To change the synchronization setting for a document, you can use `Client.pause(document)` and `Client.resume(document)`.
+
+When you pause a document, the synchronization process will no longer occur in realtime, and you will need to manually execute the synchronization to ensure that the changes are propagated to other clients.
+
+To resume the realtime synchronization, you can call `Client.resume(document)`.
+
+```kotlin
+// Pause real-time sync
+client.pause(document)
+
+// Resume real-time sync
+client.resume(document)
+
+```
+
+#### Changing Synchronization Mode
+
+By default, Yorkie synchronizes a document in `PushPull` mode, where local changes are pushed to the server, and remote changes are pulled from the server.
+
+If you only want to send your changes and not receive remote changes, you can use `PushOnly` mode.
+
+For realtime synchronization, you can use `Client.pauseRemoteChanges(document)` and `Client.resumeRemoteChanges(document)`.
+
+For manual synchronization, you can pass the desired sync mode to `Client.syncAsync(document, syncMode)`.
+
+```kotlin
+ // Pause remote changes for realtime sync
+ client.pauseRemoteChanges(document);
+ // Resume remote changes for realtime sync
+ client.resumeRemoteChanges(document);
+
+ // Declare your own CoroutineScope
+ scope.launch {
+   // Manual sync in Push-Only mode
+   client.syncAsync(doc, SyncMode.PushOnly).await();
+   // Manual sync in Push-Pull mode
+   client.syncAsync(doc, SyncMode.PushPull).await();
+ }
+ ```
 
 #### Detaching the Document
 
@@ -271,7 +304,7 @@ scope.launch {
 Custom CRDT types are data types that can be used for special applications such as text editors and counters, unlike general JSON data types such as `JsonObject` and `JsonArray`. Custom CRDT types can be created in the callback function of `document.update`.
 
 #### JsonText
-`JsonText` provides supports for collaborative text editing. `JsonText` has selection information for sharing the cursor position. In addition, contents in `JsonText` can have attributes; for example, characters can be bold, italic, or underlined.
+`JsonText` provides supports for collaborative text editing. In addition, contents in `JsonText` can have attributes; for example, characters can be bold, italic, or underlined.
 
 ```kotlin
 // Declare your own CoroutineScope
@@ -287,6 +320,42 @@ scope.launch {
 ```
 
 An example of TextEditor: [Text Editor example](https://github.com/yorkie-team/yorkie-android-sdk/tree/main/examples/texteditor)
+
+#### Selection using presence
+
+The temporary client information, such as text selection, does not need to be stored in the document permanently.
+Instead, it can be effectively shared using `presence`.
+
+When transmitting text selection information, it is essential to convert the `index`, which can vary based on the text state, into the `position` used by `JsonText`.
+This converted position selection can then be sent and applied through presence.
+
+Here is an example where presence is used to share text selection between users in CodeMirror editor.
+
+- When the text selection is changed:
+```kotlin
+document.updateAsync { root, presence ->
+  val text = root.getAs<JsonText>("content")
+  val indexRange = text.edit(from, to, content)
+  val posRange = text.indexRangeToPosRange(range)
+  presence.put(mapOf("selection" to gson.toJson(posRange))) // Serialize posRange as a JSON string
+}
+```
+
+- When applying other user's selection changes:
+```kotlin
+document.events.filterIsInstance<Others>().collect { event ->
+  if (event is Others.PresenceChanged) {
+    val (clientID, presence) = event.changed
+    val range = document.getRoot().getAs<JsonText>("content").posRangeToIndexRange(presence["selection"])
+    // handle the updated selection in the editor
+  }
+}
+```
+
+Text selection can be efficiently shared using presence.
+Please refer to the following example for a complete code:
+
+An example of Text Editor: [Text Editor example](https://github.com/yorkie-team/yorkie-android-sdk/tree/main/examples/texteditor)
 
 
 #### JsonCounter
@@ -304,7 +373,6 @@ scope.launch {
   }.await()
 }
 ```
-
 
 ### Reference
 
