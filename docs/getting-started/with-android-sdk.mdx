@@ -65,7 +65,7 @@ scope.launch {
 }
 ```
 
-The created document should be attached to the client to automatically synchronize the document between the client and peers.
+The document should be attached to the client in order to automatically synchronize it between the users participating the document.
 
 #### 3. Updating the Document
 
@@ -121,30 +121,17 @@ scope.launch {
 }
 ```
 
-To subscribe to changes for a specific path in the document, you can use the `document.events(path)` with a path argument, such as `$.todos`, where the `$` sign indicates the root of the document.
-
- With this feature, you can easily subscribe to changes for a specific part of the document and perform different actions based on the updated values.
-
-```kotlin
-// Declare your own CoroutineScope
-scope.launch {
-  document.events("$.todos").collect { event ->
-    // Events will be delivered when the root.todos or its nested values change.
-    val target = document.getValueByPath("$.todos")
-    // Do something...
-  }
-
-```
-
 #### 6. Viewing the presence of other peers
 
-Other peers' activities can be accessed by subscribing to the client.
+You can also subscribe to the presence of users participating in the document using `doc.events.filterIsInstance<PresenceChange>()`. 
+You can use `doc.presences` to get the list of users who are currently involved in the document.
 
 ```kotlin
 // Declare your own CoroutineScope
 scope.launch {
-  client.peerStatus.collect { peers ->
-    println("There are currently ${peers.size} peers")
+  document.filterIsInstance<PresenceChange>.collect {
+    val users = document.presences.value
+    println("There are currently ${users.length} users online.")
   }
 }
 ```
