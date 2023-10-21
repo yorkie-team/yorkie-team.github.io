@@ -218,7 +218,7 @@ const Examples: NextPage = () => {
             <li className="grid_item">
               <Link href="/examples/calendar" className="grid_card">
                 <div className="grid_thumbnail">
-                  <ExampleThumbnailImage fileName="nextjs-scheduler.jpg" alt="vanilla-quill" />
+                  <ExampleThumbnailImage fileName="nextjs-scheduler.jpg" alt="nextjs-scheudler" />
                 </div>
                 <div className="grid_card_info">
                   <strong className="title">Calendar</strong>
