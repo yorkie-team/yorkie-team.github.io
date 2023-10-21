@@ -90,18 +90,27 @@ export const setFirstFileOpen = (directoryInfo: DirectoryInfo): [DirectoryInfo, 
   return [directoryInfoResult, openedFileInfo];
 };
 
-export const setFileOpen = (directoryInfo: DirectoryInfo, targetFile: string): [DirectoryInfo, FileInfo | null] => {
-  const cloneDirectoryInfo = cloneDeep(directoryInfo);
-  let _openedFileInfo: FileInfo | null = null;
-  cloneDirectoryInfo.children.forEach((child, i) => {
-    if (child.isFile) {
-      child.isOpen = child.path === targetFile;
-      _openedFileInfo = child.path === targetFile ? child : _openedFileInfo;
-    } else {
-      const [childInfo, openedFileInfo] = setFileOpen(child, targetFile);
-      cloneDirectoryInfo.children[i] = childInfo;
-      _openedFileInfo = openedFileInfo;
-    }
-  });
-  return [cloneDirectoryInfo, _openedFileInfo];
+export const setFileOpen = (directoryInfo: DirectoryInfo, targetFilePath: string): [DirectoryInfo, FileInfo | null] => {
+  const clonedDirectoryInfo = cloneDeep(directoryInfo);
+  const openedFileInfo = findOpenedFileInfo(clonedDirectoryInfo, targetFilePath);
+  return [clonedDirectoryInfo, openedFileInfo];
 };
+
+const findOpenedFileInfo = (directoryInfo: DirectoryInfo, targetFilePath: string): FileInfo | null => {
+  let opendFileInfo: FileInfo | null = null;
+  for (const child of directoryInfo.children) {
+    if (opendFileInfo != null) {
+      break;
+    }
+    if (child.isFile) {
+      child.isOpen = child.path === targetFilePath;
+      if (child.isOpen) {
+        opendFileInfo = child;
+        break;
+      }
+    } else {
+      opendFileInfo = opendFileInfo ?? findOpenedFileInfo(child, targetFilePath);
+    }
+  }
+  return opendFileInfo;
+}

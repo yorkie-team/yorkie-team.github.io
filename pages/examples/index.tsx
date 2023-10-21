@@ -215,6 +215,19 @@ const Examples: NextPage = () => {
                 </div>
               </Link>
             </li>
+            <li className="grid_item">
+              <Link href="/examples/calendar" className="grid_card">
+                <div className="grid_thumbnail">
+                  <ExampleThumbnailImage fileName="nextjs-scheduler.jpg" alt="nextjs-scheudler" />
+                </div>
+                <div className="grid_card_info">
+                  <strong className="title">Calendar</strong>
+                  <p className="desc">
+                    This demo shows the real-time collaborative version of the Calendar with Yorkie and Next.js.
+                  </p>
+                </div>
+              </Link>
+            </li>
           </ul>
         </div>
       </div>
