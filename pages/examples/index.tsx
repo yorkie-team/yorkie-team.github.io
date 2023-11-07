@@ -228,6 +228,20 @@ const Examples: NextPage = () => {
                 </div>
               </Link>
             </li>
+            <li className="grid_item">
+              <Link href="/examples/simultaneous-cursors" className="grid_card">
+                <div className="grid_thumbnail">
+                  <ExampleThumbnailImage fileName="simultaneous-cursors.jpg" alt="simultaneous-cursors" />
+                </div>
+                <div className="grid_card_info">
+                  <strong className="title">Simultaneous Cursors</strong>
+                  <p className="desc">
+                    This demo shows the real-time collaborative version of simple drawing, cursor animation with Yorkie
+                    and React.
+                  </p>
+                </div>
+              </Link>
+            </li>
           </ul>
         </div>
       </div>
