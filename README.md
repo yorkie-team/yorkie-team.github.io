@@ -24,6 +24,24 @@ In the project directory, you can run:
 $ npm run dev
 ```
 
+### Fetching styles from Yorkie UI
+
+Yorkie UI is a repository that contains the styles of Yorkie. If you want to update the styles of the homepage. You can run the following command. Yorkie UI repository is private, so if you want to run this command, you need to be a member of the Yorkie UI repository.
+
+```
+$ npm run fetch:ui
+```
+
+### Fetching fileInfo of examples from Yorkie JS SDK
+
+The examples that are used in the homepage are managed in the Yorkie JS SDK repository. If you want to update examples of the homepage, you can run the following command.
+
+```
+$ npm run fetch:examples
+```
+
+This command will fetch the fileInfo of examples from JS SDK repository and copy them to the `/examples` directory.
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 <details>
@@ -60,7 +78,7 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
-  
+
 </details>
 
 ## Deploying Homepage
