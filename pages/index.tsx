@@ -327,7 +327,7 @@ const Home: NextPage = () => {
                   <br />
                   While the CRDT algorithm has been verified, not all of the code has been fully battle-tested. The
                   developers of the service currently estimate that the right time to use it in a production environment
-                  will be <b>around summer of &apos;23</b>. Until then, it is recommended to carefully evaluate the
+                  will be <b>around summer of &apos;24</b>. Until then, it is recommended to carefully evaluate the
                   service&apos;s capabilities and reliability before using it in a production setting. It is also
                   important to note that the availability and features of the service may change without notice, so it
                   is always best to check the latest information on the service&apos;s website before using it.
