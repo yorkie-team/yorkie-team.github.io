@@ -4,3 +4,50 @@ order: 60
 ---
 
 ## Devtools
+
+DevTools is a Chrome extension that can be used when developing with Yorkie.
+It visualizes Yorkie data, allows inspection, and enhances your development experience.
+
+### Install the extension
+
+To get started, simply download the extension from the [Chrome Web Store](https://chromewebstore.google.com/detail/yorkie-devtools/djhcelgbkggnbipeccnnbafbnljoikkc).
+
+Once installed, you'll find the `Yorkie🐾` panel within Chrome Developer Tools.
+
+<Image alt="devtools" src="/assets/images/docs/devtools.png" width={1400} height={900} style={{ maxWidth: '800px' }} />
+
+<Alert status="warning">Please note that the devtools is available only in yorkie-js-sdk version `0.4.13` or later for development builds.</Alert>
+
+### Key Features
+
+Within the `Yorkie 🐾` panel, on the left, you will see the `Document` pane, and on the right, there is the `Presence` pane.
+
+#### Document pane
+
+- Visualize the rootObject structure that you have defined in document.
+- CRDT insights:
+    - Clearly display data types for each CRDTElement using intuitive icons and informative tooltips.
+        - <Image alt="object icon" src="/assets/images/docs/devtools-icon-object.png" width={16} height={16} style={{ width: '16px' }}/><span>: object, </span>
+            <Image alt="array icon" src="/assets/images/docs/devtools-icon-array.png" width={16} height={16} style={{ width: '16px' }}/><span>: array, </span>
+            <Image alt="text icon" src="/assets/images/docs/devtools-icon-text.png" width={16} height={16} style={{ width: '16px' }}/><span>: text, </span>
+            <Image alt="tree icon" src="/assets/images/docs/devtools-icon-tree.png" width={16} height={16} style={{ width: '16px' }}/><span>: tree, </span>
+            <Image alt="counter icon" src="/assets/images/docs/devtools-icon-counter.png" width={16} height={16} style={{ width: '16px' }}/><span>: counter, </span>
+            <Image alt="primitive icon" src="/assets/images/docs/devtools-icon-primitive.png" width={16} height={16} style={{ width: '16px' }}/><span>: primitive</span>
+    - Click on any CRDTElement to see datatype-specific details tailored to your debugging needs.
+    <video autoPlay loop muted playsInline style={{ maxWidth: '800px' }}>
+        <source src="/assets/images/docs/devtools-document.mov"/>
+    </video>
+- View Options:
+    - By default, enjoy a JSON view for quick analysis.
+    - Explore tree data types with a graph view, offering a deeper understanding of the data structure.
+    <video autoPlay loop muted playsInline style={{ maxWidth: '800px' }}>
+        <source src="/assets/images/docs/devtools-view-option.mov"/>
+    </video>
+
+#### Presence pane
+
+- Represent clients participating in the document.
+- Access detailed data with a simple click.
+<video autoPlay loop muted playsInline style={{ maxWidth: '800px' }}>
+    <source src="/assets/images/docs/devtools-presence.mov"/>
+</video>
