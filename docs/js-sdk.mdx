@@ -458,6 +458,30 @@ doc.update((root, presence) => {
 });
 ```
 
+### Logger Options
+
+The Logger outputs events occurring within the SDK to the console for debugging purposes. To modify these options, you can use the `setLogLevel` function.
+
+```typescript
+import { setLogLevel, LogLevel } from 'yorkie-js-sdk';
+
+setLogLevel(LogLevel.Error); // Display logs with Error or higher
+```
+
+The available log levels for `setLogLevel` are:
+
+| LogLevel | Description                     |
+|----------|---------------------------------|
+| `LogLevel.Trivial`  | Lowest level of verbosity       |
+| `LogLevel.Debug`    | Debugging information            |
+| `LogLevel.Info`     | General information              |
+| `LogLevel.Warn`     | Warnings and potential issues   |
+| `LogLevel.Error`    | Errors and unexpected behavior  |
+| `LogLevel.Fatal`    | Critical errors, may lead to termination  |
+
+Adjust the log level for flexible control over log verbosity in your application.
+
+
 ### Reference
 
 For details on how to use the JS SDK, please refer to [JS SDK Reference](https://yorkie.dev/yorkie-js-sdk/api-reference/).
