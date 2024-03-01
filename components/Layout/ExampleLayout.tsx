@@ -31,7 +31,7 @@ export function ExampleLayout({
       <header className="header_example">
         <nav className="nav">
           <h1 className="logo">
-            <Link href="/">
+            <Link href="/" legacyBehavior>
               <LogoGnbSVG />
             </Link>
             <span className="blind">Yorkie</span>

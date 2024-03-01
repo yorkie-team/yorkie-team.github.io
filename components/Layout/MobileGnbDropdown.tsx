@@ -35,7 +35,7 @@ export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
               <Link
                 href="/products"
                 className={classNames('dropdown_menu', { is_active: asPath.split('#')[0] === '/products' })}
-              >
+                legacyBehavior>
                 <span className="dropdown_text">Products</span>
               </Link>
             </li>
@@ -154,7 +154,7 @@ export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
               <Link
                 href="/examples"
                 className={classNames('dropdown_menu', { is_active: asPath.split('#')[0] === '/examples' })}
-              >
+                legacyBehavior>
                 <span className="dropdown_text">Examples</span>
               </Link>
             </li>
@@ -162,7 +162,7 @@ export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
               <Link
                 href="/community"
                 className={classNames('dropdown_menu', { is_active: asPath.split('#')[0] === '/community' })}
-              >
+                legacyBehavior>
                 <span className="dropdown_text">Community</span>
               </Link>
             </li>

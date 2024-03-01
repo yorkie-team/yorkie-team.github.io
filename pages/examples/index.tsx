@@ -137,7 +137,7 @@ const Examples: NextPage = () => {
           </div>
           <ul className="grid_list">
             <li className="grid_item">
-              <Link href="/examples/profile-stack" className="grid_card">
+              <Link href="/examples/profile-stack" className="grid_card" legacyBehavior>
                 <div className="grid_thumbnail">
                   <ExampleThumbnailImage fileName="profile-stack.jpg" alt="profile-stack" />
                 </div>
@@ -148,7 +148,7 @@ const Examples: NextPage = () => {
               </Link>
             </li>
             <li className="grid_item">
-              <Link href="/examples/kanban" className="grid_card">
+              <Link href="/examples/kanban" className="grid_card" legacyBehavior>
                 <div className="grid_thumbnail">
                   <ExampleThumbnailImage fileName="vuejs-kanban.jpg" alt="vuejs-kanban" />
                 </div>
@@ -162,7 +162,7 @@ const Examples: NextPage = () => {
               </Link>
             </li>
             <li className="grid_item">
-              <Link href="/examples/todomvc" className="grid_card">
+              <Link href="/examples/todomvc" className="grid_card" legacyBehavior>
                 <div className="grid_thumbnail">
                   <ExampleThumbnailImage fileName="react-todomvc.jpg" alt="react-todomvc" />
                 </div>
@@ -175,7 +175,7 @@ const Examples: NextPage = () => {
               </Link>
             </li>
             <li className="grid_item">
-              <Link href="/examples/codemirror" className="grid_card">
+              <Link href="/examples/codemirror" className="grid_card" legacyBehavior>
                 <div className="grid_thumbnail">
                   <ExampleThumbnailImage fileName="vanilla-codemirror6.jpg" alt="vanilla-codemirror6" />
                 </div>
@@ -189,7 +189,7 @@ const Examples: NextPage = () => {
               </Link>
             </li>
             <li className="grid_item">
-              <Link href="/examples/tldraw" className="grid_card">
+              <Link href="/examples/tldraw" className="grid_card" legacyBehavior>
                 <div className="grid_thumbnail">
                   <ExampleThumbnailImage fileName="react-tldraw.jpg" alt="react-tldraw" />
                 </div>
@@ -203,7 +203,7 @@ const Examples: NextPage = () => {
               </Link>
             </li>
             <li className="grid_item">
-              <Link href="/examples/quill" className="grid_card">
+              <Link href="/examples/quill" className="grid_card" legacyBehavior>
                 <div className="grid_thumbnail">
                   <ExampleThumbnailImage fileName="vanilla-quill.jpg" alt="vanilla-quill" />
                 </div>
@@ -216,7 +216,7 @@ const Examples: NextPage = () => {
               </Link>
             </li>
             <li className="grid_item">
-              <Link href="/examples/calendar" className="grid_card">
+              <Link href="/examples/calendar" className="grid_card" legacyBehavior>
                 <div className="grid_thumbnail">
                   <ExampleThumbnailImage fileName="nextjs-scheduler.jpg" alt="nextjs-scheudler" />
                 </div>
@@ -229,7 +229,10 @@ const Examples: NextPage = () => {
               </Link>
             </li>
             <li className="grid_item">
-              <Link href="/examples/simultaneous-cursors" className="grid_card">
+              <Link
+                href="/examples/simultaneous-cursors"
+                className="grid_card"
+                legacyBehavior>
                 <div className="grid_thumbnail">
                   <ExampleThumbnailImage fileName="simultaneous-cursors.jpg" alt="simultaneous-cursors" />
                 </div>

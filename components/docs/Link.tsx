@@ -5,7 +5,7 @@ export function CustomLink({ href, ...rest }: AnchorHTMLAttributes<HTMLAnchorEle
   const isInternalLink = href && (href.startsWith('/') || href.startsWith('#'));
 
   if (isInternalLink) {
-    return <Link href={href} {...rest} className="docs_link" />;
+    return <Link href={href} {...rest} className="docs_link" legacyBehavior />;
   }
   return <a href={href} target="_blank" rel="noreferrer" {...rest} className="docs_link icon_link"></a>;
 }

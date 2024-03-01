@@ -8,7 +8,7 @@ export function Breadcrumb({ menus }: { menus: Array<{ name: string; href: strin
         <Icon type="menu" />
       </button>
       {menus.map(({ name, href }) => (
-        <Link href={href} key={name} className="docs_breadcrumbs_link">
+        <Link href={href} key={name} className="docs_breadcrumbs_link" legacyBehavior>
           {name}
         </Link>
       ))}
