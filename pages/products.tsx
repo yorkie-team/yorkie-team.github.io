@@ -178,10 +178,13 @@ const Products: NextPage = () => {
                 <strong className="product_card_title">Size optimization</strong>
                 <p className="product_card_desc">
                   Yorkie uses{' '}
-                  <a href="https://github.com/yorkie-team/yorkie/blob/main/design/garbage-collection.md" className="link">
+                  <a
+                    href="https://github.com/yorkie-team/yorkie/blob/main/design/garbage-collection.md"
+                    className="link"
+                  >
                     Garbage Collection
-                  </a>
-                  {' '}and{' '}
+                  </a>{' '}
+                  and{' '}
                   <a href="https://en.wikipedia.org/wiki/Lamport_timestamp" className="link">
                     Lamport timestamps
                   </a>{' '}
@@ -249,7 +252,7 @@ const Products: NextPage = () => {
                 Yorkie open-source package
               </strong>
             </div>
-            <Link href="/docs/self-hosted-server" className="btn gray800" legacyBehavior>
+            <Link href="/docs/self-hosted-server" className="btn gray800">
               <Icon type="book" />
               <span className="text">How to build self-hosted server</span>
             </Link>

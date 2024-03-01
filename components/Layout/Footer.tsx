@@ -18,7 +18,7 @@ export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement
       <div className="footer_inner">
         <div className="box_info">
           <strong className="logo">
-            <Link href="/" className="link" legacyBehavior>
+            <Link href="/" className="link">
               <LogoSVG />
             </Link>
           </strong>

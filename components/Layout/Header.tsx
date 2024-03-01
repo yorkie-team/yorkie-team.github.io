@@ -20,7 +20,7 @@ export function Header(): ReactElement {
     <header className="header_service">
       <div className="header_inner">
         <h1 className="logo">
-          <Link href="/" legacyBehavior>
+          <Link href="/">
             <LogoSVG />
             <LogoGnbSVG />
             <span className="blind">Yorkie</span>

@@ -72,12 +72,7 @@ function ButtonInner({
 
   if (as === 'link') {
     return (
-      <Link
-        href={href}
-        className={buttonClassName}
-        {...restProps}
-        ref={buttonRef}
-        legacyBehavior>
+      <Link href={href} className={buttonClassName} {...restProps} ref={buttonRef}>
         {icon && icon}
         {children && <span className={`${blindText ? 'blind' : 'text'}`}>{children}</span>}
       </Link>

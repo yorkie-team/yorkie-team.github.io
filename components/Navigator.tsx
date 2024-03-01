@@ -42,10 +42,7 @@ function NavGroup({ isActive, children }: { isActive: boolean; children: React.R
 
 function NavMenu({ title, href, isActive }: { title: string; href: string; isActive: boolean }) {
   return (
-    <Link
-      href={href}
-      className={classNames('navigator_menu', { is_active: isActive })}
-      legacyBehavior>
+    <Link href={href} className={classNames('navigator_menu', { is_active: isActive })}>
       <span className="icon">
         <ArrowSVG />
       </span>
@@ -56,10 +53,7 @@ function NavMenu({ title, href, isActive }: { title: string; href: string; isAct
 
 function NavItem({ title, href, isActive }: { title: string; href: string; isActive: boolean }) {
   return (
-    <Link
-      href={href}
-      className={classNames('navigator_item', { is_active: isActive })}
-      legacyBehavior>
+    <Link href={href} className={classNames('navigator_item', { is_active: isActive })}>
       {title}
     </Link>
   );
