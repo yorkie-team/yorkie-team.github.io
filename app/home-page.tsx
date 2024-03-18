@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import type { NextPage } from 'next';

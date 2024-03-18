@@ -1,3 +1,5 @@
+'use client';
+
 import { type ThemeOption, useTheme } from '@/hooks/useTheme';
 import { useEffect } from 'react';
 
