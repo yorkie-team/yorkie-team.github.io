@@ -1,3 +1,5 @@
+'use client';
+
 import { ReactNode, useRef } from 'react';
 import { useUncontrolled, useOutsideClick } from '@/hooks';
 import { PopoverContextProvider } from './Popover.context';
