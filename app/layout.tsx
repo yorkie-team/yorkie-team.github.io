@@ -2,6 +2,7 @@ import { prefix } from '@/utils/prefix';
 import type { Metadata } from 'next';
 import Script from 'next/script';
 import UserStoreInitializer from './_components/ThemeInitializer';
+import '@/styles/style.css';
 
 export const metadata: Metadata = {
   icons: {
