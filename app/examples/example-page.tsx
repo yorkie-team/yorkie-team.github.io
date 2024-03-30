@@ -1,3 +1,5 @@
+'use client';
+
 import { Button, Icon, Layout } from '@/components';
 import { ExampleThumbnailImage } from '@/components/exampleView';
 import ExampleBannerSVG from '@/public/assets/images/banner/img_example_banner.svg';
