@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react';
 import type { NextPage } from 'next';
 import Head from 'next/head';
@@ -9,11 +11,11 @@ const sampleCode = `sample code`;
 const ExamplesView: NextPage = () => {
   const [activeTab, setActiveTab] = useState<string | null>('about');
   return (
-    <ExampleLayout breadcrumbTitle="Multi Cursor" defaultViewType="split">
+    <ExampleLayout breadcrumbTitle="Creating Webtoons" viewTypes={['full', 'show', 'grid']} defaultViewType="show">
       {({ viewType }) => (
         <>
           <Head>
-            <title>Multi Cursor · Yorkie Examples</title>
+            <title>Creating Webtoons · Yorkie Examples</title>
           </Head>
           <Sidebar defaultOpened={viewType !== 'full'}>
             <Sidebar.Tabs defaultTab="about" onTabChange={setActiveTab}>
@@ -24,19 +26,34 @@ const ExamplesView: NextPage = () => {
                 </Sidebar.TabsList>
               </Sidebar.Top>
               <Sidebar.TabsPanel value="about">
-                <Sidebar.GuideTitle>Multi cursor</Sidebar.GuideTitle>
+                <Sidebar.GuideTitle>Webtoon scenario maker</Sidebar.GuideTitle>
                 <Sidebar.GuideDescription>
-                  A live cursor is a feature that allows you to view the cursors of other users in real time. If
-                  different stakeholders collaborate remotely, you can also mark each user&apos;s role with a small tag
-                  next to the cursor.
+                  Because drawing a webtoon requires several steps, experts in various roles often collaborate. There is
+                  a lot of discussion and feedback in creating a scenario. Webtoon Scenario Maker includes &apos;drawing
+                  comments&apos;, &apos;comments view&apos;, &apos;mini map&apos; and &apos;character library.&apos;
                 </Sidebar.GuideDescription>
                 <Sidebar.GuideSubTitle>Try this!</Sidebar.GuideSubTitle>
                 <Accordion defaultValue={[]} multiple>
                   {[
                     {
-                      title: "Select role and check other's cursor",
+                      title: 'Drawing comments',
                       description:
-                        'Try choosing your role. You can view the cursors of other users in real time with their role tags.',
+                        "Press the 'comment' button on the bottom or the 'C key' on the keyboard, and then press any space on the screen. You can leave text comments and drawing comments on that location. Feel free to generate drawing comments by moving your cursor out of the text window.",
+                    },
+                    {
+                      title: 'Comments view',
+                      description:
+                        'Try pressing the top left toggle button to open the comment view. You can collect and view all comments for each cut of the cartoon.',
+                    },
+                    {
+                      title: 'Mini map',
+                      description:
+                        'Use the mini-map feature in the upper right corner to see what other users are viewing. You can identify the location of each user in real time.',
+                    },
+                    {
+                      title: 'Character library',
+                      description:
+                        "In the text content area on the left, add a description of the new cut and write the characters' lines. Once you have registered your characters, they can be stored in the library and reused.",
                     },
                   ].map(({ title, description }) => (
                     <Accordion.Item key={title} value={title}>

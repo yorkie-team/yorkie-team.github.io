@@ -1,6 +1,8 @@
+'use client';
+
 import { NextPage } from 'next';
 import Head from 'next/head';
-import { ExampleLayout, CodeBlock } from '@/components';
+import { ExampleLayout } from '@/components';
 import {
   Sidebar,
   BasicExampleView,
@@ -9,13 +11,11 @@ import {
   EXAMPLE_CODE_URL,
   EXAMPLE_PREVIEW_URL,
 } from '@/components/exampleView';
-import { FILE_INFO } from '@/examples/vuejs-kanban/fileInfo';
-import { DOCUMENT_STRUCTURE } from '@/examples/vuejs-kanban/documentStructure';
+import { FILE_INFO } from '@/examples/profile-stack/fileInfo';
 
-const exampleKey = 'vuejs-kanban';
-const exampleTitle = 'Kanban Board';
-const KanbanExampleView: NextPage = () => {
-  // TODO(hackerwins): Uncomment the document structure view when the how it works is ready.
+const exampleKey = 'profile-stack';
+const exampleTitle = 'Profile Stack';
+const ProfileStackExampleView: NextPage = () => {
   return (
     <ExampleLayout breadcrumbTitle={exampleTitle}>
       {() => (
@@ -28,27 +28,19 @@ const KanbanExampleView: NextPage = () => {
               <Sidebar.Top>
                 <Sidebar.TabsList>
                   <Sidebar.TabsTab value="code">Code</Sidebar.TabsTab>
-                  {process.env.NODE_ENV === 'development' && (
-                    <Sidebar.TabsTab value="documentStructure">Document Structure</Sidebar.TabsTab>
-                  )}
                 </Sidebar.TabsList>
               </Sidebar.Top>
               <Sidebar.TabsPanel value="code">
                 <Sidebar.GuideTitle>{exampleTitle}</Sidebar.GuideTitle>
                 <Sidebar.GuideDescription>
-                  Kanban Board is a tool for managing tasks and workflow. It is a visual way to manage tasks and
-                  workflow.
+                  The profile stack shows the list of users currently accessing the Document. Try adding and deleting
+                  users to see how the profile stack changes.
                 </Sidebar.GuideDescription>
                 <ProjectCodes
                   files={FILE_INFO}
-                  activeFile="/src/App.vue"
-                  ignoreFiles={[...COMMON_IGNORE_FILES, '.env']}
+                  activeFile="/main.js"
+                  ignoreFiles={[...COMMON_IGNORE_FILES, '.env', 'vite.config.js']}
                 />
-              </Sidebar.TabsPanel>
-              <Sidebar.TabsPanel value="documentStructure">
-                <div className="codeblock_box">
-                  <CodeBlock code={DOCUMENT_STRUCTURE} language="typescript" />
-                </div>
               </Sidebar.TabsPanel>
               <Sidebar.Bottom codeURL={EXAMPLE_CODE_URL + exampleKey} />
             </Sidebar.Tabs>
@@ -58,6 +50,7 @@ const KanbanExampleView: NextPage = () => {
             apiKey={process.env.NEXT_PUBLIC_EXAMPLES_API_KEY || ''}
             documentKey={exampleKey}
             iframeURL={EXAMPLE_PREVIEW_URL + exampleKey}
+            userMaxCount={6}
           />
         </>
       )}
@@ -65,4 +58,4 @@ const KanbanExampleView: NextPage = () => {
   );
 };
 
-export default KanbanExampleView;
+export default ProfileStackExampleView;

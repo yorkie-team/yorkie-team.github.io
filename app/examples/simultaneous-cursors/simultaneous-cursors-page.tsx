@@ -1,3 +1,5 @@
+'use client';
+
 import { NextPage } from 'next';
 import Head from 'next/head';
 import { ExampleLayout } from '@/components';
@@ -9,11 +11,12 @@ import {
   EXAMPLE_CODE_URL,
   EXAMPLE_PREVIEW_URL,
 } from '@/components/exampleView';
-import { FILE_INFO } from '@/examples/react-tldraw/fileInfo';
+import { FILE_INFO } from '@/examples/simultaneous-cursors/fileInfo';
 
-const exampleKey = 'react-tldraw';
-const exampleTitle = 'tldraw';
-const TldrawExampleView: NextPage = () => {
+const exampleKey = 'simultaneous-cursors';
+const exampleTitle = 'Simultaneous Cursors';
+
+const SimultaneousExampleView: NextPage = () => {
   return (
     <ExampleLayout breadcrumbTitle={exampleTitle}>
       {() => (
@@ -31,34 +34,25 @@ const TldrawExampleView: NextPage = () => {
               <Sidebar.TabsPanel value="code">
                 <Sidebar.GuideTitle>{exampleTitle}</Sidebar.GuideTitle>
                 <Sidebar.GuideDescription>
-                  This is a real-time collaborative example of the{' '}
-                  <a href="https://tldraw.com" className="link" target="_blank" rel="noreferrer">
-                    tldraw
+                  This demo shows the real-time collaborative version of simple drawing, cursor animation with{' '}
+                  <a href="https://yorkie.dev/" className="link" target="_blank" rel="noreferrer">
+                    Yorkie
                   </a>{' '}
-                  whiteboard editor with{' '}
+                  and{' '}
                   <a
                     href="https://reactjs.org/docs/create-a-new-react-app.html"
                     className="link"
                     target="_blank"
                     rel="noreferrer"
                   >
-                    CreateReactApp
-                  </a>{' '}
-                  and{' '}
-                  <a
-                    href="https://github.com/yorkie-team/yorkie-js-sdk"
-                    className="link"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Yorkie JS SDK
+                    React
                   </a>
                   .
                 </Sidebar.GuideDescription>
                 <ProjectCodes
                   files={FILE_INFO}
-                  activeFile="/src/hooks/useMultiplayerState.ts"
-                  ignoreFiles={[...COMMON_IGNORE_FILES, '.env', 'vite.config.js']}
+                  activeFile="/src/App.jsx"
+                  ignoreFiles={[...COMMON_IGNORE_FILES, '.env']}
                 />
               </Sidebar.TabsPanel>
               <Sidebar.Bottom codeURL={EXAMPLE_CODE_URL + exampleKey} />
@@ -69,12 +63,10 @@ const TldrawExampleView: NextPage = () => {
             apiKey={process.env.NEXT_PUBLIC_EXAMPLES_API_KEY || ''}
             documentKey={exampleKey}
             iframeURL={EXAMPLE_PREVIEW_URL + exampleKey}
-            userMaxCount={30}
           />
         </>
       )}
     </ExampleLayout>
   );
 };
-
-export default TldrawExampleView;
+export default SimultaneousExampleView;
