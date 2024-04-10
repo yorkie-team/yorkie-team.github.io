@@ -1,3 +1,5 @@
+'use client';
+
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
 import Link from 'next/link';

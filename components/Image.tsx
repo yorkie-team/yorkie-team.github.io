@@ -1,4 +1,6 @@
-import { ImageProps as NextImageProps, StaticImageData } from "next/image";
+'use client';
+
+import { ImageProps as NextImageProps, StaticImageData } from 'next/image';
 import ExportedImage from 'next-image-export-optimizer';
 import { prefix } from '@/utils/prefix';
 
