@@ -3,32 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Head from 'next/head';
 import { type DocsOrderList } from '@/utils/mdxUtils';
-import type { MDXComponents } from 'mdx/types';
-import { Layout, Navigator, Button, Icon, CodeBlock, CodeBlockHeader, Image } from '@/components';
-import { CustomLink, CustomCodeBlock, Breadcrumb, Caption, ImageWrap, Alert, Blockquote } from '@/components/docs';
-
-// Custom components/renderers to pass to MDX.
-const components: MDXComponents = {
-  a: CustomLink,
-  h3: (props) => <h3 className="heading" {...props} />,
-  h4: (props) => <h4 className="heading" {...props} />,
-  h5: (props) => <h5 className="heading" {...props} />,
-  h6: (props) => <h6 className="heading" {...props} />,
-  Button,
-  Icon,
-  pre: (props) => <CustomCodeBlock {...props} />,
-  blockquote: (props) => <Blockquote {...props} />,
-  img: ({ src, alt, title, width, height }) => (
-    <Image src={src!} alt={alt || ''} title={title} width={width as number} height={height as number} />
-  ),
-  Image,
-  ImageWrap,
-  Breadcrumb,
-  Caption,
-  Alert,
-  CodeBlock,
-  CodeBlockHeader,
-};
+import { Layout, Navigator } from '@/components';
 
 export default function DocsPage({ source, navList }: { source: React.ReactElement; navList: DocsOrderList }) {
   const [activeId, setActiveId] = useState<string>('');
