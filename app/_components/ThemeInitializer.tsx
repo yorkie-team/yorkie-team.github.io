@@ -3,7 +3,7 @@
 import { type ThemeOption, useTheme } from '@/hooks/useTheme';
 import { useEffect } from 'react';
 
-function UserStoreInitializer() {
+function ThemeInitializer() {
   const { setTheme } = useTheme();
   useEffect(() => {
     const themeOption = (window.localStorage.getItem('theme') || 'system') as ThemeOption;
@@ -13,4 +13,4 @@ function UserStoreInitializer() {
   return null;
 }
 
-export default UserStoreInitializer;
+export default ThemeInitializer;
