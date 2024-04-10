@@ -1,10 +1,12 @@
 import { prefix } from '@/utils/prefix';
 import type { Metadata } from 'next';
 import Script from 'next/script';
-import UserStoreInitializer from './_components/ThemeInitializer';
+import ThemeInitializer from './_components/ThemeInitializer';
 import '@/styles/style.css';
+import type { Viewport } from 'next';
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL!),
   icons: {
     icon: [
       { url: `${prefix}/favicon.ico` },
@@ -22,18 +24,23 @@ export const metadata: Metadata = {
     type: 'website',
     siteName: 'Yorkie',
     title: 'Yorkie - Bring collaboration to your app',
-    images: [{ url: `${process.env.NEXT_PUBLIC_SITE_URL}/og.png` }],
-    url: process.env.NEXT_PUBLIC_SITE_URL,
+    images: [{ url: `/og.png` }],
+    url: '',
     description: 'Easily add collaboration to your apps with our API-based services.',
   },
   twitter: {
     card: 'summary_large_image',
     site: '@team_yorkie',
     title: 'Yorkie - Bring collaboration to your app',
-    images: [`${process.env.NEXT_PUBLIC_SITE_URL}/og.png`],
+    images: [`/og.png`],
     description: 'Easily add collaboration to your apps with our API-based services.',
   },
-  viewport: 'width=device-width, initial-scale=1, viewport-fit=cover',
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -50,7 +57,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         `}
       </Script>
       <body>
-        <UserStoreInitializer />
+        <ThemeInitializer />
         {children}
       </body>
     </html>

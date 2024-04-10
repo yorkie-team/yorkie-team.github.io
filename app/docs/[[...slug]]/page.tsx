@@ -142,7 +142,6 @@ export const generateStaticParams = () => {
     .map((slug) => ({
       slug: slug === 'index' ? [''] : slug.split('/'),
     }));
-  console.log(params);
 
   return params;
 };
