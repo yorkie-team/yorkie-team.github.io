@@ -3,7 +3,6 @@ import type { Metadata } from 'next';
 import Script from 'next/script';
 import ThemeInitializer from './_components/ThemeInitializer';
 import '@/styles/style.css';
-import type { Viewport } from 'next';
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL!),
@@ -35,12 +34,7 @@ export const metadata: Metadata = {
     images: [`/og.png`],
     description: 'Easily add collaboration to your apps with our API-based services.',
   },
-};
-
-export const viewport: Viewport = {
-  width: 'device-width',
-  initialScale: 1,
-  viewportFit: 'cover',
+  viewport: 'width=device-width, initial-scale=1, viewport-fit=cover',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
