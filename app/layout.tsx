@@ -2,6 +2,7 @@ import { prefix } from '@/utils/prefix';
 import type { Metadata } from 'next';
 import Script from 'next/script';
 import ThemeInitializer from './_components/ThemeInitializer';
+import { Viewport } from 'next';
 import '@/styles/style.css';
 
 export const metadata: Metadata = {
@@ -34,7 +35,12 @@ export const metadata: Metadata = {
     images: [`/og.png`],
     description: 'Easily add collaboration to your apps with our API-based services.',
   },
-  viewport: 'width=device-width, initial-scale=1, viewport-fit=cover',
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
