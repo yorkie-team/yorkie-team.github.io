@@ -129,8 +129,6 @@ export async function generateMetadata({ params }: Props) {
   };
 }
 
-export const dynamicParams = false;
-
 export const generateStaticParams = () => {
   const params = getSlugs()
     .filter((slug) => {
