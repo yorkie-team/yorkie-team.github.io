@@ -299,6 +299,22 @@ const unsubscribe = doc.subscribe('$.todos', (event) => {
 });
 ```
 
+##### Document.subscribe('all')
+
+You can subscribe to all events occurring in the document by using `document.subscribe('all', callback)`. This is used for displaying events in [Devtools extension](/docs/devtools).
+
+Events received from the callback function are of type `TransactionEvent`, which is an `Array<DocEvent>`. TransactionEvent represents a collection of events occurring within a single transaction (e.g., `doc.update()`).
+
+The `event.rawChange` value for `local-change` and `remote-change` events, and the `event.value.snapshot` for `snapshot` event, are set only when `enableDevtools` option is configured as `true`.
+
+```javascript
+const unsubscribe = doc.subscribe('all', (transactionEvent) => {
+  for (const docEvent of transactionEvent) {
+    console.log(docEvent);
+  }
+});
+```
+
 #### Changing Synchronization Mode
 
 To change the synchronization mode for a document, you can use `client.changeSyncMode(doc, syncMode)`.
