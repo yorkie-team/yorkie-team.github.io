@@ -156,64 +156,64 @@ for (const { clientID, presence } of users ) {
 Here is an example of showing a list of users participating in the collaborative application.
 - [Profile Stack](/examples/profile-stack)
 
-##### Document.subscribe("presence")
+##### Document.subscribe('presence')
 
 This method allows you to subscribe to all presence-related changes.
 By subscribing to these events, you can be notified when specific changes occur within the document, such as clients attaching, detaching, or modifying their presence.
 
 ```javascript
-const unsubscribe = doc.subscribe("presence", (event) => {
-  if (event.type === "initialized") {
+const unsubscribe = doc.subscribe('presence', (event) => {
+  if (event.type === 'initialized') {
     // Array of other users currently participating in the document
     // event.value;
   }
 
-  if (event.type === "watched") {
+  if (event.type === 'watched') {
     // A user has joined the document editing in online
     // event.value;
   }
 
-  if (event.type === "unwatched") {
+  if (event.type === 'unwatched') {
     // A user has left the document editing
     // event.value;
   }
 
-  if (event.type === "presence-changed") {
+  if (event.type === 'presence-changed') {
     // A user has updated their presence 
     // event.value;
   }
 });
 ```
 
-##### Document.subscribe("my-presence")
+##### Document.subscribe('my-presence')
 
 This method is specifically for subscribing to changes in the presence of the current client that has attached to the document.
 
 The possible event.type are: `initialized`, `presence-changed`.
 
 ```javascript
-const unsubscribe = doc.subscribe("my-presence", (event) => {
+const unsubscribe = doc.subscribe('my-presence', (event) => {
   // Do something
 });
 ```
 
-##### Document.subscribe("others")
+##### Document.subscribe('others')
 
 This method enables you to subscribe to changes in the presence of other clients participating in the document.
 
 The possible event.type are: `watched`, `unwatched`, `presence-changed`.
 
 ```javascript
-const unsubscribe = doc.subscribe("others", (event) => {
-  if (event.type === "watched") {
+const unsubscribe = doc.subscribe('others', (event) => {
+  if (event.type === 'watched') {
     addUser(event.value);
   }
 
-  if (event.type === "unwatched") {
+  if (event.type === 'unwatched') {
     removeUser(event.value);
   }
 
-  if (event.type === "presence-changed") {
+  if (event.type === 'presence-changed') {
     updateUser(event.value);
   }
 });
@@ -284,7 +284,7 @@ const unsubscribe = doc.subscribe((event) => {
 });
 ```
 
-##### Document.subscribe("$.path")
+##### Document.subscribe('$.path')
 
 Additionally, you can subscribe to changes for a specific path in the Document using `doc.subscribe(path, callback)` with a path argument, such as `$.todos`, where the `$` sign indicates the root of the document.
 The callback function is called when the target path and its nested values are changed.
