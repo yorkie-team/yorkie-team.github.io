@@ -26,24 +26,6 @@ await client.activate();
 
 > The API key is used to identify the project in Yorkie. You can get the API key of the project you created in the [Dashboard]({{DASHBOARD_PATH}}).
 
-#### Subscribing to Client events
-
-We can use `client.subscribe` to subscribe to client-based events, such as `status-changed`, `stream-connection-status-changed`.
-
-```javascript
-const unsubscribe = client.subscribe((event) => {
-  if (event.type === 'status-changed') {
-    console.log(event.value); // 'activated' or 'deactivated'
-  } else if (event.type === 'stream-connection-status-changed') {
-    console.log(event.value); // 'connected' or 'disconnected'
-  }
-});
-```
-
-By using the value of the `stream-connection-status-changed` event, it is possible to determine whether the Client is connected to the network.
-
-If you want to know about other client events, please refer to the [ClientEvent](https://yorkie.dev/yorkie-js-sdk/api-reference/yorkie-js-sdk.clientevent), and [ClientEventType](https://yorkie.dev/yorkie-js-sdk/api-reference/yorkie-js-sdk.clienteventtype).
-
 ### Document
 
 `Document` is a primary data type in Yorkie, which provides a JSON-like updating experience that makes it easy to represent your application's model.
@@ -296,6 +278,36 @@ const unsubscribe = doc.subscribe('$.todos', (event) => {
   // The callback will be called when the root.todos or any of its nested values change.
   const target = doc.getValueByPath('$.todos') // you can get the value by path 
   // Do something...
+});
+```
+
+##### Document.subscribe('connection')
+
+You can monitor the connection status of the document to the server.
+
+A callback function is called whenever the connection status changes.
+
+Possible `event.value` values are: `StreamConnectionStatus.Connected` and `StreamConnectionStatus.Disconnected`.
+
+When the watch stream is disconnected, it means that the user is offline and cannot receive updates from other users in real-time.
+
+```javascript
+const unsubscribe = doc.subscribe('connection', (event) => {
+  // Do something
+});
+```
+
+##### Document.subscribe('sync')
+
+You can track whether the document has been synchronized.
+
+A callback function is called whenever a synchronization occurs.
+
+Possible `event.value` values are: `DocumentSyncResultType.Synced` and `DocumentSyncResultType.SyncFailed`.
+
+```javascript
+const unsubscribe = doc.subscribe('sync', (event) => {
+  // Do something
 });
 ```
 
