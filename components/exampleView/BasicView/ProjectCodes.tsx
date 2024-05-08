@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useCallback, useState, useEffect } from 'react';
 import classNames from 'classnames';
 import type { FileInfo, DirectoryInfo, CodeInfo } from '@/utils/exampleFileUtils';

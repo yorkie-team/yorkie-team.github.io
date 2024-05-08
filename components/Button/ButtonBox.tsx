@@ -1,3 +1,5 @@
+'use client';
+
 /*
  * Copyright 2022 The Yorkie Authors. All rights reserved.
  *

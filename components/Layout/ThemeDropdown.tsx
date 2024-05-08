@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import { Popover, Icon } from 'components';

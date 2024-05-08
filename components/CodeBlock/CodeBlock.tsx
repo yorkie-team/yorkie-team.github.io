@@ -1,3 +1,5 @@
+'use client';
+
 import { ReactNode } from 'react';
 import { CopyButton, Button, Icon } from '@/components';
 import { PrismCodeProps, PrismCode } from './PrismCode';

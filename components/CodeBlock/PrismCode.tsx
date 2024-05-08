@@ -1,4 +1,4 @@
-import Highlight, { defaultProps, Language, Prism } from 'prism-react-renderer';
+import { Highlight, Language, Prism } from 'prism-react-renderer';
 import theme from './prismThemeLight';
 
 // NOTE(chacha912): By default prism-react-renderer only includes
@@ -19,7 +19,7 @@ export type PrismCodeProps = {
 
 export function PrismCode({ code, language, withLineNumbers }: PrismCodeProps) {
   return (
-    <Highlight {...defaultProps} code={code.trim()} theme={theme} language={language}>
+    <Highlight code={code.trim()} theme={theme} language={language}>
       {({ className, tokens, getLineProps, getTokenProps }) => (
         <pre className={className}>
           {tokens.map((line, i) => (

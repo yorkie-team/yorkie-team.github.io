@@ -1,13 +1,16 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import classNames from 'classnames';
 import { Popover, Icon } from 'components';
+import { usePathname } from 'next/navigation';
 
 export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
   const [gnbOpened, setGnbOpened] = useState(false);
   const [docsMenuOpened, setDocsMenuOpened] = useState(false);
-  const { asPath } = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     const handleResize = () => {
@@ -34,7 +37,7 @@ export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
             <li className="dropdown_item">
               <Link
                 href="/products"
-                className={classNames('dropdown_menu', { is_active: asPath.split('#')[0] === '/products' })}
+                className={classNames('dropdown_menu', { is_active: pathname?.split('#')[0] === '/products' })}
               >
                 <span className="dropdown_text">Products</span>
               </Link>
@@ -61,7 +64,7 @@ export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
                     <Link
                       href="/docs"
                       className={classNames('navigator_item', 'add_icon', {
-                        is_active: asPath.split('#')[0] === '/docs',
+                        is_active: pathname?.split('#')[0] === '/docs',
                       })}
                     >
                       About Yorkie
@@ -71,7 +74,7 @@ export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
                     <Link
                       href="/docs/getting-started"
                       className={classNames('navigator_item', 'add_icon', {
-                        is_active: asPath.startsWith(`/docs/getting-started`),
+                        is_active: pathname?.startsWith(`/docs/getting-started`),
                       })}
                     >
                       Getting Started
@@ -81,7 +84,7 @@ export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
                     <Link
                       href="/docs/js-sdk"
                       className={classNames('navigator_item', 'add_icon', {
-                        is_active: asPath.startsWith(`/docs/js-sdk`),
+                        is_active: pathname?.startsWith(`/docs/js-sdk`),
                       })}
                     >
                       JS SDK
@@ -91,7 +94,7 @@ export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
                     <Link
                       href="/docs/ios-sdk"
                       className={classNames('navigator_item', 'add_icon', {
-                        is_active: asPath.startsWith(`/docs/ios-sdk`),
+                        is_active: pathname?.startsWith(`/docs/ios-sdk`),
                       })}
                     >
                       iOS SDK
@@ -101,7 +104,7 @@ export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
                     <Link
                       href="/docs/android-sdk"
                       className={classNames('navigator_item', 'add_icon', {
-                        is_active: asPath.startsWith(`/docs/android-sdk`),
+                        is_active: pathname?.startsWith(`/docs/android-sdk`),
                       })}
                     >
                       Android SDK
@@ -111,7 +114,7 @@ export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
                     <Link
                       href="/docs/devtools"
                       className={classNames('navigator_item', 'add_icon', {
-                        is_active: asPath.startsWith(`/docs/devtools`),
+                        is_active: pathname?.startsWith(`/docs/devtools`),
                       })}
                     >
                       Devtools
@@ -121,7 +124,7 @@ export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
                     <Link
                       href="/docs/cli"
                       className={classNames('navigator_item', 'add_icon', {
-                        is_active: asPath.startsWith(`/docs/cli`),
+                        is_active: pathname?.startsWith(`/docs/cli`),
                       })}
                     >
                       CLI
@@ -131,7 +134,7 @@ export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
                     <Link
                       href="/docs/self-hosted-server"
                       className={classNames('navigator_item', 'add_icon', {
-                        is_active: asPath.startsWith(`/docs/self-hosted-server`),
+                        is_active: pathname?.startsWith(`/docs/self-hosted-server`),
                       })}
                     >
                       Self-Hosted Server
@@ -141,7 +144,7 @@ export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
                     <Link
                       href="/docs/internals"
                       className={classNames('navigator_item', 'add_icon', {
-                        is_active: asPath.startsWith(`/docs/internals`),
+                        is_active: pathname?.startsWith(`/docs/internals`),
                       })}
                     >
                       Internals
@@ -153,7 +156,7 @@ export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
             <li className="dropdown_item">
               <Link
                 href="/examples"
-                className={classNames('dropdown_menu', { is_active: asPath.split('#')[0] === '/examples' })}
+                className={classNames('dropdown_menu', { is_active: pathname?.split('#')[0] === '/examples' })}
               >
                 <span className="dropdown_text">Examples</span>
               </Link>
@@ -161,7 +164,7 @@ export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
             <li className="dropdown_item">
               <Link
                 href="/community"
-                className={classNames('dropdown_menu', { is_active: asPath.split('#')[0] === '/community' })}
+                className={classNames('dropdown_menu', { is_active: pathname?.split('#')[0] === '/community' })}
               >
                 <span className="dropdown_text">Community</span>
               </Link>
@@ -173,7 +176,7 @@ export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
                 <a
                   href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`}
                   className={classNames('dropdown_menu', {
-                    is_active: asPath.split('#')[0] === `${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`,
+                    is_active: pathname?.split('#')[0] === `${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`,
                   })}
                 >
                   <span className="dropdown_text">Dashboard</span>
@@ -185,7 +188,7 @@ export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
                   <a
                     href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/login`}
                     className={classNames('dropdown_menu', {
-                      is_active: asPath.split('#')[0] === `${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/login`,
+                      is_active: pathname?.split('#')[0] === `${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/login`,
                     })}
                   >
                     <span className="dropdown_text">Sign in</span>
@@ -195,7 +198,7 @@ export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
                   <a
                     href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup`}
                     className={classNames('dropdown_menu', {
-                      is_active: asPath.split('#')[0] === `${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup`,
+                      is_active: pathname?.split('#')[0] === `${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup`,
                     })}
                   >
                     <span className="dropdown_text">Start for free</span>

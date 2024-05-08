@@ -1,3 +1,5 @@
+'use client';
+
 /*
  * Copyright 2022 The Yorkie Authors. All rights reserved.
  *
@@ -99,4 +101,5 @@ export const Button = forwardRef((props: ButtonProps, ref) => {
 }) as any;
 
 Button.displayName = 'Button';
+
 Button.Box = ButtonBox;

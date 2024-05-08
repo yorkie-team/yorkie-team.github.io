@@ -1,3 +1,5 @@
+'use client';
+
 import { useUncontrolled } from '@/hooks';
 import { Icon } from '@/components';
 import { AccordionContextProvider } from './Accordion.context';

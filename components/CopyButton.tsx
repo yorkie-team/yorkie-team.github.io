@@ -1,3 +1,5 @@
+'use client';
+
 import { useClipboard } from 'hooks';
 
 export function CopyButton({
