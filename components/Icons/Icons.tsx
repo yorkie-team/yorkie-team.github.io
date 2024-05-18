@@ -23,7 +23,7 @@ import { FileIcon } from '@/components/Icons/icons/icon_file';
 import { PlusIcon } from '@/components/Icons/icons/icon_plus';
 import { ExpandIcon } from '@/components/Icons/icons/icon_expand';
 import { MinimizeIcon } from '@/components/Icons/icons/icon_minimize';
-
+import { LogoIcon } from '@/components/Icons/icons/logo';
 export {
   StarIcon,
   CopyIcon,
@@ -49,4 +49,5 @@ export {
   FolderIcon,
   FolderOpenIcon,
   FileIcon,
+  LogoIcon,
 };
