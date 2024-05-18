@@ -1,5 +1,5 @@
 export const CopyIcon = (props: any) => (
-  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+  <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
     <g clip-path="url(#clip0_3515_1439)">
       <path
         fill-rule="evenodd"
@@ -10,7 +10,7 @@ export const CopyIcon = (props: any) => (
     </g>
     <defs>
       <clipPath id="clip0_3515_1439">
-        <rect width="12" height="12" fill="white" />
+        <rect fill="white" />
       </clipPath>
     </defs>
   </svg>
