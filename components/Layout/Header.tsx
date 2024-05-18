@@ -22,7 +22,7 @@ export function Header(): ReactElement {
         <Heading as="h1">
           <span className="blind">Yorkie</span>
           <Box display={{ base: 'none', lg: 'block' }}>
-            <Link fontSize="8xl">
+            <Link href="/" fontSize="8xl">
               <LogoSVG />
             </Link>
           </Box>
