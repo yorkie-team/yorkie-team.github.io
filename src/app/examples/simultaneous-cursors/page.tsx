@@ -1,3 +1,4 @@
+'use client';
 import { NextPage } from 'next';
 import Head from 'next/head';
 import { ExampleLayout } from '@/components';
@@ -9,12 +10,12 @@ import {
   EXAMPLE_CODE_URL,
   EXAMPLE_PREVIEW_URL,
 } from '@/components/exampleView';
-import { FILE_INFO } from '@/examples/vanilla-quill/fileInfo';
+import { FILE_INFO } from '@/examples/simultaneous-cursors/fileInfo';
 
-const exampleKey = 'vanilla-quill';
-const exampleTitle = 'Quill';
+const exampleKey = 'simultaneous-cursors';
+const exampleTitle = 'Simultaneous Cursors';
 
-const QuillExampleView: NextPage = () => {
+const SimultaneousExampleView: NextPage = () => {
   return (
     <ExampleLayout breadcrumbTitle={exampleTitle}>
       {() => (
@@ -32,24 +33,25 @@ const QuillExampleView: NextPage = () => {
               <Sidebar.TabsPanel value="code">
                 <Sidebar.GuideTitle>{exampleTitle}</Sidebar.GuideTitle>
                 <Sidebar.GuideDescription>
-                  This demo shows the real-time collaborative version of the{' '}
-                  <a href="https://quilljs.com/" className="link" target="_blank" rel="noreferrer">
-                    Quill
-                  </a>{' '}
-                  editor with{' '}
+                  This demo shows the real-time collaborative version of simple drawing, cursor animation with{' '}
                   <a href="https://yorkie.dev/" className="link" target="_blank" rel="noreferrer">
                     Yorkie
                   </a>{' '}
                   and{' '}
-                  <a href="https://vitejs.dev/" className="link" target="_blank" rel="noreferrer">
-                    Vite
+                  <a
+                    href="https://reactjs.org/docs/create-a-new-react-app.html"
+                    className="link"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    React
                   </a>
                   .
                 </Sidebar.GuideDescription>
                 <ProjectCodes
                   files={FILE_INFO}
-                  activeFile="/src/main.ts"
-                  ignoreFiles={[...COMMON_IGNORE_FILES, '.env', 'vite.config.js', '/src/vite-env.d.ts']}
+                  activeFile="/src/App.jsx"
+                  ignoreFiles={[...COMMON_IGNORE_FILES, '.env']}
                 />
               </Sidebar.TabsPanel>
               <Sidebar.Bottom codeURL={EXAMPLE_CODE_URL + exampleKey} />
@@ -66,4 +68,4 @@ const QuillExampleView: NextPage = () => {
     </ExampleLayout>
   );
 };
-export default QuillExampleView;
+export default SimultaneousExampleView;

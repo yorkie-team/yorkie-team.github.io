@@ -1,19 +1,20 @@
-import { NextPage } from 'next';
-import Head from 'next/head';
+'use client';
 import { ExampleLayout } from '@/components';
 import {
-  Sidebar,
   BasicExampleView,
-  ProjectCodes,
   COMMON_IGNORE_FILES,
   EXAMPLE_CODE_URL,
   EXAMPLE_PREVIEW_URL,
+  ProjectCodes,
+  Sidebar,
 } from '@/components/exampleView';
-import { FILE_INFO } from '@/examples/profile-stack/fileInfo';
+import { FILE_INFO } from '@/examples/react-todomvc/fileInfo';
+import { NextPage } from 'next';
+import Head from 'next/head';
 
-const exampleKey = 'profile-stack';
-const exampleTitle = 'Profile Stack';
-const ProfileStackExampleView: NextPage = () => {
+const exampleKey = 'react-todomvc';
+const exampleTitle = 'TodoMVC';
+const TodoListExampleView: NextPage = () => {
   return (
     <ExampleLayout breadcrumbTitle={exampleTitle}>
       {() => (
@@ -31,13 +32,34 @@ const ProfileStackExampleView: NextPage = () => {
               <Sidebar.TabsPanel value="code">
                 <Sidebar.GuideTitle>{exampleTitle}</Sidebar.GuideTitle>
                 <Sidebar.GuideDescription>
-                  The profile stack shows the list of users currently accessing the Document. Try adding and deleting
-                  users to see how the profile stack changes.
+                  This is an example of real-time collaborative{' '}
+                  <a href="https://todomvc.com" className="link" target="_blank" rel="noreferrer">
+                    TodoMVC
+                  </a>{' '}
+                  using{' '}
+                  <a
+                    href="https://reactjs.org/docs/create-a-new-react-app.html"
+                    className="link"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    CreateReactApp
+                  </a>{' '}
+                  and{' '}
+                  <a
+                    href="https://github.com/yorkie-team/yorkie-js-sdk"
+                    className="link"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Yorkie JS SDK
+                  </a>
+                  .
                 </Sidebar.GuideDescription>
                 <ProjectCodes
                   files={FILE_INFO}
-                  activeFile="/main.js"
-                  ignoreFiles={[...COMMON_IGNORE_FILES, '.env', 'vite.config.js']}
+                  activeFile="/src/App.tsx"
+                  ignoreFiles={[...COMMON_IGNORE_FILES, '.env', '/src/vite-env.d.ts', 'tsconfig.node.json']}
                 />
               </Sidebar.TabsPanel>
               <Sidebar.Bottom codeURL={EXAMPLE_CODE_URL + exampleKey} />
@@ -48,7 +70,6 @@ const ProfileStackExampleView: NextPage = () => {
             apiKey={process.env.NEXT_PUBLIC_EXAMPLES_API_KEY || ''}
             documentKey={exampleKey}
             iframeURL={EXAMPLE_PREVIEW_URL + exampleKey}
-            userMaxCount={6}
           />
         </>
       )}
@@ -56,4 +77,4 @@ const ProfileStackExampleView: NextPage = () => {
   );
 };
 
-export default ProfileStackExampleView;
+export default TodoListExampleView;

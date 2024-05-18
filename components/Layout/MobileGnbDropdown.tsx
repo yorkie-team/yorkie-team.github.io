@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
+import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import classNames from 'classnames';
 import { Popover, Icon } from 'components';
@@ -7,7 +7,7 @@ import { Popover, Icon } from 'components';
 export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
   const [gnbOpened, setGnbOpened] = useState(false);
   const [docsMenuOpened, setDocsMenuOpened] = useState(false);
-  const { asPath } = useRouter();
+  const asPath = usePathname();
 
   useEffect(() => {
     const handleResize = () => {

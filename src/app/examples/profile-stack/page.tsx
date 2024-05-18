@@ -1,3 +1,4 @@
+'use client';
 import { NextPage } from 'next';
 import Head from 'next/head';
 import { ExampleLayout } from '@/components';
@@ -9,12 +10,11 @@ import {
   EXAMPLE_CODE_URL,
   EXAMPLE_PREVIEW_URL,
 } from '@/components/exampleView';
-import { FILE_INFO } from '@/examples/simultaneous-cursors/fileInfo';
+import { FILE_INFO } from '@/examples/profile-stack/fileInfo';
 
-const exampleKey = 'simultaneous-cursors';
-const exampleTitle = 'Simultaneous Cursors';
-
-const SimultaneousExampleView: NextPage = () => {
+const exampleKey = 'profile-stack';
+const exampleTitle = 'Profile Stack';
+const ProfileStackExampleView: NextPage = () => {
   return (
     <ExampleLayout breadcrumbTitle={exampleTitle}>
       {() => (
@@ -32,25 +32,13 @@ const SimultaneousExampleView: NextPage = () => {
               <Sidebar.TabsPanel value="code">
                 <Sidebar.GuideTitle>{exampleTitle}</Sidebar.GuideTitle>
                 <Sidebar.GuideDescription>
-                  This demo shows the real-time collaborative version of simple drawing, cursor animation with{' '}
-                  <a href="https://yorkie.dev/" className="link" target="_blank" rel="noreferrer">
-                    Yorkie
-                  </a>{' '}
-                  and{' '}
-                  <a
-                    href="https://reactjs.org/docs/create-a-new-react-app.html"
-                    className="link"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    React
-                  </a>
-                  .
+                  The profile stack shows the list of users currently accessing the Document. Try adding and deleting
+                  users to see how the profile stack changes.
                 </Sidebar.GuideDescription>
                 <ProjectCodes
                   files={FILE_INFO}
-                  activeFile="/src/App.jsx"
-                  ignoreFiles={[...COMMON_IGNORE_FILES, '.env']}
+                  activeFile="/main.js"
+                  ignoreFiles={[...COMMON_IGNORE_FILES, '.env', 'vite.config.js']}
                 />
               </Sidebar.TabsPanel>
               <Sidebar.Bottom codeURL={EXAMPLE_CODE_URL + exampleKey} />
@@ -61,10 +49,12 @@ const SimultaneousExampleView: NextPage = () => {
             apiKey={process.env.NEXT_PUBLIC_EXAMPLES_API_KEY || ''}
             documentKey={exampleKey}
             iframeURL={EXAMPLE_PREVIEW_URL + exampleKey}
+            userMaxCount={6}
           />
         </>
       )}
     </ExampleLayout>
   );
 };
-export default SimultaneousExampleView;
+
+export default ProfileStackExampleView;

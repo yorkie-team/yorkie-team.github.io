@@ -1,6 +1,7 @@
+'use client';
 import { NextPage } from 'next';
 import Head from 'next/head';
-import { ExampleLayout, CodeBlock } from '@/components';
+import { ExampleLayout } from '@/components';
 import {
   Sidebar,
   BasicExampleView,
@@ -9,13 +10,12 @@ import {
   EXAMPLE_CODE_URL,
   EXAMPLE_PREVIEW_URL,
 } from '@/components/exampleView';
-import { FILE_INFO } from '@/examples/vuejs-kanban/fileInfo';
-import { DOCUMENT_STRUCTURE } from '@/examples/vuejs-kanban/documentStructure';
+import { FILE_INFO } from '@/examples/vanilla-quill/fileInfo';
 
-const exampleKey = 'vuejs-kanban';
-const exampleTitle = 'Kanban Board';
-const KanbanExampleView: NextPage = () => {
-  // TODO(hackerwins): Uncomment the document structure view when the how it works is ready.
+const exampleKey = 'vanilla-quill';
+const exampleTitle = 'Quill';
+
+const QuillExampleView: NextPage = () => {
   return (
     <ExampleLayout breadcrumbTitle={exampleTitle}>
       {() => (
@@ -28,27 +28,30 @@ const KanbanExampleView: NextPage = () => {
               <Sidebar.Top>
                 <Sidebar.TabsList>
                   <Sidebar.TabsTab value="code">Code</Sidebar.TabsTab>
-                  {process.env.NODE_ENV === 'development' && (
-                    <Sidebar.TabsTab value="documentStructure">Document Structure</Sidebar.TabsTab>
-                  )}
                 </Sidebar.TabsList>
               </Sidebar.Top>
               <Sidebar.TabsPanel value="code">
                 <Sidebar.GuideTitle>{exampleTitle}</Sidebar.GuideTitle>
                 <Sidebar.GuideDescription>
-                  Kanban Board is a tool for managing tasks and workflow. It is a visual way to manage tasks and
-                  workflow.
+                  This demo shows the real-time collaborative version of the{' '}
+                  <a href="https://quilljs.com/" className="link" target="_blank" rel="noreferrer">
+                    Quill
+                  </a>{' '}
+                  editor with{' '}
+                  <a href="https://yorkie.dev/" className="link" target="_blank" rel="noreferrer">
+                    Yorkie
+                  </a>{' '}
+                  and{' '}
+                  <a href="https://vitejs.dev/" className="link" target="_blank" rel="noreferrer">
+                    Vite
+                  </a>
+                  .
                 </Sidebar.GuideDescription>
                 <ProjectCodes
                   files={FILE_INFO}
-                  activeFile="/src/App.vue"
-                  ignoreFiles={[...COMMON_IGNORE_FILES, '.env']}
+                  activeFile="/src/main.ts"
+                  ignoreFiles={[...COMMON_IGNORE_FILES, '.env', 'vite.config.js', '/src/vite-env.d.ts']}
                 />
-              </Sidebar.TabsPanel>
-              <Sidebar.TabsPanel value="documentStructure">
-                <div className="codeblock_box">
-                  <CodeBlock code={DOCUMENT_STRUCTURE} language="typescript" />
-                </div>
               </Sidebar.TabsPanel>
               <Sidebar.Bottom codeURL={EXAMPLE_CODE_URL + exampleKey} />
             </Sidebar.Tabs>
@@ -64,5 +67,4 @@ const KanbanExampleView: NextPage = () => {
     </ExampleLayout>
   );
 };
-
-export default KanbanExampleView;
+export default QuillExampleView;

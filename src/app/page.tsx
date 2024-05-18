@@ -1,8 +1,11 @@
-import { useState, useEffect } from 'react';
+'use client';
+import React, { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import { Layout, Button, Icon, CodeBlock, CodeBlockHeader, Accordion } from '@/components';
+import { Layout, CodeBlock, CodeBlockHeader } from '@/components';
+import { Button, Box, Icon, Heading, Text, Flex, Accordion } from 'yorkie-ui';
+import { StarIcon, BookIcon, MessageSquareIcon, TwinkleIcon, SmileIcon } from '@/components/Icons/Icons';
 import { ChartMotion, StateSharingMotion, ServerMotion, MainBannerMotion } from '@/components/motions';
 import UserGroupSVG from '@/public/assets/icons/icon_service_main_users_group.svg';
 import CollaboProfileSVG from '@/public/assets/icons/icon_collaborate_profile.svg';
@@ -16,7 +19,12 @@ const Home: NextPage = () => {
   const [bannerActive, setBannerActive] = useState(false);
   const [activeFeatureCard, setActiveFeatureCard] = useState<FeatureType>('profile');
   const [activeFeatureCode, setActiveFeatureCode] = useState({ type: 'js', info: FEATURES_CODE.profile.js });
-
+  const items = [
+    { label: 'React', value: 'react' },
+    { label: 'Solid', value: 'solid' },
+    { label: 'Svelte', value: 'svelte', disabled: true },
+    { label: 'Vue', value: 'vue' },
+  ];
   useEffect(() => {
     const handleVisualSize = () => {
       const $visual = document.querySelector('.kv_bg svg') as HTMLElement;
@@ -35,6 +43,21 @@ const Home: NextPage = () => {
     };
   }, []);
 
+  const onClickOne = (e: any) => {
+    const target = (e.target as Element).closest('.service_card_menu');
+    if (!target) return;
+
+    const featureType = target.getAttribute('data-item') as FeatureType;
+    const codeType = FEATURES_CODE[featureType].tabOrder[0];
+    setActiveFeatureCard(featureType);
+    setActiveFeatureCode({
+      type: codeType,
+      info: (FEATURES_CODE[featureType] as any)[codeType],
+    });
+  };
+  const handleClick = () => {
+    console.log('Button clicked');
+  };
   // TODO(hackerwins): Remove examples condition when examples are ready.
   return (
     <Layout className="main_page">
@@ -47,147 +70,180 @@ const Home: NextPage = () => {
             <MainBannerMotion bannerActive={bannerActive} />
           </div>
           <div className="inner">
-            <h2 className="title">
-              <span className="text">Bring</span>
-              <span className={classNames('point', { is_hover: bannerActive })}>
+            <Heading as="h2" align="center" fontWeight="bold" fontSize={{ base: 'sm', md: '5xl', lg: '8xl' }}>
+              Bring
+              <Box color="orange.default" className={classNames('point', { is_hover: bannerActive })}>
                 collaboration
-                <span className="bg"></span>
-              </span>
-              <span className="text">to your app</span>
-            </h2>
-            <Button.Box>
-              <a
-                href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`}
-                className="btn orange_0 btn_start"
-                onPointerOver={() => setBannerActive(true)}
-                onPointerOut={() => setBannerActive(false)}
-              >
-                <span className="bg"></span>
-                <Icon type="star" />
-                <span className="text">Start for free</span>
-              </a>
-            </Button.Box>
-            <p className="desc">
+                <Box className="bg"></Box>
+              </Box>
+              <Box className="text">to your app</Box>
+            </Heading>
+            <Button
+              as="link"
+              marginTop="10"
+              onClick={handleClick}
+              onPointerOver={() => setBannerActive(true)}
+              onPointerOut={() => setBannerActive(false)}
+              icon={<StarIcon />}
+              position="start"
+              size="xl"
+            >
+              Start for free
+            </Button>
+            <Text fontSize="md" fontWeight="semibold" marginTop="10">
               Unlock the full potential of real-time collaboration with open-source SDKs and API package.
-            </p>
+            </Text>
           </div>
         </section>
         <section className="section section_app">
-          <div className="align_box">
-            <div className="app_header">
-              <h2 className="tag_name">Extend Your App with Yorkie</h2>
+          <Box borderWidth="1px" borderRadius="2xl" overflow="hidden">
+            <Flex
+              borderWidth="1px"
+              borderBottom="1px"
+              justifyContent="space-between"
+              alignItems="center"
+              paddingInline="8"
+              paddingBlock="5"
+            >
+              <Heading align="center" as="h2" fontWeight="semibold" fontSize="xl">
+                Extend Your App with Yorkie
+              </Heading>
               <span className="icon">
                 <UserGroupSVG />
               </span>
-            </div>
+            </Flex>
             <div className="app_body">
-              <strong className="section_title">
-                Make your product
-                <br />
-                <span className="point">collaborative</span> in a flash!
-              </strong>
-              <p className="section_desc">
+              <Box zIndex="xs" position="relative">
+                <Text fontSize="6xl" fontWeight="semibold" align="center">
+                  Make your product
+                </Text>
+                <Box display="flex" justifyContent="center">
+                  <Text
+                    fontSize="6xl"
+                    fontWeight="semibold"
+                    position="relative"
+                    borderX="md"
+                    borderY="md"
+                    overflow="hidden"
+                    borderStyle="dashed"
+                    borderColor="orange.default"
+                    borderRadius="2xl"
+                    paddingInline="2"
+                    marginRight="3"
+                  >
+                    collaborative
+                  </Text>
+                  <Text fontSize="6xl" fontWeight="semibold" paddingTop="1">
+                    in a flash!
+                  </Text>
+                </Box>
+              </Box>
+              <Text
+                align="center"
+                color="black.a8"
+                fontWeight="semibold"
+                marginTop="8"
+                fontSize="md"
+                lineHeight="normal"
+              >
                 Easily add collaboration to your apps with our API-based services. <br /> Sign up now and start building
                 powerful, high-performance collaborative features in no time.
-              </p>
-              <Button.Box>
-                <Button as="link" href="/docs/getting-started" className="orange_0" icon={<Icon type="book" />}>
+              </Text>
+              <Flex gap="6" marginTop="12" justifyContent="center">
+                <Button as="link" href="/docs/getting-started" icon={<BookIcon />} position="start" size="xl">
                   Getting Started
                 </Button>
-                <Button as="link" href="/docs" outline icon={<Icon type="book" />}>
+                <Button as="link" href="/docs" variant="outline" icon={<BookIcon />} position="start" size="xl">
                   Read documentation
                 </Button>
-              </Button.Box>
+              </Flex>
             </div>
-          </div>
+          </Box>
         </section>
         <section className="section">
-          <h2 className="section_title">
+          <Text fontSize="6xl" fontWeight="semibold" align="center">
             Variety of <br className="br_mo" /> collaboration features <br /> for your app
-          </h2>
-          <p className="section_desc">
+          </Text>
+          <Text align="center" color="black.a8" fontWeight="semibold" marginTop="8" fontSize="md" lineHeight="normal">
             Easily add stable and diverse collaborative features <br className="br_mo" />
             to your product with Yorkie. <br />
             Transform your local-based product into a <br className="br_mo" /> collaborative online experience with our
             powerful tools. <br />
             Sign up now and start providing your users <br className="br_mo" /> with a completely new real-time
             experience.
-          </p>
+          </Text>
           <div className="section_content">
-            <ul
-              className="service_card_list"
-              onClick={(e) => {
-                const target = (e.target as Element).closest('.service_card_menu');
-                if (!target) return;
-
-                const featureType = target.getAttribute('data-item') as FeatureType;
-                const codeType = FEATURES_CODE[featureType].tabOrder[0];
-                setActiveFeatureCard(featureType);
-                setActiveFeatureCode({
-                  type: codeType,
-                  info: (FEATURES_CODE[featureType] as any)[codeType],
-                });
-              }}
-            >
-              <li className={classNames('service_card_item', { is_active: activeFeatureCard === 'profile' })}>
+            <Box className="service_card_list">
+              <div
+                onClick={(e) => onClickOne(e)}
+                className={classNames('service_card_item', { is_active: activeFeatureCard === 'profile' })}
+              >
                 <button type="button" className="service_card_menu" data-item="profile">
                   <span className="img_box">
                     <CollaboProfileSVG />
                   </span>
-                  <strong className="service_card_title">Profile Stack</strong>
-                  <span className="service_card_desc">
+                  <Text fontSize="xl" fontWeight="semibold" paddingTop="28">
+                    Profile Stack
+                  </Text>
+                  <Text fontSize="sm" lineHeight="normal" marginTop="4">
                     The Profile Stack feature shows the profile of the current users in real-time to announce that
                     multiple users are connected at the same time.
-                  </span>
+                  </Text>
                 </button>
-              </li>
-              <li className={classNames('service_card_item', { is_active: activeFeatureCard === 'cursor' })}>
-                <button type="button" className="service_card_menu" data-item="cursor">
+              </div>
+              <div className={classNames('service_card_item', { is_active: activeFeatureCard === 'cursor' })}>
+                <Box className="service_card_menu" data-item="cursor">
                   <span className="img_box">
                     <CollaboCursorSVG />
                   </span>
-                  <strong className="service_card_title">Multi-Cursor</strong>
-                  <span className="service_card_desc">
+                  <Text fontSize="xl" fontWeight="semibold" paddingTop="28">
+                    Multi-Cursor
+                  </Text>
+                  <Text fontSize="sm" lineHeight="normal" marginTop="4">
                     The Multi-Cursor shows the location of the cursor of the users who accessed the same canvas in
                     real-time. Each cursor shows the user&#39;s nickname and role as needed.
-                  </span>
-                </button>
-              </li>
-              {process.env.NODE_ENV === 'development' && (
+                  </Text>
+                </Box>
+              </div>
+              {/* {process.env.NODE_ENV === 'development' && (
                 <>
                   <li className={classNames('service_card_item', { is_active: activeFeatureCard === 'selection' })}>
-                    <button type="button" className="service_card_menu" data-item="selection">
+                    <Box className="service_card_menu" data-item="selection">
                       <span className="img_box">
                         <CollaboSelectionSVG />
                       </span>
-                      <strong className="service_card_title">Live Selection</strong>
-                      <span className="service_card_desc">
+                      <Text fontSize="xl" fontWeight="semibold" paddingTop="28">
+                        Live Selection
+                      </Text>
+                      <Text fontSize="sm" lineHeight="normal" marginTop="4">
                         Live Selection displays the object selected by each user who accesses the same canvas. Users can
                         see what each other is doing in real-time.
-                      </span>
-                    </button>
+                      </Text>
+                    </Box>
                   </li>
                   <li className={classNames('service_card_item', { is_active: activeFeatureCard === 'editing' })}>
-                    <button type="button" className="service_card_menu" data-item="editing">
+                    <Box className="service_card_menu" data-item="editing">
                       <span className="img_box">
                         <CollaboEditingSVG />
                       </span>
-                      <strong className="service_card_title">Multiplayer Editing</strong>
-                      <span className="service_card_desc">
+                      <Text fontSize="xl" fontWeight="semibold" paddingTop="28">
+                        Multiplayer Editing
+                      </Text>
+                      <Text fontSize="sm" lineHeight="normal" marginTop="4">
                         Interact in real-time with the presence of others and edit material together. Any real-time
                         interaction, such as texting, drawing, commenting, or expressing emotion, could be shared with
                         Yorkie.
-                      </span>
-                    </button>
+                      </Text>
+                    </Box>
                   </li>
                 </>
-              )}
-            </ul>
+              )} */}
+            </Box>
             <CodeBlock.Wrapper>
               <CodeBlockHeader>
                 <CodeBlockHeader.LeftBox>
                   {FEATURES_CODE[activeFeatureCard].tabOrder.map((codeType) => (
-                    <button
+                    <Button
                       type="button"
                       key={codeType}
                       className={classNames('btn_item', { is_active: activeFeatureCode.type === codeType })}
@@ -199,7 +255,7 @@ const Home: NextPage = () => {
                       }
                     >
                       {(FEATURES_CODE[activeFeatureCard] as any)[codeType].title}
-                    </button>
+                    </Button>
                   ))}
                 </CodeBlockHeader.LeftBox>
                 <CodeBlockHeader.RightBox>
@@ -214,7 +270,7 @@ const Home: NextPage = () => {
             </CodeBlock.Wrapper>
           </div>
         </section>
-        {process.env.NODE_ENV === 'development' && (
+        {/* {process.env.NODE_ENV === 'development' && (
           <section className="section">
             <h2 className="section_title">
               What experiences <br />
@@ -226,21 +282,19 @@ const Home: NextPage = () => {
               <div className="draw_box"></div>
               <div className="draw_box"></div>
             </div>
-            <Button.Box>
-              <Button as="link" href="/examples" className="orange_0" icon={<Icon type="bulb" />}>
-                View all examples
-              </Button>
-            </Button.Box>
+            <Button as="link" href="/examples" className="orange_0" icon={<Icon type="bulb" />}>
+              View all examples
+            </Button>
           </section>
-        )}
+        )} */}
         <section className="section">
-          <h2 className="section_title">
+          <Heading as="h2" fontSize="6xl" fontWeight="semibold" align="center">
             Stable.
             <br />
             Reliable.
             <br />
             Manageable.
-          </h2>
+          </Heading>
           <div className="section_content">
             <ul className="horizon_list">
               <li className="horizon_item">
@@ -248,18 +302,23 @@ const Home: NextPage = () => {
                   <StateSharingMotion />
                 </div>
                 <div className="text_box">
-                  <strong className="title">Document and Presence</strong>
-                  <p className="desc">
+                  <Text fontSize="2xl" fontWeight="semibold" color="black.a9">
+                    Document and Presence
+                  </Text>
+                  <Text fontSize="md" marginTop="6" fontWeight="medium" color="black.a9">
                     Document is stored using conflict-free replicated data types(CRDTs), which ensures that multiple
                     users can edit the same data concurrently without encountering conflicts. Presence represents a
                     peer&apos;s awareness of the data being edited. It is used to track which users are currently
                     editing the document.
-                  </p>
+                  </Text>
                   <Button
                     as="link"
                     href="/products#document-and-presence"
-                    className="gray800"
-                    icon={<Icon type="book" />}
+                    backgroundColor="black.a9"
+                    icon={<BookIcon />}
+                    position="start"
+                    size="lg"
+                    marginTop="6"
                   >
                     Learn more about Document and Presence
                   </Button>
@@ -270,13 +329,23 @@ const Home: NextPage = () => {
                   <ChartMotion />
                 </div>
                 <div className="text_box">
-                  <strong className="title">Data Warehouse with Dashboard</strong>
-                  <p className="desc">
+                  <Text fontSize="xl" fontWeight="semibold" color="black.a9">
+                    Data Warehouse with Dashboard
+                  </Text>
+                  <Text fontSize="md" marginTop="6" fontWeight="medium" color="black.a9">
                     Dashboard allows users to easily browse stored documents and monitor the data warehouse in
                     real-time. With Dashboard, users can quickly and easily supervise the data warehouse and ensure that
                     it is functioning properly.
-                  </p>
-                  <Button as="link" href="/products#dashboard" className="gray800" icon={<Icon type="book" />}>
+                  </Text>
+                  <Button
+                    as="link"
+                    href="/products#dashboard"
+                    backgroundColor="black.a9"
+                    icon={<BookIcon />}
+                    position="start"
+                    size="lg"
+                    marginTop="6"
+                  >
                     Learn more about Dashboard
                   </Button>
                 </div>
@@ -286,13 +355,23 @@ const Home: NextPage = () => {
                   <ServerMotion />
                 </div>
                 <div className="text_box">
-                  <strong className="title">Cloud or Self-Hosted Server</strong>
-                  <p className="desc">
+                  <Text fontSize="xl" fontWeight="semibold" color="black.a9">
+                    Cloud or Self-Hosted Server
+                  </Text>
+                  <Text fontSize="md" marginTop="6" fontWeight="medium" color="black.a9">
                     Yorkie offers flexible deployment options, allowing user to use a cloud or host the server on your
                     own premises. Whether you want the convenience of cloud or the control of a self-hosted server,
                     Yorkie has you covered.
-                  </p>
-                  <Button as="link" href="/products#self-hosted-server" className="gray800" icon={<Icon type="book" />}>
+                  </Text>
+                  <Button
+                    as="link"
+                    href="/products#self-hosted-server"
+                    backgroundColor="black.a9"
+                    icon={<BookIcon />}
+                    position="start"
+                    size="lg"
+                    marginTop="6"
+                  >
                     Learn more about Self-Hosted Server
                   </Button>
                 </div>
@@ -301,28 +380,40 @@ const Home: NextPage = () => {
           </div>
         </section>
         <section className="section section_faq">
-          <h2 className="section_title">FAQ</h2>
-          <div className="section_content">
-            <Accordion defaultValue={[]} multiple icon={null}>
-              <Accordion.Item value="faq1">
-                <Accordion.Control>
-                  <Icon type="messageSquare" />
-                  Can we use the Yorkie for free?
-                </Accordion.Control>
-                <Accordion.Panel>
+          <Heading as="h2" fontSize="6xl" align="center">
+            FAQ
+          </Heading>
+          <Accordion.Root collapsible marginTop="14">
+            <Accordion.Item value="question-one">
+              <Accordion.ItemTrigger>
+                <Flex alignItems="center" gap="3">
+                  <Icon icon={<MessageSquareIcon />} position="start" size="lg" />
+                  <Text color="black.a8" size="3xl">
+                    Can we use the Yorkie for free?
+                  </Text>
+                </Flex>
+              </Accordion.ItemTrigger>
+              <Accordion.ItemContent>
+                <Text size="md" lineHeight="normal" color="black.a11">
                   Yes, Yorkie is free to use. <br />
                   <br />
                   You can access it at no cost. Please note that the availability of the service and any associated
                   features may be subject to change without notice. It is always a good idea to check the latest
                   information on the service&apos;s website to ensure that it is still available and meets your needs.
-                </Accordion.Panel>
-              </Accordion.Item>
-              <Accordion.Item value="faq2">
-                <Accordion.Control>
-                  <Icon type="messageSquare" />
-                  Is the Yorkie production ready?
-                </Accordion.Control>
-                <Accordion.Panel>
+                </Text>
+              </Accordion.ItemContent>
+            </Accordion.Item>
+            <Accordion.Item value="question-two">
+              <Accordion.ItemTrigger>
+                <Flex alignItems="center" gap="3">
+                  <Icon icon={<MessageSquareIcon />} position="start" size="lg" />
+                  <Text color="black.a8" size="3xl">
+                    Is the Yorkie production ready?
+                  </Text>
+                </Flex>
+              </Accordion.ItemTrigger>
+              <Accordion.ItemContent>
+                <Text size="md" lineHeight="normal" color="black.a11">
                   No, Yorkie is not yet production ready. <br />
                   <br />
                   While the CRDT algorithm has been verified, not all of the code has been fully battle-tested. The
@@ -331,14 +422,20 @@ const Home: NextPage = () => {
                   service&apos;s capabilities and reliability before using it in a production setting. It is also
                   important to note that the availability and features of the service may change without notice, so it
                   is always best to check the latest information on the service&apos;s website before using it.
-                </Accordion.Panel>
-              </Accordion.Item>
-              <Accordion.Item value="faq3">
-                <Accordion.Control>
-                  <Icon type="messageSquare" />
-                  How can I contribute to the Yorkie project?
-                </Accordion.Control>
-                <Accordion.Panel>
+                </Text>
+              </Accordion.ItemContent>
+            </Accordion.Item>
+            <Accordion.Item value="question-three">
+              <Accordion.ItemTrigger>
+                <Flex alignItems="center" gap="3">
+                  <Icon icon={<MessageSquareIcon />} position="start" size="lg" />
+                  <Text color="black.a8" size="3xl">
+                    How can I contribute to the Yorkie project?
+                  </Text>
+                </Flex>
+              </Accordion.ItemTrigger>
+              <Accordion.ItemContent>
+                <Text size="md" lineHeight="normal" color="black.a11">
                   Yorkie is an open source project, so there are many ways to contribute to its development. <br />
                   <br />
                   One way to contribute is by reporting any bugs you encounter while using the service. You can also
@@ -350,30 +447,31 @@ const Home: NextPage = () => {
                     <a href="https://discord.com/invite/MVEAwz9sBy">Discord</a>
                   </u>
                   .
-                </Accordion.Panel>
-              </Accordion.Item>
-            </Accordion>
-          </div>
-          <Button.Box>
+                </Text>
+              </Accordion.ItemContent>
+            </Accordion.Item>
+          </Accordion.Root>
+          <Flex gap="6" marginTop="16" justifyContent="center">
             <Button
-              as="a"
+              as="link"
               href="https://discord.gg/MVEAwz9sBy"
-              outline
-              icon={<Icon type="smile" />}
-              target="_blank"
-              rel="noreferrer"
+              variant="outline"
+              icon={<SmileIcon />}
+              position="start"
+              size="xl"
             >
               Contact
             </Button>
             <Button
-              as="a"
+              as="link"
               href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`}
-              className="orange_0 btn_start"
-              icon={<Icon type="twinkle" />}
+              icon={<TwinkleIcon />}
+              position="start"
+              size="xl"
             >
               Start for free
             </Button>
-          </Button.Box>
+          </Flex>
         </section>
       </div>
     </Layout>

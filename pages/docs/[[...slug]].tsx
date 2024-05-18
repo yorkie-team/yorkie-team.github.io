@@ -68,7 +68,6 @@ export default function DocsPage({
     });
     setHeadingTops(headingTops);
   }, [headings]);
-
   useEffect(() => {
     setHeadings(Array.from(document.querySelectorAll('.documentation_page .heading')));
   }, [source]);

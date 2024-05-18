@@ -1,12 +1,17 @@
-import { useEffect } from 'react';
-import type { AppProps } from 'next/app';
+'use client';
+
+import React, { useEffect } from 'react';
 import Head from 'next/head';
 import Script from 'next/script';
 import '@/styles/style.css';
 import { prefix } from '@/utils/prefix';
 import { ThemeOption, useTheme } from '@/hooks/useTheme';
 
-function MyApp({ Component, pageProps }: AppProps) {
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   const { setTheme } = useTheme();
   useEffect(() => {
     const themeOption = (window.localStorage.getItem('theme') || 'system') as ThemeOption;
@@ -14,7 +19,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   }, [setTheme]);
 
   return (
-    <>
+    <html lang="en">
       <Head>
         <link rel="icon" href={`${prefix}/favicon.ico`} />
         <link rel="icon" type="image/png" sizes="16x16" href={`${prefix}/favicon-16x16.png`} />
@@ -47,9 +52,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           gtag('config', 'G-7KXWLDH8CH');
         `}
       </Script>
-      <Component {...pageProps} />
-    </>
+      <body>{children}</body>
+    </html>
   );
 }
-
-export default MyApp;

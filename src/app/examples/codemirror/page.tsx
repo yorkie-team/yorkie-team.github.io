@@ -1,19 +1,20 @@
+'use client';
+import { NextPage } from 'next';
+import Head from 'next/head';
 import { ExampleLayout } from '@/components';
 import {
+  Sidebar,
   BasicExampleView,
+  ProjectCodes,
   COMMON_IGNORE_FILES,
   EXAMPLE_CODE_URL,
   EXAMPLE_PREVIEW_URL,
-  ProjectCodes,
-  Sidebar,
 } from '@/components/exampleView';
-import { FILE_INFO } from '@/examples/react-todomvc/fileInfo';
-import { NextPage } from 'next';
-import Head from 'next/head';
+import { FILE_INFO } from '@/examples/vanilla-codemirror6/fileInfo';
 
-const exampleKey = 'react-todomvc';
-const exampleTitle = 'TodoMVC';
-const TodoListExampleView: NextPage = () => {
+const exampleKey = 'vanilla-codemirror6';
+const exampleTitle = 'CodeMirror';
+const CodemirrorExampleView: NextPage = () => {
   return (
     <ExampleLayout breadcrumbTitle={exampleTitle}>
       {() => (
@@ -31,34 +32,20 @@ const TodoListExampleView: NextPage = () => {
               <Sidebar.TabsPanel value="code">
                 <Sidebar.GuideTitle>{exampleTitle}</Sidebar.GuideTitle>
                 <Sidebar.GuideDescription>
-                  This is an example of real-time collaborative{' '}
-                  <a href="https://todomvc.com" className="link" target="_blank" rel="noreferrer">
-                    TodoMVC
+                  This is a real-time collaborative example of the{' '}
+                  <a href="https://codemirror.net/" className="link" target="_blank" rel="noreferrer">
+                    CodeMirror 6
                   </a>{' '}
-                  using{' '}
-                  <a
-                    href="https://reactjs.org/docs/create-a-new-react-app.html"
-                    className="link"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    CreateReactApp
-                  </a>{' '}
-                  and{' '}
-                  <a
-                    href="https://github.com/yorkie-team/yorkie-js-sdk"
-                    className="link"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Yorkie JS SDK
+                  editor. It uses the{' '}
+                  <a href="https://yorkie.dev/docs/js-sdk#text" className="link" target="_blank" rel="noreferrer">
+                    Text
                   </a>
-                  .
+                  , a custom CRDT type from Yorkie.
                 </Sidebar.GuideDescription>
                 <ProjectCodes
                   files={FILE_INFO}
-                  activeFile="/src/App.tsx"
-                  ignoreFiles={[...COMMON_IGNORE_FILES, '.env', '/src/vite-env.d.ts', 'tsconfig.node.json']}
+                  activeFile="/src/main.ts"
+                  ignoreFiles={[...COMMON_IGNORE_FILES, '.env', 'vite.config.js', '/src/vite-env.d.ts']}
                 />
               </Sidebar.TabsPanel>
               <Sidebar.Bottom codeURL={EXAMPLE_CODE_URL + exampleKey} />
@@ -76,4 +63,4 @@ const TodoListExampleView: NextPage = () => {
   );
 };
 
-export default TodoListExampleView;
+export default CodemirrorExampleView;
