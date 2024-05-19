@@ -304,13 +304,13 @@ const Home: NextPage = () => {
             <br />
             Manageable.
           </Heading>
-          <Grid gridTemplateColumns={6} justifyContent="space-between" marginTop="24">
-            <GridItem gridColumnStart={1} gridColumnEnd={5} gridColumn={4}>
-              <Box>
+          <Grid gridTemplateColumns={10} justifyContent="space-between" marginTop="24">
+            <GridItem gridColumnStart={1} gridColumnEnd={10} gridColumn={6}>
+              <Flex>
                 <StateSharingMotion />
-              </Box>
+              </Flex>
             </GridItem>
-            <GridItem gridColumnStart={6} gridColumnEnd={12} gridColumn={2}>
+            <GridItem gridColumnStart={11} gridColumnEnd={12} gridColumn={3}>
               <Box>
                 <Text fontSize="2xl" fontWeight="semibold" color="black.a9">
                   Document and Presence
@@ -335,13 +335,13 @@ const Home: NextPage = () => {
               </Box>
             </GridItem>
           </Grid>
-          <Grid gridTemplateColumns={6} justifyContent="space-between" marginTop="24">
-            <GridItem gridColumnStart={1} gridColumnEnd={5} gridColumn={4}>
+          <Grid gridTemplateColumns={10} justifyContent="space-between" marginTop="24">
+            <GridItem gridColumnStart={1} gridColumnEnd={10} gridColumn={6}>
               <Box>
                 <ChartMotion />
               </Box>
             </GridItem>
-            <GridItem gridColumnStart={6} gridColumnEnd={12} gridColumn={2}>
+            <GridItem gridColumnStart={11} gridColumnEnd={12} gridColumn={3}>
               <Box>
                 <Text fontSize="xl" fontWeight="semibold" color="black.a9">
                   Data Warehouse with Dashboard
@@ -365,13 +365,13 @@ const Home: NextPage = () => {
               </Box>
             </GridItem>
           </Grid>
-          <Grid gridTemplateColumns={6} justifyContent="space-between" marginTop="24">
-            <GridItem gridColumnStart={1} gridColumnEnd={5} gridColumn={4}>
+          <Grid gridTemplateColumns={10} justifyContent="space-between" marginTop="24">
+            <GridItem gridColumnStart={1} gridColumnEnd={10} gridColumn={6}>
               <Box>
                 <ServerMotion />
               </Box>
             </GridItem>
-            <GridItem gridColumnStart={6} gridColumnEnd={12} gridColumn={2}>
+            <GridItem gridColumnStart={11} gridColumnEnd={12} gridColumn={3}>
               <Box>
                 <Text fontSize="xl" fontWeight="semibold" color="black.a9">
                   Cloud or Self-Hosted Server
