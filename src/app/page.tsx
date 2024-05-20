@@ -26,21 +26,19 @@ const Home: NextPage = () => {
     { label: 'Vue', value: 'vue' },
   ];
   useEffect(() => {
-    const handleVisualSize = () => {
-      const $visual = document.querySelector('.homepage svg') as HTMLElement;
-      if (!$visual) return;
-
-      const SVG_ASPECT_RATIO = 1512 / 868;
-      const HEADER_HEIGHT = 64;
-      const scale = window.innerWidth / ((window.innerHeight - HEADER_HEIGHT) * SVG_ASPECT_RATIO);
-      $visual.style.setProperty('scale', scale < 1 ? '1' : `${scale}`);
-    };
-    window.addEventListener('resize', handleVisualSize);
-    handleVisualSize();
-
-    return () => {
-      window.removeEventListener('resize', handleVisualSize);
-    };
+    // const handleVisualSize = () => {
+    //   const $visual = document.querySelector('.homepage svg') as HTMLElement;
+    //   if (!$visual) return;
+    //   const SVG_ASPECT_RATIO = 1512 / 868;
+    //   const HEADER_HEIGHT = 64;
+    //   const scale = window.innerWidth / ((window.innerHeight - HEADER_HEIGHT) * SVG_ASPECT_RATIO);
+    //   $visual.style.setProperty('scale', scale < 1 ? '1' : `${scale}`);
+    // };
+    // window.addEventListener('resize', handleVisualSize);
+    // handleVisualSize();
+    // return () => {
+    //   window.removeEventListener('resize', handleVisualSize);
+    // };
   }, []);
 
   const onClickOne = (e: any) => {
@@ -65,7 +63,7 @@ const Home: NextPage = () => {
         <title>Yorkie</title>
       </Head>
 
-      <Box position="relative">
+      <Box position="relative" overflow="hidden">
         <Box margin="auto" width="screen" className="homepage">
           <MainBannerMotion bannerActive={bannerActive} />
         </Box>
