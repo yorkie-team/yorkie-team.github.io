@@ -25,6 +25,7 @@ import { ExpandIcon } from '@/components/Icons/icons/icon_expand';
 import { MinimizeIcon } from '@/components/Icons/icons/icon_minimize';
 import { ArrowLeftIcon } from '@/components/Icons/icons/icon_arrow_left';
 import { ArrowRightIcon } from '@/components/Icons/icons/icon_arrow_right';
+import { LogoIcon } from '@/components/Icons/icons/logo';
 export {
   StarIcon,
   CopyIcon,
@@ -52,4 +53,5 @@ export {
   FileIcon,
   ArrowLeftIcon,
   ArrowRightIcon,
+  LogoIcon,
 };
