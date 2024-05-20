@@ -11,7 +11,7 @@ import { HoverCardPositioner } from '@ark-ui/react';
 
 const Examples: NextPage = () => {
   return (
-    <Layout className="examples_page">
+    <Layout>
       <Container
         margin="auto"
         width={{ sm: 'breakpoint-sm', md: 'breakpoint-md', lg: 'breakpoint-lg', xl: 'breakpoint-xl' }}
@@ -45,6 +45,7 @@ const Examples: NextPage = () => {
       </Container>
       <Box borderWidth="1px" borderBottom="1px" marginTop="28" />
       <Container
+        paddingBottom="40"
         margin="auto"
         width={{ sm: 'breakpoint-sm', md: 'breakpoint-md', lg: 'breakpoint-lg', xl: 'breakpoint-xl' }}
       >
