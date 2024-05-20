@@ -17,7 +17,14 @@ export function Header(): ReactElement {
   }, [setIsLoggedIn]);
 
   return (
-    <Flex justifyContent="space-between" paddingLeft="6" alignItems="center" position="sticky" height="20">
+    <Flex
+      justifyContent="space-between"
+      paddingLeft="6"
+      alignItems="center"
+      position="sticky"
+      height="20"
+      zIndex="10xl"
+    >
       <Flex gap="12">
         <Heading as="h1">
           <span className="blind">Yorkie</span>
