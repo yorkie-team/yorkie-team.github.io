@@ -26,24 +26,6 @@ await client.activate();
 
 > The API key is used to identify the project in Yorkie. You can get the API key of the project you created in the [Dashboard]({{DASHBOARD_PATH}}).
 
-#### Subscribing to Client events
-
-We can use `client.subscribe` to subscribe to client-based events, such as `status-changed`, `stream-connection-status-changed`.
-
-```javascript
-const unsubscribe = client.subscribe((event) => {
-  if (event.type === 'status-changed') {
-    console.log(event.value); // 'activated' or 'deactivated'
-  } else if (event.type === 'stream-connection-status-changed') {
-    console.log(event.value); // 'connected' or 'disconnected'
-  }
-});
-```
-
-By using the value of the `stream-connection-status-changed` event, it is possible to determine whether the Client is connected to the network.
-
-If you want to know about other client events, please refer to the [ClientEvent](https://yorkie.dev/yorkie-js-sdk/api-reference/yorkie-js-sdk.clientevent), and [ClientEventType](https://yorkie.dev/yorkie-js-sdk/api-reference/yorkie-js-sdk.clienteventtype).
-
 ### Document
 
 `Document` is a primary data type in Yorkie, which provides a JSON-like updating experience that makes it easy to represent your application's model.
@@ -72,12 +54,12 @@ This ensures that any modifications made by one client are instantly propagated 
 
 The second argument is options.
 - `initialPresence`: Sets the initial presence of the client that attaches the document. The presence is shared with other users participating in the document. It must be serializable to JSON.
-- `isRealtimeSync`(Optional): Specifies whether to enable real-time synchronization. The default value is `true`, which means synchronization occurs automatically. If set to `false`, you should manually control the synchronization.
+- `syncMode`(Optional): Specifies synchronization modes. The default value is `SyncMode.Realtime`, which automatically pushes and pulls changes. If you set it to `SyncMode.Manual`, you'll need to manually handle synchronization.
 
 ```javascript
 await client.attach(doc, {
   initialPresence: { color: 'blue', cursor: { x: 0, y: 0 } },
-  isRealtimeSync: true,
+  syncMode: SyncMode.Manual,
 });
 ```
 
@@ -156,64 +138,64 @@ for (const { clientID, presence } of users ) {
 Here is an example of showing a list of users participating in the collaborative application.
 - [Profile Stack](/examples/profile-stack)
 
-##### Document.subscribe("presence")
+##### Document.subscribe('presence')
 
 This method allows you to subscribe to all presence-related changes.
 By subscribing to these events, you can be notified when specific changes occur within the document, such as clients attaching, detaching, or modifying their presence.
 
 ```javascript
-const unsubscribe = doc.subscribe("presence", (event) => {
-  if (event.type === "initialized") {
+const unsubscribe = doc.subscribe('presence', (event) => {
+  if (event.type === 'initialized') {
     // Array of other users currently participating in the document
     // event.value;
   }
 
-  if (event.type === "watched") {
+  if (event.type === 'watched') {
     // A user has joined the document editing in online
     // event.value;
   }
 
-  if (event.type === "unwatched") {
+  if (event.type === 'unwatched') {
     // A user has left the document editing
     // event.value;
   }
 
-  if (event.type === "presence-changed") {
+  if (event.type === 'presence-changed') {
     // A user has updated their presence 
     // event.value;
   }
 });
 ```
 
-##### Document.subscribe("my-presence")
+##### Document.subscribe('my-presence')
 
 This method is specifically for subscribing to changes in the presence of the current client that has attached to the document.
 
 The possible event.type are: `initialized`, `presence-changed`.
 
 ```javascript
-const unsubscribe = doc.subscribe("my-presence", (event) => {
+const unsubscribe = doc.subscribe('my-presence', (event) => {
   // Do something
 });
 ```
 
-##### Document.subscribe("others")
+##### Document.subscribe('others')
 
 This method enables you to subscribe to changes in the presence of other clients participating in the document.
 
 The possible event.type are: `watched`, `unwatched`, `presence-changed`.
 
 ```javascript
-const unsubscribe = doc.subscribe("others", (event) => {
-  if (event.type === "watched") {
+const unsubscribe = doc.subscribe('others', (event) => {
+  if (event.type === 'watched') {
     addUser(event.value);
   }
 
-  if (event.type === "unwatched") {
+  if (event.type === 'unwatched') {
     removeUser(event.value);
   }
 
-  if (event.type === "presence-changed") {
+  if (event.type === 'presence-changed') {
     updateUser(event.value);
   }
 });
@@ -261,7 +243,7 @@ The callback is called with an event object, and the `event.type` property indic
 
 When the `event.type` is `local-change` or `remote-change`, the `event.value` is a changeInfo, which has `{operations, message}` properties.
 
-For more information about changeInfo for document events, please refer to the [ChangeInfo](https://yorkie.dev/yorkie-js-sdk/api-reference/yorkie-js-sdk.remotechangeevent.html).
+For more information about changeInfo for document events, please refer to the [ChangeInfo](https://yorkie.dev/yorkie-js-sdk/api-reference/interfaces/ChangeInfo.html).
 
 
 ```javascript
@@ -284,7 +266,7 @@ const unsubscribe = doc.subscribe((event) => {
 });
 ```
 
-##### Document.subscribe("$.path")
+##### Document.subscribe('$.path')
 
 Additionally, you can subscribe to changes for a specific path in the Document using `doc.subscribe(path, callback)` with a path argument, such as `$.todos`, where the `$` sign indicates the root of the document.
 The callback function is called when the target path and its nested values are changed.
@@ -299,43 +281,79 @@ const unsubscribe = doc.subscribe('$.todos', (event) => {
 });
 ```
 
-#### Changing Synchronization Setting
+##### Document.subscribe('connection')
 
-To change the synchronization setting for a document, you can use `client.pause(doc)` and `client.resume(doc)`.
+You can monitor the connection status of the document to the server.
 
-When you pause a document, the synchronization process will no longer occur in realtime, and you will need to manually execute the synchronization to ensure that the changes are propagated to other clients.
+A callback function is called whenever the connection status changes.
 
-To resume the realtime synchronization, you can call `client.resume(doc)`.
+Possible `event.value` values are: `StreamConnectionStatus.Connected` and `StreamConnectionStatus.Disconnected`.
+
+When the watch stream is disconnected, it means that the user is offline and cannot receive updates from other users in real-time.
 
 ```javascript
-// 1. Pause real-time sync
-await client.pause(doc);
-await client.sync(doc); // To perform synchronization, you need to manually call the sync function
+const unsubscribe = doc.subscribe('connection', (event) => {
+  // Do something
+});
+```
 
-// 2. Resume real-time sync
-await client.resume(doc);
+##### Document.subscribe('sync')
+
+You can track whether the document has been synchronized.
+
+A callback function is called whenever a synchronization occurs.
+
+Possible `event.value` values are: `DocumentSyncResultType.Synced` and `DocumentSyncResultType.SyncFailed`.
+
+```javascript
+const unsubscribe = doc.subscribe('sync', (event) => {
+  // Do something
+});
+```
+
+##### Document.subscribe('all')
+
+You can subscribe to all events occurring in the document by using `document.subscribe('all', callback)`. This is used for displaying events in [Devtools extension](/docs/devtools).
+
+Events received from the callback function are of type `TransactionEvent`, which is an `Array<DocEvent>`. TransactionEvent represents a collection of events occurring within a single transaction (e.g., `doc.update()`).
+
+The `event.rawChange` value for `local-change` and `remote-change` events, and the `event.value.snapshot` for `snapshot` event, are set only when `enableDevtools` option is configured as `true`.
+
+```javascript
+const unsubscribe = doc.subscribe('all', (transactionEvent) => {
+  for (const docEvent of transactionEvent) {
+    console.log(docEvent);
+  }
+});
 ```
 
 #### Changing Synchronization Mode
 
-By default, Yorkie synchronizes a document in `push-pull` mode, where local changes are pushed to the server, and remote changes are pulled from the server.
+To change the synchronization mode for a document, you can use `client.changeSyncMode(doc, syncMode)`.
 
-If you only want to send your changes and not receive remote changes, you can use `push-only` mode.
+Yorkie offers four SyncModes:
 
-For realtime synchronization, you can use `client.pauseRemoteChanges(doc)` and `client.resumeRemoteChanges(doc)`.
+- `SyncMode.Realtime`: Local changes are automatically pushed to the server, and remote changes are pulled from the server.
 
-For manual synchronization, you can pass the desired sync mode to `client.sync(doc, syncMode)`.
+- `SyncMode.RealtimePushOnly`: Only local changes are pushed, and remote changes are not pulled.
+
+- `SyncMode.RealtimeSyncOff`: Changes are not synchronized, but the watch stream remains active.
+
+- `SyncMode.Manual`: Synchronization no longer occurs in real-time, and the watch stream is disconneted. Manual handling is required for synchronization.
 
 ```javascript
-// Pause remote changes for realtime sync
-client.pauseRemoteChanges(doc);
-// Resume remote changes for realtime sync
-client.resumeRemoteChanges(doc);
+// Enable automatic synchronization of both local and remote changes.
+await client.changeSyncMode(doc, SyncMode.Realtime);
 
-// Manual sync in Push-Only mode
-await client.sync(doc, SyncMode.PushOnly);
-// Manual sync in Push-Pull mode
-await client.sync(doc, SyncMode.PushPull);
+// Only push local changes automatically.
+await client.changeSyncMode(doc, SyncMode.RealtimePushOnly);
+
+// Synchronization turned off, but the watch stream remains active.
+await client.changeSyncMode(doc, SyncMode.RealtimeSyncOff);
+
+// Synchronization turned off, and the watch stream is disconneted.
+await client.changeSyncMode(doc, SyncMode.Manual);
+await client.sync(doc); // Trigger synchronization manually using the sync function.
 ```
 
 #### Detaching the Document
