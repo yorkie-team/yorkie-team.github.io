@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { Layout, CodeBlock, CodeBlockHeader } from '@/components';
-import { Button, Box, Icon, Heading, Text, Flex, Accordion } from 'yorkie-ui';
+import { Button, Box, Icon, Heading, Text, Flex, Accordion, Container, Grid, GridItem } from 'yorkie-ui';
 import { StarIcon, BookIcon, MessageSquareIcon, TwinkleIcon, SmileIcon } from '@/components/Icons/Icons';
 import { ChartMotion, StateSharingMotion, ServerMotion, MainBannerMotion } from '@/components/motions';
 import UserGroupSVG from '@/public/assets/icons/icon_service_main_users_group.svg';
@@ -26,21 +26,19 @@ const Home: NextPage = () => {
     { label: 'Vue', value: 'vue' },
   ];
   useEffect(() => {
-    const handleVisualSize = () => {
-      const $visual = document.querySelector('.kv_bg svg') as HTMLElement;
-      if (!$visual) return;
-
-      const SVG_ASPECT_RATIO = 1512 / 868;
-      const HEADER_HEIGHT = 64;
-      const scale = window.innerWidth / ((window.innerHeight - HEADER_HEIGHT) * SVG_ASPECT_RATIO);
-      $visual.style.setProperty('--scale', scale < 1 ? '1' : `${scale}`);
-    };
-    window.addEventListener('resize', handleVisualSize);
-    handleVisualSize();
-
-    return () => {
-      window.removeEventListener('resize', handleVisualSize);
-    };
+    // const handleVisualSize = () => {
+    //   const $visual = document.querySelector('.homepage svg') as HTMLElement;
+    //   if (!$visual) return;
+    //   const SVG_ASPECT_RATIO = 1512 / 868;
+    //   const HEADER_HEIGHT = 64;
+    //   const scale = window.innerWidth / ((window.innerHeight - HEADER_HEIGHT) * SVG_ASPECT_RATIO);
+    //   $visual.style.setProperty('scale', scale < 1 ? '1' : `${scale}`);
+    // };
+    // window.addEventListener('resize', handleVisualSize);
+    // handleVisualSize();
+    // return () => {
+    //   window.removeEventListener('resize', handleVisualSize);
+    // };
   }, []);
 
   const onClickOne = (e: any) => {
@@ -60,24 +58,25 @@ const Home: NextPage = () => {
   };
   // TODO(hackerwins): Remove examples condition when examples are ready.
   return (
-    <Layout className="main_page">
+    <Layout>
       <Head>
         <title>Yorkie</title>
       </Head>
-      <div className="content">
-        <section className="key_visual">
-          <div className="kv_bg">
-            <MainBannerMotion bannerActive={bannerActive} />
-          </div>
-          <div className="inner">
-            <Heading as="h2" align="center" fontWeight="bold" fontSize={{ base: 'sm', md: '5xl', lg: '8xl' }}>
-              Bring
-              <Box color="orange.default" className={classNames('point', { is_hover: bannerActive })}>
-                collaboration
-                <Box className="bg"></Box>
-              </Box>
-              <Box className="text">to your app</Box>
-            </Heading>
+
+      <Box position="relative" overflow="hidden">
+        <Box margin="auto" width="screen" className="homepage">
+          <MainBannerMotion bannerActive={bannerActive} />
+        </Box>
+        <Box position="absolute" margin="auto" top="0" left="0" bottom="0" right="0" width="fit" height="fit">
+          <Heading as="h2" align="center" fontWeight="bold" fontSize={{ base: 'sm', md: '5xl', lg: '8xl' }}>
+            Bring
+            <Box color="orange.default" className={classNames('point', { is_hover: bannerActive })}>
+              collaboration
+              <Box className="bg"></Box>
+            </Box>
+            <Box className="text">to your app</Box>
+          </Heading>
+          <Flex justifyContent="center">
             <Button
               as="link"
               marginTop="10"
@@ -90,77 +89,73 @@ const Home: NextPage = () => {
             >
               Start for free
             </Button>
-            <Text fontSize="md" fontWeight="semibold" marginTop="10">
-              Unlock the full potential of real-time collaboration with open-source SDKs and API package.
-            </Text>
-          </div>
-        </section>
-        <section className="section section_app">
-          <Box borderWidth="1px" borderRadius="2xl" overflow="hidden">
-            <Flex
-              borderWidth="1px"
-              borderBottom="1px"
-              justifyContent="space-between"
-              alignItems="center"
-              paddingInline="8"
-              paddingBlock="5"
-            >
-              <Heading align="center" as="h2" fontWeight="semibold" fontSize="xl">
-                Extend Your App with Yorkie
-              </Heading>
-              <span className="icon">
-                <UserGroupSVG />
-              </span>
-            </Flex>
-            <div className="app_body">
-              <Box zIndex="xs" position="relative">
-                <Text fontSize="6xl" fontWeight="semibold" align="center">
-                  Make your product
-                </Text>
-                <Box display="flex" justifyContent="center">
-                  <Text
-                    fontSize="6xl"
-                    fontWeight="semibold"
-                    position="relative"
-                    borderX="md"
-                    borderY="md"
-                    overflow="hidden"
-                    borderStyle="dashed"
-                    borderColor="orange.default"
-                    borderRadius="2xl"
-                    paddingInline="2"
-                    marginRight="3"
-                  >
-                    collaborative
-                  </Text>
-                  <Text fontSize="6xl" fontWeight="semibold" paddingTop="1">
-                    in a flash!
-                  </Text>
-                </Box>
-              </Box>
-              <Text
-                align="center"
-                color="black.a8"
-                fontWeight="semibold"
-                marginTop="8"
-                fontSize="md"
-                lineHeight="normal"
-              >
-                Easily add collaboration to your apps with our API-based services. <br /> Sign up now and start building
-                powerful, high-performance collaborative features in no time.
+          </Flex>
+          <Text fontSize="md" fontWeight="semibold" marginTop="10">
+            Unlock the full potential of real-time collaboration with open-source SDKs and API package.
+          </Text>
+        </Box>
+      </Box>
+      <Container
+        margin="auto"
+        width={{ sm: 'breakpoint-sm', md: 'breakpoint-md', lg: 'breakpoint-lg', xl: 'breakpoint-xl' }}
+      >
+        <Box borderWidth="1px" borderRadius="2xl" overflow="hidden" marginTop="60">
+          <Flex
+            borderWidth="1px"
+            borderBottom="1px"
+            justifyContent="space-between"
+            alignItems="center"
+            paddingInline="8"
+            paddingBlock="5"
+          >
+            <Heading align="center" as="h2" fontWeight="semibold" fontSize="xl">
+              Extend Your App with Yorkie
+            </Heading>
+            <span className="icon">
+              <UserGroupSVG />
+            </span>
+          </Flex>
+          <Box className="homepage__bg-point" position="relative" paddingBlock="24">
+            <Box zIndex="xs" position="relative">
+              <Text fontSize="6xl" fontWeight="semibold" align="center">
+                Make your product
               </Text>
-              <Flex gap="6" marginTop="12" justifyContent="center">
-                <Button as="link" href="/docs/getting-started" icon={<BookIcon />} position="start" size="xl">
-                  Getting Started
-                </Button>
-                <Button as="link" href="/docs" variant="outline" icon={<BookIcon />} position="start" size="xl">
-                  Read documentation
-                </Button>
-              </Flex>
-            </div>
+              <Box display="flex" justifyContent="center">
+                <Text
+                  fontSize="6xl"
+                  fontWeight="semibold"
+                  position="relative"
+                  borderX="md"
+                  borderY="md"
+                  overflow="hidden"
+                  borderStyle="dashed"
+                  borderColor="orange.default"
+                  borderRadius="2xl"
+                  paddingInline="2"
+                  marginRight="3"
+                >
+                  collaborative
+                </Text>
+                <Text fontSize="6xl" fontWeight="semibold" paddingTop="1">
+                  in a flash!
+                </Text>
+              </Box>
+            </Box>
+            <Text align="center" color="black.a8" fontWeight="semibold" marginTop="8" fontSize="md" lineHeight="normal">
+              Easily add collaboration to your apps with our API-based services. <br /> Sign up now and start building
+              powerful, high-performance collaborative features in no time.
+            </Text>
+            <Flex gap="6" marginTop="12" justifyContent="center">
+              <Button as="link" href="/docs/getting-started" icon={<BookIcon />} position="start" size="xl">
+                Getting Started
+              </Button>
+              <Button as="link" href="/docs" variant="outline" icon={<BookIcon />} position="start" size="xl">
+                Read documentation
+              </Button>
+            </Flex>
           </Box>
-        </section>
-        <section className="section">
+        </Box>
+        <Box marginTop="40">
           <Text fontSize="6xl" fontWeight="semibold" align="center">
             Variety of <br className="br_mo" /> collaboration features <br /> for your app
           </Text>
@@ -172,40 +167,41 @@ const Home: NextPage = () => {
             Sign up now and start providing your users <br className="br_mo" /> with a completely new real-time
             experience.
           </Text>
-          <div className="section_content">
-            <Box className="service_card_list">
-              <div
-                onClick={(e) => onClickOne(e)}
-                className={classNames('service_card_item', { is_active: activeFeatureCard === 'profile' })}
-              >
-                <button type="button" className="service_card_menu" data-item="profile">
-                  <span className="img_box">
-                    <CollaboProfileSVG />
-                  </span>
-                  <Text fontSize="xl" fontWeight="semibold" paddingTop="28">
-                    Profile Stack
-                  </Text>
-                  <Text fontSize="sm" lineHeight="normal" marginTop="4">
-                    The Profile Stack feature shows the profile of the current users in real-time to announce that
-                    multiple users are connected at the same time.
-                  </Text>
-                </button>
-              </div>
-              <div className={classNames('service_card_item', { is_active: activeFeatureCard === 'cursor' })}>
-                <Box className="service_card_menu" data-item="cursor">
-                  <span className="img_box">
-                    <CollaboCursorSVG />
-                  </span>
-                  <Text fontSize="xl" fontWeight="semibold" paddingTop="28">
-                    Multi-Cursor
-                  </Text>
-                  <Text fontSize="sm" lineHeight="normal" marginTop="4">
-                    The Multi-Cursor shows the location of the cursor of the users who accessed the same canvas in
-                    real-time. Each cursor shows the user&#39;s nickname and role as needed.
-                  </Text>
-                </Box>
-              </div>
-              {/* {process.env.NODE_ENV === 'development' && (
+          <Grid gridTemplateColumns={6} gap={4} marginTop="32">
+            <GridItem gridColumnStart={1} gridColumnEnd={3} gridColumn={2} display="grid">
+              <Box className="service_card_list">
+                <div
+                  onClick={(e) => onClickOne(e)}
+                  className={classNames('service_card_item', { is_active: activeFeatureCard === 'profile' })}
+                >
+                  <button type="button" className="service_card_menu" data-item="profile">
+                    <span className="img_box">
+                      <CollaboProfileSVG />
+                    </span>
+                    <Text fontSize="xl" fontWeight="semibold" paddingTop="28">
+                      Profile Stack
+                    </Text>
+                    <Text fontSize="sm" lineHeight="normal" marginTop="4">
+                      The Profile Stack feature shows the profile of the current users in real-time to announce that
+                      multiple users are connected at the same time.
+                    </Text>
+                  </button>
+                </div>
+                <div className={classNames('service_card_item', { is_active: activeFeatureCard === 'cursor' })}>
+                  <Box className="service_card_menu" data-item="cursor">
+                    <span className="img_box">
+                      <CollaboCursorSVG />
+                    </span>
+                    <Text fontSize="xl" fontWeight="semibold" paddingTop="28">
+                      Multi-Cursor
+                    </Text>
+                    <Text fontSize="sm" lineHeight="normal" marginTop="4">
+                      The Multi-Cursor shows the location of the cursor of the users who accessed the same canvas in
+                      real-time. Each cursor shows the user&#39;s nickname and role as needed.
+                    </Text>
+                  </Box>
+                </div>
+                {/* {process.env.NODE_ENV === 'development' && (
                 <>
                   <li className={classNames('service_card_item', { is_active: activeFeatureCard === 'selection' })}>
                     <Box className="service_card_menu" data-item="selection">
@@ -238,38 +234,49 @@ const Home: NextPage = () => {
                   </li>
                 </>
               )} */}
-            </Box>
-            <CodeBlock.Wrapper>
-              <CodeBlockHeader>
-                <CodeBlockHeader.LeftBox>
-                  {FEATURES_CODE[activeFeatureCard].tabOrder.map((codeType) => (
-                    <Button
-                      type="button"
-                      key={codeType}
-                      className={classNames('btn_item', { is_active: activeFeatureCode.type === codeType })}
-                      onClick={() =>
-                        setActiveFeatureCode({
-                          type: codeType,
-                          info: (FEATURES_CODE[activeFeatureCard] as any)[codeType],
-                        })
-                      }
-                    >
-                      {(FEATURES_CODE[activeFeatureCard] as any)[codeType].title}
-                    </Button>
-                  ))}
-                </CodeBlockHeader.LeftBox>
-                <CodeBlockHeader.RightBox>
-                  <CodeBlockHeader.CopyButton value={activeFeatureCode.info.code} />
-                </CodeBlockHeader.RightBox>
-              </CodeBlockHeader>
-              <CodeBlock
-                code={activeFeatureCode.info.code}
-                language={activeFeatureCode.info.language as any}
-                withLineNumbers
-              />
-            </CodeBlock.Wrapper>
-          </div>
-        </section>
+              </Box>
+            </GridItem>
+            <GridItem
+              gridColumnStart={3}
+              gridColumnEnd={8}
+              gridColumn={4}
+              display="grid"
+              fontSize="xs"
+              className="homepage__codeblock"
+              height="90"
+            >
+              <CodeBlock.Wrapper>
+                <CodeBlockHeader>
+                  <CodeBlockHeader.LeftBox>
+                    {FEATURES_CODE[activeFeatureCard].tabOrder.map((codeType) => (
+                      <Button
+                        type="button"
+                        key={codeType}
+                        className={classNames('btn_item', { is_active: activeFeatureCode.type === codeType })}
+                        onClick={() =>
+                          setActiveFeatureCode({
+                            type: codeType,
+                            info: (FEATURES_CODE[activeFeatureCard] as any)[codeType],
+                          })
+                        }
+                      >
+                        {(FEATURES_CODE[activeFeatureCard] as any)[codeType].title}
+                      </Button>
+                    ))}
+                  </CodeBlockHeader.LeftBox>
+                  <CodeBlockHeader.RightBox>
+                    <CodeBlockHeader.CopyButton value={activeFeatureCode.info.code} />
+                  </CodeBlockHeader.RightBox>
+                </CodeBlockHeader>
+                <CodeBlock
+                  code={activeFeatureCode.info.code}
+                  language={activeFeatureCode.info.language as any}
+                  withLineNumbers
+                />
+              </CodeBlock.Wrapper>
+            </GridItem>
+          </Grid>
+        </Box>
         {/* {process.env.NODE_ENV === 'development' && (
           <section className="section">
             <h2 className="section_title">
@@ -287,7 +294,7 @@ const Home: NextPage = () => {
             </Button>
           </section>
         )} */}
-        <section className="section">
+        <Box marginTop="40">
           <Heading as="h2" fontSize="6xl" fontWeight="semibold" align="center">
             Stable.
             <br />
@@ -295,91 +302,99 @@ const Home: NextPage = () => {
             <br />
             Manageable.
           </Heading>
-          <div className="section_content">
-            <ul className="horizon_list">
-              <li className="horizon_item">
-                <div className="img_box">
-                  <StateSharingMotion />
-                </div>
-                <div className="text_box">
-                  <Text fontSize="2xl" fontWeight="semibold" color="black.a9">
-                    Document and Presence
-                  </Text>
-                  <Text fontSize="md" marginTop="6" fontWeight="medium" color="black.a9">
-                    Document is stored using conflict-free replicated data types(CRDTs), which ensures that multiple
-                    users can edit the same data concurrently without encountering conflicts. Presence represents a
-                    peer&apos;s awareness of the data being edited. It is used to track which users are currently
-                    editing the document.
-                  </Text>
-                  <Button
-                    as="link"
-                    href="/products#document-and-presence"
-                    backgroundColor="black.a9"
-                    icon={<BookIcon />}
-                    position="start"
-                    size="lg"
-                    marginTop="6"
-                  >
-                    Learn more about Document and Presence
-                  </Button>
-                </div>
-              </li>
-              <li className="horizon_item">
-                <div className="img_box">
-                  <ChartMotion />
-                </div>
-                <div className="text_box">
-                  <Text fontSize="xl" fontWeight="semibold" color="black.a9">
-                    Data Warehouse with Dashboard
-                  </Text>
-                  <Text fontSize="md" marginTop="6" fontWeight="medium" color="black.a9">
-                    Dashboard allows users to easily browse stored documents and monitor the data warehouse in
-                    real-time. With Dashboard, users can quickly and easily supervise the data warehouse and ensure that
-                    it is functioning properly.
-                  </Text>
-                  <Button
-                    as="link"
-                    href="/products#dashboard"
-                    backgroundColor="black.a9"
-                    icon={<BookIcon />}
-                    position="start"
-                    size="lg"
-                    marginTop="6"
-                  >
-                    Learn more about Dashboard
-                  </Button>
-                </div>
-              </li>
-              <li className="horizon_item">
-                <div className="img_box">
-                  <ServerMotion />
-                </div>
-                <div className="text_box">
-                  <Text fontSize="xl" fontWeight="semibold" color="black.a9">
-                    Cloud or Self-Hosted Server
-                  </Text>
-                  <Text fontSize="md" marginTop="6" fontWeight="medium" color="black.a9">
-                    Yorkie offers flexible deployment options, allowing user to use a cloud or host the server on your
-                    own premises. Whether you want the convenience of cloud or the control of a self-hosted server,
-                    Yorkie has you covered.
-                  </Text>
-                  <Button
-                    as="link"
-                    href="/products#self-hosted-server"
-                    backgroundColor="black.a9"
-                    icon={<BookIcon />}
-                    position="start"
-                    size="lg"
-                    marginTop="6"
-                  >
-                    Learn more about Self-Hosted Server
-                  </Button>
-                </div>
-              </li>
-            </ul>
-          </div>
-        </section>
-        <section className="section section_faq">
+          <Grid gridTemplateColumns={10} justifyContent="space-between" marginTop="24">
+            <GridItem gridColumnStart={1} gridColumnEnd={10} gridColumn={6}>
+              <Flex>
+                <StateSharingMotion />
+              </Flex>
+            </GridItem>
+            <GridItem gridColumnStart={11} gridColumnEnd={12} gridColumn={3}>
+              <Box>
+                <Text fontSize="2xl" fontWeight="semibold" color="black.a9">
+                  Document and Presence
+                </Text>
+                <Text fontSize="md" marginTop="6" fontWeight="medium" color="black.a9">
+                  Document is stored using conflict-free replicated data types(CRDTs), which ensures that multiple users
+                  can edit the same data concurrently without encountering conflicts. Presence represents a peer&apos;s
+                  awareness of the data being edited. It is used to track which users are currently editing the
+                  document.
+                </Text>
+                <Button
+                  as="link"
+                  href="/products#document-and-presence"
+                  backgroundColor="black.a9"
+                  icon={<BookIcon />}
+                  position="start"
+                  size="lg"
+                  marginTop="6"
+                >
+                  Learn more about Document and Presence
+                </Button>
+              </Box>
+            </GridItem>
+          </Grid>
+          <Grid gridTemplateColumns={10} justifyContent="space-between" marginTop="24">
+            <GridItem gridColumnStart={1} gridColumnEnd={10} gridColumn={6}>
+              <Box>
+                <ChartMotion />
+              </Box>
+            </GridItem>
+            <GridItem gridColumnStart={11} gridColumnEnd={12} gridColumn={3}>
+              <Box>
+                <Text fontSize="xl" fontWeight="semibold" color="black.a9">
+                  Data Warehouse with Dashboard
+                </Text>
+                <Text fontSize="md" marginTop="6" fontWeight="medium" color="black.a9">
+                  Dashboard allows users to easily browse stored documents and monitor the data warehouse in real-time.
+                  With Dashboard, users can quickly and easily supervise the data warehouse and ensure that it is
+                  functioning properly.
+                </Text>
+                <Button
+                  as="link"
+                  href="/products#dashboard"
+                  backgroundColor="black.a9"
+                  icon={<BookIcon />}
+                  position="start"
+                  size="lg"
+                  marginTop="6"
+                >
+                  Learn more about Dashboard
+                </Button>
+              </Box>
+            </GridItem>
+          </Grid>
+          <Grid gridTemplateColumns={10} justifyContent="space-between" marginTop="24">
+            <GridItem gridColumnStart={1} gridColumnEnd={10} gridColumn={6}>
+              <Box>
+                <ServerMotion />
+              </Box>
+            </GridItem>
+            <GridItem gridColumnStart={11} gridColumnEnd={12} gridColumn={3}>
+              <Box>
+                <Text fontSize="xl" fontWeight="semibold" color="black.a9">
+                  Cloud or Self-Hosted Server
+                </Text>
+                <Text fontSize="md" marginTop="6" fontWeight="medium" color="black.a9">
+                  Yorkie offers flexible deployment options, allowing user to use a cloud or host the server on your own
+                  premises. Whether you want the convenience of cloud or the control of a self-hosted server, Yorkie has
+                  you covered.
+                </Text>
+                <Button
+                  as="link"
+                  href="/products#self-hosted-server"
+                  backgroundColor="black.a9"
+                  icon={<BookIcon />}
+                  position="start"
+                  size="lg"
+                  marginTop="6"
+                >
+                  Learn more about Self-Hosted Server
+                </Button>
+              </Box>
+            </GridItem>
+          </Grid>
+        </Box>
+        <Box marginBlock="40">
           <Heading as="h2" fontSize="6xl" align="center">
             FAQ
           </Heading>
@@ -472,8 +487,8 @@ const Home: NextPage = () => {
               Start for free
             </Button>
           </Flex>
-        </section>
-      </div>
+        </Box>
+      </Container>
     </Layout>
   );
 };

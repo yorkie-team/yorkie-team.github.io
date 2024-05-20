@@ -1595,17 +1595,6 @@
   width: 12px;
   height: 12px;
 }
-.codeblock {
-  position: relative;
-  overflow-x: auto;
-  min-height: 48px;
-  padding: 8px 0;
-  border-radius: 4px;
-  border: 1px solid var(--gray-400);
-  background: var(--gray-000);
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
-}
 .prism-code {
   display: table;
   margin: 0;
@@ -1613,6 +1602,7 @@
 }
 .prism-code .token {
   white-space: pre;
+  font-size: 12px;
 }
 .prism-code .token-line {
   display: table-row;
@@ -13925,4 +13915,42 @@ html {
 }
 .darkmode .product_page .house_content .img_box [fill='#332E2B'] + [fill='#514C49'] {
   fill: var(--gray-100);
+}
+
+/* New Layout */
+
+/* Homepage */
+
+.homepage__bg-point::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-bottom-left-radius: 23px;
+  border-bottom-right-radius: 23px;
+  background-image: url(/assets/images/main_bg.png);
+  background-repeat: repeat;
+  content: '';
+}
+
+.homepage__codeblock .codeblock {
+  overflow-y: overlay;
+  height: 494px;
+  border-radius: 0 0 16px 16px;
+  border-top: 0;
+}
+
+/* Code Block */
+.codeblock {
+  position: relative;
+  overflow-x: auto;
+  height: 100%;
+  min-height: 48px;
+  padding: 8px 0;
+  border-radius: 4px;
+  border: 1px solid var(--gray-400);
+  background: var(--gray-000);
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
 }

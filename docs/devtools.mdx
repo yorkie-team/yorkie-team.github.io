@@ -16,11 +16,19 @@ Once installed, you'll find the `Yorkie🐾` panel within Chrome Developer Tools
 
 <Image alt="devtools" src="/assets/images/docs/devtools.png" width={1400} height={900} style={{ maxWidth: '800px' }} />
 
-<Alert status="warning">Please note that the devtools is available only in yorkie-js-sdk version `0.4.13` or later for development builds.</Alert>
+To use devtools, you need to set the `enableDevtools` option when creating the Document.
+
+```javascript
+const doc = new yorkie.Document('docKey', {
+  enableDevtools: true, // Adjust the condition according to your situation
+});
+```
+
+<Alert status="warning">Please note that the devtools is available only in yorkie-js-sdk version `0.4.18` or later.</Alert>
 
 ### Key Features
 
-Within the `Yorkie 🐾` panel, on the left, you will see the `Document` pane, and on the right, there is the `Presence` pane.
+Within the `Yorkie 🐾` panel, you will find the `History` panel at the top, the `Document` panel at the bottom left, and the `Presence` panel at the bottom right.
 
 #### Document pane
 
@@ -50,4 +58,21 @@ Within the `Yorkie 🐾` panel, on the left, you will see the `Document` pane, a
 - Access detailed data with a simple click.
 <video autoPlay loop muted playsInline style={{ maxWidth: '800px' }}>
     <source src="/assets/images/docs/devtools-presence.mov"/>
+</video>
+
+#### History pane
+
+| Event Type | Document | Presence |
+| :------: | :------: | :------: |
+| Local Change  | <Image alt="object icon" src="/assets/images/docs/devtools-event-local-document.png" width={16} height={16} style={{ width: '16px' }}/> | <Image alt="object icon" src="/assets/images/docs/devtools-event-local-presence.png" width={16} height={16} style={{ width: '16px' }}/> |
+| Remote Change | <Image alt="object icon" src="/assets/images/docs/devtools-event-remote-document.png" width={16} height={16} style={{ width: '16px' }}/> | <Image alt="object icon" src="/assets/images/docs/devtools-event-remote-presence.png" width={16} height={16} style={{ width: '16px' }}/> |
+
+- Observe events occurring within the document.
+    - Local changes are highlighted in yellow, remote changes in blue, presence changes are represented by cursor icons and document changes are indicated by document-shaped icons.
+- Easily debug through time-travel and replay.
+    - Move the slider and click on an event to check event details and see how the document has changed.
+    - Convenient navigation is possible using the arrow buttons at the top right or using the directional keys.
+
+<video autoPlay loop muted playsInline style={{ maxWidth: '900px' }}>
+    <source src="/assets/images/docs/devtools-history.mov"/>
 </video>
