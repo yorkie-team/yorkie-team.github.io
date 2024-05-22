@@ -19,12 +19,6 @@ const Home: NextPage = () => {
   const [bannerActive, setBannerActive] = useState(false);
   const [activeFeatureCard, setActiveFeatureCard] = useState<FeatureType>('profile');
   const [activeFeatureCode, setActiveFeatureCode] = useState({ type: 'js', info: FEATURES_CODE.profile.js });
-  const items = [
-    { label: 'React', value: 'react' },
-    { label: 'Solid', value: 'solid' },
-    { label: 'Svelte', value: 'svelte', disabled: true },
-    { label: 'Vue', value: 'vue' },
-  ];
   useEffect(() => {
     // const handleVisualSize = () => {
     //   const $visual = document.querySelector('.homepage svg') as HTMLElement;
@@ -41,20 +35,13 @@ const Home: NextPage = () => {
     // };
   }, []);
 
-  const onClickOne = (e: any) => {
-    const target = (e.target as Element).closest('.service_card_menu');
-    if (!target) return;
-
-    const featureType = target.getAttribute('data-item') as FeatureType;
-    const codeType = FEATURES_CODE[featureType].tabOrder[0];
-    setActiveFeatureCard(featureType);
+  const onClickOne = (e: any, name: string) => {
+    const codeType = FEATURES_CODE[name].tabOrder[0];
+    setActiveFeatureCard(name);
     setActiveFeatureCode({
       type: codeType,
-      info: (FEATURES_CODE[featureType] as any)[codeType],
+      info: (FEATURES_CODE[name] as any)[codeType],
     });
-  };
-  const handleClick = () => {
-    console.log('Button clicked');
   };
   // TODO(hackerwins): Remove examples condition when examples are ready.
   return (
@@ -67,8 +54,18 @@ const Home: NextPage = () => {
         <Box margin="auto" width="screen" className="homepage">
           <MainBannerMotion bannerActive={bannerActive} />
         </Box>
-        <Box position="absolute" margin="auto" top="0" left="0" bottom="0" right="0" width="fit" height="fit">
-          <Heading as="h2" align="center" fontWeight="bold" fontSize={{ base: 'sm', md: '5xl', lg: '8xl' }}>
+        <Box
+          position="absolute"
+          margin="auto"
+          top="0"
+          left="0"
+          bottom="0"
+          right="0"
+          width="fit"
+          height="fit"
+          padding="10"
+        >
+          <Heading as="h2" align="center" fontWeight="bold" fontSize={{ base: '5xl', lg: '8xl' }}>
             Bring
             <Box color="orange.default" className={classNames('point', { is_hover: bannerActive })}>
               collaboration
@@ -80,7 +77,7 @@ const Home: NextPage = () => {
             <Button
               as="link"
               marginTop="10"
-              onClick={handleClick}
+              href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`}
               onPointerOver={() => setBannerActive(true)}
               onPointerOut={() => setBannerActive(false)}
               icon={<StarIcon />}
@@ -96,10 +93,16 @@ const Home: NextPage = () => {
         </Box>
       </Box>
       <Container
+        paddingInline={{ base: '6', lg: '0' }}
         margin="auto"
         width={{ sm: 'breakpoint-sm', md: 'breakpoint-md', lg: 'breakpoint-lg', xl: 'breakpoint-xl' }}
       >
-        <Box borderWidth="1px" borderRadius="2xl" overflow="hidden" marginTop="60">
+        <Box
+          borderWidth={{ base: '0', lg: '1px' }}
+          borderRadius="2xl"
+          overflow="hidden"
+          marginTop={{ base: '0', lg: '60' }}
+        >
           <Flex
             borderWidth="1px"
             borderBottom="1px"
@@ -107,6 +110,7 @@ const Home: NextPage = () => {
             alignItems="center"
             paddingInline="8"
             paddingBlock="5"
+            display={{ base: 'none', lg: 'block' }}
           >
             <Heading align="center" as="h2" fontWeight="semibold" fontSize="xl">
               Extend Your App with Yorkie
@@ -117,35 +121,48 @@ const Home: NextPage = () => {
           </Flex>
           <Box className="homepage__bg-point" position="relative" paddingBlock="24">
             <Box zIndex="xs" position="relative">
-              <Text fontSize="6xl" fontWeight="semibold" align="center">
+              <Text fontSize={{ base: '3xl', lg: '6xl' }} fontWeight="semibold" align="center">
                 Make your product
               </Text>
               <Box display="flex" justifyContent="center">
                 <Text
-                  fontSize="6xl"
+                  fontSize={{ base: '3xl', lg: '6xl' }}
                   fontWeight="semibold"
                   position="relative"
-                  borderX="md"
-                  borderY="md"
+                  borderX={{ base: '0', lg: 'md' }}
+                  borderY={{ base: '0', lg: 'md' }}
                   overflow="hidden"
                   borderStyle="dashed"
                   borderColor="orange.default"
                   borderRadius="2xl"
                   paddingInline="2"
-                  marginRight="3"
+                  marginRight={{ base: '0', lg: '3' }}
                 >
                   collaborative
                 </Text>
-                <Text fontSize="6xl" fontWeight="semibold" paddingTop="1">
+                <Text fontSize={{ base: '3xl', lg: '6xl' }} fontWeight="semibold" paddingTop="1">
                   in a flash!
                 </Text>
               </Box>
             </Box>
-            <Text align="center" color="black.a8" fontWeight="semibold" marginTop="8" fontSize="md" lineHeight="normal">
+            <Text
+              align="center"
+              color="black.a8"
+              fontWeight="semibold"
+              marginTop="8"
+              fontSize={{ base: 'sm', lg: 'md' }}
+              lineHeight="normal"
+            >
               Easily add collaboration to your apps with our API-based services. <br /> Sign up now and start building
               powerful, high-performance collaborative features in no time.
             </Text>
-            <Flex gap="6" marginTop="12" justifyContent="center">
+            <Flex
+              flexDirection={{ base: 'column', lg: 'row' }}
+              gap="6"
+              marginTop="12"
+              justifyContent="center"
+              alignItems="center"
+            >
               <Button as="link" href="/docs/getting-started" icon={<BookIcon />} position="start" size="xl">
                 Getting Started
               </Button>
@@ -156,10 +173,17 @@ const Home: NextPage = () => {
           </Box>
         </Box>
         <Box marginTop="40">
-          <Text fontSize="6xl" fontWeight="semibold" align="center">
+          <Text fontSize={{ base: '3xl', lg: '6xl' }} fontWeight="semibold" align="center">
             Variety of <br className="br_mo" /> collaboration features <br /> for your app
           </Text>
-          <Text align="center" color="black.a8" fontWeight="semibold" marginTop="8" fontSize="md" lineHeight="normal">
+          <Text
+            align="center"
+            color="black.a8"
+            fontWeight="semibold"
+            marginTop="8"
+            fontSize={{ base: 'sm', lg: 'md' }}
+            lineHeight="normal"
+          >
             Easily add stable and diverse collaborative features <br className="br_mo" />
             to your product with Yorkie. <br />
             Transform your local-based product into a <br className="br_mo" /> collaborative online experience with our
@@ -167,40 +191,58 @@ const Home: NextPage = () => {
             Sign up now and start providing your users <br className="br_mo" /> with a completely new real-time
             experience.
           </Text>
-          <Grid gridTemplateColumns={6} gap={4} marginTop="32">
+          <Grid gridTemplateColumns={{ base: 1, lg: 6 }} gap={4} marginTop={{ base: '14', lg: '32' }}>
             <GridItem gridColumnStart={1} gridColumnEnd={3} gridColumn={2} display="grid">
               <Box className="service_card_list">
-                <div
-                  onClick={(e) => onClickOne(e)}
-                  className={classNames('service_card_item', { is_active: activeFeatureCard === 'profile' })}
-                >
-                  <button type="button" className="service_card_menu" data-item="profile">
-                    <span className="img_box">
-                      <CollaboProfileSVG />
-                    </span>
-                    <Text fontSize="xl" fontWeight="semibold" paddingTop="28">
+                <Box onClick={(e) => onClickOne(e, 'profile')} borderWidth="1px" borderRadius="2xl" cursor="pointer">
+                  <Box paddingInline="10" paddingBottom={activeFeatureCard == 'profile' ? '10' : '6'} paddingTop="6">
+                    {activeFeatureCard == 'profile' && (
+                      <Box margin="auto" width="fit">
+                        <CollaboProfileSVG />
+                      </Box>
+                    )}
+
+                    <Text fontSize="xl" fontWeight="semibold" paddingTop={activeFeatureCard == 'profile' ? '6' : 0}>
                       Profile Stack
                     </Text>
-                    <Text fontSize="sm" lineHeight="normal" marginTop="4">
-                      The Profile Stack feature shows the profile of the current users in real-time to announce that
-                      multiple users are connected at the same time.
-                    </Text>
-                  </button>
-                </div>
-                <div className={classNames('service_card_item', { is_active: activeFeatureCard === 'cursor' })}>
-                  <Box className="service_card_menu" data-item="cursor">
-                    <span className="img_box">
-                      <CollaboCursorSVG />
-                    </span>
-                    <Text fontSize="xl" fontWeight="semibold" paddingTop="28">
+
+                    {activeFeatureCard == 'profile' && (
+                      <Text fontSize="sm" lineHeight="normal" marginTop="4">
+                        The Profile Stack feature shows the profile of the current users in real-time to announce that
+                        multiple users are connected at the same time.
+                      </Text>
+                    )}
+                  </Box>
+                </Box>
+                <Box
+                  onClick={(e) => onClickOne(e, 'cursor')}
+                  borderWidth="1px"
+                  borderRadius="2xl"
+                  marginTop="6"
+                  cursor="pointer"
+                >
+                  <Box
+                    paddingInline="10"
+                    paddingBottom={activeFeatureCard == 'cursor' ? '10' : '6'}
+                    paddingTop="6"
+                    data-item="cursor"
+                  >
+                    {activeFeatureCard == 'cursor' && (
+                      <Box margin="auto" width="fit">
+                        <CollaboCursorSVG />
+                      </Box>
+                    )}
+                    <Text fontSize="xl" fontWeight="semibold" paddingTop={activeFeatureCard == 'cursor' ? '6' : 0}>
                       Multi-Cursor
                     </Text>
-                    <Text fontSize="sm" lineHeight="normal" marginTop="4">
-                      The Multi-Cursor shows the location of the cursor of the users who accessed the same canvas in
-                      real-time. Each cursor shows the user&#39;s nickname and role as needed.
-                    </Text>
+                    {activeFeatureCard == 'cursor' && (
+                      <Text fontSize="sm" lineHeight="normal" marginTop="4">
+                        The Multi-Cursor shows the location of the cursor of the users who accessed the same canvas in
+                        real-time. Each cursor shows the user&#39;s nickname and role as needed.
+                      </Text>
+                    )}
                   </Box>
-                </div>
+                </Box>
                 {/* {process.env.NODE_ENV === 'development' && (
                 <>
                   <li className={classNames('service_card_item', { is_active: activeFeatureCard === 'selection' })}>
@@ -240,10 +282,10 @@ const Home: NextPage = () => {
               gridColumnStart={3}
               gridColumnEnd={8}
               gridColumn={4}
-              display="grid"
+              display={{ base: 'none', lg: 'block' }}
               fontSize="xs"
-              className="homepage__codeblock"
               height="90"
+              className="homepage__codeblock"
             >
               <CodeBlock.Wrapper>
                 <CodeBlockHeader>
@@ -302,15 +344,15 @@ const Home: NextPage = () => {
             <br />
             Manageable.
           </Heading>
-          <Grid gridTemplateColumns={10} justifyContent="space-between" marginTop="24">
+          <Grid gridTemplateColumns={{ base: 1, lg: 10 }} justifyContent="space-between" marginTop="24">
             <GridItem gridColumnStart={1} gridColumnEnd={10} gridColumn={6}>
-              <Flex>
+              <Flex className="svg-responsive">
                 <StateSharingMotion />
               </Flex>
             </GridItem>
             <GridItem gridColumnStart={11} gridColumnEnd={12} gridColumn={3}>
               <Box>
-                <Text fontSize="2xl" fontWeight="semibold" color="black.a9">
+                <Text fontSize="2xl" fontWeight="semibold" color="black.a9" marginTop={{ base: 10, lg: 0 }}>
                   Document and Presence
                 </Text>
                 <Text fontSize="md" marginTop="6" fontWeight="medium" color="black.a9">
@@ -333,15 +375,15 @@ const Home: NextPage = () => {
               </Box>
             </GridItem>
           </Grid>
-          <Grid gridTemplateColumns={10} justifyContent="space-between" marginTop="24">
+          <Grid gridTemplateColumns={{ base: 1, lg: 10 }} justifyContent="space-between" marginTop="24">
             <GridItem gridColumnStart={1} gridColumnEnd={10} gridColumn={6}>
-              <Box>
+              <Box className="svg-responsive">
                 <ChartMotion />
               </Box>
             </GridItem>
             <GridItem gridColumnStart={11} gridColumnEnd={12} gridColumn={3}>
               <Box>
-                <Text fontSize="xl" fontWeight="semibold" color="black.a9">
+                <Text fontSize="xl" fontWeight="semibold" color="black.a9" marginTop={{ base: 10, lg: 0 }}>
                   Data Warehouse with Dashboard
                 </Text>
                 <Text fontSize="md" marginTop="6" fontWeight="medium" color="black.a9">
@@ -363,15 +405,15 @@ const Home: NextPage = () => {
               </Box>
             </GridItem>
           </Grid>
-          <Grid gridTemplateColumns={10} justifyContent="space-between" marginTop="24">
+          <Grid gridTemplateColumns={{ base: 1, lg: 10 }} justifyContent="space-between" marginTop="24">
             <GridItem gridColumnStart={1} gridColumnEnd={10} gridColumn={6}>
-              <Box>
+              <Box className="svg-responsive">
                 <ServerMotion />
               </Box>
             </GridItem>
             <GridItem gridColumnStart={11} gridColumnEnd={12} gridColumn={3}>
               <Box>
-                <Text fontSize="xl" fontWeight="semibold" color="black.a9">
+                <Text fontSize="xl" fontWeight="semibold" color="black.a9" marginTop={{ base: 10, lg: 0 }}>
                   Cloud or Self-Hosted Server
                 </Text>
                 <Text fontSize="md" marginTop="6" fontWeight="medium" color="black.a9">
