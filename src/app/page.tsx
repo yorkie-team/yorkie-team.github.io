@@ -98,7 +98,7 @@ const Home: NextPage = () => {
         width={{ sm: 'breakpoint-sm', md: 'breakpoint-md', lg: 'breakpoint-lg', xl: 'breakpoint-xl' }}
       >
         <Box
-          borderWidth={{ base: '0', lg: '1px' }}
+          borderWidth={{ base: '0', lg: 'xs' }}
           borderRadius="2xl"
           overflow="hidden"
           marginTop={{ base: '0', lg: '60' }}
@@ -110,7 +110,7 @@ const Home: NextPage = () => {
             alignItems="center"
             paddingInline="8"
             paddingBlock="5"
-            display={{ base: 'none', lg: 'block' }}
+            display={{ base: 'none', lg: 'flex' }}
           >
             <Heading align="center" as="h2" fontWeight="semibold" fontSize="xl">
               Extend Your App with Yorkie
