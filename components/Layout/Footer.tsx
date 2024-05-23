@@ -4,6 +4,7 @@ import LogoSVG from '@/public/assets/icons/logo_horizontal_s.svg';
 import { ThemeDropdown } from './ThemeDropdown';
 import { LogoIcon } from '@/components/Icons/Icons';
 import { Link, Box, Grid, GridItem, Container, Text, Flex, Icon } from 'yorkie-ui';
+import React from 'react';
 
 const fullYear = new Date(process.env.NEXT_PUBLIC_BUILT_AT!).getFullYear();
 export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement {
@@ -16,12 +17,17 @@ export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement
   }
 
   return (
-    <Box background="gray.a2">
+    <Box background="gray.a2" paddingInline={{ base: '6', lg: '0' }}>
       <Container
         margin="auto"
         width={{ sm: 'breakpoint-sm', md: 'breakpoint-md', lg: 'breakpoint-lg', xl: 'breakpoint-xl' }}
       >
-        <Grid gap={4} gridTemplateColumns={6} paddingBlock="20">
+        <Grid
+          gap={4}
+          gridTemplateColumns={{ base: 0, lg: 6 }}
+          paddingBlock="20"
+          display={{ base: 'block', lg: 'grid' }}
+        >
           <GridItem gridColumnStart={1} gridColumnEnd={3}>
             <Link href="/" fontSize="9xl" height="6">
               <LogoIcon />
@@ -30,7 +36,7 @@ export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement
               Copyright &copy; {fullYear} Yorkie
             </Text>
           </GridItem>
-          <GridItem gridColumnStart={3} gridColumnEnd={4} display="grid">
+          <GridItem gridColumnStart={3} gridColumnEnd={4} display="grid" marginTop={{ base: 20, lg: 0 }}>
             <Flex direction="column" gap="6">
               <Link href="/products" fontSize="lg" fontWeight="semibold">
                 Products
@@ -46,7 +52,7 @@ export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement
               </Link>
             </Flex>
           </GridItem>
-          <GridItem gridColumnStart={7} gridColumnEnd={9} display="grid">
+          <GridItem gridColumnStart={7} gridColumnEnd={9} display="grid" marginTop={{ base: 20, lg: 0 }}>
             <Flex direction="column" gap="6">
               <Link href="/docs" fontSize="lg" fontWeight="semibold">
                 Documentation
@@ -68,7 +74,7 @@ export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement
               </Link>
             </Flex>
           </GridItem>
-          <GridItem gridColumnStart={10} gridColumnEnd={12} display="grid">
+          <GridItem gridColumnStart={10} gridColumnEnd={12} display="grid" marginTop={{ base: 20, lg: 0 }}>
             <Flex direction="column" gap="6">
               <Link href="/examples" fontSize="lg" fontWeight="semibold">
                 Examples
@@ -93,7 +99,7 @@ export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement
               </Link>
             </Flex>
           </GridItem>
-          <GridItem gridColumnStart={13} gridColumnEnd={15} display="grid">
+          <GridItem gridColumnStart={13} gridColumnEnd={15} display="grid" marginTop={{ base: 20, lg: 0 }}>
             <Flex direction="column" gap="6">
               <Link href="/community" fontSize="lg" fontWeight="semibold">
                 Community
