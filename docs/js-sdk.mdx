@@ -241,14 +241,11 @@ Whenever the Document is modified, change events are triggered and we can subscr
 
 The callback is called with an event object, and the `event.type` property indicates the source of the change, which can be one of the following values: `local-change`, `remote-change`, or `snapshot`.
 
-When the `event.type` is `local-change` or `remote-change`, the `event.value` is a changeInfo, which has `{operations, message}` properties.
-
-For more information about changeInfo for document events, please refer to the [ChangeInfo](https://yorkie.dev/yorkie-js-sdk/api-reference/interfaces/ChangeInfo.html).
-
-
 ```javascript
 const unsubscribe = doc.subscribe((event) => {
-  if (event.type === 'local-change') {
+  if (event.type === 'snapshot') {
+    // Update with data from the Yorkie Document.
+  } else if (event.type === 'local-change') {
     console.log(event);
   } else if (event.type === 'remote-change') {
     // `message` delivered when calling document.update
@@ -265,6 +262,24 @@ const unsubscribe = doc.subscribe((event) => {
   }
 });
 ```
+
+When the `event.type` is `local-change` or `remote-change`, the `event.value` is a changeInfo, which has `{operations, message}` properties.
+For more information about changeInfo for document events, please refer to the [ChangeInfo](https://yorkie.dev/yorkie-js-sdk/api-reference/interfaces/ChangeInfo.html).
+
+<Alert status="warning">
+The `event.rawChange` value for `local-change` and `remote-change` events, and the `event.value.snapshot` for `snapshot` event, are set only when [`enableDevtools`](/docs/devtools/#install-the-extension) option is configured as `true`.
+</Alert>
+
+The `snapshot` event is triggered when a snapshot is received from the server.
+This occurs when the changes that a document needs to fetch from the server exceed a certain `SnapshotThreshold`.
+Instead of sending numerous changes, the server sends a snapshot of the document.
+In such cases, it is essential to update with data from the Yorkie Document.
+Refer to the [example code](https://github.com/yorkie-team/yorkie-js-sdk/blob/9c7accdfe337b9c9e7c7d0d3b3acc335951866ce/public/index.html#L346-L350) for handling snapshots in CodeMirror.
+
+<Alert status="warning">
+If a client has not synchronized for a prolonged period and then makes a sync request, it might receive a `snapshot` event.
+Ensure your application processes these snapshot events correctly to maintain document synchronization.
+</Alert>
 
 ##### Document.subscribe('$.path')
 
@@ -316,8 +331,6 @@ const unsubscribe = doc.subscribe('sync', (event) => {
 You can subscribe to all events occurring in the document by using `document.subscribe('all', callback)`. This is used for displaying events in [Devtools extension](/docs/devtools).
 
 Events received from the callback function are of type `TransactionEvent`, which is an `Array<DocEvent>`. TransactionEvent represents a collection of events occurring within a single transaction (e.g., `doc.update()`).
-
-The `event.rawChange` value for `local-change` and `remote-change` events, and the `event.value.snapshot` for `snapshot` event, are set only when `enableDevtools` option is configured as `true`.
 
 ```javascript
 const unsubscribe = doc.subscribe('all', (transactionEvent) => {
