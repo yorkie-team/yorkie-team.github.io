@@ -38,7 +38,7 @@
     "typescript-eslint": "^7.7.1",
     "unist-util-visit": "^4.1.1",
     "yorkie-js-sdk": "^0.4.19",
-    "yorkie-ui": "^0.5.0"
+    "yorkie-ui": "^0.5.1"
   },
   "devDependencies": {
     "@mdx-js/loader": "^2.1.5",
