@@ -33,13 +33,13 @@ export function Header(): ReactElement {
               <LogoSVG />
             </Link>
           </Box>
-          <Box display={{ base: 'block', md: 'none' }}>
-            <Link fontSize="8xl">
+          <Box display={{ base: 'block', lg: 'none' }}>
+            <Link fontSize="4xl">
               <LogoGnbSVG />
             </Link>
           </Box>
         </Heading>
-        <Flex gap="10">
+        <Flex gap="10" display={{ base: 'none', lg: 'flex' }}>
           <Button
             as="link"
             size="sm"
@@ -88,12 +88,22 @@ export function Header(): ReactElement {
       </Flex>
       <Flex gap="3">
         {isLoggedIn ? (
-          <Button variant="outline" as="link" href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`}>
+          <Button
+            variant="outline"
+            as="link"
+            href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`}
+            display={{ base: 'none', lg: 'block' }}
+          >
             Dashboard
           </Button>
         ) : isLoggedIn === false ? (
           <>
-            <Button variant="outline" as="link" href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/login`}>
+            <Button
+              variant="outline"
+              as="link"
+              href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/login`}
+              display={{ base: 'none', lg: 'block' }}
+            >
               Sign in
             </Button>
             <Button
@@ -101,6 +111,7 @@ export function Header(): ReactElement {
               href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup`}
               icon={<StarIcon />}
               position="start"
+              display={{ base: 'none', lg: 'block' }}
             >
               Start for free
             </Button>
