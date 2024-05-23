@@ -140,32 +140,38 @@ Here is an example of showing a list of users participating in the collaborative
 
 ##### Document.subscribe('presence')
 
-This method allows you to subscribe to all presence-related changes.
-By subscribing to these events, you can be notified when specific changes occur within the document, such as clients attaching, detaching, or modifying their presence.
+This method allows you to subscribe to presence-related changes.
+
+You'll be notified whenever clients watch, unwatch, or modify their presence.
+
+The `initialized` event occurs when the client list needs to be initialized.
+For example, this happens when you first connect a watch stream to a document, when the connection is lost, or when it is reconnected.
+
+<Alert status="warning">
+Subscribe before attaching the document to ensure you receive the initial `initialized` event.
+</Alert>
 
 ```javascript
 const unsubscribe = doc.subscribe('presence', (event) => {
   if (event.type === 'initialized') {
-    // Array of other users currently participating in the document
-    // event.value;
+    // event.value: Array of users currently participating in the document
   }
 
   if (event.type === 'watched') {
-    // A user has joined the document editing in online
-    // event.value;
+    // event.value: A user has joined the document editing in online
   }
 
   if (event.type === 'unwatched') {
-    // A user has left the document editing
-    // event.value;
+    // event.value: A user has left the document editing
   }
 
   if (event.type === 'presence-changed') {
-    // A user has updated their presence 
-    // event.value;
+    // event.value: A user has updated their presence
   }
 });
 ```
+
+Use `my-presence` and `others` topics to distinguish between your own events and those of others.
 
 ##### Document.subscribe('my-presence')
 
