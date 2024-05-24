@@ -13916,18 +13916,19 @@ html {
 /* New Layout */
 
 /* Homepage */
-
-.homepage__bg-point::before {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border-bottom-left-radius: 23px;
-  border-bottom-right-radius: 23px;
-  background-image: url(/assets/images/main_bg.png);
-  background-repeat: repeat;
-  content: '';
+@media screen and (min-width: 1023px) {
+  .homepage__bg-point::before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-bottom-left-radius: 23px;
+    border-bottom-right-radius: 23px;
+    background-image: url(/assets/images/main_bg.png);
+    background-repeat: repeat;
+    content: '';
+  }
 }
 
 .homepage__codeblock .codeblock {
@@ -13949,4 +13950,10 @@ html {
   background: var(--gray-000);
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
+}
+
+@media screen and (max-width: 1023px) {
+  .svg-responsive svg {
+    width: 100%;
+  }
 }
