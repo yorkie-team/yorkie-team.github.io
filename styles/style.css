@@ -13959,5 +13959,6 @@ html {
 @media screen and (max-width: 1023px) {
   .svg-responsive svg {
     width: 100%;
+    height: fit-content;
   }
 }

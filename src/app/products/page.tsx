@@ -24,13 +24,14 @@ const Products: NextPage = () => {
         <title>Products · Yorkie</title>
       </Head>
       <Container
-        paddingBlock="20"
+        paddingBlock={{ base: '6', lg: '20' }}
         margin="auto"
+        paddingInline={{ base: '6', lg: '0' }}
         width={{ sm: 'breakpoint-sm', md: 'breakpoint-md', lg: 'breakpoint-lg', xl: 'breakpoint-xl' }}
       >
-        <Flex justifyContent="space-between" alignItems="center">
+        <Flex justifyContent="space-between" alignItems="center" flexDirection={{ base: 'column-reverse', lg: 'row' }}>
           <Box>
-            <Heading as="h2" fontWeight="bold" fontSize={{ base: 'sm', md: '5xl', lg: '67xl' }}>
+            <Heading as="h2" fontWeight="bold" fontSize={{ base: '4xl', lg: '67xl' }}>
               Ship faster,
               <br />
               Stay in control
@@ -43,6 +44,8 @@ const Products: NextPage = () => {
               as a document store.
             </Text>
             <Button
+              width="100w"
+              wLink={{ base: '100w', lg: 'fit' }}
               as="link"
               href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`}
               icon={<StarIcon />}
@@ -53,52 +56,55 @@ const Products: NextPage = () => {
               Start for free
             </Button>
           </Box>
-          <ProductBannerSVG />
+          <Box className="svg-responsive">
+            <ProductBannerSVG />
+          </Box>
         </Flex>
       </Container>
       <Box borderWidth="1px" borderRadius="2xl" overflow="hidden" />
       <Container
+        paddingInline={{ base: '6', lg: '0' }}
         paddingBlock="20"
         margin="auto"
         width={{ sm: 'breakpoint-sm', md: 'breakpoint-md', lg: 'breakpoint-lg', xl: 'breakpoint-xl' }}
       >
-        <Grid columns="2" alignItems="center">
+        <Grid gridTemplateColumns={{ base: '0', lg: '2' }} alignItems="center">
           <Link href="#document-and-presence">
-            <Heading as="h2" fontSize="6xl">
+            <Heading as="h2" fontSize={{ base: '3xl', lg: '6xl' }}>
               Turn anything <br />
               into multiplayer.
             </Heading>
           </Link>
-          <Text fontSize="md" lineHeight="relaxed" fontWeight="semibold">
+          <Text fontSize="md" lineHeight="relaxed" fontWeight={{ base: 'regular', lg: 'semibold' }}>
             Yorkie allow you to build multiplayer products without the need for database configuration and conflict
             management. This saves time and money.
           </Text>
         </Grid>
-        <Box borderWidth="1px" borderRadius="2xl" overflow="hidden" marginBlock="16" />
+        <Box borderWidth="1px" borderRadius="2xl" overflow="hidden" marginBlock={{ base: '6', lg: '16' }} />
 
-        <Text fontWeight="semibold" fontSize="3xl">
+        <Text fontWeight="semibold" fontSize={{ base: 'xl', lg: '3xl' }} marginTop={{ base: '20', lg: '0' }}>
           Conflict-free state sharing
         </Text>
-        <Text marginTop="10" lineHeight="normal" fontWeight="semibold">
+        <Text marginTop="10" lineHeight="normal" fontWeight={{ base: 'regular', lg: 'semibold' }}>
           Yorkie implements real-time collaboration based on the Conflict-free Replicated Data Type(CRDT) algorithm.
           CRDTs offer a clean and reliable way to resolve conflicts when editing concurrent data, unlike Operational
           Transformation(OT) algorithms which can be complex and may not always ensure convergence. Yorkie&apos;s use of
           the well-proven CRDT algorithm ensures reliable services.
         </Text>
-        <Box margin="auto" width="fit" marginTop="14">
+        <Box margin="auto" width="fit" marginTop="14" className="svg-responsive">
           <StateSharingDetailMotion />
         </Box>
-        <Text fontWeight="semibold" fontSize="3xl" marginTop="14">
+        <Text fontWeight="semibold" fontSize={{ base: 'xl', lg: '3xl' }} marginTop="14">
           Document
         </Text>
-        <Text marginTop="10" lineHeight="normal" fontWeight="semibold">
+        <Text marginTop="10" lineHeight="normal" fontWeight={{ base: 'regular', lg: 'semibold' }}>
           Yorkie provides a general-purpose JSON-like{' '}
           <Link href="/docs/js-sdk#document" textDecoration="underline" textDecorationColor="black.a9">
             Document
           </Link>{' '}
           to enable complex application models while some CRDT libraries that only offer basic data types.
         </Text>
-        <Flex gap="4" alignItems="center" marginTop="10">
+        <Flex display={{ base: 'block', lg: 'flex' }} gap="4" alignItems="center" marginTop="10">
           <CodeBlock.Wrapper>
             <CodeBlockHeader>
               <CodeBlockHeader.LeftBox>
@@ -139,32 +145,32 @@ const Products: NextPage = () => {
             </CodeBlockHeader>
             <CodeBlock code={DOCUMENT_CODE[documentType]} language="javascript" withLineNumbers />
           </CodeBlock.Wrapper>
-          <Box>
+          <Box className="svg-responsive" marginTop={{ base: '6', lg: '0' }}>
             <FlexibleDocumentMotion />
           </Box>
         </Flex>
-        <Link href="#collaboration-awareness" fontWeight="semibold" fontSize="3xl" marginTop="14">
+        <Link href="#collaboration-awareness" fontWeight="semibold" fontSize={{ base: 'xl', lg: '3xl' }} marginTop="14">
           Presence
         </Link>
-        <Text marginTop="10" lineHeight="normal" fontWeight="semibold">
+        <Text marginTop="10" lineHeight="normal" fontWeight={{ base: 'regular', lg: 'semibold' }}>
           You can build a sense of presence by tracking the status of users who are editing the same document with{' '}
           <Link href="/docs/js-sdk#presence" className="link">
             Presence
           </Link>
           .
         </Text>
-        <Flex gap="4" justifyContent="space-between" marginTop="10">
-          <Box>
+        <Flex display={{ base: 'block', lg: 'flex' }} gap="4" justifyContent="space-between" marginTop="10">
+          <Box className="svg-responsive">
             <ProductAwarenessLeftSVG />
           </Box>
-          <Box>
+          <Box className="svg-responsive" marginTop={{ base: '6', lg: '0' }}>
             <ProductAwarenessRightSVG />
           </Box>
         </Flex>
-        <Link href="#collaboration-awareness" fontWeight="semibold" fontSize="3xl" marginTop="14">
+        <Link href="#collaboration-awareness" fontWeight="semibold" fontSize={{ base: 'xl', lg: '3xl' }} marginTop="14">
           More features of Yorkie SDK
         </Link>
-        <Grid columns="3" marginTop="10" gap="6">
+        <Grid gridTemplateColumns={{ base: '0', lg: '3' }} marginTop="10" gap="6">
           <GridItem borderWidth="1px" borderRadius="md" overflow="hidden" padding="8">
             <Text fontSize="lg" fontWeight="semibold" color="black.a9">
               SDKs for Mobile &amp; Web
@@ -222,35 +228,35 @@ const Products: NextPage = () => {
             </Text>
           </GridItem>
         </Grid>
-        <Grid columns="2" alignItems="center" marginTop="36">
+        <Grid gridTemplateColumns={{ base: '0', lg: '2' }} alignItems="center" marginTop="36">
           <Link href="#dashboard">
-            <Heading as="h2" fontSize="5xl" color="black.a9">
+            <Heading as="h2" fontSize={{ base: '3xl', lg: '5xl' }} color="black.a9">
               Real-time monitoring
               <br />
               anytime, anywhere.
             </Heading>
           </Link>
-          <Text fontSize="md" lineHeight="relaxed" fontWeight="semibold">
+          <Text fontSize="md" lineHeight="relaxed" fontWeight="semibold" marginTop={{ base: '6', lg: '0' }}>
             Dashboard allows project members to browse stored documents and supervise the data warehouse easily.
           </Text>
         </Grid>
         <Box borderWidth="1px" borderRadius="2xl" overflow="hidden" marginBlock="16" />
-        <Link href="#collaboration-awareness" fontWeight="semibold" fontSize="3xl" marginTop="6">
-          <Icon icon={<CloudIcon />} stroke="#F27B2F" size="xl" />
+        <Link href="#collaboration-awareness" fontWeight="semibold" fontSize={{ base: 'xl', lg: '3xl' }} marginTop="6">
+          <Icon icon={<CloudIcon />} stroke="#F27B2F" size={{ base: 'lg', lg: 'xl' }} />
           Dashboard
         </Link>
-        <Text marginTop="10" lineHeight="normal" fontWeight="semibold">
+        <Text marginTop={{ base: '6', lg: '10' }} lineHeight="normal" fontWeight="semibold">
           Dashboard in Cloud is accessible from any device without the need for installation.
         </Text>
-        <Flex justifyContent="space-between" marginTop="10">
-          <Box borderWidth="1px" borderRadius="sm">
+        <Flex justifyContent="space-between" marginTop="10" gap="2">
+          <Box borderWidth="1px" borderRadius="sm" className="svg-responsive">
             <ProductPCSVG />
           </Box>
-          <Box borderWidth="1px" borderRadius="sm">
+          <Box borderWidth="1px" borderRadius="sm" className="svg-responsive">
             <ProductMobileSVG />
           </Box>
         </Flex>
-        <Grid columns="2" alignItems="center" marginTop="36">
+        <Grid gridTemplateColumns={{ base: '0', lg: '2' }} alignItems="center" marginTop="36">
           <Link href="#self-hosted-server">
             <Heading as="h2" fontSize="5xl" color="black.a9">
               Build your own
@@ -263,30 +269,38 @@ const Products: NextPage = () => {
           </Text>
         </Grid>
         <Box borderWidth="1px" borderRadius="2xl" overflow="hidden" marginBlock="16" />
-        <Flex justifyContent="space-between">
-          <Flex alignItems="center" gap="4">
-            <Icon icon={<PackageIcon />} size="2xl" />
-            <Text fontWeight="semibold" fontSize="3xl">
-              Yorkie open-source package
-            </Text>
+        <Flex display={{ base: 'flex', lg: 'block' }} flexDirection="column">
+          <Box display="inline-block">
+            <Flex alignItems="center" gap="4" width="fit">
+              <Icon icon={<PackageIcon />} size="2xl" />
+              <Text fontWeight="semibold" fontSize="3xl">
+                Yorkie open-source package
+              </Text>
+            </Flex>
+          </Box>
+          <Box order={{ base: 4, lg: 0 }} display="inline-block" marginTop={{ base: '6', lg: '0' }} float="right">
+            <Button
+              width="100w"
+              wLink={{ base: '100w', lg: 'fit' }}
+              float="right"
+              marginRight="auto"
+              backgroundColor="black.a9"
+              as="link"
+              href="/docs/self-hosted-server"
+              icon={<BookIcon />}
+              position="start"
+              size="xl"
+            >
+              How to build self-hosted server
+            </Button>
+          </Box>
+          <Text fontWeight="semibold" marginTop="10">
+            Yorkie open-source package includes SDKs, a server, and a database, making it easy to implement the
+            co-editing feature.
+          </Text>
+          <Flex marginTop="16" justifyContent="center" className="svg-responsive">
+            <ProductPackageSVG />
           </Flex>
-          <Button
-            backgroundColor="black.a9"
-            as="link"
-            href="/docs/self-hosted-server"
-            icon={<BookIcon />}
-            position="start"
-            size="xl"
-          >
-            How to build self-hosted server
-          </Button>
-        </Flex>
-        <Text fontWeight="semibold" marginTop="10">
-          Yorkie open-source package includes SDKs, a server, and a database, making it easy to implement the co-editing
-          feature.
-        </Text>
-        <Flex marginTop="16" justifyContent="center">
-          <ProductPackageSVG />
         </Flex>
       </Container>
     </Layout>
