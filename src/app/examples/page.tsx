@@ -13,15 +13,16 @@ const Examples: NextPage = () => {
   return (
     <Layout>
       <Container
+        paddingInline={{ base: '6', lg: '0' }}
         margin="auto"
         width={{ sm: 'breakpoint-sm', md: 'breakpoint-md', lg: 'breakpoint-lg', xl: 'breakpoint-xl' }}
       >
         <Head>
           <title>Examples · Yorkie</title>
         </Head>
-        <Flex marginTop="28" gap="6" alignItems="center">
+        <Flex flexDirection={{ base: 'column-reverse', lg: 'row' }} marginTop="28" gap="6" alignItems="center">
           <Box>
-            <Heading as="h2" fontSize="6xl" fontWeight="600">
+            <Heading as="h2" fontSize={{ base: '3xl', lg: '6xl' }} color="black.a9" fontWeight="600">
               Explore examples <br /> built by Yorkie
             </Heading>
             <Text fontSize="md" fontWeight="semibold" marginBlock="10">
@@ -30,6 +31,8 @@ const Examples: NextPage = () => {
             </Text>
             <Button
               as="link"
+              width={{ base: '100w', lg: 'fit' }}
+              wLink={{ base: '100w', lg: 'fit' }}
               href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`}
               icon={<StarIcon />}
               position="start"
@@ -38,18 +41,19 @@ const Examples: NextPage = () => {
               Start for free
             </Button>
           </Box>
-          <Box>
+          <Box className="svg-responsive">
             <ExampleBannerSVG />
           </Box>
         </Flex>
       </Container>
       <Box borderWidth="1px" borderBottom="1px" marginTop="28" />
       <Container
+        paddingInline={{ base: '6', lg: '0' }}
         paddingBottom="40"
         margin="auto"
         width={{ sm: 'breakpoint-sm', md: 'breakpoint-md', lg: 'breakpoint-lg', xl: 'breakpoint-xl' }}
       >
-        <Grid gridTemplateColumns={6} gap={4} marginTop="32">
+        <Grid gridTemplateColumns={{ base: 1, lg: 6 }} gap={4} marginTop="32">
           <GridItem gridColumnStart={1} gridColumnEnd={3} gridColumn={2} display="grid">
             <Button icon={<DiamondIcon />} position="start" size="lg" variant="ghost" color="black.a9">
               All examples
