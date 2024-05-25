@@ -24,6 +24,8 @@ import { PlusIcon } from '@/components/Icons/icons/icon_plus';
 import { ExpandIcon } from '@/components/Icons/icons/icon_expand';
 import { MinimizeIcon } from '@/components/Icons/icons/icon_minimize';
 import { LogoIcon } from '@/components/Icons/icons/logo';
+import { CheckIcon } from '@/components/Icons/icons/icon_check';
+
 export {
   StarIcon,
   CopyIcon,
@@ -50,4 +52,5 @@ export {
   FolderOpenIcon,
   FileIcon,
   LogoIcon,
+  CheckIcon,
 };
