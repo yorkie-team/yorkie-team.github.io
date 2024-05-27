@@ -1,8 +1,9 @@
-import { Icon } from '@/components';
 import classNames from 'classnames';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import yorkie from 'yorkie-js-sdk';
 import UserContent from './UserContent';
+import { Text, Icon, Button } from 'yorkie-ui';
+import { CloseIcon } from '@/components/Icons/Icons';
 
 interface DocChangeInfo {
   type: 'update' | 'initialize' | 'presence';
@@ -97,20 +98,19 @@ export function BasicExampleView({
               <li key={userNumber} className={classNames('pin_item shadow_m')}>
                 <span className="user">
                   <span className={`icon gradient_180deg_${UserColors[userNumber % UserColors.length]}`}></span>
-                  <span className="text">{`User ${userNumber}`}</span>
+                  <Text fontSize="sm">{`User ${userNumber}`}</Text>
                 </span>
-                <div className="btn_box">
-                  <button
-                    type="button"
-                    className={classNames('btn btn_line btn_pin')}
-                    title="Pin"
-                    onClick={() => {
-                      deleteUser(userNumber);
-                    }}
-                  >
-                    <Icon type="close" />
-                  </button>
-                </div>
+                <Button
+                  onClick={() => {
+                    deleteUser(userNumber);
+                  }}
+                  title="Pin"
+                  variant="outline"
+                  icon={<CloseIcon />}
+                  position="start"
+                  size="xs"
+                  marginLeft="4"
+                />
               </li>
             );
           })}

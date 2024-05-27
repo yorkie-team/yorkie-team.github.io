@@ -17,12 +17,14 @@ import { CopyIcon } from '@/components/Icons/icons/icon_copy';
 import { GnbMenuIcon } from '@/components/Icons/icons/icon_gnb_menu';
 import { CloseIcon } from '@/components/Icons/icons/icon_close';
 import { CloseSmallIcon } from '@/components/Icons/icons/icon_close_small';
-import { FolderIcon } from '@/components/Icons/icons/icon_folder';
+import { FolderCloseIcon } from '@/components/Icons/icons/icon_folder';
 import { FolderOpenIcon } from '@/components/Icons/icons/icon_folder_open';
 import { FileIcon } from '@/components/Icons/icons/icon_file';
 import { PlusIcon } from '@/components/Icons/icons/icon_plus';
 import { ExpandIcon } from '@/components/Icons/icons/icon_expand';
 import { MinimizeIcon } from '@/components/Icons/icons/icon_minimize';
+import { ArrowLeftIcon } from '@/components/Icons/icons/icon_arrow_left';
+import { ArrowRightIcon } from '@/components/Icons/icons/icon_arrow_right';
 import { LogoIcon } from '@/components/Icons/icons/logo';
 import { CheckIcon } from '@/components/Icons/icons/icon_check';
 
@@ -48,9 +50,11 @@ export {
   MinimizeIcon,
   PackageIcon,
   CloudIcon,
-  FolderIcon,
+  FolderCloseIcon,
   FolderOpenIcon,
   FileIcon,
+  ArrowLeftIcon,
+  ArrowRightIcon,
   LogoIcon,
   CheckIcon,
 };

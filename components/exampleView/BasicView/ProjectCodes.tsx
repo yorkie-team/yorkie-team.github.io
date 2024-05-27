@@ -8,7 +8,9 @@ import {
   setFileOpen,
   getFileInfo,
 } from '@/utils/exampleFileUtils';
-import { CodeBlock, Icon } from '@/components';
+import { CodeBlock } from '@/components';
+import { Icon, Text, Box } from 'yorkie-ui';
+import { FileIcon, FolderOpenIcon, FolderCloseIcon } from '@/components/Icons/Icons';
 
 export function ProjectCodes({
   files,
@@ -76,13 +78,13 @@ export function ProjectCodes({
                 }}
               >
                 {child.isFile ? (
-                  <Icon type="file" />
+                  <Icon icon={<FileIcon />} position="start" size="xl" />
                 ) : isFolderOpen ? (
-                  <Icon type="folderOpen" />
+                  <Icon icon={<FolderOpenIcon />} position="start" size="sm" />
                 ) : (
-                  <Icon type="folderClose" />
+                  <Icon icon={<FolderCloseIcon />} position="start" size="sm" />
                 )}
-                <span className="name"> {child.name}</span>
+                <Text fontSize="sm"> {child.name}</Text>
               </button>
               {!child.isFile && isFolderOpen && <SubFolderCodes fileList={child.children} onClickFile={onClickFile} />}
             </li>
@@ -90,14 +92,16 @@ export function ProjectCodes({
         })}
       </ul>
       <div className="codeblock_area">
-        <em className="file_title">{activeFileInfo?.name || ''}</em>
-        <div className="codeblock_box">
+        <Text fontSize="md" borderWidth="1px" borderBottom="1px" align="center" fontWeight="semibold" paddingBlock="3">
+          {activeFileInfo?.name || ''}
+        </Text>
+        <Box className="codeblock_box" fontSize="sm">
           <CodeBlock
             code={activeFileInfo?.content || ''}
             language={(activeFileInfo?.language as any) || 'javascript'}
             withLineNumbers
           />
-        </div>
+        </Box>
       </div>
     </div>
   );
@@ -131,13 +135,13 @@ function SubFolderCodes({
               }}
             >
               {child.isFile ? (
-                <Icon type="file" />
+                <Icon icon={<FileIcon />} position="start" size="sm" />
               ) : isFolderOpen ? (
-                <Icon type="folderOpen" />
+                <Icon icon={<FolderOpenIcon />} position="start" size="sm" />
               ) : (
-                <Icon type="folderClose" />
+                <Icon icon={<FolderCloseIcon />} position="start" size="sm" />
               )}
-              <span className="name">{child.name}</span>
+              <Text fontSize="sm">{child.name}</Text>
             </button>
             {!child.isFile && isFolderOpen && <SubFolderCodes fileList={child.children} onClickFile={onClickFile} />}
           </li>

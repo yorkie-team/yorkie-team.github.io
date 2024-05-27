@@ -10,7 +10,7 @@ export const CopyIcon = (props: any) => (
     </g>
     <defs>
       <clipPath id="clip0_3515_1439">
-        <rect width="12" height="12" fill="white" />
+        <rect fill="white" />
       </clipPath>
     </defs>
   </svg>
