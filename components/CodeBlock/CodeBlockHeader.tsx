@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { CopyButton } from '@/components';
-import { Button, Icon, Box } from 'yorkie-ui';
+import { Button, Icon } from 'yorkie-ui';
 import { CopyIcon, CheckIcon } from '@/components/Icons/Icons';
 
 export function CodeBlockHeader({ children }: { children: ReactNode }) {

@@ -6,7 +6,7 @@ import ExampleBannerSVG from '@/public/assets/images/banner/img_example_banner.s
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
-import { StarIcon, BookIcon, MessageSquareIcon, TwinkleIcon, SmileIcon } from '@/components/Icons/Icons';
+import { StarIcon } from '@/components/Icons/Icons';
 
 const Examples: NextPage = () => {
   return (

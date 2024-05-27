@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import classNames from 'classnames';
-import { Button, Icon, Box, Menu, Link } from 'yorkie-ui';
+import { Button, Menu, Link } from 'yorkie-ui';
 import React from 'react';
-import { GnbMenuIcon, CloseIcon, MessageSquareIcon, TwinkleIcon, SmileIcon } from '@/components/Icons/Icons';
+import { GnbMenuIcon } from '@/components/Icons/Icons';
 
 export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
   const [gnbOpened, setGnbOpened] = useState(false);

@@ -8,7 +8,8 @@ import {
   setFileOpen,
   getFileInfo,
 } from '@/utils/exampleFileUtils';
-import { CodeBlock, Icon } from '@/components';
+import { CodeBlock} from '@/components';
+import { Icon } from 'yorkie-ui';
 
 export function ProjectCodes({
   files,

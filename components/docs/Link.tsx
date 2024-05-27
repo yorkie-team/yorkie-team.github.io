@@ -1,5 +1,5 @@
 import { AnchorHTMLAttributes } from 'react';
-import Link from 'next/link';
+import { Link } from 'yorkie-ui';
 
 export function CustomLink({ href, ...rest }: AnchorHTMLAttributes<HTMLAnchorElement>) {
   const isInternalLink = href && (href.startsWith('/') || href.startsWith('#'));

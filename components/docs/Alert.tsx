@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import classNames from 'classnames';
-import { Icon } from '@/components';
+import { Icon } from 'yorkie-ui';
 
 export function Alert({
   children,
@@ -18,7 +18,7 @@ export function Alert({
         alert_info: status === 'info',
       })}
     >
-      <Icon type={status} />
+      <Icon icon={status} />
       {children}
     </div>
   );

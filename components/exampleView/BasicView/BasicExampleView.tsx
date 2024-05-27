@@ -1,8 +1,9 @@
-import { Icon } from '@/components';
+import { Icon } from 'yorkie-ui';
 import classNames from 'classnames';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import yorkie from 'yorkie-js-sdk';
 import UserContent from './UserContent';
+import { CloseIcon, PlusIcon } from '@/components/Icons/Icons';
 
 interface DocChangeInfo {
   type: 'update' | 'initialize' | 'presence';
@@ -108,7 +109,7 @@ export function BasicExampleView({
                       deleteUser(userNumber);
                     }}
                   >
-                    <Icon type="close" />
+                    <Icon icon={<CloseIcon />} />
                   </button>
                 </div>
               </li>
@@ -116,7 +117,7 @@ export function BasicExampleView({
           })}
         </ul>
         <button type="button" className="btn btn_add" onClick={addUser}>
-          <Icon type="plus" />
+        <Icon icon={<PlusIcon />} />
         </button>
       </div>
       <ul className="grid_list2">

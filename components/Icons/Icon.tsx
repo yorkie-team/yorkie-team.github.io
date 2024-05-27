@@ -7,10 +7,6 @@ import CheckCircleSVG from '@/public/assets/icons/icon_check_circle.svg';
 import RecorderSVG from '@/public/assets/icons/icon_recorder.svg';
 import BulbSVG from '@/public/assets/icons/icon_bulb.svg';
 import MenuSVG from '@/public/assets/icons/icon_menu.svg';
-import DangerSVG from '@/public/assets/icons/icon_alert_danger.svg';
-import SuccessSVG from '@/public/assets/icons/icon_alert_success.svg';
-import WarningSVG from '@/public/assets/icons/icon_alert_warning.svg';
-import InfoSVG from '@/public/assets/icons/icon_alert_info.svg';
 import CheckSVG from '@/public/assets/icons/icon_check.svg';
 import ViewFullSVG from '@/public/assets/icons/icon_view_full.svg';
 import ViewShowSVG from '@/public/assets/icons/icon_view_show.svg';
@@ -26,10 +22,6 @@ const svgMap = {
   recorder: <RecorderSVG />,
   bulb: <BulbSVG />,
   menu: <MenuSVG />,
-  danger: <DangerSVG />,
-  success: <SuccessSVG />,
-  warning: <WarningSVG />,
-  info: <InfoSVG />,
   check: <CheckSVG />,
   viewFull: <ViewFullSVG />,
   viewShow: <ViewShowSVG />,

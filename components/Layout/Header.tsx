@@ -1,6 +1,6 @@
 import { ReactElement, useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { Button, Box, Icon, Heading, Text, Flex, Link } from 'yorkie-ui';
+import { Button, Box, Heading, Flex, Link } from 'yorkie-ui';
 import { isValidToken } from '@/utils/isValidToken';
 import { MobileGnbDropdown } from './MobileGnbDropdown';
 import LogoSVG from '@/public/assets/icons/logo_horizontal_xs.svg';

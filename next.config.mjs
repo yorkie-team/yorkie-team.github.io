@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 
 const nextConfig = {
+  transpilePackages: ['next-mdx-remote'],
   reactStrictMode: true,
   swcMinify: true,
   images: {
@@ -34,4 +35,4 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+export default nextConfig;

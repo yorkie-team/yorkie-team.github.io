@@ -1,9 +1,10 @@
 import { useUncontrolled } from '@/hooks';
-import { Icon } from '@/components';
+import { Icon } from 'yorkie-ui';
 import { AccordionContextProvider } from './Accordion.context';
 import { AccordionItem } from './AccordionItem';
 import { AccordionControl } from './AccordionControl';
 import { AccordionPanel } from './AccordionPanel';
+import { ArrowIcon } from '@/components/Icons/Icons';
 
 export type AccordionIconPosition = 'left' | 'right';
 type AccordionValue<Multiple extends boolean> = Multiple extends true ? string[] : string | null;
@@ -38,7 +39,7 @@ export function Accordion<Multiple extends boolean = false>({
   defaultValue,
   onChange,
   iconPosition = 'right',
-  icon = <Icon type="arrow" />,
+  icon = <Icon icon={<ArrowIcon />}/>,
 }: AccordionProps<Multiple>) {
   const [_value, handleChange] = useUncontrolled({
     value,

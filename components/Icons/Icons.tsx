@@ -25,6 +25,10 @@ import { ExpandIcon } from '@/components/Icons/icons/icon_expand';
 import { MinimizeIcon } from '@/components/Icons/icons/icon_minimize';
 import { LogoIcon } from '@/components/Icons/icons/logo';
 import { CheckIcon } from '@/components/Icons/icons/icon_check';
+import DangerSVG from '@/public/assets/icons/icon_alert_danger.svg';
+import SuccessSVG from '@/public/assets/icons/icon_alert_success.svg';
+import WarningSVG from '@/public/assets/icons/icon_alert_warning.svg';
+import InfoSVG from '@/public/assets/icons/icon_alert_info.svg';
 
 export {
   StarIcon,
