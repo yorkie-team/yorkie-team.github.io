@@ -26,6 +26,8 @@ import { MinimizeIcon } from '@/components/Icons/icons/icon_minimize';
 import { ArrowLeftIcon } from '@/components/Icons/icons/icon_arrow_left';
 import { ArrowRightIcon } from '@/components/Icons/icons/icon_arrow_right';
 import { LogoIcon } from '@/components/Icons/icons/logo';
+import { CheckIcon } from '@/components/Icons/icons/icon_check';
+
 export {
   StarIcon,
   CopyIcon,
@@ -54,4 +56,5 @@ export {
   ArrowLeftIcon,
   ArrowRightIcon,
   LogoIcon,
+  CheckIcon,
 };

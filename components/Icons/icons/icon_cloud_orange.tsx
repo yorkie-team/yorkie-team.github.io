@@ -1,5 +1,5 @@
 export const CloudIcon = (props: any) => (
-  <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+  <svg stroke="current" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
     <path
       fill-rule="evenodd"
       clip-rule="evenodd"

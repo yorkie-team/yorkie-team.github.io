@@ -8880,12 +8880,6 @@ dl,
 dt,
 fieldset,
 form,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
 input,
 legend,
 li,
@@ -8963,7 +8957,6 @@ ul {
 }
 a {
   color: inherit;
-  text-decoration: none;
 }
 input,
 optgroup,
@@ -13955,5 +13948,6 @@ html {
 @media screen and (max-width: 1023px) {
   .svg-responsive svg {
     width: 100%;
+    height: fit-content;
   }
 }

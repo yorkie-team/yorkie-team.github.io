@@ -18,9 +18,9 @@ export function CodeBlock({ withCopyButton, ...restProps }: { withCopyButton?: b
   }
 
   return (
-    <div className="codeblock">
+    <Box className="codeblock">
       <PrismCode {...restProps} />
-    </div>
+    </Box>
   );
 }
 
