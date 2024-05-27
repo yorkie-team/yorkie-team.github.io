@@ -76,6 +76,8 @@ const Home: NextPage = () => {
           <Flex justifyContent="center">
             <Button
               as="link"
+              width={{base: '100w',lg: 'fit'}}
+              wLink={{base: '100w',lg: 'fit'}}
               marginTop="10"
               href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`}
               onPointerOver={() => setBannerActive(true)}
@@ -163,10 +165,10 @@ const Home: NextPage = () => {
               justifyContent="center"
               alignItems="center"
             >
-              <Button as="link" href="/docs/getting-started" icon={<BookIcon />} position="start" size="xl">
+              <Button width={{base: '100w',lg: 'fit'}} wLink={{base: '100w',lg: 'fit'}} as="link" href="/docs/getting-started" icon={<BookIcon />} position="start" size="xl">
                 Getting Started
               </Button>
-              <Button as="link" href="/docs" variant="outline" icon={<BookIcon />} position="start" size="xl">
+              <Button width={{base: '100w',lg: 'fit'}} wLink={{base: '100w',lg: 'fit'}} as="link" href="/docs" variant="outline" icon={<BookIcon />} position="start" size="xl">
                 Read documentation
               </Button>
             </Flex>
@@ -363,11 +365,13 @@ const Home: NextPage = () => {
                 </Text>
                 <Button
                   as="link"
+                  width={{base: '100w',lg: 'fit'}}
+                  wLink={{base: '100w',lg: 'fit'}}
                   href="/products#document-and-presence"
                   backgroundColor="black.a9"
                   icon={<BookIcon />}
                   position="start"
-                  size="lg"
+                  size={{base: 'sm',lg: 'lg'}}
                   marginTop="6"
                 >
                   Learn more about Document and Presence
@@ -393,11 +397,13 @@ const Home: NextPage = () => {
                 </Text>
                 <Button
                   as="link"
+                  width={{base: '100w',lg: 'fit'}}
+                  wLink={{base: '100w',lg: 'fit'}}
                   href="/products#dashboard"
                   backgroundColor="black.a9"
                   icon={<BookIcon />}
                   position="start"
-                  size="lg"
+                  size={{base: 'sm',lg: 'lg'}}
                   marginTop="6"
                 >
                   Learn more about Dashboard
@@ -423,11 +429,13 @@ const Home: NextPage = () => {
                 </Text>
                 <Button
                   as="link"
+                  width={{base: '100w',lg: 'fit'}}
+                  wLink={{base: '100w',lg: 'fit'}}
                   href="/products#self-hosted-server"
                   backgroundColor="black.a9"
                   icon={<BookIcon />}
                   position="start"
-                  size="lg"
+                  size={{base: 'sm',lg: 'lg'}}
                   marginTop="6"
                 >
                   Learn more about Self-Hosted Server
@@ -511,6 +519,8 @@ const Home: NextPage = () => {
           <Flex gap="6" marginTop="16" justifyContent="center">
             <Button
               as="link"
+              width={{base: '100w',lg: 'fit'}}
+              wLink={{base: '100w',lg: 'fit'}}
               href="https://discord.gg/MVEAwz9sBy"
               variant="outline"
               icon={<SmileIcon />}
@@ -521,6 +531,8 @@ const Home: NextPage = () => {
             </Button>
             <Button
               as="link"
+              width={{base: '100w',lg: 'fit'}}
+              wLink={{base: '100w',lg: 'fit'}}
               href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`}
               icon={<TwinkleIcon />}
               position="start"

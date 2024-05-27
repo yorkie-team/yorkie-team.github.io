@@ -1602,7 +1602,7 @@
 }
 .prism-code .token {
   white-space: pre;
-  font-size: 12px;
+  font-size: 14px;
 }
 .prism-code .token-line {
   display: table-row;
@@ -8880,12 +8880,6 @@ dl,
 dt,
 fieldset,
 form,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
 input,
 legend,
 li,
@@ -12516,6 +12510,7 @@ html {
   padding-bottom: 0;
   border: none;
   border-radius: 0;
+  font-size: 14px;
 }
 .examples_view_page .sidebar .folder_box .codeblock {
   border-radius: 0;
@@ -12723,12 +12718,6 @@ html {
   height: 9px;
   margin-right: 8px;
   border-radius: 50%;
-}
-.examples_view_page .pin_item .user .text {
-  font-size: 1.2rem;
-  line-height: 1.34;
-  font-weight: 500;
-  color: var(--gray-800);
 }
 .examples_view_page .pin_item .btn_box {
   margin-left: 16px;
