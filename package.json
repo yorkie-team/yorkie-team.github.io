@@ -33,7 +33,7 @@
     "rehype-slug": "^5.1.0",
     "remark-gfm": "^3.0.1",
     "unist-util-visit": "^4.1.1",
-    "yorkie-js-sdk": "^0.4.21"
+    "yorkie-js-sdk": "^0.4.22"
   },
   "devDependencies": {
     "@mdx-js/loader": "^2.1.5",
