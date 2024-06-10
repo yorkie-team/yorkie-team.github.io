@@ -1,15 +1,12 @@
-# Maintaining yorkie-ui
+# Maintaining
 
 ## Releasing a New Version
 
-### 1. Update the version number.
+### Updating and Deploying homepage
 
-- Update `version` in [package.json](https://github.com/yorkie-team/yorkie-ui/blob/main/package.json#L3).
-
-### 2. Create Pull Request and merge it into main.
-
-### 3. Publish a new release.
-
-Create [a new release](https://github.com/yorkie-team/yorkie-ui/releases/new) by attaching the changelog by clicking Generate release notes button.
-
-Then [GitHub action](https://github.com/yorkie-team/yorkie-ui/blob/main/.github/workflows/npm-publish.yml) will publish Yorkie UI to [npm](https://www.npmjs.com/package/yorkie-ui).
+1. Update `version` in [package.json](https://github.com/yorkie-team/yorkie-team.github.io/blob/main/package.json#L36).
+2. Update `NEXT_PUBLIC_YORKIE_VERSION`, `NEXT_PUBLIC_YORKIE_JS_VERSION`, and `NEXT_PUBLIC_JS_SDK_URL` in [.env](https://github.com/yorkie-team/yorkie-team.github.io/blob/34e382b81029c8cfb865bc549bdfe8a4cdd884b8/.env).
+3. Modify Yorkie [documentation](https://github.com/yorkie-team/yorkie-team.github.io/tree/main/docs) and add explanations as necessary.
+4. Run `npm install` and `npm run fetch:examples` to update the code on the [examples page](https://yorkie.dev/examples).
+5. Run `npm run build` and ensure there are no errors.
+6. Create Pull Request and merge it into main.
