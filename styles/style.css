@@ -8955,9 +8955,6 @@ ul {
   list-style: none;
   padding-left: 0;
 }
-a {
-  color: inherit;
-}
 input,
 optgroup,
 select,
@@ -13951,3 +13948,10 @@ html {
     height: fit-content;
   }
 }
+
+/* Config */
+/* 
+.link svg {
+  height: inherit;
+  width: inherit;
+} */

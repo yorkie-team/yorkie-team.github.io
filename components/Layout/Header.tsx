@@ -1,3 +1,4 @@
+'use client';
 import { ReactElement, useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { Button, Box, Heading, Flex, Link } from 'yorkie-ui';
@@ -22,23 +23,23 @@ export function Header(): ReactElement {
       paddingLeft="6"
       alignItems="center"
       position="sticky"
+      top="0"
+      background="white"
       height="20"
       zIndex="10xl"
     >
       <Flex gap="12">
-        <Heading as="h1">
-          <span className="blind">Yorkie</span>
-          <Box display={{ base: 'none', lg: 'block' }}>
-            <Link href="/" fontSize="8xl">
-              <LogoSVG />
-            </Link>
-          </Box>
-          <Box display={{ base: 'block', lg: 'none' }}>
-            <Link fontSize="4xl">
-              <LogoGnbSVG />
-            </Link>
-          </Box>
-        </Heading>
+        <Box display="none">Yorkie</Box>
+        <Box display={{ base: 'none', lg: 'block' }}>
+          <Link href="/">
+            <LogoSVG />
+          </Link>
+        </Box>
+        <Box display={{ base: 'block', lg: 'none' }}>
+          <Link fontSize="4xl">
+            <LogoGnbSVG />
+          </Link>
+        </Box>
         <Flex gap="10" display={{ base: 'none', lg: 'flex' }}>
           <Button
             as="link"

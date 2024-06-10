@@ -1,7 +1,7 @@
----
-title: 'JS SDK'
-order: 30
----
+export const metadata = {
+  title: "JS SDK",
+  order: 30,
+};
 
 ## JS SDK
 
@@ -79,7 +79,7 @@ doc.update((root, presence) => {
 // we can see that the changes made were merged and the final state of the current user's presence is as we desire
 ```
 
-<Alert status="warning">
+{/* <Alert status="warning">
 Note, the properties provided will be replaced entirely and not merely updated.
 
 For example:
@@ -100,7 +100,7 @@ doc.update((root, presence) => {
 // presence = { cursor: { x: 1, y: 1 } } 
 // we can see that all properties inside cursor get replaced (i.e. we lose the property 'color')
 ```
-</Alert>
+</Alert> */}
 
 
 #### Getting presence 
