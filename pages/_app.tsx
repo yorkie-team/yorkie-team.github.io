@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 import Head from 'next/head';
 import Script from 'next/script';
 import '@/styles/style.css';
+import 'test-yorkie-v1/style';
 import { prefix } from '@/utils/prefix';
 import { ThemeOption, useTheme } from '@/hooks/useTheme';
 
