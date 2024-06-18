@@ -2,17 +2,21 @@ import { ReactElement } from 'react';
 
 import LogoSVG from '@/public/assets/icons/logo_horizontal_s.svg';
 import { ThemeDropdown } from './ThemeDropdown';
-import { LogoIcon } from '@/components/Icons/Icons';
-import { Link, Box, Grid, GridItem, Container, Text, Flex, Icon } from 'yorkie-ui';
+import { Link, Box, Grid, GridItem, Container, Text, Flex, Icon, IconLogo } from 'yorkie-ui';
 import React from 'react';
 
 const fullYear = new Date(process.env.NEXT_PUBLIC_BUILT_AT!).getFullYear();
 export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement {
   if (shortFooter) {
     return (
-      <footer className="footer_service">
-        <p className="copyright">Copyright © {fullYear} Yorkie</p>
-      </footer>
+      <Flex
+        justifyContent="center"
+        background="gray.a2"
+        paddingBlock={{ base: '4', lg: '6' }}
+        paddingInline={{ base: '6', lg: '0' }}
+      >
+        <Text textAlign="center">Copyright © {fullYear} Yorkie</Text>
+      </Flex>
     );
   }
 
@@ -30,7 +34,7 @@ export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement
         >
           <GridItem gridColumnStart={1} gridColumnEnd={3}>
             <Link href="/" fontSize="9xl" height="6">
-              <LogoIcon />
+              <IconLogo />
             </Link>
             <Text color="black.a9" fontSize="sm">
               Copyright &copy; {fullYear} Yorkie

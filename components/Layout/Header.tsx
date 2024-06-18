@@ -1,11 +1,10 @@
 import { ReactElement, useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { Button, Box, Icon, Heading, Text, Flex, Link } from 'yorkie-ui';
+import { Button, Box, Icon, Heading, Flex, Link, IconStar } from 'yorkie-ui';
 import { isValidToken } from '@/utils/isValidToken';
 import { MobileGnbDropdown } from './MobileGnbDropdown';
 import LogoSVG from '@/public/assets/icons/logo_horizontal_xs.svg';
 import LogoGnbSVG from '@/public/assets/icons/logo_gnb.svg';
-import { StarIcon } from '@/components/Icons/Icons';
 
 export function Header(): ReactElement {
   const pathname = usePathname();
@@ -46,7 +45,7 @@ export function Header(): ReactElement {
             variant="outline"
             border="none"
             href="/products"
-            className={`gnb_item ${pathname == '/products' ? 'orange.default' : ''}`}
+            className={`gnb_item ${pathname === '/products' ? 'orange.default' : ''}`}
             fontSize="md"
           >
             Products
@@ -57,7 +56,7 @@ export function Header(): ReactElement {
             variant="outline"
             border="none"
             href="/docs"
-            className={`gnb_item ${pathname == '/docs/[[...slug]]' ? 'orange.default' : ''}`}
+            className={`gnb_item ${pathname === '/docs/[[...slug]]' ? 'orange.default' : ''}`}
             fontSize="md"
           >
             Documentation
@@ -68,7 +67,7 @@ export function Header(): ReactElement {
             variant="outline"
             border="none"
             href="/examples"
-            className={`gnb_item ${pathname == '/examples' ? 'orange.default' : ''}`}
+            className={`gnb_item ${pathname === '/examples' ? 'orange.default' : ''}`}
             fontSize="md"
           >
             Examples
@@ -79,7 +78,7 @@ export function Header(): ReactElement {
             variant="outline"
             border="none"
             href="/community"
-            className={`gnb_item ${pathname == '/community' ? 'orange.default' : ''}`}
+            className={`gnb_item ${pathname === '/community' ? 'orange.default' : ''}`}
             fontSize="md"
           >
             Community
@@ -97,7 +96,7 @@ export function Header(): ReactElement {
             Dashboard
           </Button>
         ) : isLoggedIn === false ? (
-          <>
+          <Flex gap="4">
             <Button
               variant="outline"
               as="link"
@@ -109,13 +108,13 @@ export function Header(): ReactElement {
             <Button
               as="link"
               href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup`}
-              icon={<StarIcon />}
+              icon={<IconStar />}
               position="start"
               display={{ base: 'none', lg: 'block' }}
             >
               Start for free
             </Button>
-          </>
+          </Flex>
         ) : null}
         <MobileGnbDropdown isLoggedIn={!isLoggedIn} />
       </Flex>

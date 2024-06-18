@@ -2,8 +2,7 @@ import classNames from 'classnames';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import yorkie from 'yorkie-js-sdk';
 import UserContent from './UserContent';
-import { Text, Icon, Button } from 'yorkie-ui';
-import { CloseIcon } from '@/components/Icons/Icons';
+import { Text, Icon, Button, IconClose, IconPlus } from 'yorkie-ui';
 
 interface DocChangeInfo {
   type: 'update' | 'initialize' | 'presence';
@@ -97,7 +96,7 @@ export function BasicExampleView({
             return (
               <li key={userNumber} className={classNames('pin_item shadow_m')}>
                 <span className="user">
-                  <span className={`icon gradient_180deg_${UserColors[userNumber % UserColors.length]}`}></span>
+                  <span className={`icon gradient_180deg_${UserColors[userNumber % UserColors.length]}`} />
                   <Text fontSize="sm">{`User ${userNumber}`}</Text>
                 </span>
                 <Button
@@ -106,17 +105,18 @@ export function BasicExampleView({
                   }}
                   title="Pin"
                   variant="outline"
-                  icon={<CloseIcon />}
                   position="start"
                   size="xs"
                   marginLeft="4"
-                />
+                >
+                  <IconClose />
+                </Button>
               </li>
             );
           })}
         </ul>
         <button type="button" className="btn btn_add" onClick={addUser}>
-          <Icon type="plus" />
+          <Icon icon={<IconPlus />} size="md" />
         </button>
       </div>
       <ul className="grid_list2">

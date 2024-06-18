@@ -19,16 +19,48 @@ import rehypeToc, { HtmlElementNode, ListItemNode } from '@jsdevtools/rehype-toc
 import rehypeImageMeta from '@/utils/rehypeImageMeta';
 import rehypeWrapContents from '@/utils/rehypeWrapContents';
 import rehypeVariables from '@/utils/rehypeVariables';
-import { Layout, Navigator, Button, Icon, CodeBlock, CodeBlockHeader, Image } from '@/components';
+import { Grid, GridItem, Container, Heading, Button, Icon, Text } from 'yorkie-ui';
+import { Layout, Navigator, CodeBlock, CodeBlockHeader, Image } from '@/components';
 import { CustomLink, CustomCodeBlock, Breadcrumb, Caption, ImageWrap, Alert, Blockquote } from '@/components/docs';
 
 // Custom components/renderers to pass to MDX.
 const components: MDXComponents = {
   a: CustomLink,
-  h3: (props) => <h3 className="heading" {...props} />,
-  h4: (props) => <h4 className="heading" {...props} />,
-  h5: (props) => <h5 className="heading" {...props} />,
-  h6: (props) => <h6 className="heading" {...props} />,
+  h1: (props) => (
+    <Heading as="h1" className="heading" fontSize={{ base: '3xl', lg: '5xl' }} fontWeight="semibold">
+      {props.children}
+    </Heading>
+  ),
+  h2: (props) => (
+    <Heading as="h2" className="heading" fontSize={{ base: '2xl', lg: '4xl' }} fontWeight="semibold">
+      {props.children}
+    </Heading>
+  ),
+  h3: (props) => (
+    <Heading as="h3" className="heading" fontSize={{ base: 'xl', lg: '3xl' }} fontWeight="semibold">
+      {props.children}
+    </Heading>
+  ),
+  h4: (props) => (
+    <Heading as="h4" className="heading" fontSize={{ base: 'lg', lg: '2xl' }} fontWeight="semibold">
+      {props.children}
+    </Heading>
+  ),
+  h5: (props) => (
+    <Heading as="h5" className="heading" fontSize={{ base: 'md', lg: 'xl' }} fontWeight="semibold">
+      {props.children}
+    </Heading>
+  ),
+  h6: (props) => (
+    <Heading as="h6" className="heading" fontSize={{ base: 'md', lg: 'xl' }} fontWeight="semibold">
+      {props.children}
+    </Heading>
+  ),
+  p: (props) => (
+    <Text fontSize={{ base: 'xs', lg: 'md' }} lineHeight="normal" fontWeight="semibold">
+      {props.children}
+    </Text>
+  ),
   Button,
   Icon,
   pre: (props) => <CustomCodeBlock {...props} />,

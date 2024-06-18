@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import classNames from 'classnames';
-import { Button, Icon, Box, Menu, Link } from 'yorkie-ui';
+import { Button, Box, Menu, Link, IconGnbMenu, IconClose, Flex } from 'yorkie-ui';
 import React from 'react';
-import { GnbMenuIcon, CloseIcon, MessageSquareIcon, TwinkleIcon, SmileIcon } from '@/components/Icons/Icons';
 
 export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
   const [gnbOpened, setGnbOpened] = useState(false);
@@ -21,85 +20,81 @@ export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
   }, []);
 
   return (
-    <Menu.Root>
-      <Menu.Trigger>
-        <Button
-          variant="ghost"
-          icon={<GnbMenuIcon />}
-          position="start"
-          display={{ base: !gnbOpened ? 'block' : 'none', lg: 'none' }}
-        />
-        <Button
-          variant="ghost"
-          icon={<GnbMenuIcon />}
-          position="start"
-          display={{ base: gnbOpened ? 'block' : 'none', lg: 'none' }}
-        />
-      </Menu.Trigger>
-      <Menu.Positioner>
-        <Menu.Content>
-          <Menu.Item id="products" width="screen">
+    <Box>
+      <Box
+        width="12"
+        padding="4"
+        display={{ base: 'block', lg: 'none' }}
+        onClick={() => setDocsMenuOpened(!docsMenuOpened)}
+      >
+        {gnbOpened ? <IconClose /> : <IconGnbMenu />}
+      </Box>
+      <Flex
+        display={docsMenuOpened ? 'flex' : 'none'}
+        marginTop="4"
+        flexDirection="column"
+        position="absolute"
+        width="100w"
+        left="0"
+        paddingInline="6"
+        background="white"
+      >
+        <Link
+          href="/products"
+          bg={asPath?.split('#')[0] === '/products' ? 'orange.default' : 'white.11'}
+          paddingBlock="3"
+        >
+          <span className="dropdown_text">Products</span>
+        </Link>
+        <Link
+          href="/example"
+          bg={asPath?.split('#')[0] === '/example' ? 'orange.default' : 'white.11'}
+          paddingBlock="3"
+        >
+          <span className="dropdown_text">Example</span>
+        </Link>
+        <Link
+          href="/community"
+          bg={asPath?.split('#')[0] === '/community' ? 'orange.default' : 'white.11'}
+          paddingBlock="3"
+        >
+          <span className="dropdown_text">Community</span>
+        </Link>
+        {isLoggedIn ? (
+          <Link
+            href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`}
+            bg={asPath?.split('#')[0] === `${process.env.NEXT_PUBLIC_DASHBOARD_PATH}` ? 'orange.default' : 'white.11'}
+            paddingBlock="3"
+          >
+            <span className="dropdown_text">Dashboard</span>
+          </Link>
+        ) : (
+          <>
             <Link
-              href="/products"
-              className={classNames('dropdown_menu', { is_active: asPath.split('#')[0] === '/products' })}
+              href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/login`}
+              bg={
+                asPath?.split('#')[0] === `${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/login`
+                  ? 'orange.default'
+                  : 'white.11'
+              }
+              paddingBlock="3"
             >
-              <span className="dropdown_text">Products</span>
+              <span className="dropdown_text">Sign in</span>
             </Link>
-          </Menu.Item>
-          <Menu.Item id="example">
             <Link
-              href="/products"
-              className={classNames('dropdown_menu', { is_active: asPath.split('#')[0] === '/products' })}
+              href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup`}
+              bg={
+                asPath?.split('#')[0] === `${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup`
+                  ? 'orange.default'
+                  : 'white.11'
+              }
+              paddingBlock="3"
             >
-              <span className="dropdown_text">Example</span>
+              <span className="dropdown_text">Start for free</span>
             </Link>
-          </Menu.Item>
-          <Menu.Item id="community">
-            <Link
-              href="/community"
-              className={classNames('dropdown_menu', { is_active: asPath.split('#')[0] === '/community' })}
-            >
-              <span className="dropdown_text">Community</span>
-            </Link>
-          </Menu.Item>
-          <Menu.Separator />
-          {isLoggedIn ? (
-            <Menu.Item id="dashboard">
-              <Link
-                href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`}
-                className={classNames('dropdown_menu', {
-                  is_active: asPath.split('#')[0] === `${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`,
-                })}
-              >
-                <span className="dropdown_text">Dashboard</span>
-              </Link>
-            </Menu.Item>
-          ) : (
-            <>
-              <Menu.Item id="sign-in">
-                <Link
-                  href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/login`}
-                  className={classNames('dropdown_menu', {
-                    is_active: asPath.split('#')[0] === `${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/login`,
-                  })}
-                >
-                  <span className="dropdown_text">Sign in</span>
-                </Link>
-              </Menu.Item>
-              <Menu.Item id="startForFree">
-                <Link
-                  href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup`}
-                  className={classNames('dropdown_menu', {
-                    is_active: asPath.split('#')[0] === `${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup`,
-                  })}
-                >
-                  <span className="dropdown_text">Start for free</span>
-                </Link>
-              </Menu.Item>
-            </>
-          )}
-        </Menu.Content>
-      </Menu.Positioner>
-    </Menu.Root>
+          </>
+        )}
+      </Flex>
+    </Box>
   );
 }

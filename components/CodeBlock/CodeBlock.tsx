@@ -1,9 +1,8 @@
 import { ReactNode } from 'react';
 import { CopyButton } from '@/components';
 import { PrismCodeProps, PrismCode } from './PrismCode';
-import { Box, Text, Icon, Button } from 'yorkie-ui';
+import { Box, IconCopy, IconCheck, Icon, Button } from 'yorkie-ui';
 import React from 'react';
-import { CopyIcon, CheckIcon } from '@/components/Icons/Icons';
 
 export function CodeBlock({ withCopyButton, ...restProps }: { withCopyButton?: boolean } & PrismCodeProps) {
   if (withCopyButton) {
@@ -30,19 +29,13 @@ function CopyButtonBox({ value, timeout = 1000 }: { value: string; timeout?: num
       <CopyButton value={value} timeout={timeout}>
         {({ copied, copy }) => (
           <>
-            <Button
-              icon={<CopyIcon />}
-              position="start"
-              size="lg"
-              onClick={copy}
-              variant="outline"
-              title="Copy to clipboard"
-            >
+            <Button size="lg" onClick={copy} variant="outline" title="Copy to clipboard">
+              <Icon icon={<IconCopy stroke="#000" />} stroke="orange.default" position="start" size="lg" />
               All examples
             </Button>
             {copied && (
               <div className="toast_box shadow_l">
-                <Icon icon={<CheckIcon />} position="start" size="lg" />
+                <Icon icon={<IconCheck stroke="#000" />} stroke="orange.default" position="start" size="lg" />
                 Copied
               </div>
             )}

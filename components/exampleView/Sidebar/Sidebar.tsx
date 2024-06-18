@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import { SidebarContextProvider, useSidebarContext } from './Sidebar.context';
 import { SidebarTabs, SidebarTabsList, SidebarTabsTab, SidebarTabsPanel } from './SidebarTabs';
-import { Flex, Button } from 'yorkie-ui';
-import { ArrowLeftIcon, ArrowRightIcon } from '@/components/Icons/Icons';
+import { Flex, Button, IconArrowLeft, IconArrowRight } from 'yorkie-ui';
 import React from 'react';
 
 export function Sidebar({
@@ -44,7 +43,7 @@ function SidebarTop({ children }: { children?: React.ReactNode }) {
       <Button
         onClick={() => ctx.setIsOpened((opened) => !opened)}
         variant="outline"
-        icon={ctx.isOpened ? <ArrowLeftIcon /> : <ArrowRightIcon />}
+        icon={ctx.isOpened ? <IconArrowLeft /> : <IconArrowRight />}
         position="start"
         size="sm"
       />

@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import { Popover } from 'components';
 import { ThemeOption, useTheme } from '@/hooks/useTheme';
-import { Icon } from 'yorkie-ui';
-import { ArrowIcon } from '@/components/Icons/Icons';
+import { Icon, IconArrow } from 'yorkie-ui';
 
 export function ThemeDropdown() {
   const [dropdownOpened, setDropdownOpened] = useState(false);
@@ -21,7 +20,7 @@ export function ThemeDropdown() {
         <button type="button" className="btn btn_small">
           <span className="filter_title">Theme:</span>
           <span className="text">{themeOption.replace(/^[a-z]/, (char) => char.toUpperCase())}</span>
-          <Icon icon={<ArrowIcon />} position="start" size="xl" />
+          <Icon icon={<IconArrow />} position="start" size="xl" />
         </button>
       </Popover.Target>
       <Popover.Dropdown>
