@@ -42,7 +42,7 @@ function NavGroup({ isActive, children }: { isActive: boolean; children: React.R
 
 function NavMenu({ title, href, isActive }: { title: string; href: string; isActive: boolean }) {
   return (
-    <Link href={href} className={classNames('navigator_menu', { is_active: isActive })}>
+    <Link href={href} className={classNames('navigator_menu', { is_active: isActive })} color="gray.a12">
       <span className="icon">
         <ArrowSVG />
       </span>

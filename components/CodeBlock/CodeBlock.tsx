@@ -29,10 +29,13 @@ function CopyButtonBox({ value, timeout = 1000 }: { value: string; timeout?: num
       <CopyButton value={value} timeout={timeout}>
         {({ copied, copy }) => (
           <>
-            <Button size="lg" onClick={copy} variant="outline" title="Copy to clipboard">
-              <Icon icon={<IconCopy stroke="#000" />} stroke="orange.default" position="start" size="lg" />
-              All examples
-            </Button>
+            <Button
+              as="link"
+              href="https://github.com/yorkie-team/dashboard/issues"
+              variant="outline"
+              position="start"
+              icon={<Icon icon={<IconCopy />} />}
+            ></Button>
             {copied && (
               <div className="toast_box shadow_l">
                 <Icon icon={<IconCheck stroke="#000" />} stroke="orange.default" position="start" size="lg" />

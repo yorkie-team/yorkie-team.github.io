@@ -1,6 +1,6 @@
 import { ReactElement, useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { Button, Box, Icon, Heading, Flex, Link, IconStar } from 'yorkie-ui';
+import { Button, Box, Icon, Heading, Flex, Link, IconStar, Text } from 'yorkie-ui';
 import { isValidToken } from '@/utils/isValidToken';
 import { MobileGnbDropdown } from './MobileGnbDropdown';
 import LogoSVG from '@/public/assets/icons/logo_horizontal_xs.svg';
@@ -26,7 +26,9 @@ export function Header(): ReactElement {
     >
       <Flex gap="12">
         <Heading as="h1">
-          <span className="blind">Yorkie</span>
+          <Text display="none" className="blind">
+            Yorkie
+          </Text>
           <Box display={{ base: 'none', lg: 'block' }}>
             <Link href="/" fontSize="8xl">
               <LogoSVG />

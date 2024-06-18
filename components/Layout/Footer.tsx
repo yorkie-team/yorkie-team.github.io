@@ -1,12 +1,16 @@
-import { ReactElement } from 'react';
+import { ReactElement, useEffect, useState } from 'react';
 
 import LogoSVG from '@/public/assets/icons/logo_horizontal_s.svg';
 import { ThemeDropdown } from './ThemeDropdown';
-import { Link, Box, Grid, GridItem, Container, Text, Flex, Icon, IconLogo } from 'yorkie-ui';
+import { Link, Box, Grid, GridItem, Container, Text, Flex, Icon, IconLogo, Select, IconDown } from 'yorkie-ui';
 import React from 'react';
+import { ThemeOption, useTheme } from '@/hooks/useTheme';
 
 const fullYear = new Date(process.env.NEXT_PUBLIC_BUILT_AT!).getFullYear();
 export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement {
+  const { setTheme } = useTheme();
+  const [themeOption, setThemeOption] = useState<ThemeOption>('system');
+
   if (shortFooter) {
     return (
       <Flex
@@ -20,6 +24,19 @@ export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement
     );
   }
 
+  useEffect(() => {
+    const themeOption = (window.localStorage.getItem('theme') || 'system') as ThemeOption;
+    setThemeOption(themeOption);
+  }, [setTheme]);
+
+  const setThemeSelect = (value: items) => {
+    setThemeOption(value.label);
+    setTheme(value.value);
+  };
+  const items = [
+    { label: 'Dark', value: 'dark' },
+    { label: 'Light', value: 'light' },
+  ];
   return (
     <Box background="gray.a2" paddingInline={{ base: '6', lg: '0' }}>
       <Container
@@ -33,12 +50,34 @@ export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement
           display={{ base: 'block', lg: 'grid' }}
         >
           <GridItem gridColumnStart={1} gridColumnEnd={3}>
-            <Link href="/" fontSize="9xl" height="6">
+            <Link href="/" fontSize="9xl" height="6" className="logo">
               <IconLogo />
             </Link>
-            <Text color="black.a9" fontSize="sm">
+            <Text color="neutral.a12" fontSize="sm" marginBottom="4">
               Copyright &copy; {fullYear} Yorkie
             </Text>
+            <Select.Root positioning={{ sameWidth: true }} width="2xs" items={items} width="fit">
+              <Select.Control>
+                <Select.Trigger>
+                  <Select.ValueText placeholder={`Theme: ${themeOption}`} />
+                  <IconDown />
+                </Select.Trigger>
+              </Select.Control>
+              <Select.Positioner>
+                <Select.Content>
+                  <Select.ItemGroup id="framework">
+                    {items.map((item) => (
+                      <Select.Item onClick={(e) => setThemeSelect(item)} key={item.value} item={item}>
+                        <Select.ItemText>{item.label}</Select.ItemText>
+                        <Select.ItemIndicator>
+                          <IconDown />
+                        </Select.ItemIndicator>
+                      </Select.Item>
+                    ))}
+                  </Select.ItemGroup>
+                </Select.Content>
+              </Select.Positioner>
+            </Select.Root>
           </GridItem>
           <GridItem gridColumnStart={3} gridColumnEnd={4} display="grid" marginTop={{ base: 20, lg: 0 }}>
             <Flex direction="column" gap="6">

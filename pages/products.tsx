@@ -70,12 +70,12 @@ const Products: NextPage = () => {
               Start for free
             </Button>
           </Box>
-          <Box className="svg-responsive">
+          <Box className="svg-responsive img_box">
             <ProductBannerSVG />
           </Box>
         </Flex>
       </Container>
-      <Box borderWidth="1px" borderRadius="2xl" overflow="hidden" />
+      <Box borderWidth="1px" borderRadius="2xl" overflow="hidden" borderColor="gray.a10" />
       <Container
         paddingInline={{ base: '6', lg: '0' }}
         paddingBlock="20"
@@ -94,7 +94,13 @@ const Products: NextPage = () => {
             management. This saves time and money.
           </Text>
         </Grid>
-        <Box borderWidth="1px" borderRadius="2xl" overflow="hidden" marginBlock={{ base: '6', lg: '16' }} />
+        <Box
+          borderWidth="1px"
+          borderRadius="2xl"
+          overflow="hidden"
+          marginBlock={{ base: '6', lg: '16' }}
+          borderColor="gray.a10"
+        />
 
         <Text fontWeight="semibold" fontSize={{ base: 'xl', lg: '3xl' }} marginTop={{ base: '20', lg: '0' }}>
           Conflict-free state sharing
@@ -105,7 +111,7 @@ const Products: NextPage = () => {
           Transformation(OT) algorithms which can be complex and may not always ensure convergence. Yorkie&apos;s use of
           the well-proven CRDT algorithm ensures reliable services.
         </Text>
-        <Box margin="auto" width="fit" marginTop="14" className="svg-responsive">
+        <Box margin="auto" width="fit" marginTop="14" className="svg-responsive img_box">
           <StateSharingDetailMotion />
         </Box>
         <Text fontWeight="semibold" fontSize={{ base: 'xl', lg: '3xl' }} marginTop="14">
@@ -113,7 +119,7 @@ const Products: NextPage = () => {
         </Text>
         <Text marginTop="10" lineHeight="normal" fontWeight={{ base: 'regular', lg: 'semibold' }}>
           Yorkie provides a general-purpose JSON-like{' '}
-          <Link href="/docs/js-sdk#document" textDecoration="underline" textDecorationColor="black.a9">
+          <Link href="/docs/js-sdk#document" textDecoration="underline" textDecorationColor="neutral.a12">
             Document
           </Link>{' '}
           to enable complex application models while some CRDT libraries that only offer basic data types.
@@ -125,7 +131,7 @@ const Products: NextPage = () => {
                 <Button
                   variant="ghost"
                   color={documentType == 'common' ? 'white' : ''}
-                  background={documentType == 'common' ? 'black.a9' : ''}
+                  background={documentType == 'common' ? 'neutral.a12' : ''}
                   onClick={() => {
                     setDocumentType('common');
                   }}
@@ -135,7 +141,7 @@ const Products: NextPage = () => {
                 <Button
                   variant="ghost"
                   color={documentType == 'text' ? 'white' : ''}
-                  background={documentType == 'text' ? 'black.a9' : ''}
+                  background={documentType == 'text' ? 'neutral.a12' : ''}
                   onClick={() => {
                     setDocumentType('text');
                   }}
@@ -145,7 +151,7 @@ const Products: NextPage = () => {
                 <Button
                   variant="ghost"
                   color={documentType == 'counter' ? 'white' : ''}
-                  background={documentType == 'counter' ? 'black.a9' : ''}
+                  background={documentType == 'counter' ? 'neutral.a12' : ''}
                   onClick={() => {
                     setDocumentType('counter');
                   }}
@@ -159,7 +165,7 @@ const Products: NextPage = () => {
             </CodeBlockHeader>
             <CodeBlock code={DOCUMENT_CODE[documentType]} language="javascript" withLineNumbers />
           </CodeBlock.Wrapper>
-          <Box className="svg-responsive" marginTop={{ base: '6', lg: '0' }}>
+          <Box className="svg-responsive img_box" marginTop={{ base: '6', lg: '0' }}>
             <FlexibleDocumentMotion />
           </Box>
         </Flex>
@@ -174,10 +180,10 @@ const Products: NextPage = () => {
           .
         </Text>
         <Flex display={{ base: 'block', lg: 'flex' }} gap="4" justifyContent="space-between" marginTop="10">
-          <Box className="svg-responsive">
+          <Box className="svg-responsive img_box">
             <ProductAwarenessLeftSVG />
           </Box>
-          <Box className="svg-responsive" marginTop={{ base: '6', lg: '0' }}>
+          <Box className="svg-responsive img_box" marginTop={{ base: '6', lg: '0' }}>
             <ProductAwarenessRightSVG />
           </Box>
         </Flex>
@@ -186,27 +192,27 @@ const Products: NextPage = () => {
         </Link>
         <Grid gridTemplateColumns={{ base: '0', lg: '3' }} marginTop="10" gap="6">
           <GridItem borderWidth="1px" borderRadius="md" overflow="hidden" padding="8">
-            <Text fontSize="lg" fontWeight="semibold" color="black.a9">
+            <Text fontSize="lg" fontWeight="semibold" color="neutral.a12">
               SDKs for Mobile &amp; Web
             </Text>
             <Text marginTop="6" fontSize="xs">
               Yorkie SDKs support development for{' '}
-              <Link href="/docs/ios-sdk" textDecoration="underline" textDecorationColor="black.a9">
+              <Link href="/docs/ios-sdk" textDecoration="underline" textDecorationColor="neutral.a12">
                 iOS
               </Link>
               ,{' '}
-              <Link href="/docs/android-sdk" textDecoration="underline" textDecorationColor="black.a9">
+              <Link href="/docs/android-sdk" textDecoration="underline" textDecorationColor="neutral.a12">
                 Android
               </Link>{' '}
               and{' '}
-              <Link href="/docs/js-sdk" textDecoration="underline" textDecorationColor="black.a9">
+              <Link href="/docs/js-sdk" textDecoration="underline" textDecorationColor="neutral.a12">
                 Web
               </Link>{' '}
               applications.
             </Text>
           </GridItem>
           <GridItem borderWidth="1px" borderRadius="md" overflow="hidden" padding="8">
-            <Text fontSize="lg" fontWeight="semibold" color="black.a9">
+            <Text fontSize="lg" fontWeight="semibold" color="neutral.a12">
               Size optimization
             </Text>
             <Text marginTop="6" fontSize="xs">
@@ -214,7 +220,7 @@ const Products: NextPage = () => {
               <Link
                 href="https://github.com/yorkie-team/yorkie/blob/main/design/garbage-collection.md"
                 textDecoration="underline"
-                textDecorationColor="black.a9"
+                textDecorationColor="neutral.a12"
               >
                 Garbage Collection
               </Link>{' '}
@@ -222,7 +228,7 @@ const Products: NextPage = () => {
               <Link
                 href="https://en.wikipedia.org/wiki/Lamport_timestamp"
                 textDecoration="underline"
-                textDecorationColor="black.a9"
+                textDecorationColor="neutral.a12"
               >
                 Lamport timestamps
               </Link>{' '}
@@ -230,12 +236,12 @@ const Products: NextPage = () => {
             </Text>
           </GridItem>
           <GridItem borderWidth="1px" borderRadius="md" overflow="hidden" padding="8">
-            <Text fontSize="lg" fontWeight="semibold" color="black.a9">
+            <Text fontSize="lg" fontWeight="semibold" color="neutral.a12">
               Security
             </Text>
             <Text marginTop="6" fontSize="xs">
               Yorkie uses{' '}
-              <Link href="/docs/cli#auth-webhook" textDecoration="underline" textDecorationColor="black.a9">
+              <Link href="/docs/cli#auth-webhook" textDecoration="underline" textDecorationColor="neutral.a12">
                 Auth Webhook
               </Link>{' '}
               allows users to verify the authorization of clients to access documents from an external service.
@@ -244,7 +250,7 @@ const Products: NextPage = () => {
         </Grid>
         <Grid gridTemplateColumns={{ base: '0', lg: '2' }} alignItems="center" marginTop="36">
           <Link href="#dashboard">
-            <Heading as="h2" fontSize={{ base: '3xl', lg: '5xl' }} color="black.a9">
+            <Heading as="h2" fontSize={{ base: '3xl', lg: '5xl' }} color="neutral.a12">
               Real-time monitoring
               <br />
               anytime, anywhere.
@@ -254,7 +260,7 @@ const Products: NextPage = () => {
             Dashboard allows project members to browse stored documents and supervise the data warehouse easily.
           </Text>
         </Grid>
-        <Box borderWidth="1px" borderRadius="2xl" overflow="hidden" marginBlock="16" />
+        <Box borderWidth="1px" borderRadius="2xl" overflow="hidden" marginBlock="16" borderColor="gray.a10" />
         <Link href="#collaboration-awareness" fontWeight="semibold" fontSize={{ base: 'xl', lg: '3xl' }} marginTop="6">
           <Icon icon={<IconCloud />} stroke="#F27B2F" size={{ base: 'lg', lg: 'xl' }} />
           Dashboard
@@ -263,16 +269,16 @@ const Products: NextPage = () => {
           Dashboard in Cloud is accessible from any device without the need for installation.
         </Text>
         <Flex justifyContent="space-between" marginTop="10" gap="2">
-          <Box borderWidth="1px" borderRadius="sm" className="svg-responsive">
+          <Box borderWidth="1px" borderRadius="sm" className="svg-responsive img_box" borderColor="gray.a10">
             <ProductPCSVG />
           </Box>
-          <Box borderWidth="1px" borderRadius="sm" className="svg-responsive">
+          <Box borderWidth="1px" borderRadius="sm" className="svg-responsive img_box" borderColor="gray.a10">
             <ProductMobileSVG />
           </Box>
         </Flex>
         <Grid gridTemplateColumns={{ base: '0', lg: '2' }} alignItems="center" marginTop="36">
           <Link href="#self-hosted-server">
-            <Heading as="h2" fontSize="5xl" color="black.a9">
+            <Heading as="h2" fontSize="5xl" color="neutral.a12">
               Build your own
               <br />
               Cluster
@@ -282,7 +288,7 @@ const Products: NextPage = () => {
             If needed, Yorkie open source packages allow you to build self-hosted server locally.
           </Text>
         </Grid>
-        <Box borderWidth="1px" borderRadius="2xl" overflow="hidden" marginBlock="16" />
+        <Box borderWidth="1px" borderRadius="2xl" overflow="hidden" marginBlock="16" borderColor="gray.a10" />
         <Flex display={{ base: 'flex', lg: 'block' }} flexDirection="column">
           <Box display="inline-block">
             <Flex alignItems="center" gap="4" width="fit">
@@ -298,7 +304,7 @@ const Products: NextPage = () => {
               wLink={{ base: '100w', lg: 'fit' }}
               float="right"
               marginRight="auto"
-              backgroundColor="black.a9"
+              backgroundColor="neutral.a10"
               as="link"
               href="/docs/self-hosted-server"
               icon={<IconBook />}
@@ -312,7 +318,7 @@ const Products: NextPage = () => {
             Yorkie open-source package includes SDKs, a server, and a database, making it easy to implement the
             co-editing feature.
           </Text>
-          <Flex marginTop="16" justifyContent="center" className="svg-responsive">
+          <Flex marginTop="16" justifyContent="center" className="svg-responsive img_box">
             <ProductPackageSVG />
           </Flex>
         </Flex>

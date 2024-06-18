@@ -22,7 +22,7 @@ const Community: NextPage = () => {
           paddingInline={{ base: '6', lg: '0' }}
           paddingBlock={{ base: '12', lg: '40' }}
         >
-          <Heading as="h2" fontSize={{ base: '3xl', lg: '6xl' }} color="black.a9">
+          <Heading as="h2" fontSize={{ base: '3xl', lg: '6xl' }} color="neutral.a12">
             Join our community
           </Heading>
           <Flex
@@ -31,17 +31,17 @@ const Community: NextPage = () => {
             flexDirection={{ base: 'column-reverse', lg: 'row' }}
           >
             <Box>
-              <Text fontWeight="semibold" paddingBottom="10" lineHeight="normal">
+              <Box fontWeight="semibold" paddingBottom="10" lineHeight="normal">
                 If you have any questions along the way,
-                <br className="br_mo" /> please don’t hesitate to ask us
-                <br className="br_tablet" /> through our
-                <br className="br_mo" />
-                <br className="br_pc" />
+                <Text display={{ base: 'block', lg: 'none' }} /> please don’t hesitate to ask us
+                <Text display={{ base: 'block', sm: 'none' }} /> through our
+                <Text display={{ base: 'block', lg: 'none' }} />
+                <Text display={{ base: 'block', lg: 'none' }} />
                 channels.
-                <br className="br_mo_xs" /> You can sign up for our Discord or
-                <br className="br_mo" /> raise GitHub
-                <br className="br_tablet" /> discussions.
-              </Text>
+                <Text display={{ base: 'block' }} /> You can sign up for our Discord or
+                <Text display={{ base: 'block', lg: 'none' }} /> raise GitHub
+                <Text display={{ base: 'block', sm: 'none' }} /> discussions.
+              </Box>
               <Flex gap="6" justifyContent={{ base: 'space-evenly', lg: 'flex-start' }}>
                 <Button
                   icon={<IconDiscord />}

@@ -77,13 +77,13 @@ export function ProjectCodes({
                 }}
               >
                 {child.isFile ? (
-                  <Icon icon={<IconFile />} position="start" size="xl" />
+                  <Icon icon={<IconFile />} position="start" size="xs" />
                 ) : isFolderOpen ? (
-                  <Icon icon={<IconFolderOpen />} position="start" size="sm" />
+                  <Icon icon={<IconFolderOpen />} position="start" size="xs" />
                 ) : (
-                  <Icon icon={<IconFolderClose />} position="start" size="sm" />
+                  <Icon icon={<IconFolderClose />} position="start" size="xs" />
                 )}
-                <Text fontSize="sm"> {child.name}</Text>
+                <Text fontSize="xs"> {child.name}</Text>
               </button>
               {!child.isFile && isFolderOpen && <SubFolderCodes fileList={child.children} onClickFile={onClickFile} />}
             </li>
@@ -91,7 +91,7 @@ export function ProjectCodes({
         })}
       </ul>
       <div className="codeblock_area">
-        <Text fontSize="md" borderWidth="1px" borderBottom="1px" align="center" fontWeight="semibold" paddingBlock="3">
+        <Text fontSize="xs" borderWidth="1px" borderBottom="1px" align="center" fontWeight="semibold" paddingBlock="1">
           {activeFileInfo?.name || ''}
         </Text>
         <Box className="codeblock_box" fontSize="sm">
@@ -134,13 +134,13 @@ function SubFolderCodes({
               }}
             >
               {child.isFile ? (
-                <Icon icon={<IconFile />} position="start" size="sm" />
+                <Icon icon={<IconFile />} position="start" size="xs" />
               ) : isFolderOpen ? (
-                <Icon icon={<IconFolderOpen />} position="start" size="sm" />
+                <Icon icon={<IconFolderOpen />} position="start" size="xs" />
               ) : (
-                <Icon icon={<IconFolderClose />} position="start" size="sm" />
+                <Icon icon={<IconFolderClose />} position="start" size="xs" />
               )}
-              <Text fontSize="sm">{child.name}</Text>
+              <Text fontSize="xs">{child.name}</Text>
             </button>
             {!child.isFile && isFolderOpen && <SubFolderCodes fileList={child.children} onClickFile={onClickFile} />}
           </li>

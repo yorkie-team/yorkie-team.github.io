@@ -36,24 +36,26 @@ export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
         position="absolute"
         width="100w"
         left="0"
-        paddingInline="6"
-        background="white"
+        background="neutral.2"
       >
         <Link
           href="/products"
           bg={asPath?.split('#')[0] === '/products' ? 'orange.default' : 'white.11'}
           paddingBlock="3"
+          paddingInline="6"
         >
           <span className="dropdown_text">Products</span>
         </Link>
         <Link
+          paddingInline="6"
           href="/example"
-          bg={asPath?.split('#')[0] === '/example' ? 'orange.default' : 'white.11'}
+          bg={asPath?.split('#')[0] === '/examples' ? 'orange.default' : 'white.11'}
           paddingBlock="3"
         >
           <span className="dropdown_text">Example</span>
         </Link>
         <Link
+          paddingInline="6"
           href="/community"
           bg={asPath?.split('#')[0] === '/community' ? 'orange.default' : 'white.11'}
           paddingBlock="3"
@@ -65,6 +67,7 @@ export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
             href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`}
             bg={asPath?.split('#')[0] === `${process.env.NEXT_PUBLIC_DASHBOARD_PATH}` ? 'orange.default' : 'white.11'}
             paddingBlock="3"
+            paddingInline="6"
           >
             <span className="dropdown_text">Dashboard</span>
           </Link>
@@ -78,6 +81,7 @@ export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
                   : 'white.11'
               }
               paddingBlock="3"
+              paddingInline="6"
             >
               <span className="dropdown_text">Sign in</span>
             </Link>
@@ -89,6 +93,7 @@ export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
                   : 'white.11'
               }
               paddingBlock="3"
+              paddingInline="6"
             >
               <span className="dropdown_text">Start for free</span>
             </Link>

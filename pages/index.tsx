@@ -116,12 +116,14 @@ const Home: NextPage = () => {
       >
         <Box
           borderWidth={{ base: '0', lg: 'xs' }}
+          borderColor="gray.a11"
           borderRadius="2xl"
           overflow="hidden"
           marginTop={{ base: '0', lg: '60' }}
         >
           <Flex
             borderWidth="1px"
+            borderColor="gray.a11"
             borderBottom="1px"
             justifyContent="space-between"
             alignItems="center"
@@ -164,7 +166,7 @@ const Home: NextPage = () => {
             </Box>
             <Text
               align="center"
-              color="black.a8"
+              color="neutral.a11"
               fontWeight="semibold"
               marginTop="8"
               fontSize={{ base: 'sm', lg: 'md' }}
@@ -207,28 +209,34 @@ const Home: NextPage = () => {
           </Box>
         </Box>
         <Box marginTop="40">
-          <Text fontSize={{ base: '3xl', lg: '6xl' }} fontWeight="semibold" align="center">
-            Variety of <br className="br_mo" /> collaboration features <br /> for your app
-          </Text>
-          <Text
+          <Box fontSize={{ base: '3xl', lg: '6xl' }} fontWeight="semibold" align="center">
+            Variety of <Text display={{ base: 'block', lg: 'none' }} /> collaboration features <br /> for your app
+          </Box>
+          <Box
             align="center"
-            color="black.a8"
+            color="neutral.a12"
             fontWeight="semibold"
             marginTop="8"
             fontSize={{ base: 'sm', lg: 'md' }}
             lineHeight="normal"
           >
-            Easily add stable and diverse collaborative features <br className="br_mo" />
+            Easily add stable and diverse collaborative features <Text display={{ base: 'block', lg: 'none' }} />
             to your product with Yorkie. <br />
-            Transform your local-based product into a <br className="br_mo" /> collaborative online experience with our
-            powerful tools. <br />
-            Sign up now and start providing your users <br className="br_mo" /> with a completely new real-time
-            experience.
-          </Text>
-          <Grid gridTemplateColumns={{ base: 1, lg: 6 }} gap={4} marginTop={{ base: '14', lg: '32' }}>
+            Transform your local-based product into a <Text display={{ base: 'block', lg: 'none' }} /> collaborative
+            online experience with our powerful tools. <br />
+            Sign up now and start providing your users <Text display={{ base: 'block', lg: 'none' }} /> with a
+            completely new real-time experience.
+          </Box>
+          <Grid gridTemplateColumns={{ base: 1, lg: 6 }} gap={4} marginTop={{ base: '14', lg: '12' }}>
             <GridItem gridColumnStart={1} gridColumnEnd={3} gridColumn={2} display="grid">
               <Box className="service_card_list">
-                <Box onClick={(e) => onClickOne(e, 'profile')} borderWidth="1px" borderRadius="2xl" cursor="pointer">
+                <Box
+                  onClick={(e) => onClickOne(e, 'profile')}
+                  borderWidth="1px"
+                  borderColor="gray.a11"
+                  borderRadius="2xl"
+                  cursor="pointer"
+                >
                   <Box paddingInline="10" paddingBottom={activeFeatureCard == 'profile' ? '10' : '6'} paddingTop="6">
                     {activeFeatureCard == 'profile' && (
                       <Box margin="auto" width="fit">
@@ -254,6 +262,7 @@ const Home: NextPage = () => {
                   borderRadius="2xl"
                   marginTop="6"
                   cursor="pointer"
+                  borderColor="gray.a7"
                 >
                   <Box
                     paddingInline="10"
@@ -386,10 +395,10 @@ const Home: NextPage = () => {
             </GridItem>
             <GridItem gridColumnStart={11} gridColumnEnd={12} gridColumn={3}>
               <Box>
-                <Text fontSize="2xl" fontWeight="semibold" color="black.a9" marginTop={{ base: 10, lg: 0 }}>
+                <Text fontSize="2xl" fontWeight="semibold" color="neutral.a12" marginTop={{ base: 10, lg: 0 }}>
                   Document and Presence
                 </Text>
-                <Text fontSize="md" marginTop="6" fontWeight="medium" color="black.a9">
+                <Text fontSize="md" marginTop="6" fontWeight="medium" color="neutral.a12">
                   Document is stored using conflict-free replicated data types(CRDTs), which ensures that multiple users
                   can edit the same data concurrently without encountering conflicts. Presence represents a peer&apos;s
                   awareness of the data being edited. It is used to track which users are currently editing the
@@ -400,7 +409,7 @@ const Home: NextPage = () => {
                   width={{ base: '100w', lg: 'fit' }}
                   wLink={{ base: '100w', lg: 'fit' }}
                   href="/products#document-and-presence"
-                  backgroundColor="black.a9"
+                  backgroundColor="neutral.a10"
                   icon={<IconBook />}
                   position="start"
                   size={{ base: 'sm', lg: 'lg' }}
@@ -419,10 +428,10 @@ const Home: NextPage = () => {
             </GridItem>
             <GridItem gridColumnStart={11} gridColumnEnd={12} gridColumn={3}>
               <Box>
-                <Text fontSize="xl" fontWeight="semibold" color="black.a9" marginTop={{ base: 10, lg: 0 }}>
+                <Text fontSize="xl" fontWeight="semibold" color="neutral.a12" marginTop={{ base: 10, lg: 0 }}>
                   Data Warehouse with Dashboard
                 </Text>
-                <Text fontSize="md" marginTop="6" fontWeight="medium" color="black.a9">
+                <Text fontSize="md" marginTop="6" fontWeight="medium" color="neutral.a12">
                   Dashboard allows users to easily browse stored documents and monitor the data warehouse in real-time.
                   With Dashboard, users can quickly and easily supervise the data warehouse and ensure that it is
                   functioning properly.
@@ -432,7 +441,7 @@ const Home: NextPage = () => {
                   width={{ base: '100w', lg: 'fit' }}
                   wLink={{ base: '100w', lg: 'fit' }}
                   href="/products#dashboard"
-                  backgroundColor="black.a9"
+                  backgroundColor="neutral.a10"
                   icon={<IconBook />}
                   position="start"
                   size={{ base: 'sm', lg: 'lg' }}
@@ -451,10 +460,10 @@ const Home: NextPage = () => {
             </GridItem>
             <GridItem gridColumnStart={11} gridColumnEnd={12} gridColumn={3}>
               <Box>
-                <Text fontSize="xl" fontWeight="semibold" color="black.a9" marginTop={{ base: 10, lg: 0 }}>
+                <Text fontSize="xl" fontWeight="semibold" color="neutral.a12" marginTop={{ base: 10, lg: 0 }}>
                   Cloud or Self-Hosted Server
                 </Text>
-                <Text fontSize="md" marginTop="6" fontWeight="medium" color="black.a9">
+                <Text fontSize="md" marginTop="6" fontWeight="medium" color="neutral.a12">
                   Yorkie offers flexible deployment options, allowing user to use a cloud or host the server on your own
                   premises. Whether you want the convenience of cloud or the control of a self-hosted server, Yorkie has
                   you covered.
@@ -464,7 +473,7 @@ const Home: NextPage = () => {
                   width={{ base: '100w', lg: 'fit' }}
                   wLink={{ base: '100w', lg: 'fit' }}
                   href="/products#self-hosted-server"
-                  backgroundColor="black.a9"
+                  backgroundColor="neutral.a10"
                   icon={<IconBook />}
                   position="start"
                   size={{ base: 'sm', lg: 'lg' }}
@@ -485,13 +494,13 @@ const Home: NextPage = () => {
               <Accordion.ItemTrigger>
                 <Flex alignItems="center" gap="3">
                   <Icon icon={<IconMessageSquare />} position="start" size="lg" />
-                  <Text color="black.a8" size="3xl">
+                  <Text color="neutral.a11" size="3xl">
                     Can we use the Yorkie for free?
                   </Text>
                 </Flex>
               </Accordion.ItemTrigger>
               <Accordion.ItemContent>
-                <Text size="md" lineHeight="normal" color="black.a11">
+                <Text size="md" lineHeight="normal" color="neutral.a12">
                   Yes, Yorkie is free to use. <br />
                   <br />
                   You can access it at no cost. Please note that the availability of the service and any associated
@@ -504,13 +513,13 @@ const Home: NextPage = () => {
               <Accordion.ItemTrigger>
                 <Flex alignItems="center" gap="3">
                   <Icon icon={<IconMessageSquare />} position="start" size="lg" />
-                  <Text color="black.a8" size="3xl">
+                  <Text color="neutral.a11" size="3xl">
                     Is the Yorkie production ready?
                   </Text>
                 </Flex>
               </Accordion.ItemTrigger>
               <Accordion.ItemContent>
-                <Text size="md" lineHeight="normal" color="black.a11">
+                <Text size="md" lineHeight="normal" color="neutral.a12">
                   No, Yorkie is not yet production ready. <br />
                   <br />
                   While the CRDT algorithm has been verified, not all of the code has been fully battle-tested. The
@@ -525,14 +534,14 @@ const Home: NextPage = () => {
             <Accordion.Item value="question-three">
               <Accordion.ItemTrigger>
                 <Flex alignItems="center" gap="3">
-                  <Icon icon={<IconMessageSquare />} position="start" size="lg" />
-                  <Text color="black.a8" size="3xl">
+                  <Icon icon={<IconMessageSquare />} size="lg" />
+                  <Text color="neutral.a11" size="3xl">
                     How can I contribute to the Yorkie project?
                   </Text>
                 </Flex>
               </Accordion.ItemTrigger>
               <Accordion.ItemContent>
-                <Text size="md" lineHeight="normal" color="black.a11">
+                <Text size="md" lineHeight="normal" color="neutral.a11">
                   Yorkie is an open source project, so there are many ways to contribute to its development. <br />
                   <br />
                   One way to contribute is by reporting any bugs you encounter while using the service. You can also

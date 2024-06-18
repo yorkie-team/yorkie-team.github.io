@@ -1,8 +1,8 @@
 import { ReactElement, ReactNode, useState } from 'react';
 import Link from 'next/link';
 import classNames from 'classnames';
-import { Button, Icon } from '@/components';
 import LogoGnbSVG from '@/public/assets/icons/logo_gnb.svg';
+import { Box, Text,} from 'yorkie-ui';
 
 type ExampleViewType = 'full' | 'show' | 'grid' | 'split';
 type ExampleViewIconType = 'viewFull' | 'viewShow' | 'viewGrid' | 'viewSplit';
@@ -34,7 +34,7 @@ export function ExampleLayout({
             <Link href="/">
               <LogoGnbSVG />
             </Link>
-            <span className="blind">Yorkie</span>
+            <Box display="none">Yorkie</Box>
           </h1>
           <span className="nav_text">
             <Link href="/examples">Examples</Link>

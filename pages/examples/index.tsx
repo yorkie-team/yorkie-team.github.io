@@ -33,7 +33,7 @@ const Examples: NextPage = () => {
         </Head>
         <Flex flexDirection={{ base: 'column-reverse', lg: 'row' }} marginTop="28" gap="6" alignItems="center">
           <Box>
-            <Heading as="h2" fontSize={{ base: '3xl', lg: '6xl' }} color="black.a9" fontWeight="600">
+            <Heading as="h2" fontSize={{ base: '3xl', lg: '6xl' }} color="neutral.a12" fontWeight="600">
               Explore examples <br /> built by Yorkie
             </Heading>
             <Text fontSize="md" fontWeight="semibold" marginBlock="10">
@@ -57,7 +57,7 @@ const Examples: NextPage = () => {
           </Box>
         </Flex>
       </Container>
-      <Box borderWidth="1px" borderBottom="1px" marginTop="28" />
+      <Box borderWidth="1px" borderBottom="1px" marginTop="28" borderColor="gray.a11" />
       <Container
         paddingInline={{ base: '6', lg: '0' }}
         paddingBottom="40"
@@ -66,13 +66,20 @@ const Examples: NextPage = () => {
       >
         <Grid gridTemplateColumns={{ base: 1, lg: 6 }} gap={4} marginTop="32">
           <GridItem gridColumnStart={1} gridColumnEnd={3} gridColumn={2} display="grid">
-            <Button position="start" size="lg" variant="ghost" color="black.a9">
+            <Button position="start" size="lg" variant="ghost" color="neutral.a12">
               <Icon icon={<IconDiamond />} />
               All examples
             </Button>
           </GridItem>
           <GridItem gridColumnStart={3} gridColumnEnd={5} gridColumn={2} display="grid">
-            <Link display="block" href="/examples/profile-stack" borderWidth="1px" borderRadius="lg" overflow="hidden">
+            <Link
+              display="block"
+              href="/examples/profile-stack"
+              borderWidth="1px"
+              borderRadius="lg"
+              overflow="hidden"
+              borderColor="gray.a11"
+            >
               <ExampleThumbnailImage fileName="profile-stack.jpg" alt="profile-stack" />
               <Box
                 mt="3"
@@ -92,7 +99,14 @@ const Examples: NextPage = () => {
               </Box>
             </Link>
             <Box marginBlock="4" />
-            <Link display="block" href="/examples/todomvc" borderWidth="1px" borderRadius="lg" overflow="hidden">
+            <Link
+              display="block"
+              href="/examples/todomvc"
+              borderWidth="1px"
+              borderRadius="lg"
+              overflow="hidden"
+              borderColor="gray.a11"
+            >
               <ExampleThumbnailImage fileName="react-todomvc.jpg" alt="react-todomvc" />
               <Box
                 mt="3"
@@ -112,7 +126,14 @@ const Examples: NextPage = () => {
               </Box>
             </Link>
             <Box marginBlock="4" />
-            <Link display="block" href="/examples/tldraw" borderWidth="1px" borderRadius="lg" overflow="hidden">
+            <Link
+              display="block"
+              href="/examples/tldraw"
+              borderWidth="1px"
+              borderRadius="lg"
+              overflow="hidden"
+              borderColor="gray.a11"
+            >
               <ExampleThumbnailImage fileName="react-tldraw.jpg" alt="react-tldraw" />
               <Box
                 mt="3"
@@ -133,7 +154,14 @@ const Examples: NextPage = () => {
               </Box>
             </Link>
             <Box marginBlock="4" />
-            <Link display="block" href="/examples/calendar" borderWidth="1px" borderRadius="lg" overflow="hidden">
+            <Link
+              display="block"
+              href="/examples/calendar"
+              borderWidth="1px"
+              borderRadius="lg"
+              overflow="hidden"
+              borderColor="gray.a11"
+            >
               <ExampleThumbnailImage fileName="nextjs-scheduler.jpg" alt="nextjs-scheudler" />
               <Box
                 mt="3"
@@ -154,7 +182,14 @@ const Examples: NextPage = () => {
             </Link>
           </GridItem>
           <GridItem gridColumnStart={5} gridColumnEnd={8} gridColumn={2} display="grid">
-            <Link display="block" href="/examples/profile-stack" borderWidth="1px" borderRadius="lg" overflow="hidden">
+            <Link
+              display="block"
+              href="/examples/profile-stack"
+              borderWidth="1px"
+              borderRadius="lg"
+              overflow="hidden"
+              borderColor="gray.a11"
+            >
               <ExampleThumbnailImage fileName="vuejs-kanban.jpg" alt="vuejs-kanban" />
               <Box
                 mt="3"
@@ -175,7 +210,14 @@ const Examples: NextPage = () => {
               </Box>
             </Link>
             <Box marginBlock="4" />
-            <Link display="block" href="/examples/codemirror" borderWidth="1px" borderRadius="lg" overflow="hidden">
+            <Link
+              display="block"
+              href="/examples/codemirror"
+              borderWidth="1px"
+              borderRadius="lg"
+              overflow="hidden"
+              borderColor="gray.a11"
+            >
               <ExampleThumbnailImage fileName="vanilla-codemirror6.jpg" alt="vanilla-codemirror6" />
               <Box
                 mt="3"
@@ -196,7 +238,14 @@ const Examples: NextPage = () => {
               </Box>
             </Link>
             <Box marginBlock="4" />
-            <Link display="block" href="/examples/quill" borderWidth="1px" borderRadius="lg" overflow="hidden">
+            <Link
+              display="block"
+              href="/examples/quill"
+              borderWidth="1px"
+              borderRadius="lg"
+              overflow="hidden"
+              borderColor="gray.a11"
+            >
               <ExampleThumbnailImage fileName="vanilla-quill.jpg" alt="vanilla-quill" />
               <Box
                 mt="3"
@@ -222,6 +271,7 @@ const Examples: NextPage = () => {
               borderWidth="1px"
               borderRadius="lg"
               overflow="hidden"
+              borderColor="gray.a11"
             >
               <ExampleThumbnailImage fileName="vanilla-quill.jpg" alt="vanilla-quill" />
               <Box

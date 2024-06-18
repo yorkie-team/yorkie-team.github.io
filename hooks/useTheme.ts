@@ -16,10 +16,12 @@ export function useTheme(initialTheme?: ThemeOption) {
 
     if (theme === 'dark') {
       window.document.body.classList.add('darkmode');
+      document.documentElement.setAttribute('data-theme', 'dark');
       window.localStorage.setItem('theme', 'dark');
     } else if (theme === 'light') {
       window.document.body.classList.remove('darkmode');
       window.localStorage.setItem('theme', 'light');
+      document.documentElement.setAttribute('data-theme', 'light');
     } else if (theme === 'system') {
       window.localStorage.setItem('theme', 'system');
       if (window.matchMedia('(prefers-color-scheme: dark)').matches) {

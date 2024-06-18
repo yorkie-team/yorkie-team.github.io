@@ -11,6 +11,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   const { setTheme } = useTheme();
   useEffect(() => {
     const themeOption = (window.localStorage.getItem('theme') || 'system') as ThemeOption;
+    document.documentElement.setAttribute('data-theme', themeOption);
     setTheme(themeOption);
   }, [setTheme]);
 
