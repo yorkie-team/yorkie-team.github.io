@@ -27,32 +27,32 @@ import { CustomLink, CustomCodeBlock, Breadcrumb, Caption, ImageWrap, Alert, Blo
 const components: MDXComponents = {
   a: CustomLink,
   h1: (props) => (
-    <Heading as="h1" className="heading" fontSize={{ base: '3xl', lg: '5xl' }} fontWeight="semibold">
+    <Heading as="h1" className="heading" fontSize={{ base: '3xl', lg: '5xl' }} fontWeight="semibold" id={props.id}>
       {props.children}
     </Heading>
   ),
   h2: (props) => (
-    <Heading as="h2" className="heading" fontSize={{ base: '2xl', lg: '4xl' }} fontWeight="semibold">
+    <Heading as="h2" className="heading" fontSize={{ base: '2xl', lg: '4xl' }} fontWeight="semibold" id={props.id}>
       {props.children}
     </Heading>
   ),
   h3: (props) => (
-    <Heading as="h3" className="heading" fontSize={{ base: 'xl', lg: '3xl' }} fontWeight="semibold">
+    <Heading as="h3" className="heading" fontSize={{ base: 'xl', lg: '3xl' }} fontWeight="semibold" id={props.id}>
       {props.children}
     </Heading>
   ),
   h4: (props) => (
-    <Heading as="h4" className="heading" fontSize={{ base: 'lg', lg: '2xl' }} fontWeight="semibold">
+    <Heading as="h4" className="heading" fontSize={{ base: 'lg', lg: '2xl' }} fontWeight="semibold" id={props.id}>
       {props.children}
     </Heading>
   ),
   h5: (props) => (
-    <Heading as="h5" className="heading" fontSize={{ base: 'md', lg: 'xl' }} fontWeight="semibold">
+    <Heading as="h5" className="heading" fontSize={{ base: 'md', lg: 'xl' }} fontWeight="semibold" id={props.id}>
       {props.children}
     </Heading>
   ),
   h6: (props) => (
-    <Heading as="h6" className="heading" fontSize={{ base: 'md', lg: 'xl' }} fontWeight="semibold">
+    <Heading as="h6" className="heading" fontSize={{ base: 'md', lg: 'xl' }} fontWeight="semibold" id={props.id}>
       {props.children}
     </Heading>
   ),

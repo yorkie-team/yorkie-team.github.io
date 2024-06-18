@@ -109,7 +109,7 @@ export function BasicExampleView({
                   size="xs"
                   marginLeft="4"
                 >
-                  <IconClose />
+                  <Icon stroke="orange.default" icon={<IconClose />} />
                 </Button>
               </li>
             );
