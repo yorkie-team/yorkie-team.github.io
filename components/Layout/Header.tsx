@@ -21,6 +21,7 @@ export function Header(): ReactElement {
       paddingLeft="6"
       alignItems="center"
       position="sticky"
+      top="0"
       height="20"
       zIndex="10xl"
     >
