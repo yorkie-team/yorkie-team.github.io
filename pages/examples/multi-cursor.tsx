@@ -2,7 +2,8 @@
 import { useState } from 'react';
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import { ExampleLayout, Accordion, CodeBlock } from '@/components';
+import { Accordion, Icon, IconDown } from 'yorkie-ui';
+import { ExampleLayout, CodeBlock } from '@/components';
 import { Sidebar, FullView, ShowView, GridView, DualView } from '@/components/exampleView';
 
 const sampleCode = `sample code`;
@@ -32,7 +33,7 @@ const ExamplesView: NextPage = () => {
                   next to the cursor.
                 </Sidebar.GuideDescription>
                 <Sidebar.GuideSubTitle>Try this!</Sidebar.GuideSubTitle>
-                <Accordion defaultValue={[]} multiple>
+                <Accordion.Root defaultValue={[]} multiple>
                   {[
                     {
                       title: "Select role and check other's cursor",
@@ -41,11 +42,16 @@ const ExamplesView: NextPage = () => {
                     },
                   ].map(({ title, description }) => (
                     <Accordion.Item key={title} value={title}>
-                      <Accordion.Control>{title}</Accordion.Control>
-                      <Accordion.Panel>{description}</Accordion.Panel>
+                      <Accordion.ItemTrigger>
+                        {title}
+                        <Accordion.ItemIndicator>
+                          <Icon size="md" icon={<IconDown />} stroke="neutral.11" />
+                        </Accordion.ItemIndicator>
+                      </Accordion.ItemTrigger>
+                      <Accordion.ItemContent>{description}</Accordion.ItemContent>
                     </Accordion.Item>
                   ))}
-                </Accordion>
+                </Accordion.Root>
               </Sidebar.TabsPanel>
               <Sidebar.TabsPanel value="code">
                 <div className="codeblock_box">

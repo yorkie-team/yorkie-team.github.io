@@ -18,7 +18,7 @@ import ViewGridSVG from '@/public/assets/icons/icon_view_grid.svg';
 import ViewSplitSVG from '@/public/assets/icons/icon_view_split.svg';
 import PinSVG from '@/public/assets/icons/icon_pin.svg';
 
-const svgMap = {
+export const svgMap = {
   openSelector: <OpenSelectorSVG />,
   tool: <ToolSVG />,
   messageSmile: <MessageSmileSVG />,

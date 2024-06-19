@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import classNames from 'classnames';
-import { Icon } from '@/components';
+import { svgMap } from '@/components/Icons/Icon';
+import { Icon, IconExpand, IconPlus } from 'yorkie-ui';
 import DashboardUserGreenSVG from '@/public/assets/icons/icon_dashboard_user_green.svg';
 import DashboardUserPurpleSVG from '@/public/assets/icons/icon_dashboard_user_purple.svg';
 import DashboardUserRedSVG from '@/public/assets/icons/icon_dashboard_user_red.svg';
@@ -84,11 +85,11 @@ export function DualView() {
                 className={classNames('btn btn_line btn_pin', { blue_0: pinList.includes('user1') })}
                 title="Pin"
               >
-                <Icon type="pin" />
+                <Icon icon={svgMap.pin} />
               </button>
               <button type="button" className="btn btn_expand blue_0">
                 <span className="text">Move to this tab</span>
-                <Icon type="expand" />
+                <Icon icon={<IconExpand />} />
               </button>
             </div>
           </li>
@@ -106,11 +107,11 @@ export function DualView() {
                   handlePin('user2');
                 }}
               >
-                <Icon type="pin" />
+                <Icon icon={svgMap.pin} />
               </button>
               <button type="button" className="btn btn_expand blue_0">
                 <span className="text">Move to this tab</span>
-                <Icon type="expand" />
+                <Icon icon={<IconExpand />} />
               </button>
             </div>
           </li>
@@ -128,11 +129,11 @@ export function DualView() {
                   handlePin('user3');
                 }}
               >
-                <Icon type="pin" />
+                <Icon icon={svgMap.pin} />
               </button>
               <button type="button" className="btn btn_expand blue_0">
                 <span className="text">Move to this tab</span>
-                <Icon type="expand" />
+                <Icon icon={<IconExpand />} />
               </button>
             </div>
           </li>
@@ -150,17 +151,17 @@ export function DualView() {
                   handlePin('user4');
                 }}
               >
-                <Icon type="pin" />
+                <Icon icon={svgMap.pin} />
               </button>
               <button type="button" className="btn is_disabled btn_expand gray300" disabled>
                 <span className="text">Move to this tab</span>
-                <Icon type="expand" />
+                <Icon icon={<IconExpand />} />
               </button>
             </div>
           </li>
         </ul>
         <button type="button" className="btn btn_add">
-          <Icon type="plus" />
+          <IconPlus />
           <span className="blind">화면 추가하기</span>
         </button>
       </div>

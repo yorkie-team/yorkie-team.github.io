@@ -57,7 +57,7 @@ const Examples: NextPage = () => {
           </Box>
         </Flex>
       </Container>
-      <Box borderWidth="1px" borderBottom="1px" marginTop="28" borderColor="gray.a11" />
+      <Box borderWidth="1px" borderBottom="1px" marginTop="28" borderColor="gray.a5" borderTop="none" />
       <Container
         paddingInline={{ base: '6', lg: '0' }}
         paddingBottom="40"

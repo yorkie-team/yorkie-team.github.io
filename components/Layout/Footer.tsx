@@ -7,6 +7,10 @@ const fullYear = new Date(process.env.NEXT_PUBLIC_BUILT_AT!).getFullYear();
 export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement {
   const { setTheme } = useTheme();
   const [themeOption, setThemeOption] = useState<ThemeOption>('system');
+  useEffect(() => {
+    const themeOption = (window.localStorage.getItem('theme') || 'system') as ThemeOption;
+    setThemeOption(themeOption);
+  }, [setTheme]);
 
   if (shortFooter) {
     return (
@@ -21,12 +25,7 @@ export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement
     );
   }
 
-  useEffect(() => {
-    const themeOption = (window.localStorage.getItem('theme') || 'system') as ThemeOption;
-    setThemeOption(themeOption);
-  }, [setTheme]);
-
-  const setThemeSelect = (value: items) => {
+  const setThemeSelect = (value: any) => {
     setThemeOption(value.value);
     setTheme(value.value);
   };

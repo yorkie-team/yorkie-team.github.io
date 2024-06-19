@@ -75,7 +75,7 @@ const Products: NextPage = () => {
           </Box>
         </Flex>
       </Container>
-      <Box borderWidth="1px" borderRadius="2xl" overflow="hidden" borderColor="gray.a10" />
+      <Box borderWidth="1px" borderRadius="2xl" overflow="hidden" borderColor="gray.a5" borderTop="none" />
       <Container
         paddingInline={{ base: '6', lg: '0' }}
         paddingBlock="20"
@@ -99,7 +99,8 @@ const Products: NextPage = () => {
           borderRadius="2xl"
           overflow="hidden"
           marginBlock={{ base: '6', lg: '16' }}
-          borderColor="gray.a10"
+          borderColor="gray.a5"
+          borderTop="none"
         />
 
         <Text fontWeight="semibold" fontSize={{ base: 'xl', lg: '3xl' }} marginTop={{ base: '20', lg: '0' }}>

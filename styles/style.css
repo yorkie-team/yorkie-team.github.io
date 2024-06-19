@@ -482,11 +482,8 @@
   -webkit-box-shadow: 0 20px 24px -12px rgba(0, 0, 0, 0.2);
   box-shadow: 0 20px 24px -12px rgba(0, 0, 0, 0.2);
 }
-.darkmode .icon svg path {
+.fillSVG svg path {
   fill: currentColor;
-}
-.btn_area .icon svg path {
-  fill: transparent;
 }
 
 /* Homepage */

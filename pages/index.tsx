@@ -30,18 +30,22 @@ import CollaboEditingSVG from '@/public/assets/icons/icon_collaborate_editing.sv
 import { FEATURES_CODE } from '@/codes/features';
 
 type FeatureType = keyof typeof FEATURES_CODE;
+type FeatureKey = 'profile' | 'cursor' | 'selection' | 'editing';
+
 const Home: NextPage = () => {
   const [bannerActive, setBannerActive] = useState(false);
   const [activeFeatureCard, setActiveFeatureCard] = useState<FeatureType>('profile');
   const [activeFeatureCode, setActiveFeatureCode] = useState({ type: 'js', info: FEATURES_CODE.profile.js });
 
-  const onClickOne = (name: string) => {
-    const codeType = FEATURES_CODE[name].tabOrder[0];
-    setActiveFeatureCard(name);
-    setActiveFeatureCode({
-      type: codeType,
-      info: (FEATURES_CODE[name] as any)[codeType],
-    });
+  const onClickOne = (e: any, name: FeatureKey) => {
+    if (FEATURES_CODE[name] && e) {
+      const codeType = FEATURES_CODE[name].tabOrder[0];
+      setActiveFeatureCard(name);
+      setActiveFeatureCode({
+        type: codeType,
+        info: (FEATURES_CODE[name] as any)[codeType],
+      });
+    }
   };
   // TODO(hackerwins): Remove examples condition when examples are ready.
   return (
@@ -185,6 +189,7 @@ const Home: NextPage = () => {
                 wLink={{ base: '100w', lg: 'fit' }}
                 as="link"
                 href="/docs"
+                className="fillSVG"
                 variant="outline"
                 icon={<IconBook />}
                 position="start"
@@ -195,12 +200,11 @@ const Home: NextPage = () => {
             </Flex>
           </Box>
         </Box>
-        <Box marginTop="40">
-          <Box fontSize={{ base: '3xl', lg: '6xl' }} fontWeight="semibold" align="center">
+        <Flex flexDirection="column" alignItems="center" marginTop="40">
+          <Box fontSize={{ base: '3xl', lg: '6xl' }} fontWeight="semibold" textAlign="center">
             Variety of <Text display={{ base: 'block', lg: 'none' }} /> collaboration features <br /> for your app
           </Box>
           <Box
-            align="center"
             color="neutral.a12"
             fontWeight="semibold"
             marginTop="8"
@@ -218,7 +222,7 @@ const Home: NextPage = () => {
             <GridItem gridColumnStart={1} gridColumnEnd={3} gridColumn={2} display="grid">
               <Box className="service_card_list">
                 <Box
-                  onClick={() => onClickOne('profile')}
+                  onClick={(e) => onClickOne(e, 'profile')}
                   borderWidth="1px"
                   borderColor="gray.a11"
                   borderRadius="2xl"
@@ -244,7 +248,7 @@ const Home: NextPage = () => {
                   </Box>
                 </Box>
                 <Box
-                  onClick={() => onClickOne('cursor')}
+                  onClick={(e) => onClickOne(e, 'cursor')}
                   borderWidth="1px"
                   borderRadius="2xl"
                   marginTop="6"
@@ -337,18 +341,18 @@ const Home: NextPage = () => {
                     ))}
                   </CodeBlockHeader.LeftBox>
                   <CodeBlockHeader.RightBox>
-                    <CodeBlockHeader.CopyButton value={activeFeatureCode.info.code} />
+                    <CodeBlockHeader.CopyButton value={activeFeatureCode?.info?.code} />
                   </CodeBlockHeader.RightBox>
                 </CodeBlockHeader>
                 <CodeBlock
-                  code={activeFeatureCode.info.code}
-                  language={activeFeatureCode.info.language as any}
+                  code={activeFeatureCode?.info?.code || ''}
+                  language={activeFeatureCode?.info?.language as any}
                   withLineNumbers
                 />
               </CodeBlock.Wrapper>
             </GridItem>
           </Grid>
-        </Box>
+        </Flex>
         {/* {process.env.NODE_ENV === 'development' && (
           <section className="section">
             <h2 className="section_title">
@@ -551,6 +555,7 @@ const Home: NextPage = () => {
               wLink={{ base: '100w', lg: 'fit' }}
               href="https://discord.gg/MVEAwz9sBy"
               variant="outline"
+              className="fillSVG"
               icon={<Icon icon={<IconSmile />} stroke="neutral.10" />}
               position="start"
               size="xl"

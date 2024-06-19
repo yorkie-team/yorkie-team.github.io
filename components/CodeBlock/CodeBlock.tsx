@@ -23,7 +23,7 @@ export function CodeBlock({ withCopyButton, ...restProps }: { withCopyButton?: b
   );
 }
 
-function CopyButtonBox({ value, timeout = 1000 }: { value: string; timeout?: number }) {
+function CopyButtonBox({ value, timeout = 1000 }: { value?: string; timeout?: number }) {
   return (
     <div className="btn_area">
       <CopyButton value={value} timeout={timeout}>

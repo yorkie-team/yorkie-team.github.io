@@ -1,8 +1,9 @@
-import { Icon } from '@/components';
 import DashboardUserGreenSVG from '@/public/assets/icons/icon_dashboard_user_green.svg';
 import DashboardUserPurpleSVG from '@/public/assets/icons/icon_dashboard_user_purple.svg';
 import DashboardUserRedSVG from '@/public/assets/icons/icon_dashboard_user_red.svg';
 import DashboardUserYellowSVG from '@/public/assets/icons/icon_dashboard_user_yellow.svg';
+import { svgMap } from '@/components/Icons/Icon';
+import { Icon, IconExpand, IconPlus } from 'yorkie-ui';
 
 export function GridView() {
   return (
@@ -71,7 +72,7 @@ export function GridView() {
               <iframe title="Example" src="https://yorkie.dev" width="100%" height="100%"></iframe>
               <div className="btn_box">
                 <button type="button" className="btn btn_expand blue_0">
-                  <Icon type="expand" />
+                  <Icon icon={<IconExpand />} />
                   <span className="blind">창 활성화 시키기</span>
                 </button>
               </div>
@@ -109,7 +110,7 @@ export function GridView() {
               <iframe title="Example" src="https://yorkie.dev" width="100%" height="100%"></iframe>
               <div className="btn_box">
                 <button type="button" className="btn btn_expand blue_0">
-                  <Icon type="expand" />
+                  <Icon icon={<IconExpand />} />
                   <span className="blind">창 활성화 시키기</span>
                 </button>
               </div>
@@ -152,7 +153,7 @@ export function GridView() {
               ></iframe>
               <div className="btn_box">
                 <button type="button" className="btn is_disabled btn_expand gray300" disabled>
-                  <Icon type="expand" />
+                  <Icon icon={<IconExpand />} />
                   <span className="blind">창 활성화 시키기</span>
                 </button>
               </div>
@@ -162,7 +163,7 @@ export function GridView() {
         <li className="grid_item shadow_m">
           <button type="button" className="btn_add">
             <span className="blind">화면 추가하기</span>
-            <Icon type="plus" className="icon_plus" />
+            <Icon icon={<IconPlus />} />
           </button>
         </li>
       </ul>

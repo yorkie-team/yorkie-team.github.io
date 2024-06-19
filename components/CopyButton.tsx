@@ -7,10 +7,10 @@ export function CopyButton({
 }: {
   children(payload: { copied: boolean; copy(): void }): React.ReactNode;
   timeout?: number;
-  value: string;
+  value?: string;
 }) {
   const clipboard = useClipboard({ timeout });
-  const copy = () => clipboard.copy(value);
+  const copy = () => clipboard.copy(value || '');
 
   return <>{children({ copy, copied: clipboard.copied })}</>;
 }

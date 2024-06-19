@@ -1,8 +1,7 @@
 import { ReactElement, ReactNode, useState } from 'react';
 import Link from 'next/link';
-import classNames from 'classnames';
 import LogoGnbSVG from '@/public/assets/icons/logo_gnb.svg';
-import { Box, Text,} from 'yorkie-ui';
+import { Box } from 'yorkie-ui';
 
 type ExampleViewType = 'full' | 'show' | 'grid' | 'split';
 type ExampleViewIconType = 'viewFull' | 'viewShow' | 'viewGrid' | 'viewSplit';
