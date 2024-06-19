@@ -34,7 +34,7 @@
     "remark-gfm": "^3.0.1",
     "unist-util-visit": "^4.1.1",
     "yorkie-js-sdk": "^0.4.23",
-    "yorkie-ui": "^0.5.14"
+    "yorkie-ui": "^0.5.15"
   },
   "devDependencies": {
     "@mdx-js/loader": "^2.1.5",

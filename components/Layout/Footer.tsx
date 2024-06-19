@@ -1,7 +1,4 @@
 import { ReactElement, useEffect, useState } from 'react';
-
-import LogoSVG from '@/public/assets/icons/logo_horizontal_s.svg';
-import { ThemeDropdown } from './ThemeDropdown';
 import { Link, Box, Grid, GridItem, Container, Text, Flex, Icon, IconLogo, Select, IconDown } from 'yorkie-ui';
 import React from 'react';
 import { ThemeOption, useTheme } from '@/hooks/useTheme';
@@ -30,7 +27,7 @@ export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement
   }, [setTheme]);
 
   const setThemeSelect = (value: items) => {
-    setThemeOption(value.label);
+    setThemeOption(value.value);
     setTheme(value.value);
   };
   const items = [
@@ -38,7 +35,7 @@ export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement
     { label: 'Light', value: 'light' },
   ];
   return (
-    <Box background="gray.a2" paddingInline={{ base: '6', lg: '0' }}>
+    <Box background="gray.a2" paddingInline={{ base: '6', lg: '0' }} className="footer">
       <Container
         margin="auto"
         width={{ sm: 'breakpoint-sm', md: 'breakpoint-md', lg: 'breakpoint-lg', xl: 'breakpoint-xl' }}
@@ -56,11 +53,11 @@ export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement
             <Text color="neutral.a12" fontSize="sm" marginBottom="4">
               Copyright &copy; {fullYear} Yorkie
             </Text>
-            <Select.Root positioning={{ sameWidth: true }} width="2xs" items={items} width="fit">
+            <Select.Root positioning={{ sameWidth: true }} items={items} width="fit" background="neutral.1">
               <Select.Control>
                 <Select.Trigger>
-                  <Select.ValueText placeholder={`Theme: ${themeOption}`} />
-                  <IconDown />
+                  <Select.ValueText placeholder={`Theme: ${themeOption == 'dark' ? 'Dark' : 'Light'}`} />
+                  <Icon icon={<IconDown />} stroke="neutral.10" size="sm" />
                 </Select.Trigger>
               </Select.Control>
               <Select.Positioner>
@@ -70,7 +67,7 @@ export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement
                       <Select.Item onClick={(e) => setThemeSelect(item)} key={item.value} item={item}>
                         <Select.ItemText>{item.label}</Select.ItemText>
                         <Select.ItemIndicator>
-                          <IconDown />
+                          <Icon icon={<IconDown />} stroke="neutral.10" size="sm" />
                         </Select.ItemIndicator>
                       </Select.Item>
                     ))}

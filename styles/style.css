@@ -1,3 +1,24 @@
+/* ------------------------
+
+------New Layout-----------
+
+/*
+0. Config
+1. Homepage
+2. Code Block
+3. Documents
+4. SVG
+5. Navigator
+6. Toast
+7. Modal
+8. Example
+9. Product
+10.Header
+
+------------------------ */
+
+/* Config */
+
 :root {
   --gray-900: #332e2b;
   --gray-800: #514c49;
@@ -461,19 +482,12 @@
   -webkit-box-shadow: 0 20px 24px -12px rgba(0, 0, 0, 0.2);
   box-shadow: 0 20px 24px -12px rgba(0, 0, 0, 0.2);
 }
-/* New Layout */
-
-/*
-1. Homepage
-2. Code Block
-3. Documents
-4. SVG
-5. Navigator
-6. Toast
-7. Modal
-8. Example
-9. Product
-*/
+.darkmode .icon svg path {
+  fill: currentColor;
+}
+.btn_area .icon svg path {
+  fill: transparent;
+}
 
 /* Homepage */
 @media screen and (min-width: 1023px) {
@@ -4729,4 +4743,15 @@ html {
 }
 .darkmode .img_box [fill='#332E2B'] + [fill='#514C49'] {
   fill: var(--gray-100);
+}
+
+/* Header */
+.header {
+  background-color: var(--gray-000);
+}
+.footer .logo svg path:nth-child(-n + 7) {
+  fill: var(--gray-800);
+}
+.header .logo svg path:nth-child(n + 5) {
+  fill: var(--gray-800);
 }

@@ -34,23 +34,8 @@ const Home: NextPage = () => {
   const [bannerActive, setBannerActive] = useState(false);
   const [activeFeatureCard, setActiveFeatureCard] = useState<FeatureType>('profile');
   const [activeFeatureCode, setActiveFeatureCode] = useState({ type: 'js', info: FEATURES_CODE.profile.js });
-  useEffect(() => {
-    // const handleVisualSize = () => {
-    //   const $visual = document.querySelector('.homepage svg') as HTMLElement;
-    //   if (!$visual) return;
-    //   const SVG_ASPECT_RATIO = 1512 / 868;
-    //   const HEADER_HEIGHT = 64;
-    //   const scale = window.innerWidth / ((window.innerHeight - HEADER_HEIGHT) * SVG_ASPECT_RATIO);
-    //   $visual.style.setProperty('scale', scale < 1 ? '1' : `${scale}`);
-    // };
-    // window.addEventListener('resize', handleVisualSize);
-    // handleVisualSize();
-    // return () => {
-    //   window.removeEventListener('resize', handleVisualSize);
-    // };
-  }, []);
 
-  const onClickOne = (e: any, name: string) => {
+  const onClickOne = (name: string) => {
     const codeType = FEATURES_CODE[name].tabOrder[0];
     setActiveFeatureCard(name);
     setActiveFeatureCode({
@@ -123,6 +108,8 @@ const Home: NextPage = () => {
         >
           <Flex
             borderWidth="1px"
+            borderTop="none"
+            borderInline="none"
             borderColor="gray.a11"
             borderBottom="1px"
             justifyContent="space-between"
@@ -231,7 +218,7 @@ const Home: NextPage = () => {
             <GridItem gridColumnStart={1} gridColumnEnd={3} gridColumn={2} display="grid">
               <Box className="service_card_list">
                 <Box
-                  onClick={(e) => onClickOne(e, 'profile')}
+                  onClick={() => onClickOne('profile')}
                   borderWidth="1px"
                   borderColor="gray.a11"
                   borderRadius="2xl"
@@ -257,7 +244,7 @@ const Home: NextPage = () => {
                   </Box>
                 </Box>
                 <Box
-                  onClick={(e) => onClickOne(e, 'cursor')}
+                  onClick={() => onClickOne('cursor')}
                   borderWidth="1px"
                   borderRadius="2xl"
                   marginTop="6"
@@ -564,7 +551,7 @@ const Home: NextPage = () => {
               wLink={{ base: '100w', lg: 'fit' }}
               href="https://discord.gg/MVEAwz9sBy"
               variant="outline"
-              icon={<IconSmile />}
+              icon={<Icon icon={<IconSmile />} stroke="neutral.10" />}
               position="start"
               size="xl"
             >

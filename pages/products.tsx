@@ -130,7 +130,7 @@ const Products: NextPage = () => {
               <CodeBlockHeader.LeftBox>
                 <Button
                   variant="ghost"
-                  color={documentType == 'common' ? 'white' : ''}
+                  color={documentType == 'common' ? 'neutral.1' : ''}
                   background={documentType == 'common' ? 'neutral.a12' : ''}
                   onClick={() => {
                     setDocumentType('common');
@@ -140,7 +140,7 @@ const Products: NextPage = () => {
                 </Button>
                 <Button
                   variant="ghost"
-                  color={documentType == 'text' ? 'white' : ''}
+                  color={documentType == 'text' ? 'neutral.1' : ''}
                   background={documentType == 'text' ? 'neutral.a12' : ''}
                   onClick={() => {
                     setDocumentType('text');
@@ -150,7 +150,7 @@ const Products: NextPage = () => {
                 </Button>
                 <Button
                   variant="ghost"
-                  color={documentType == 'counter' ? 'white' : ''}
+                  color={documentType == 'counter' ? 'neutral.1' : ''}
                   background={documentType == 'counter' ? 'neutral.a12' : ''}
                   onClick={() => {
                     setDocumentType('counter');
@@ -191,7 +191,7 @@ const Products: NextPage = () => {
           More features of Yorkie SDK
         </Link>
         <Grid gridTemplateColumns={{ base: '0', lg: '3' }} marginTop="10" gap="6">
-          <GridItem borderWidth="1px" borderRadius="md" overflow="hidden" padding="8">
+          <GridItem borderWidth="1px" borderRadius="md" overflow="hidden" padding="8" borderColor="gray.a11">
             <Text fontSize="lg" fontWeight="semibold" color="neutral.a12">
               SDKs for Mobile &amp; Web
             </Text>
@@ -211,7 +211,7 @@ const Products: NextPage = () => {
               applications.
             </Text>
           </GridItem>
-          <GridItem borderWidth="1px" borderRadius="md" overflow="hidden" padding="8">
+          <GridItem borderWidth="1px" borderRadius="md" overflow="hidden" padding="8" borderColor="gray.a11">
             <Text fontSize="lg" fontWeight="semibold" color="neutral.a12">
               Size optimization
             </Text>
@@ -235,7 +235,7 @@ const Products: NextPage = () => {
               to reduce the size of documents.
             </Text>
           </GridItem>
-          <GridItem borderWidth="1px" borderRadius="md" overflow="hidden" padding="8">
+          <GridItem borderWidth="1px" borderRadius="md" overflow="hidden" padding="8" borderColor="gray.a11">
             <Text fontSize="lg" fontWeight="semibold" color="neutral.a12">
               Security
             </Text>

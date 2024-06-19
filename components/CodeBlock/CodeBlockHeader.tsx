@@ -22,7 +22,7 @@ function CopyButtonBox({ value, timeout = 1000 }: { value: string; timeout?: num
         {({ copied, copy }) => (
           <>
             <Button size="xs" onClick={copy} variant="outline" title="Copy to clipboard">
-              <Icon icon={<IconCopy />} stroke="black.a7" size={{ base: 'lg', lg: '2xl' }} />
+              <Icon icon={<IconCopy />} stroke="neutral.12" size={{ base: 'lg', lg: '2xl' }} />
             </Button>
             {copied && (
               <Box className="toast_box shadow_l" fontSize="sm">

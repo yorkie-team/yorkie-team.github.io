@@ -48,7 +48,7 @@ export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
         </Link>
         <Link
           paddingInline="6"
-          href="/example"
+          href="/examples"
           bg={asPath?.split('#')[0] === '/examples' ? 'orange.default' : 'white.11'}
           paddingBlock="3"
         >

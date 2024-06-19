@@ -24,14 +24,13 @@ export function Header(): ReactElement {
       top="0"
       height="20"
       zIndex="10xl"
+      className="header"
     >
       <Flex gap="12">
         <Heading as="h1">
-          <Text display="none" className="blind">
-            Yorkie
-          </Text>
+          <Text display="none">Yorkie</Text>
           <Box display={{ base: 'none', lg: 'block' }}>
-            <Link href="/" fontSize="8xl">
+            <Link href="/" fontSize="8xl" className="logo">
               <LogoSVG />
             </Link>
           </Box>
