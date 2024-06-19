@@ -18,7 +18,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: "16"
+          node-version: '18'
           cache: ${{ steps.detect-package-manager.outputs.manager }}
       - name: Setup Pages
         uses: actions/configure-pages@v2
@@ -45,7 +45,7 @@ jobs:
       - name: Static HTML export with Next.js
         run: ${{ steps.detect-package-manager.outputs.runner }} next export
       - name: Optimize all static images after the Next.js static export
-        run: ${{ steps.detect-package-manager.outputs.runner }} next-image-export-optimizer  
+        run: ${{ steps.detect-package-manager.outputs.runner }} next-image-export-optimizer
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
