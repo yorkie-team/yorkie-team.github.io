@@ -45,6 +45,8 @@ const Community: NextPage = () => {
               <Flex gap="6" justifyContent={{ base: 'space-evenly', lg: 'flex-start' }}>
                 <Button
                   icon={<IconDiscord />}
+                  className="fillSVG"
+                  stroke="neutral.11"
                   href="https://discord.gg/MVEAwz9sBy"
                   as="link"
                   variant="outline"
@@ -55,6 +57,8 @@ const Community: NextPage = () => {
                 </Button>
                 <Button
                   icon={<IconGitHub />}
+                  stroke="neutral.11"
+                  className="fillSVG"
                   href="https://github.com/yorkie-team/dashboard/issues"
                   as="link"
                   variant="outline"

@@ -42,7 +42,9 @@ const Custom404: NextPage = () => {
                 background="grey.a9"
                 variant="outline"
                 position="start"
-                icon={<Icon icon={<IconDiscord />} />}
+                stroke="neutral.11"
+                className="fillSVG"
+                icon={<IconDiscord />}
               >
                 Discord
               </Button>
@@ -50,9 +52,11 @@ const Custom404: NextPage = () => {
                 as="link"
                 href="https://github.com/yorkie-team/dashboard/issues"
                 background="grey.a9"
+                stroke="neutral.11"
+                className="fillSVG"
                 variant="outline"
                 position="start"
-                icon={<Icon icon={<IconGitHub />} />}
+                icon={<IconGitHub />}
               >
                 GitHub
               </Button>

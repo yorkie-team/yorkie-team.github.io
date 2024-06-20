@@ -13,6 +13,7 @@ export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
     const handleResize = () => {
       if (window.innerWidth > 1023) {
         setGnbOpened(false);
+        setDocsMenuOpened(false);
       }
     };
     window.addEventListener('resize', handleResize);

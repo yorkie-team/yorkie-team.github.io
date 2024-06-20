@@ -485,6 +485,14 @@
 .fillSVG svg path {
   fill: currentColor;
 }
+html,
+body,
+#__next {
+  height: 100%;
+}
+.link:is(:hover, [data-hover]) {
+  text-decoration-color: transparent;
+}
 
 /* Homepage */
 @media screen and (min-width: 1023px) {
