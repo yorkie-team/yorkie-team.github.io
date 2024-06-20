@@ -100,11 +100,11 @@ Flags:
       --mongo-connection-uri string                     MongoDB's connection URI
       --mongo-ping-timeout duration                     Mongo DB's ping timeout (default 5s)
       --mongo-yorkie-database string                    Yorkie's database name in MongoDB (default "yorkie-meta")
-      --profiling-port int                              Profiling port (default 11102)
+      --profiling-port int                              Profiling port (default 8081)
       --rpc-cert-file string                            RPC certification file's path
       --rpc-key-file string                             RPC key file's path
       --rpc-max-requests-bytes uint                     Maximum client request size in bytes the server will accept. (default 4194304)
-      --rpc-port int                                    RPC port (default 11101)
+      --rpc-port int                                    RPC port (default 8080)
 ```
 
 ### Login
@@ -127,7 +127,7 @@ You can check the context of the CLI using the `context` subcommand:
 $ yorkie context ls
  CURRENT  RPC ADDR            INSECURE  TOKEN                   
           api.yorkie.dev:443  false     eyJhbGciOi...DuhaUgofYg 
- *        localhost:11101     true      eyJhbGciOi...FUT3js73Mw 
+ *        localhost:8080      true      eyJhbGciOi...FUT3js73Mw 
 ```
 
 If you want to log out from the server, you can use the `logout` subcommand:
