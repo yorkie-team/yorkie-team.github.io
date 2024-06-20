@@ -493,6 +493,9 @@ body,
 .link:is(:hover, [data-hover]) {
   text-decoration-color: transparent;
 }
+.h_100vh {
+  height: 100vh;
+}
 
 /* Homepage */
 @media screen and (min-width: 1023px) {
