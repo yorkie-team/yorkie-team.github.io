@@ -1,13 +1,24 @@
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
-import Link from 'next/link';
-import classNames from 'classnames';
-import { Popover, Icon } from 'components';
+import { usePathname } from 'next/navigation';
+import {
+  Button,
+  Box,
+  Menu,
+  Link,
+  Icon,
+  IconGnbMenu,
+  IconClose,
+  Flex,
+  IconChevronRight,
+  IconDown,
+  Text,
+} from 'yorkie-ui';
+import React from 'react';
 
 export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
   const [gnbOpened, setGnbOpened] = useState(false);
   const [docsMenuOpened, setDocsMenuOpened] = useState(false);
-  const { asPath } = useRouter();
+  const asPath = usePathname();
 
   useEffect(() => {
     const handleResize = () => {
@@ -20,192 +31,199 @@ export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
   }, []);
 
   return (
-    <Popover opened={gnbOpened} onChange={setGnbOpened}>
-      <Popover.Target>
-        <button className="btn_menu">
-          <span className="blind">Open menu</span>
-          <Icon type="gnbMenu" className={classNames('icon_menu', { is_active: !gnbOpened })} />
-          <Icon type="close" className={classNames('icon_close', { is_active: gnbOpened })} />
-        </button>
-      </Popover.Target>
-      <Popover.Dropdown>
-        <div className="menu_list_mo dropdown">
-          <ul className="dropdown_list">
-            <li className="dropdown_item">
-              <Link
-                href="/products"
-                className={classNames('dropdown_menu', { is_active: asPath.split('#')[0] === '/products' })}
-              >
-                <span className="dropdown_text">Products</span>
-              </Link>
-            </li>
-            <li className="dropdown_item">
-              <button
-                type="button"
-                className={classNames('dropdown_menu', 'btn_docs', { is_show: docsMenuOpened })}
-                onClick={() => {
-                  setDocsMenuOpened((opened) => !opened);
-                }}
-              >
-                <Icon type="arrow" className="icon_toggle" />
-                <span className="dropdown_text">Documentation</span>
-              </button>
-              <nav
-                className="navigator"
-                onClick={() => {
-                  setGnbOpened(false);
-                }}
-              >
-                <ul className="navigator_list">
-                  <li className="navigator_group">
-                    <Link
-                      href="/docs"
-                      className={classNames('navigator_item', 'add_icon', {
-                        is_active: asPath.split('#')[0] === '/docs',
-                      })}
-                    >
-                      About Yorkie
-                    </Link>
-                  </li>
-                  <li className="navigator_group">
-                    <Link
-                      href="/docs/getting-started"
-                      className={classNames('navigator_item', 'add_icon', {
-                        is_active: asPath.startsWith(`/docs/getting-started`),
-                      })}
-                    >
-                      Getting Started
-                    </Link>
-                  </li>
-                  <li className="navigator_group">
-                    <Link
-                      href="/docs/js-sdk"
-                      className={classNames('navigator_item', 'add_icon', {
-                        is_active: asPath.startsWith(`/docs/js-sdk`),
-                      })}
-                    >
-                      JS SDK
-                    </Link>
-                  </li>
-                  <li className="navigator_group">
-                    <Link
-                      href="/docs/ios-sdk"
-                      className={classNames('navigator_item', 'add_icon', {
-                        is_active: asPath.startsWith(`/docs/ios-sdk`),
-                      })}
-                    >
-                      iOS SDK
-                    </Link>
-                  </li>
-                  <li className="navigator_group">
-                    <Link
-                      href="/docs/android-sdk"
-                      className={classNames('navigator_item', 'add_icon', {
-                        is_active: asPath.startsWith(`/docs/android-sdk`),
-                      })}
-                    >
-                      Android SDK
-                    </Link>
-                  </li>
-                  <li className="navigator_group">
-                    <Link
-                      href="/docs/devtools"
-                      className={classNames('navigator_item', 'add_icon', {
-                        is_active: asPath.startsWith(`/docs/devtools`),
-                      })}
-                    >
-                      Devtools
-                    </Link>
-                  </li>
-                  <li className="navigator_group">
-                    <Link
-                      href="/docs/cli"
-                      className={classNames('navigator_item', 'add_icon', {
-                        is_active: asPath.startsWith(`/docs/cli`),
-                      })}
-                    >
-                      CLI
-                    </Link>
-                  </li>
-                  <li className="navigator_group">
-                    <Link
-                      href="/docs/self-hosted-server"
-                      className={classNames('navigator_item', 'add_icon', {
-                        is_active: asPath.startsWith(`/docs/self-hosted-server`),
-                      })}
-                    >
-                      Self-Hosted Server
-                    </Link>
-                  </li>
-                  <li className="navigator_group">
-                    <Link
-                      href="/docs/internals"
-                      className={classNames('navigator_item', 'add_icon', {
-                        is_active: asPath.startsWith(`/docs/internals`),
-                      })}
-                    >
-                      Internals
-                    </Link>
-                  </li>
-                </ul>
-              </nav>
-            </li>
-            <li className="dropdown_item">
-              <Link
-                href="/examples"
-                className={classNames('dropdown_menu', { is_active: asPath.split('#')[0] === '/examples' })}
-              >
-                <span className="dropdown_text">Examples</span>
-              </Link>
-            </li>
-            <li className="dropdown_item">
-              <Link
-                href="/community"
-                className={classNames('dropdown_menu', { is_active: asPath.split('#')[0] === '/community' })}
-              >
-                <span className="dropdown_text">Community</span>
-              </Link>
-            </li>
-          </ul>
-          <ul className="dropdown_list">
-            {isLoggedIn ? (
-              <li className="dropdown_item">
-                <a
-                  href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`}
-                  className={classNames('dropdown_menu', {
-                    is_active: asPath.split('#')[0] === `${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`,
-                  })}
-                >
-                  <span className="dropdown_text">Dashboard</span>
-                </a>
-              </li>
-            ) : (
-              <>
-                <li className="dropdown_item">
-                  <a
-                    href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/login`}
-                    className={classNames('dropdown_menu', {
-                      is_active: asPath.split('#')[0] === `${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/login`,
-                    })}
-                  >
-                    <span className="dropdown_text">Sign in</span>
-                  </a>
-                </li>
-                <li className="dropdown_item">
-                  <a
-                    href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup`}
-                    className={classNames('dropdown_menu', {
-                      is_active: asPath.split('#')[0] === `${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup`,
-                    })}
-                  >
-                    <span className="dropdown_text">Start for free</span>
-                  </a>
-                </li>
-              </>
-            )}
-          </ul>
-        </div>
-      </Popover.Dropdown>
-    </Popover>
+    <Box>
+      <Box
+        width="12"
+        padding="4"
+        cursor="pointer"
+        display={{ base: 'block', lg: 'none' }}
+        onClick={() => setGnbOpened(!gnbOpened)}
+        stroke="neutral.12"
+        className="fillSVG"
+      >
+        {gnbOpened ? <IconClose /> : <IconGnbMenu />}
+      </Box>
+      <Flex
+        display={gnbOpened ? 'flex' : 'none'}
+        marginTop="4"
+        flexDirection="column"
+        position="absolute"
+        width="100w"
+        left="0"
+        background="neutral.2"
+        height="100vh"
+      >
+        <Link
+          href="/products"
+          bg={asPath?.split('#')[0] === '/products' ? 'orange.default' : 'white.11'}
+          paddingBlock="3"
+          paddingInline="8"
+        >
+          <span>Products</span>
+        </Link>
+        <Box paddingRight="6">
+          <Flex
+            alignItems="center"
+            fontWeight="medium"
+            onClick={() => setDocsMenuOpened(!docsMenuOpened)}
+            cursor="pointer"
+          >
+            <Icon
+              icon={docsMenuOpened ? <IconDown /> : <IconChevronRight />}
+              paddingInline="2"
+              size="2xl"
+              stroke="neutral.12"
+            />
+            <Text>Document</Text>
+          </Flex>
+          <Box display={docsMenuOpened ? 'block' : 'none'}>
+            <Link
+              href="/docs"
+              color={asPath?.split('#')[0] === '/docs' ? 'orange.default' : 'white.11'}
+              paddingBlock="3"
+              paddingInline="8"
+              fontSize="sm"
+              display="block"
+            >
+              <span>About Yorkie</span>
+            </Link>
+            <Link
+              href="/docs/getting-started"
+              color={asPath?.startsWith(`/docs/getting-started`) ? 'orange.default' : 'white.11'}
+              paddingBlock="3"
+              paddingInline="8"
+              fontSize="sm"
+              display="block"
+            >
+              <span>Getting Started</span>
+            </Link>
+            <Link
+              href="/docs/js-sdk"
+              color={asPath?.startsWith(`/docs/js-sdk`) ? 'orange.default' : 'white.11'}
+              paddingBlock="3"
+              paddingInline="8"
+              fontSize="sm"
+              display="block"
+            >
+              <span>JS SDK</span>
+            </Link>
+            <Link
+              href="/docs/ios-sdk"
+              color={asPath?.startsWith(`/docs/ios-sdk`) ? 'orange.default' : 'white.11'}
+              paddingBlock="3"
+              paddingInline="8"
+              fontSize="sm"
+              display="block"
+            >
+              <span>iOS SDK</span>
+            </Link>
+            <Link
+              href="/docs/android-sdk"
+              color={asPath?.startsWith(`docs/android-sdk`) ? 'orange.default' : 'white.11'}
+              paddingBlock="3"
+              paddingInline="8"
+              fontSize="sm"
+              display="block"
+            >
+              <span>Android SDK</span>
+            </Link>
+            <Link
+              href="/docs/devtools"
+              color={asPath?.startsWith(`/docs/devtools`) ? 'orange.default' : 'white.11'}
+              paddingBlock="3"
+              paddingInline="8"
+              fontSize="sm"
+              display="block"
+            >
+              <span>Devtools</span>
+            </Link>
+            <Link
+              href="/docs/cli"
+              color={asPath?.startsWith(`/docs/cli`) ? 'orange.default' : 'white.11'}
+              paddingBlock="3"
+              paddingInline="8"
+              fontSize="sm"
+              display="block"
+            >
+              <span>CLI</span>
+            </Link>
+            <Link
+              href="/docs/self-hosted-server"
+              color={asPath?.startsWith(`/docs/self-hosted-server`) ? 'orange.default' : 'white.11'}
+              paddingBlock="3"
+              paddingInline="8"
+              fontSize="sm"
+              display="block"
+            >
+              <span>Self-Hosted Server</span>
+            </Link>
+            <Link
+              href="/docs/internals"
+              color={asPath?.startsWith(`/docs/internals`) ? 'orange.default' : 'white.11'}
+              paddingBlock="3"
+              paddingInline="8"
+              fontSize="sm"
+              display="block"
+            >
+              <span>Internals</span>
+            </Link>
+          </Box>
+        </Box>
+        <Link
+          paddingInline="8"
+          href="/examples"
+          bg={asPath?.split('#')[0] === '/examples' ? 'orange.default' : 'white.11'}
+          paddingBlock="3"
+        >
+          <span>Example</span>
+        </Link>
+        <Link
+          paddingInline="8"
+          href="/community"
+          bg={asPath?.split('#')[0] === '/community' ? 'orange.default' : 'white.11'}
+          paddingBlock="3"
+        >
+          <span>Community</span>
+        </Link>
+        <Box borderWidth="1px" borderColor="gray.5" borderTop="none" borderInline="none" />
+        {isLoggedIn ? (
+          <Link
+            href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`}
+            bg={asPath?.split('#')[0] === `${process.env.NEXT_PUBLIC_DASHBOARD_PATH}` ? 'orange.default' : 'white.11'}
+            paddingBlock="3"
+            paddingInline="8"
+          >
+            <span>Dashboard</span>
+          </Link>
+        ) : (
+          <>
+            <Link
+              href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/login`}
+              bg={
+                asPath?.split('#')[0] === `${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/login`
+                  ? 'orange.default'
+                  : 'white.11'
+              }
+              paddingBlock="3"
+              paddingInline="8"
+            >
+              <span>Sign in</span>
+            </Link>
+            <Link
+              href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup`}
+              bg={
+                asPath?.split('#')[0] === `${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup`
+                  ? 'orange.default'
+                  : 'white.11'
+              }
+              paddingBlock="3"
+              paddingInline="8"
+            >
+              <span>Start for free</span>
+            </Link>
+          </>
+        )}
+      </Flex>
+    </Box>
   );
 }

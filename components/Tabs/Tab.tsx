@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTabsContext } from './Tabs.context';
+import { Button, Text } from 'yorkie-ui';
 
 export interface TabProps extends React.ComponentPropsWithoutRef<'button'> {
   /** Value that is used to connect Tab with associated panel */
@@ -19,16 +20,11 @@ export const Tab = ({ value, children, onClick, ...others }: TabProps) => {
   };
 
   return (
-    <button
-      data-active={isActive || undefined}
-      type="button"
-      role="tab"
-      id={ctx.getTabId(value)}
-      onClick={activateTab}
-      {...others}
-    >
-      <div className="tablabel">{children}</div>
-    </button>
+    <Button size="sm" type="button" role="tab" id={ctx.getTabId(value)} onClick={activateTab} {...others}>
+      <Text fontSize="sm" fontWeight="semibold">
+        {children}
+      </Text>
+    </Button>
   );
 };
 

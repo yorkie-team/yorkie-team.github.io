@@ -1,4 +1,4 @@
-import { Icon, Image } from '@/components';
+import { Image } from '@/components';
 import DashboardUserGreenSVG from '@/public/assets/icons/icon_dashboard_user_green.svg';
 import DashboardUserPurpleSVG from '@/public/assets/icons/icon_dashboard_user_purple.svg';
 import DashboardUserRedSVG from '@/public/assets/icons/icon_dashboard_user_red.svg';
@@ -7,6 +7,8 @@ import SystemUserGreenSVG from '@/public/assets/icons/icon_system_user_green.svg
 import SystemUserPinkSVG from '@/public/assets/icons/icon_system_user_pink.svg';
 import SystemUserPurpleSVG from '@/public/assets/icons/icon_system_user_purple.svg';
 import ImgExampleWebtoonSVG from '@/public/assets/images/@tmp/img_example_webtoon.svg';
+import { svgMap } from '@/components/Icons/Icon';
+import { Icon, IconExpand, IconMinimize, IconCloseSmall } from 'yorkie-ui';
 
 const ExampleContent = () => {
   return (
@@ -84,7 +86,7 @@ const ExampleContent = () => {
             </li>
           </ol>
           <button type="button" className="btn btn_add">
-            <Icon type="plus" />
+            <Icon icon={svgMap['pin']} />
             <span className="blind">추가 하기</span>
           </button>
         </div>
@@ -109,7 +111,7 @@ const ExampleContent = () => {
         <div className="mini_map_header">
           <p className="title">Mini Map</p>
           <button type="button" className="btn_minimize">
-            <Icon type="minimize" />
+            <Icon icon={<IconMinimize />} />
             <span className="blind">최소화</span>
           </button>
         </div>
@@ -136,7 +138,7 @@ export function ShowView() {
               </p>
             </a>
             <button type="button" className="btn_close">
-              <Icon type="closeSmall" />
+              <Icon icon={<IconCloseSmall />} />
               <span className="blind">닫기</span>
             </button>
           </div>
@@ -153,12 +155,12 @@ export function ShowView() {
               </p>
             </a>
             <button type="button" className="btn_close">
-              <Icon type="closeSmall" />
+              <Icon icon={<IconCloseSmall />} />
               <span className="blind">닫기</span>
             </button>
             <button type="button" className="btn btn_expand">
               <span className="text">Move to this tab</span>
-              <Icon type="expand" />
+              <Icon icon={<IconExpand />} />
             </button>
           </div>
           <div className="system_view_item">
@@ -174,12 +176,12 @@ export function ShowView() {
               </p>
             </a>
             <button type="button" className="btn_close">
-              <Icon type="closeSmall" />
+              <Icon icon={<IconCloseSmall />} />
               <span className="blind">닫기</span>
             </button>
             <button type="button" className="btn btn_expand">
               <span className="text">Open in new tab</span>
-              <Icon type="expand" />
+              <Icon icon={<IconExpand />} />
             </button>
           </div>
           <div className="system_view_item">
@@ -195,17 +197,17 @@ export function ShowView() {
               </p>
             </a>
             <button type="button" className="btn_close">
-              <Icon type="closeSmall" />
+              <Icon icon={<IconCloseSmall />} />
               <span className="blind">닫기</span>
             </button>
             <button type="button" className="btn is_disabled btn_expand gray300">
-              <Icon type="expand" />
+              <Icon icon={<IconExpand />} />
               <span className="blind">창 활성화 시키기</span>
             </button>
           </div>
         </div>
         <button type="button" className="btn btn_add">
-          <Icon type="plus" />
+          <Icon icon={svgMap['pin']} />
           <span className="blind">화면 추가하기</span>
         </button>
       </div>

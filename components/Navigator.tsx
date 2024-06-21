@@ -1,6 +1,7 @@
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import { IconArrow, Icon } from 'yorkie-ui';
 import { type DocsOrderList } from '@/utils/mdxUtils';
 import ArrowSVG from '@/public/assets/icons/icon_arrow.svg';
 
@@ -42,9 +43,9 @@ function NavGroup({ isActive, children }: { isActive: boolean; children: React.R
 
 function NavMenu({ title, href, isActive }: { title: string; href: string; isActive: boolean }) {
   return (
-    <Link href={href} className={classNames('navigator_menu', { is_active: isActive })}>
+    <Link href={href} className={classNames('navigator_menu', { is_active: isActive })} color="gray.a12">
       <span className="icon">
-        <ArrowSVG />
+        <Icon icon={<IconArrow />} stroke="neutral.10" />
       </span>
       {title}
     </Link>

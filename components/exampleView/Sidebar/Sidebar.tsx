@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import classNames from 'classnames';
-import { Icon } from '@/components';
 import { SidebarContextProvider, useSidebarContext } from './Sidebar.context';
 import { SidebarTabs, SidebarTabsList, SidebarTabsTab, SidebarTabsPanel } from './SidebarTabs';
+import { Flex, Button, IconArrowLeft, IconArrowRight, Box } from 'yorkie-ui';
+import React from 'react';
 
 export function Sidebar({
   defaultOpened = true,
@@ -37,13 +38,19 @@ export function Sidebar({
 function SidebarTop({ children }: { children?: React.ReactNode }) {
   const ctx = useSidebarContext();
   return (
-    <div className="sidebar_top">
+    <Flex justifyContent="space-between">
       {children}
-      <button type="button" className="btn btn_toggle" onClick={() => ctx.setIsOpened((opened) => !opened)}>
-        <Icon type="arrow" />
-        <span className="blind">Close sidebar</span>
-      </button>
-    </div>
+      <Button
+        onClick={() => ctx.setIsOpened((opened) => !opened)}
+        variant="outline"
+        icon={ctx.isOpened ? <IconArrowLeft /> : <IconArrowRight />}
+        position="start"
+        size="sm"
+      />
+      <Box className="blind" display="none">
+        Close sidebar
+      </Box>
+    </Flex>
   );
 }
 
