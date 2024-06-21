@@ -185,7 +185,7 @@ export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
         >
           <span>Community</span>
         </Link>
-        <Box borderWidth="1px" borderColor="gray.12" borderTop="none" borderInline="none" />
+        <Box borderWidth="1px" borderColor="gray.5" borderTop="none" borderInline="none" />
         {isLoggedIn ? (
           <Link
             href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`}

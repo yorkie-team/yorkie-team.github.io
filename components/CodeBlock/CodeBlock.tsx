@@ -25,7 +25,7 @@ export function CodeBlock({ withCopyButton, ...restProps }: { withCopyButton?: b
 
 function CopyButtonBox({ value, timeout = 1000 }: { value?: string; timeout?: number }) {
   return (
-    <div className="btn_area">
+    <Box position="absolute" right="2" top="2">
       <CopyButton value={value} timeout={timeout}>
         {({ copied, copy }) => (
           <>
@@ -34,18 +34,20 @@ function CopyButtonBox({ value, timeout = 1000 }: { value?: string; timeout?: nu
               href="https://github.com/yorkie-team/dashboard/issues"
               variant="outline"
               position="start"
+              size="xs"
+              stroke="neutral.11"
               icon={<Icon icon={<IconCopy />} />}
             ></Button>
             {copied && (
               <div className="toast_box shadow_l">
-                <Icon icon={<IconCheck stroke="#000" />} stroke="orange.default" position="start" size="lg" />
+                <Icon icon={<IconCheck />} stroke="orange.default" position="start" size="lg" />
                 Copied
               </div>
             )}
           </>
         )}
       </CopyButton>
-    </div>
+    </Box>
   );
 }
 
