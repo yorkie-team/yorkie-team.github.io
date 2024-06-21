@@ -29,28 +29,6 @@ scope.launch {
 > usePlainText should be set false unless you use it for testing. For more information, please refer to [usePlainText](https://grpc.github.io/grpc-java/javadoc/io/grpc/ManagedChannelBuilder.html#usePlaintext--).
 
 
-#### Subscribing to Client events
-
-We can use `client.events` to subscribe to client based events, such as `status`, `streamConnectionStatus`, and `peerStatus`. 
-
-```kotlin
-// Declare your own CoroutineScope
-scope.launch {
-  client.status.collect {
-    println(it) // "Activated" or "Deactivated"
-  }
-}
-
-scope.launch {
-  client.streamConnectionStatus.collect {
-    println(it) // "Connected" or "Disconnected"
-  }
-}
-```
-By using the value of the `streamConnectionStatus`, it is possible to determine whether the Client is connected to the network.
-
-If you want to know about other client events, please refer to [Client.Event](https://yorkie.dev/yorkie-android-sdk/yorkie/dev.yorkie.core/-client/-event/index.html).
-
 ### Document
 
 `Document` is a primary data type in Yorkie, which provides a JSON-like updating experience that makes it easy to represent your application's model.
@@ -94,7 +72,7 @@ scope.launch {
 
 #### Updating presence
 
-The `Document.update()` method allows you to make changes to the state of the current user's presence.
+The `Document.updateAsync()` method allows you to make changes to the state of the current user's presence.
 
 Specific properties provided will be changed. The existing presence object will be updated by merging the new changes. In other words, properties not specified in the update function will remain unchanged. 
 
@@ -173,7 +151,7 @@ scope.launch {
 }
 ```
 
-Under the hood, `root` in the `update` function creates a `change`, a set of operations, using a JavaScript proxy. Every element has its unique ID, created by the logical clock. This ID is used by Yorkie to track which object is which.
+Under the hood, `root` in the `updateAsync()` function creates a `change`, a set of operations, using a JavaScript proxy. Every element has its unique ID, created by the logical clock. This ID is used by Yorkie to track which object is which.
 
 You can get the contents of the Document using `document.getRoot()`.
 
@@ -290,7 +268,7 @@ scope.launch {
 
 ### Custom CRDT types
 
-Custom CRDT types are data types that can be used for special applications such as text editors and counters, unlike general JSON data types such as `JsonObject` and `JsonArray`. Custom CRDT types can be created in the callback function of `document.update`.
+Custom CRDT types are data types that can be used for special applications such as text editors and counters, unlike general JSON data types such as `JsonObject` and `JsonArray`. Custom CRDT types can be created in the callback function of `document.updateAsync()`.
 
 #### JsonText
 `JsonText` provides supports for collaborative text editing. In addition, contents in `JsonText` can have attributes; for example, characters can be bold, italic, or underlined.
