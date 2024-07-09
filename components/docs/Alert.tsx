@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import classNames from 'classnames';
-import { Icon } from '@/components';
+import { Icons, Icon } from 'yorkie-ui';
 
 export function Alert({
   children,
@@ -9,6 +9,12 @@ export function Alert({
   children: ReactNode;
   status: 'danger' | 'success' | 'warning' | 'info';
 }) {
+  const statusIcons = {
+    danger: <Icons.IconAlertDanger />,
+    warning: <Icons.IconAlertWarning />,
+    success: <Icons.IconAlertSuccess />,
+    info: <Icons.IconAlertInfo />,
+  };
   return (
     <div
       className={classNames('alert', {
@@ -18,7 +24,7 @@ export function Alert({
         alert_info: status === 'info',
       })}
     >
-      <Icon type={status} />
+      <Icon icon={statusIcons[status]} />
       {children}
     </div>
   );

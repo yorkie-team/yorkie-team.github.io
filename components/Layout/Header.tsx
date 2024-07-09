@@ -1,6 +1,6 @@
 import { ReactElement, useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { Button, Box, Icon, Heading, Flex, Link, IconStar, Text } from 'yorkie-ui';
+import { Button, Box, Icon, Heading, Flex, Link, Text, Icons } from 'yorkie-ui';
 import { isValidToken } from '@/utils/isValidToken';
 import { MobileGnbDropdown } from './MobileGnbDropdown';
 import LogoSVG from '@/public/assets/icons/logo_horizontal_xs.svg';
@@ -110,7 +110,7 @@ export function Header(): ReactElement {
             <Button
               as="link"
               href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup`}
-              icon={<IconStar />}
+              icon={<Icons.IconStar />}
               position="start"
               display={{ base: 'none', lg: 'block' }}
             >

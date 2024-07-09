@@ -1,9 +1,8 @@
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { IconArrow, Icon } from 'yorkie-ui';
+import { Icons, Icon } from 'yorkie-ui';
 import { type DocsOrderList } from '@/utils/mdxUtils';
-import ArrowSVG from '@/public/assets/icons/icon_arrow.svg';
 
 export function Navigator({ navList }: { navList: DocsOrderList }) {
   return (
@@ -45,7 +44,7 @@ function NavMenu({ title, href, isActive }: { title: string; href: string; isAct
   return (
     <Link href={href} className={classNames('navigator_menu', { is_active: isActive })} color="gray.a12">
       <span className="icon">
-        <Icon icon={<IconArrow />} stroke="neutral.10" />
+        <Icon icon={<Icons.IconArrow />} stroke="neutral.10" />
       </span>
       {title}
     </Link>

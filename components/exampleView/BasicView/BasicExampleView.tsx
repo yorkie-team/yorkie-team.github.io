@@ -2,7 +2,7 @@ import classNames from 'classnames';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import yorkie from 'yorkie-js-sdk';
 import UserContent from './UserContent';
-import { Text, Icon, Button, IconClose, IconPlus } from 'yorkie-ui';
+import { Text, Icon, Button, Icons } from 'yorkie-ui';
 
 interface DocChangeInfo {
   type: 'update' | 'initialize' | 'presence';
@@ -109,14 +109,14 @@ export function BasicExampleView({
                   size="xs"
                   marginLeft="4"
                 >
-                  <Icon stroke="neutral.11" icon={<IconClose />} />
+                  <Icon stroke="neutral.11" icon={<Icons.IconClose />} />
                 </Button>
               </li>
             );
           })}
         </ul>
         <button type="button" className="btn btn_add" onClick={addUser}>
-          <Icon icon={<IconPlus />} size="md" />
+          <Icon icon={<Icons.IconPlus />} size="md" />
         </button>
       </div>
       <ul className="grid_list2">

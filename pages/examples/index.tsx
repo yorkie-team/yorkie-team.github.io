@@ -1,19 +1,6 @@
 'use client';
 import { Layout } from '@/components';
-import {
-  Button,
-  Box,
-  Icon,
-  Heading,
-  Text,
-  Flex,
-  Container,
-  Grid,
-  GridItem,
-  Link,
-  IconStar,
-  IconDiamond,
-} from 'yorkie-ui';
+import { Button, Box, Icon, Heading, Text, Flex, Container, Grid, GridItem, Link, Icons } from 'yorkie-ui';
 import { ExampleThumbnailImage } from '@/components/exampleView';
 import ExampleBannerSVG from '@/public/assets/images/banner/img_example_banner.svg';
 import type { NextPage } from 'next';
@@ -45,7 +32,7 @@ const Examples: NextPage = () => {
               width={{ base: '100w', lg: 'fit' }}
               wLink={{ base: '100w', lg: 'fit' }}
               href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`}
-              icon={<IconStar />}
+              icon={<Icons.IconStar />}
               position="start"
               size="xl"
             >
@@ -67,7 +54,7 @@ const Examples: NextPage = () => {
         <Grid gridTemplateColumns={{ base: 1, lg: 6 }} gap={4} marginTop="32">
           <GridItem gridColumnStart={1} gridColumnEnd={3} gridColumn={2} display="grid">
             <Button position="start" size="lg" variant="ghost" color="neutral.a12">
-              <Icon icon={<IconDiamond />} />
+              <Icon icon={<Icons.IconDiamond />} />
               All examples
             </Button>
           </GridItem>

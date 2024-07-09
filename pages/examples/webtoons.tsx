@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import { Accordion, Icon, IconDown } from 'yorkie-ui';
+import { Accordion, Icon, Icons } from 'yorkie-ui';
 import { ExampleLayout, CodeBlock } from '@/components';
 import { Sidebar, FullView, ShowView, GridView, DualView } from '@/components/exampleView';
 
@@ -60,7 +60,7 @@ const ExamplesView: NextPage = () => {
                       <Accordion.ItemTrigger>
                         {title}
                         <Accordion.ItemIndicator>
-                          <Icon size="md" icon={<IconDown />} stroke="neutral.11" />
+                          <Icon size="md" icon={<Icons.IconArrow />} stroke="neutral.11" />
                         </Accordion.ItemIndicator>
                       </Accordion.ItemTrigger>
                       <Accordion.ItemContent>{description}</Accordion.ItemContent>

@@ -8,7 +8,7 @@ import SystemUserPinkSVG from '@/public/assets/icons/icon_system_user_pink.svg';
 import SystemUserPurpleSVG from '@/public/assets/icons/icon_system_user_purple.svg';
 import ImgExampleWebtoonSVG from '@/public/assets/images/@tmp/img_example_webtoon.svg';
 import { svgMap } from '@/components/Icons/Icon';
-import { Icon, IconExpand, IconMinimize, IconCloseSmall } from 'yorkie-ui';
+import { Icon, Icons } from 'yorkie-ui';
 
 const ExampleContent = () => {
   return (
@@ -111,7 +111,7 @@ const ExampleContent = () => {
         <div className="mini_map_header">
           <p className="title">Mini Map</p>
           <button type="button" className="btn_minimize">
-            <Icon icon={<IconMinimize />} />
+            <Icon icon={<Icons.IconMinimize />} />
             <span className="blind">최소화</span>
           </button>
         </div>
@@ -138,7 +138,7 @@ export function ShowView() {
               </p>
             </a>
             <button type="button" className="btn_close">
-              <Icon icon={<IconCloseSmall />} />
+              <Icon icon={<Icons.IconCloseSmall />} />
               <span className="blind">닫기</span>
             </button>
           </div>
@@ -155,12 +155,12 @@ export function ShowView() {
               </p>
             </a>
             <button type="button" className="btn_close">
-              <Icon icon={<IconCloseSmall />} />
+              <Icon icon={<Icons.IconCloseSmall />} />
               <span className="blind">닫기</span>
             </button>
             <button type="button" className="btn btn_expand">
               <span className="text">Move to this tab</span>
-              <Icon icon={<IconExpand />} />
+              <Icon icon={<Icons.IconExpand />} />
             </button>
           </div>
           <div className="system_view_item">
@@ -176,12 +176,12 @@ export function ShowView() {
               </p>
             </a>
             <button type="button" className="btn_close">
-              <Icon icon={<IconCloseSmall />} />
+              <Icon icon={<Icons.IconCloseSmall />} />
               <span className="blind">닫기</span>
             </button>
             <button type="button" className="btn btn_expand">
               <span className="text">Open in new tab</span>
-              <Icon icon={<IconExpand />} />
+              <Icon icon={<Icons.IconExpand />} />
             </button>
           </div>
           <div className="system_view_item">
@@ -197,11 +197,11 @@ export function ShowView() {
               </p>
             </a>
             <button type="button" className="btn_close">
-              <Icon icon={<IconCloseSmall />} />
+              <Icon icon={<Icons.IconCloseSmall />} />
               <span className="blind">닫기</span>
             </button>
             <button type="button" className="btn is_disabled btn_expand gray300">
-              <Icon icon={<IconExpand />} />
+              <Icon icon={<Icons.IconExpand />} />
               <span className="blind">창 활성화 시키기</span>
             </button>
           </div>

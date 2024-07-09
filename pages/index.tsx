@@ -4,23 +4,7 @@ import classNames from 'classnames';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { Layout, CodeBlock, CodeBlockHeader } from '@/components';
-import {
-  Button,
-  Box,
-  Icon,
-  Heading,
-  Text,
-  Flex,
-  Accordion,
-  Container,
-  Grid,
-  GridItem,
-  IconStar,
-  IconBook,
-  IconMessageSquare,
-  IconTwinkle,
-  IconSmile,
-} from 'yorkie-ui';
+import { Button, Box, Icon, Heading, Text, Flex, Accordion, Container, Grid, GridItem, Icons } from 'yorkie-ui';
 import { ChartMotion, StateSharingMotion, ServerMotion, MainBannerMotion } from '@/components/motions';
 import UserGroupSVG from '@/public/assets/icons/icon_service_main_users_group.svg';
 import CollaboProfileSVG from '@/public/assets/icons/icon_collaborate_profile.svg';
@@ -86,7 +70,7 @@ const Home: NextPage = () => {
               href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`}
               onPointerOver={() => setBannerActive(true)}
               onPointerOut={() => setBannerActive(false)}
-              icon={<IconStar />}
+              icon={<Icons.IconStar />}
               position="start"
               size="xl"
             >
@@ -178,7 +162,7 @@ const Home: NextPage = () => {
                 wLink={{ base: '100w', lg: 'fit' }}
                 as="link"
                 href="/docs/getting-started"
-                icon={<IconBook />}
+                icon={<Icons.IconBook />}
                 position="start"
                 size="xl"
               >
@@ -191,7 +175,7 @@ const Home: NextPage = () => {
                 href="/docs"
                 className="fillSVG"
                 variant="outline"
-                icon={<IconBook />}
+                icon={<Icons.IconBook />}
                 position="start"
                 size="xl"
               >
@@ -401,7 +385,7 @@ const Home: NextPage = () => {
                   wLink={{ base: '100w', lg: 'fit' }}
                   href="/products#document-and-presence"
                   backgroundColor="neutral.a10"
-                  icon={<IconBook />}
+                  icon={<Icons.IconBook />}
                   position="start"
                   size={{ base: 'sm', lg: 'lg' }}
                   marginTop="6"
@@ -433,7 +417,7 @@ const Home: NextPage = () => {
                   wLink={{ base: '100w', lg: 'fit' }}
                   href="/products#dashboard"
                   backgroundColor="neutral.a10"
-                  icon={<IconBook />}
+                  icon={<Icons.IconBook />}
                   position="start"
                   size={{ base: 'sm', lg: 'lg' }}
                   marginTop="6"
@@ -465,7 +449,7 @@ const Home: NextPage = () => {
                   wLink={{ base: '100w', lg: 'fit' }}
                   href="/products#self-hosted-server"
                   backgroundColor="neutral.a10"
-                  icon={<IconBook />}
+                  icon={<Icons.IconBook />}
                   position="start"
                   size={{ base: 'sm', lg: 'lg' }}
                   marginTop="6"
@@ -484,7 +468,7 @@ const Home: NextPage = () => {
             <Accordion.Item value="question-one">
               <Accordion.ItemTrigger>
                 <Flex alignItems="center" gap="3">
-                  <Icon icon={<IconMessageSquare />} position="start" size="lg" />
+                  <Icon icon={<Icons.IconMessageSquare />} position="start" size="lg" />
                   <Text color="neutral.a11" size="3xl">
                     Can we use the Yorkie for free?
                   </Text>
@@ -503,7 +487,7 @@ const Home: NextPage = () => {
             <Accordion.Item value="question-two">
               <Accordion.ItemTrigger>
                 <Flex alignItems="center" gap="3">
-                  <Icon icon={<IconMessageSquare />} position="start" size="lg" />
+                  <Icon icon={<Icons.IconMessageSquare />} position="start" size="lg" />
                   <Text color="neutral.a11" size="3xl">
                     Is the Yorkie production ready?
                   </Text>
@@ -525,7 +509,7 @@ const Home: NextPage = () => {
             <Accordion.Item value="question-three">
               <Accordion.ItemTrigger>
                 <Flex alignItems="center" gap="3">
-                  <Icon icon={<IconMessageSquare />} size="lg" />
+                  <Icon icon={<Icons.IconMessageSquare />} size="lg" />
                   <Text color="neutral.a11" size="3xl">
                     How can I contribute to the Yorkie project?
                   </Text>
@@ -556,7 +540,7 @@ const Home: NextPage = () => {
               href="https://discord.gg/MVEAwz9sBy"
               variant="outline"
               className="fillSVG"
-              icon={<Icon icon={<IconSmile />} stroke="neutral.10" />}
+              icon={<Icon icon={<Icons.IconSmile />} stroke="neutral.10" />}
               position="start"
               size="xl"
             >
@@ -567,7 +551,7 @@ const Home: NextPage = () => {
               width={{ base: '100w', lg: 'fit' }}
               wLink={{ base: '100w', lg: 'fit' }}
               href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`}
-              icon={<IconTwinkle />}
+              icon={<Icons.IconTwinkle />}
               position="start"
               size="xl"
             >

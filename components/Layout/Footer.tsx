@@ -1,5 +1,5 @@
 import { ReactElement, useEffect, useState } from 'react';
-import { Link, Box, Grid, GridItem, Container, Text, Flex, Icon, IconLogo, Select, IconDown } from 'yorkie-ui';
+import { Link, Box, Grid, GridItem, Container, Text, Flex, Icon, Icons, Select } from 'yorkie-ui';
 import React from 'react';
 import { ThemeOption, useTheme } from '@/hooks/useTheme';
 
@@ -48,7 +48,7 @@ export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement
           >
             <GridItem gridColumnStart={1} gridColumnEnd={3}>
               <Link href="/" fontSize="9xl" height="6" className="logo">
-                <IconLogo />
+                <Icons.IconLogo />
               </Link>
               <Text color="neutral.a12" fontSize="sm" marginBottom="4">
                 Copyright &copy; {fullYear} Yorkie
@@ -57,7 +57,7 @@ export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement
                 <Select.Control>
                   <Select.Trigger>
                     <Select.ValueText placeholder={`Theme: ${themeOption == 'dark' ? 'Dark' : 'Light'}`} />
-                    <Icon icon={<IconDown />} stroke="neutral.10" size="sm" />
+                    <Icon icon={<Icons.IconArrow />} stroke="neutral.10" size="sm" />
                   </Select.Trigger>
                 </Select.Control>
                 <Select.Positioner>
@@ -67,7 +67,7 @@ export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement
                         <Select.Item onClick={(e) => setThemeSelect(item)} key={item.value} item={item}>
                           <Select.ItemText>{item.label}</Select.ItemText>
                           <Select.ItemIndicator>
-                            <Icon icon={<IconDown />} stroke="neutral.10" size="sm" />
+                            <Icon icon={<Icons.IconArrow />} stroke="neutral.10" size="sm" />
                           </Select.ItemIndicator>
                         </Select.Item>
                       ))}

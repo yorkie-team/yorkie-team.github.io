@@ -9,7 +9,7 @@ import {
   getFileInfo,
 } from '@/utils/exampleFileUtils';
 import { CodeBlock } from '@/components';
-import { Icon, Text, Box, IconFile, IconFolderOpen, IconFolderClose } from 'yorkie-ui';
+import { Icon, Text, Box, Icons } from 'yorkie-ui';
 
 export function ProjectCodes({
   files,
@@ -77,11 +77,11 @@ export function ProjectCodes({
                 }}
               >
                 {child.isFile ? (
-                  <Icon icon={<IconFile />} position="start" size="xs" />
+                  <Icon icon={<Icons.IconFile />} position="start" size="xs" />
                 ) : isFolderOpen ? (
-                  <Icon icon={<IconFolderOpen />} position="start" size="xs" />
+                  <Icon icon={<Icons.IconFolderOpen />} position="start" size="xs" />
                 ) : (
-                  <Icon icon={<IconFolderClose />} position="start" size="xs" />
+                  <Icon icon={<Icons.IconFolderClose />} position="start" size="xs" />
                 )}
                 <Text fontSize="xs"> {child.name}</Text>
               </button>
@@ -134,11 +134,11 @@ function SubFolderCodes({
               }}
             >
               {child.isFile ? (
-                <Icon icon={<IconFile />} position="start" size="xs" />
+                <Icon icon={<Icons.IconFile />} position="start" size="xs" />
               ) : isFolderOpen ? (
-                <Icon icon={<IconFolderOpen />} position="start" size="xs" />
+                <Icon icon={<Icons.IconFolderOpen />} position="start" size="xs" />
               ) : (
-                <Icon icon={<IconFolderClose />} position="start" size="xs" />
+                <Icon icon={<Icons.IconFolderClose />} position="start" size="xs" />
               )}
               <Text fontSize="xs">{child.name}</Text>
             </button>

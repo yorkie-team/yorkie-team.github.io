@@ -1,18 +1,6 @@
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import {
-  Button,
-  Box,
-  Menu,
-  Link,
-  Icon,
-  IconGnbMenu,
-  IconClose,
-  Flex,
-  IconChevronRight,
-  IconDown,
-  Text,
-} from 'yorkie-ui';
+import { Button, Box, Menu, Link, Icon, Icons, Flex, Text } from 'yorkie-ui';
 import React from 'react';
 
 export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
@@ -41,7 +29,7 @@ export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
         stroke="neutral.12"
         className="fillSVG"
       >
-        {gnbOpened ? <IconClose /> : <IconGnbMenu />}
+        {gnbOpened ? <Icons.IconClose /> : <Icons.IconGnbMenu />}
       </Box>
       <Flex
         display={gnbOpened ? 'flex' : 'none'}
@@ -69,7 +57,7 @@ export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
             cursor="pointer"
           >
             <Icon
-              icon={docsMenuOpened ? <IconDown /> : <IconChevronRight />}
+              icon={docsMenuOpened ? <Icons.IconDown /> : <Icons.IconChevronRight />}
               paddingInline="2"
               size="2xl"
               stroke="neutral.12"

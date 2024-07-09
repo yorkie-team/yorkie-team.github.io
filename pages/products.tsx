@@ -13,22 +13,7 @@ import ProductPCSVG from '@/public/assets/images/banner/img_product_pc.svg';
 import ProductMobileSVG from '@/public/assets/images/banner/img_product_mobile.svg';
 import ProductPackageSVG from '@/public/assets/images/banner/img_product_package.svg';
 import { DOCUMENT_CODE } from '@/codes/document';
-import {
-  Button,
-  Box,
-  Icon,
-  Heading,
-  Text,
-  Flex,
-  Container,
-  Grid,
-  Link,
-  GridItem,
-  IconStar,
-  IconCloud,
-  IconPackage,
-  IconBook,
-} from 'yorkie-ui';
+import { Button, Box, Icon, Heading, Text, Flex, Container, Grid, Link, GridItem, Icons } from 'yorkie-ui';
 
 const Products: NextPage = () => {
   const [documentType, setDocumentType] = useState<keyof typeof DOCUMENT_CODE>('common');
@@ -62,7 +47,7 @@ const Products: NextPage = () => {
               wLink={{ base: '100w', lg: 'fit' }}
               as="link"
               href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`}
-              icon={<IconStar />}
+              icon={<Icons.IconStar />}
               position="start"
               size="xl"
               marginTop="6"
@@ -263,7 +248,7 @@ const Products: NextPage = () => {
         </Grid>
         <Box borderWidth="1px" borderRadius="2xl" overflow="hidden" marginBlock="16" borderColor="gray.a10" />
         <Link href="#collaboration-awareness" fontWeight="semibold" fontSize={{ base: 'xl', lg: '3xl' }} marginTop="6">
-          <Icon icon={<IconCloud />} stroke="#F27B2F" size={{ base: 'lg', lg: 'xl' }} />
+          <Icon icon={<Icons.IconCloud />} stroke="#F27B2F" size={{ base: 'lg', lg: 'xl' }} />
           Dashboard
         </Link>
         <Text marginTop={{ base: '6', lg: '10' }} lineHeight="normal" fontWeight="semibold">
@@ -293,7 +278,7 @@ const Products: NextPage = () => {
         <Flex display={{ base: 'flex', lg: 'block' }} flexDirection="column">
           <Box display="inline-block">
             <Flex alignItems="center" gap="4" width="fit">
-              <Icon icon={<IconPackage />} size="2xl" />
+              <Icon icon={<Icons.IconPackage />} size="2xl" />
               <Text fontWeight="semibold" fontSize="3xl">
                 Yorkie open-source package
               </Text>
@@ -308,7 +293,7 @@ const Products: NextPage = () => {
               backgroundColor="neutral.a10"
               as="link"
               href="/docs/self-hosted-server"
-              icon={<IconBook />}
+              icon={<Icons.IconBook />}
               position="start"
               size="xl"
             >

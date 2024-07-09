@@ -4,7 +4,7 @@ import type { NextPage } from 'next';
 import Head from 'next/head';
 import { Layout } from '@/components';
 import CommunitySVG from '@/public/assets/icons/community_help.svg';
-import { Button, Box, Heading, Text, Flex, Container, IconDiscord, IconGitHub } from 'yorkie-ui';
+import { Button, Box, Heading, Text, Flex, Container, Icons } from 'yorkie-ui';
 
 const Community: NextPage = () => {
   return (
@@ -44,7 +44,7 @@ const Community: NextPage = () => {
               </Box>
               <Flex gap="6" justifyContent={{ base: 'space-evenly', lg: 'flex-start' }}>
                 <Button
-                  icon={<IconDiscord />}
+                  icon={<Icons.IconDiscord />}
                   className="fillSVG"
                   stroke="neutral.11"
                   href="https://discord.gg/MVEAwz9sBy"
@@ -56,7 +56,7 @@ const Community: NextPage = () => {
                   Discord
                 </Button>
                 <Button
-                  icon={<IconGitHub />}
+                  icon={<Icons.IconGithub />}
                   stroke="neutral.11"
                   className="fillSVG"
                   href="https://github.com/yorkie-team/dashboard/issues"

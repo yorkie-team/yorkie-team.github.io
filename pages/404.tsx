@@ -1,7 +1,7 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { Layout } from '@/components';
-import { Button, Icon, Box, Heading, Text, Flex, IconDiscord, IconGitHub, IconBackHome, Container } from 'yorkie-ui';
+import { Button, Icon, Box, Heading, Text, Flex, Icons, Container } from 'yorkie-ui';
 import Error404SVG from '@/public/assets/icons/error_404.svg';
 
 const Custom404: NextPage = () => {
@@ -33,7 +33,7 @@ const Custom404: NextPage = () => {
               <br className="br_mo" /> removed or is temporarily unavailable.
             </Text>
             <Flex gap="6" flexDirection={{ base: 'column', lg: 'row' }}>
-              <Button as="link" href="/" position="start" icon={<Icon icon={<IconBackHome />} />}>
+              <Button as="link" href="/" position="start" icon={<Icon icon={<Icons.IconBackHome />} />}>
                 Back to home
               </Button>
               <Button
@@ -44,7 +44,7 @@ const Custom404: NextPage = () => {
                 position="start"
                 stroke="neutral.11"
                 className="fillSVG"
-                icon={<IconDiscord />}
+                icon={<Icons.IconDiscord />}
               >
                 Discord
               </Button>
@@ -56,7 +56,7 @@ const Custom404: NextPage = () => {
                 className="fillSVG"
                 variant="outline"
                 position="start"
-                icon={<IconGitHub />}
+                icon={<Icons.IconGithub />}
               >
                 GitHub
               </Button>
