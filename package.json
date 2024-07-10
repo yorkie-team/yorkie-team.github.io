@@ -33,7 +33,6 @@
     "rehype-autolink-headings": "^6.1.1",
     "rehype-slug": "^5.1.0",
     "remark-gfm": "^3.0.1",
-    "test-yorkie-v1": "^0.9.52",
     "unist-util-visit": "^4.1.1",
     "yorkie-js-sdk": "^0.4.23",
     "yorkie-ui": "^0.5.25"
