@@ -18,9 +18,9 @@ Let's start a Server with the CLI. You can start a Server with the following com
 ```bash
 $ yorkie server
 
-backend created: id: c6ljcdl94818baveba8g, rpc: localhost:11101: db: memory
-serving RPC on 11101
-serving profiling on 11102
+backend created: id: cppoq5huevgut6tjo8qg, db: memory
+serving RPC on 8080
+serving profiling on 8081
 ```
 The Server handles administrative requests such as project maintenance, and it continues to run until it's told to quit with termination commands such as Ctrl+C.
 The Server stores its data using an in-memory DB, which does not provide durability by default.
@@ -29,7 +29,7 @@ The Server stores its data using an in-memory DB, which does not provide durabil
 
 If you start the Server with a MongoDB address, you can permanently save the data stored by Yorkie.
 
-> To start MongoDB, `docker-compose -f docker/docker-compose.yml up --build -d` in [the project root](https://github.com/yorkie-team/yorkie).
+> To start MongoDB, `docker-compose -f build/docker/docker-compose.yml up --build -d` in [the project root](https://github.com/yorkie-team/yorkie).
 
 Then, start a Yorkie Server with `--mongo-connection-uri` flag to connect the MongoDB.
 
@@ -37,63 +37,10 @@ Then, start a Yorkie Server with `--mongo-connection-uri` flag to connect the Mo
 $ yorkie server --mongo-connection-uri mongodb://localhost:27017
 
 MongoDB connected, URI: mongodb://localhost:27017, DB: yorkie-meta
-backend created: id: c6ljibt948102kkt9neg, rpc: localhost:11101: db: mongodb://localhost:27017
-serving profiling on 11102
-serving RPC on 11101
+backend created: id: cppoqe9uevguvlsehcg0, rpc: mongodb://localhost:27017
+serving profiling on 8081
+serving RPC on 8080
 ```
-
-### Server for Web
-
-Server uses [gRPC](https://grpc.io/) to provide an API that Clients can connect to. Since it is currently impossible to implement the HTTP/2 gRPC in some browsers, [Envoy](https://www.envoyproxy.io/) is required for web. For more details: [gRPC-web](https://grpc.io/blog/state-of-grpc-web/)
-
-This page shows how to start the Server for web. Overall structure is as follows:
-
-```
- Browser            Envoy                  Server
-┌────────┐         ┌──────────────┐       ┌───────────┐
-│gRPC-web├─HTTP1.1─┤gRPC-web Proxy├─HTTP2─┤gRPC Server│
-└────────┘         └──────────────┘       └───────────┘
-```
-
-Configuring Envoy by hand with its config file is cumbersome, but using [Docker Compose](https://docs.docker.com/compose/) makes it easy.
-
-<Alert status="warning">If docker compose is not installed, install it : [Install Docker Compose](https://docs.docker.com/compose/install/)</Alert>
-
-First, download all manifest files from [docker folder](https://github.com/yorkie-team/yorkie-team.github.io/tree/main/docker). Then, execute the following command in the folder containing the downloaded file.
-
-```bash
-$ docker-compose up --build -d
-
-Starting yorkie ... done
-Starting envoy  ... done
-```
-
-This will launch Yorkie(Server) and envoy containers on your environment.
-
-```bash
-$ docker ps
-
-IMAGE                      COMMAND                  PORTS                                  NAMES
-grpcweb:envoy              "/usr/local/bin/envo…"   0.0.0.0:8080->8080/tcp                 envoy
-yorkieteam/yorkie:latest   "yorkie server --ena…"   0.0.0.0:11101-11102->11101-11102/tcp   yorkie
-```
-
-Then, the ports of the services are bound to the host environment.
-
-- 8080: gRPC-web port for RPC Server, including SDK and Admin
-- 11101: gRPC port for RPC Server, including SDK and Admin
-- 11102: HTML port for Profiling Server
-
-<Alert status="warning">Server stores its data using an in-memory DB, which does not provide durability. If you want to store data permanently, please refer to [Running Server With MongoDB](/docs/self-hosted-server#running-server-with-mongodb)</Alert>
-
-Now, let's create a Client with address `{{API_ADDR}}`.
-
-```javascript
-const client = new yorkie.Client('{{API_ADDR}}');
-await client.activate();
-```
-
-Next, let's take a look at the [JS SDK](/docs/js-sdk).
 
 ### Monitoring
 
@@ -101,7 +48,7 @@ Server exports metrics under the `/metrics` path on its profiling port.
 The metrics can be fetched with curl:
 
 ```bash
-$ curl http://localhost:11102/metrics
+$ curl http://localhost:8081/metrics
 
 yorkie_server_version{server_version="{{site.version}}"} 1
 # HELP yorkie_pushpull_received_changes_total The total count of changes included
@@ -114,10 +61,10 @@ This metrics can be collected from [Prometheus](https://prometheus.io/).
 
 Running [Prometheus](https://prometheus.io/) and [Grafana](https://grafana.com/oss/grafana/) is the easiest way to monitor Server's metrics.
 
-First, download all manifest files from [docker folder](https://github.com/yorkie-team/yorkie-team.github.io/tree/main/docker). Then, start the applications with `docker-compose`:
+First, download all manifest files from [docker folder](https://github.com/yorkie-team/yorkie/tree/main/build/docker). Then, start the applications with `docker-compose`:
 
 ```bash
-$ docker-compose -f docker-compose-monitoring.yml up --build -d
+$ docker-compose -f docker-compose-full.yml up --build -d
 
 Creating prometheus ... done
 Creating grafana    ... done
@@ -134,7 +81,7 @@ Url:    http://localhost:9090
 Access: proxy
 ```
 
-Then, import the [default Yorkie dashboard template](https://github.com/yorkie-team/yorkie-team.github.io/tree/main/docker/yorkie-dashboard.json) and customize it. For instance, if Prometheus data source name is `my-prometheus`, the datasource field values in JSON also need to be `my-prometheus`.
+Then, import the [default Yorkie dashboard template](https://grafana.com/grafana/dashboards/18560-yorkie-dashboard/) and customize it. For instance, if Prometheus data source name is `my-prometheus`, the datasource field values in JSON also need to be `my-prometheus`.
 
 Sample dashboard:
 
