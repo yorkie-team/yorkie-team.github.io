@@ -1,8 +1,8 @@
 import React from 'react';
 import { useTabsContext } from './Tabs.context';
-import { Button, Text } from 'yorkie-ui';
+import { Button, ButtonProps, Text } from 'yorkie-ui';
 
-export interface TabProps extends React.ComponentPropsWithoutRef<'button'> {
+export interface TabProps extends ButtonProps {
   /** Value that is used to connect Tab with associated panel */
   value: string;
 
@@ -10,11 +10,10 @@ export interface TabProps extends React.ComponentPropsWithoutRef<'button'> {
   children?: React.ReactNode;
 }
 
-export const Tab = ({ value, children, onClick, ...others }: TabProps) => {
+export const Tab: React.FC<TabProps> = ({ value, children, onClick, ...others }) => {
   const ctx = useTabsContext();
-  const isActive = value === ctx.value;
 
-  const activateTab = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const activateTab = (event: any) => {
     ctx.onTabChange(value);
     onClick?.(event);
   };

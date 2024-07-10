@@ -57,7 +57,7 @@ export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
             cursor="pointer"
           >
             <Icon
-              icon={docsMenuOpened ? <Icons.IconDown /> : <Icons.IconChevronRight />}
+              icon={docsMenuOpened ? <Icons.IconArrow /> : <Icons.IconChevRight />}
               paddingInline="2"
               size="2xl"
               stroke="neutral.12"

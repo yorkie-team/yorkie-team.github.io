@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { Layout, CodeBlock, CodeBlockHeader } from '@/components';
-import { Button, Box, Icon, Heading, Text, Flex, Accordion, Container, Grid, GridItem, Icons } from 'yorkie-ui';
+import { Button, Box, Icon, Text, Flex, Accordion, Container, Grid, GridItem, Icons, Heading } from 'yorkie-ui';
 import { ChartMotion, StateSharingMotion, ServerMotion, MainBannerMotion } from '@/components/motions';
 import UserGroupSVG from '@/public/assets/icons/icon_service_main_users_group.svg';
 import CollaboProfileSVG from '@/public/assets/icons/icon_collaborate_profile.svg';

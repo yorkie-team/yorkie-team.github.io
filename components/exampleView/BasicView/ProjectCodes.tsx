@@ -81,7 +81,7 @@ export function ProjectCodes({
                 ) : isFolderOpen ? (
                   <Icon icon={<Icons.IconFolderOpen />} position="start" size="xs" />
                 ) : (
-                  <Icon icon={<Icons.IconFolderClose />} position="start" size="xs" />
+                  <Icon icon={<Icons.IconFolderClosed />} position="start" size="xs" />
                 )}
                 <Text fontSize="xs"> {child.name}</Text>
               </button>
@@ -138,7 +138,7 @@ function SubFolderCodes({
               ) : isFolderOpen ? (
                 <Icon icon={<Icons.IconFolderOpen />} position="start" size="xs" />
               ) : (
-                <Icon icon={<Icons.IconFolderClose />} position="start" size="xs" />
+                <Icon icon={<Icons.IconFolderClosed />} position="start" size="xs" />
               )}
               <Text fontSize="xs">{child.name}</Text>
             </button>
