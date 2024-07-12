@@ -11,11 +11,11 @@ If you want to install the SDK, refer to the [Getting Started with JS SDK](/docs
 
 ### Client
 
-`Client` is a normal client that can communicate with the server. It has documents and sends changes of the document from local to the server to synchronize with other replicas remotely.
+`Client` is a regular client that communicates with the server. It has documents and sends local changes to the server to synchronize with other replicas remotely.
 
 #### Creating a Client
 
-We can create a Client using `new yorkie.Client()`. After the Client has been activated, it is connected to the server and ready to use.
+You can create a Client using `new yorkie.Client()`. After the Client has been activated, it is connected to the server and ready to use.
 
 ```javascript
 const client = new yorkie.Client('{{API_ADDR}}', {
@@ -33,7 +33,7 @@ A `Document` can be updated without being attached to the client, and its change
 
 #### Creating a Document
 
-We can create a Document using `yorkie.Document()`. Let's create a Document with a key and attach it to the Client.
+You can create a Document using `yorkie.Document()`. Let's create a Document with a key and attach it to the Client.
 
 ```javascript
 const doc = new yorkie.Document('doc-1');
@@ -95,15 +95,15 @@ doc.update((root, presence) => {
   presence.set({ cursor: { x: 1, y: 1 } }); 
 });
 
-
 // final state
 // presence = { cursor: { x: 1, y: 1 } } 
 // we can see that all properties inside cursor get replaced (i.e. we lose the property 'color')
 ```
 </Alert>
 
-
 #### Getting presence 
+
+You can get the presences of the current client and other clients participating in the document.
 
 ##### Document.getPresence(clientID) 
 
@@ -133,16 +133,12 @@ for (const { clientID, presence } of users ) {
 }
 ```
 
-#### Displaying users
-
 Here is an example of showing a list of users participating in the collaborative application.
 - [Profile Stack](/examples/profile-stack)
 
 ##### Document.subscribe('presence')
 
-This method allows you to subscribe to presence-related changes.
-
-You'll be notified whenever clients watch, unwatch, or modify their presence.
+This method allows you to subscribe to presence-related changes. You'll be notified whenever clients watch, unwatch, or modify their presence.
 
 The `initialized` event occurs when the client list needs to be initialized.
 For example, this happens when you first connect a watch stream to a document, when the connection is lost, or when it is reconnected.
@@ -239,29 +235,32 @@ console.log(root.counter.getValue()); // 1
 
 #### Subscribing to Document
 
+You can subscribe to various events occurring in the Document, such as changes, connection status, synchronization status, and all events by using the `document.subscribe()` method.
+By subscribing to these events, you can update the UI in real-time and handle exceptions that may occur during synchronization.
+
 ##### Document.subscribe()
 
-A Document can be modified by changes generated remotely or locally in Yorkie.
-
-Whenever the Document is modified, change events are triggered and we can subscribe to these events using the `document.subscribe(callback)`.
+A Document can be modified by changes generated remotely or locally in Yorkie. Whenever the Document is modified, change events are triggered and you can subscribe to these events using the `document.subscribe(callback)` method.
+By subscribing to changes in the Document, you can receive updates in real-time, which is useful for updating the UI when the Document changes.
 
 The callback is called with an event object, and the `event.type` property indicates the source of the change, which can be one of the following values: `local-change`, `remote-change`, or `snapshot`.
 
 ```javascript
 const unsubscribe = doc.subscribe((event) => {
   if (event.type === 'snapshot') {
-    // Update with data from the Yorkie Document.
+    // `snapshot` delivered when the entire document is updated from the server.
   } else if (event.type === 'local-change') {
-    console.log(event);
+    // `local-change` delivered when calling document.update from the current client.
   } else if (event.type === 'remote-change') {
-    // `message` delivered when calling document.update
-    const { message, operations } = event.value;    
+    // `remote-change` delivered when the document is updated from other clients.
+    const { message, operations } = event.value;
     
+    // You can access the operations that have been applied to the document.
     for (const op of operations) {
-      // ex) { type: 'increase', value: 1, path: '$.counter' }
+      // e.g.) { type: 'increase', value: 1, path: '$.counter' }
       switch (op.type) {
         case 'increase':
-          // Do something...
+          // ...
           break;
       }
     }
@@ -295,42 +294,74 @@ The callback function is called when the target path and its nested values are c
 With this feature, you can easily subscribe to changes for a specific part of the document and perform different actions based on the updated values.
 
 ```javascript
+// The event is triggered when the value of the path("$.todos") is changed.
 const unsubscribe = doc.subscribe('$.todos', (event) => { 
-  // The callback will be called when the root.todos or any of its nested values change.
-  const target = doc.getValueByPath('$.todos') // you can get the value by path 
-  // Do something...
+  // You can access the updated value of the path.
+  const target = doc.getValueByPath('$.todos');
 });
 ```
 
 ##### Document.subscribe('connection')
 
-You can monitor the connection status of the document to the server.
+After attaching the document to the client, the document is continuously synchronized with the server in real-time. This is achieved by maintaining a watch stream connection between the client and the server, which allows the client to receive events and updates from other users.
 
-A callback function is called whenever the connection status changes.
+To monitor the connection status of the stream, you can use a callback function that is triggered whenever the connection status changes. The possible values for `event.value` are `StreamConnectionStatus.Connected` and `StreamConnectionStatus.Disconnected`.
 
-Possible `event.value` values are: `StreamConnectionStatus.Connected` and `StreamConnectionStatus.Disconnected`.
-
-When the watch stream is disconnected, it means that the user is offline and cannot receive updates from other users in real-time.
+When the watch stream is disconnected, it indicates that the user is offline and will not receive real-time updates from other users.
 
 ```javascript
 const unsubscribe = doc.subscribe('connection', (event) => {
-  // Do something
+  if (event.value === StreamConnectionStatus.Connected) {
+    // The watch stream is connected.
+  } else if (event.value === StreamConnectionStatus.Disconnected) {
+    // The watch stream is disconnected.
+  }
 });
 ```
+
+For more information about `StreamConnectionStatus`, please refer to the [StreamConnectionStatus](https://yorkie.dev/yorkie-js-sdk/api-reference/enums/StreamConnectionStatus.html).
 
 ##### Document.subscribe('sync')
 
-You can track whether the document has been synchronized.
-
-A callback function is called whenever a synchronization occurs.
-
-Possible `event.value` values are: `DocumentSyncResultType.Synced` and `DocumentSyncResultType.SyncFailed`.
+If the document is attached to the client in `SyncMode.Realtime`, the document is automatically synchronized with the server in real-time.
+Under this mode, the document executes synchronization in the background, and you can track the synchronization status using the `sync` event. The possible `event.value` values are: `DocumentSyncStatus.Synced` and `DocumentSyncStatus.SyncFailed`.
 
 ```javascript
 const unsubscribe = doc.subscribe('sync', (event) => {
-  // Do something
+  if (event.value === DocumentSyncStatus.Synced) {
+    // The document is synchronized with the server.
+  } else if (event.value === DocumentSyncStatus.SyncFailed) {
+    // The document failed to synchronize with the server.
+  }
 });
 ```
+
+For more information about `DocumentSyncStatus`, please refer to the [DocumentSyncStatus](https://yorkie.dev/yorkie-js-sdk/api-reference/enums/DocumentSyncStatus.html).
+
+##### Document.subscribe('status')
+
+You can subscribe to the status of the document using `doc.subscribe('status', callback)`. The possible values for `event.value` are `DocumentStatus.Attached` and `DocumentStatus.Detached`.
+
+```javascript
+const unsubscribe = doc.subscribe('status', (event) => {
+  if (event.value === DocumentStatus.Attached) {
+    // The document is attached to the client.
+  } else if (event.value === DocumentStatus.Detached) {
+    // The document is detached from the client.
+  }
+});
+```
+
+For more information about `DocumentStatus`, please refer to the [DocumentStatus](https://yorkie.dev/yorkie-js-sdk/api-reference/enums/DocumentStatus.html).
+
+<Alert status="warning">
+In Web-based applications, it is hard to detect when the user closes the browser or navigates to another page. In such cases, the document may remain attached to the client, which can lead to unefficient storage and memory usage.
+For handle this, Yorkie provides one of housekeeping feature, `client-deactivate-threshold`, which is a time interval to automatically deactivate the clients that have not been used for a certain period.
+<br/>
+If the client is deactivated due to inactivity, the document will be detached from the client, and you will receive a `DocumentStatus.Detached` event through the `doc.subscribe('status', callback)` method.
+<br/>
+For more information about `client-deactivate-threshold`, please refer to the [Client Deactivate Threashold](/docs/cli#client-deactivate-threshold).
+</Alert>
 
 ##### Document.subscribe('all')
 
@@ -468,7 +499,7 @@ doc.update((root) => {
 
 ### TypeScript Support
 
-To use the Document more strictly, we can use [type variable](https://www.typescriptlang.org/docs/handbook/2/generics.html) in TypeScript when creating a Document.
+To use the Document more strictly, you can use [type variable](https://www.typescriptlang.org/docs/handbook/2/generics.html) in TypeScript when creating a Document.
 
 ```typescript
 import yorkie, { JSONArray } from 'yorkie-js-sdk';
