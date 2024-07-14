@@ -26,7 +26,7 @@ export function Header(): ReactElement {
       zIndex="10xl"
       className="header"
     >
-      <Flex gap="12">
+      <Flex gap="12" alignItems="center">
         <Heading as="h1">
           <Text display="none">Yorkie</Text>
           <Box display={{ base: 'none', lg: 'block' }}>
@@ -47,7 +47,7 @@ export function Header(): ReactElement {
             variant="outline"
             border="none"
             href="/products"
-            className={`gnb_item ${pathname === '/products' ? 'orange.default' : ''}`}
+            color={pathname === '/products' ? 'orange.default' : ''}
             fontSize="md"
           >
             Products
@@ -58,7 +58,7 @@ export function Header(): ReactElement {
             variant="outline"
             border="none"
             href="/docs"
-            className={`gnb_item ${pathname === '/docs/[[...slug]]' ? 'orange.default' : ''}`}
+            color={pathname?.includes('/docs') ? 'orange.default' : ''}
             fontSize="md"
           >
             Documentation
@@ -69,7 +69,7 @@ export function Header(): ReactElement {
             variant="outline"
             border="none"
             href="/examples"
-            className={`gnb_item ${pathname === '/examples' ? 'orange.default' : ''}`}
+            color={pathname === '/examples' ? 'orange.default' : ''}
             fontSize="md"
           >
             Examples
@@ -80,7 +80,7 @@ export function Header(): ReactElement {
             variant="outline"
             border="none"
             href="/community"
-            className={`gnb_item ${pathname === '/community' ? 'orange.default' : ''}`}
+            color={pathname === '/community' ? 'orange.default' : ''}
             fontSize="md"
           >
             Community
@@ -101,18 +101,20 @@ export function Header(): ReactElement {
           <Flex gap="4">
             <Button
               variant="outline"
+              size="md"
               as="link"
               href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/login`}
-              display={{ base: 'none', lg: 'block' }}
+              display={{ base: 'none', lg: 'flex' }}
             >
               Sign in
             </Button>
             <Button
               as="link"
+              variant="solid"
               href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup`}
-              icon={<Icons.IconStar />}
+              icon={<Icon icon={<Icons.IconStars />} />}
               position="start"
-              display={{ base: 'none', lg: 'block' }}
+              display={{ base: 'none', lg: 'flex' }}
             >
               Start for free
             </Button>

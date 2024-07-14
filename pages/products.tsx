@@ -46,8 +46,9 @@ const Products: NextPage = () => {
               width="100w"
               wLink={{ base: '100w', lg: 'fit' }}
               as="link"
+              variant="solid"
               href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`}
-              icon={<Icons.IconStar />}
+              icon={<Icon icon={<Icons.IconStars />} />}
               position="start"
               size="xl"
               marginTop="6"
@@ -105,7 +106,7 @@ const Products: NextPage = () => {
         </Text>
         <Text marginTop="10" lineHeight="normal" fontWeight={{ base: 'regular', lg: 'semibold' }}>
           Yorkie provides a general-purpose JSON-like{' '}
-          <Link href="/docs/js-sdk#document" textDecoration="underline" textDecorationColor="neutral.a12">
+          <Link href="/docs/js-sdk#document" decoration="link" textDecorationColor="neutral.a12">
             Document
           </Link>{' '}
           to enable complex application models while some CRDT libraries that only offer basic data types.
@@ -160,7 +161,7 @@ const Products: NextPage = () => {
         </Link>
         <Text marginTop="10" lineHeight="normal" fontWeight={{ base: 'regular', lg: 'semibold' }}>
           You can build a sense of presence by tracking the status of users who are editing the same document with{' '}
-          <Link href="/docs/js-sdk#presence" className="link">
+          <Link href="/docs/js-sdk#presence" decoration="link">
             Presence
           </Link>
           .
@@ -286,16 +287,18 @@ const Products: NextPage = () => {
           </Box>
           <Box order={{ base: 4, lg: 0 }} display="inline-block" marginTop={{ base: '6', lg: '0' }} float="right">
             <Button
-              width="100w"
-              wLink={{ base: '100w', lg: 'fit' }}
               float="right"
               marginRight="auto"
-              backgroundColor="neutral.a10"
-              as="link"
+              wLink={{ base: '100w', lg: 'fit' }}
+              marginTop="6"
+              color="neutral.1"
               href="/docs/self-hosted-server"
-              icon={<Icons.IconBook />}
+              variant="outline"
+              as="link"
+              backgroundColor="neutral.a10"
               position="start"
-              size="xl"
+              icon={<Icon icon={<Icons.IconBook />} stroke="neutral.1" />}
+              size={{ base: 'sm', lg: 'lg' }}
             >
               How to build self-hosted server
             </Button>

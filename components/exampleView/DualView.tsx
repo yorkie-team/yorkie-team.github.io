@@ -88,7 +88,7 @@ export function DualView() {
               </button>
               <button type="button" className="btn btn_expand blue_0">
                 <span className="text">Move to this tab</span>
-                <Icon icon={<Icons.IconExpand />} />
+                <Icon icon={<Icons.IconExpand />} stroke="neutral.10" />
               </button>
             </div>
           </li>

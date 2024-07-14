@@ -48,7 +48,7 @@ export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement
           >
             <GridItem gridColumnStart={1} gridColumnEnd={3}>
               <Link href="/" fontSize="9xl" height="6" className="logo">
-                <Icons.IconLogo />
+                <Icons.IconLogoHorizontalL />
               </Link>
               <Text color="neutral.a12" fontSize="sm" marginBottom="4">
                 Copyright &copy; {fullYear} Yorkie

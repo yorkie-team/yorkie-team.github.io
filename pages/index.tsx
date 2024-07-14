@@ -64,13 +64,14 @@ const Home: NextPage = () => {
           <Flex justifyContent="center">
             <Button
               as="link"
+              variant="solid"
               width={{ base: '100w', lg: 'fit' }}
               wLink={{ base: '100w', lg: 'fit' }}
               marginTop="10"
               href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`}
               onPointerOver={() => setBannerActive(true)}
               onPointerOut={() => setBannerActive(false)}
-              icon={<Icons.IconStar />}
+              icon={<Icons.IconStars />}
               position="start"
               size="xl"
             >
@@ -114,15 +115,14 @@ const Home: NextPage = () => {
             </span>
           </Flex>
           <Box className="homepage__bg-point" position="relative" paddingBlock="24">
-            <Box zIndex="xs" position="relative">
+            <Box zIndex="xs" position="relative" width="fit" margin="auto">
               <Text fontSize={{ base: '3xl', lg: '6xl' }} fontWeight="semibold" align="center">
                 Make your product
               </Text>
-              <Box display="flex" justifyContent="center">
+              <Box display="flex" justifyContent="center" alignItems="center" position="relative">
                 <Text
                   fontSize={{ base: '3xl', lg: '6xl' }}
                   fontWeight="semibold"
-                  position="relative"
                   borderX={{ base: '0', lg: 'md' }}
                   borderY={{ base: '0', lg: 'md' }}
                   overflow="hidden"
@@ -130,6 +130,9 @@ const Home: NextPage = () => {
                   borderColor="orange.default"
                   borderRadius="2xl"
                   paddingInline="2"
+                  className="point"
+                  lineHeight="none"
+                  height="fit"
                   marginRight={{ base: '0', lg: '3' }}
                 >
                   collaborative
@@ -156,14 +159,17 @@ const Home: NextPage = () => {
               marginTop="12"
               justifyContent="center"
               alignItems="center"
+              position="relative"
+              zIndex="xs"
             >
               <Button
                 width={{ base: '100w', lg: 'fit' }}
                 wLink={{ base: '100w', lg: 'fit' }}
                 as="link"
                 href="/docs/getting-started"
-                icon={<Icons.IconBook />}
+                icon={<Icon icon={<Icons.IconBook />} stroke="neutral.2" />}
                 position="start"
+                variant="solid"
                 size="xl"
               >
                 Getting Started
@@ -175,7 +181,8 @@ const Home: NextPage = () => {
                 href="/docs"
                 className="fillSVG"
                 variant="outline"
-                icon={<Icons.IconBook />}
+                background="neutral.1"
+                icon={<Icon icon={<Icons.IconBook />} stroke="neutral.11" />}
                 position="start"
                 size="xl"
               >
@@ -380,15 +387,17 @@ const Home: NextPage = () => {
                   document.
                 </Text>
                 <Button
-                  as="link"
+                  marginTop="6"
                   width={{ base: '100w', lg: 'fit' }}
                   wLink={{ base: '100w', lg: 'fit' }}
+                  color="neutral.1"
                   href="/products#document-and-presence"
+                  variant="outline"
+                  as="link"
                   backgroundColor="neutral.a10"
-                  icon={<Icons.IconBook />}
                   position="start"
+                  icon={<Icon icon={<Icons.IconBook />} stroke="neutral.1" />}
                   size={{ base: 'sm', lg: 'lg' }}
-                  marginTop="6"
                 >
                   Learn more about Document and Presence
                 </Button>
@@ -412,15 +421,17 @@ const Home: NextPage = () => {
                   functioning properly.
                 </Text>
                 <Button
-                  as="link"
+                  marginTop="6"
                   width={{ base: '100w', lg: 'fit' }}
                   wLink={{ base: '100w', lg: 'fit' }}
+                  color="neutral.1"
                   href="/products#dashboard"
+                  variant="outline"
+                  as="link"
                   backgroundColor="neutral.a10"
-                  icon={<Icons.IconBook />}
                   position="start"
+                  icon={<Icon icon={<Icons.IconBook />} stroke="neutral.1" />}
                   size={{ base: 'sm', lg: 'lg' }}
-                  marginTop="6"
                 >
                   Learn more about Dashboard
                 </Button>
@@ -444,15 +455,17 @@ const Home: NextPage = () => {
                   you covered.
                 </Text>
                 <Button
-                  as="link"
                   width={{ base: '100w', lg: 'fit' }}
                   wLink={{ base: '100w', lg: 'fit' }}
-                  href="/products#self-hosted-server"
-                  backgroundColor="neutral.a10"
-                  icon={<Icons.IconBook />}
-                  position="start"
-                  size={{ base: 'sm', lg: 'lg' }}
                   marginTop="6"
+                  color="neutral.1"
+                  href="/products#self-hosted-server"
+                  variant="outline"
+                  as="link"
+                  backgroundColor="neutral.a10"
+                  position="start"
+                  icon={<Icon icon={<Icons.IconBook />} stroke="neutral.1" />}
+                  size={{ base: 'sm', lg: 'lg' }}
                 >
                   Learn more about Self-Hosted Server
                 </Button>
@@ -469,7 +482,7 @@ const Home: NextPage = () => {
               <Accordion.ItemTrigger>
                 <Flex alignItems="center" gap="3">
                   <Icon icon={<Icons.IconMessageSquare />} position="start" size="lg" />
-                  <Text color="neutral.a11" size="3xl">
+                  <Text color="neutral.a11" size="2xl">
                     Can we use the Yorkie for free?
                   </Text>
                 </Flex>
@@ -488,7 +501,7 @@ const Home: NextPage = () => {
               <Accordion.ItemTrigger>
                 <Flex alignItems="center" gap="3">
                   <Icon icon={<Icons.IconMessageSquare />} position="start" size="lg" />
-                  <Text color="neutral.a11" size="3xl">
+                  <Text color="neutral.a11" size="2xl">
                     Is the Yorkie production ready?
                   </Text>
                 </Flex>
@@ -510,7 +523,7 @@ const Home: NextPage = () => {
               <Accordion.ItemTrigger>
                 <Flex alignItems="center" gap="3">
                   <Icon icon={<Icons.IconMessageSquare />} size="lg" />
-                  <Text color="neutral.a11" size="3xl">
+                  <Text color="neutral.a11" size="2xl">
                     How can I contribute to the Yorkie project?
                   </Text>
                 </Flex>
@@ -548,6 +561,7 @@ const Home: NextPage = () => {
             </Button>
             <Button
               as="link"
+              variant="solid"
               width={{ base: '100w', lg: 'fit' }}
               wLink={{ base: '100w', lg: 'fit' }}
               href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`}

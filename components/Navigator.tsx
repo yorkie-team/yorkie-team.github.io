@@ -44,7 +44,7 @@ function NavMenu({ title, href, isActive }: { title: string; href: string; isAct
   return (
     <Link href={href} className={classNames('navigator_menu', { is_active: isActive })} color="gray.a12">
       <span className="icon">
-        <Icon icon={<Icons.IconArrow />} stroke="neutral.10" />
+        <Icon icon={<Icons.IconArrow />} />
       </span>
       {title}
     </Link>

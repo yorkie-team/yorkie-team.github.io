@@ -29,10 +29,11 @@ const Examples: NextPage = () => {
             </Text>
             <Button
               as="link"
+              variant="solid"
               width={{ base: '100w', lg: 'fit' }}
               wLink={{ base: '100w', lg: 'fit' }}
               href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`}
-              icon={<Icons.IconStar />}
+              icon={<Icon icon={<Icons.IconStars />} />}
               position="start"
               size="xl"
             >
