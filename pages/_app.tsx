@@ -3,6 +3,7 @@ import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import Script from 'next/script';
 import '@/styles/style.css';
+import 'yorkie-ui/style';
 import { prefix } from '@/utils/prefix';
 import { ThemeOption, useTheme } from '@/hooks/useTheme';
 
@@ -10,6 +11,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   const { setTheme } = useTheme();
   useEffect(() => {
     const themeOption = (window.localStorage.getItem('theme') || 'system') as ThemeOption;
+    document.documentElement.setAttribute('data-theme', themeOption);
     setTheme(themeOption);
   }, [setTheme]);
 

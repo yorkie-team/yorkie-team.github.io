@@ -14,6 +14,7 @@
   "dependencies": {
     "@jsdevtools/rehype-toc": "^3.0.2",
     "@svgr/webpack": "^6.5.0",
+    "@types/react": "^18",
     "classnames": "^2.3.2",
     "framer-motion": "^7.6.7",
     "gray-matter": "^4.0.3",
@@ -21,7 +22,7 @@
     "jwt-decode": "^3.1.2",
     "lodash.clonedeep": "^4.5.0",
     "minimatch": "^5.1.2",
-    "next": "13.0.0",
+    "next": "13.4.7",
     "next-image-export-optimizer": "^1.0.1",
     "next-mdx-remote": "^4.1.0",
     "next-remote-watch": "^2.0.0",
@@ -33,18 +34,19 @@
     "rehype-slug": "^5.1.0",
     "remark-gfm": "^3.0.1",
     "unist-util-visit": "^4.1.1",
-    "yorkie-js-sdk": "^0.4.27"
+    "yorkie-js-sdk": "^0.4.27",
+    "yorkie-ui": "^0.5.32"
   },
   "devDependencies": {
     "@mdx-js/loader": "^2.1.5",
     "@types/lodash.clonedeep": "^4.5.7",
     "@types/minimatch": "^5.1.2",
-    "@types/node": "18.11.5",
-    "@types/react": "18.0.23",
-    "@types/react-dom": "18.0.7",
+    "@types/node": "^18",
+    "@types/react-dom": "^18",
     "eslint": "8.26.0",
     "eslint-config-next": "13.0.0",
     "postcss-path-replace": "^1.0.4",
+    "rollup-plugin-ts": "^3.4.5",
     "typescript": "4.8.4"
   }
 }

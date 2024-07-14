@@ -1,5 +1,7 @@
 import { ReactNode } from 'react';
-import { CopyButton, Button, Icon } from '@/components';
+import { CopyButton } from '@/components';
+import { Icon, Icons, Button, Box } from 'yorkie-ui';
+import React from 'react';
 
 export function CodeBlockHeader({ children }: { children: ReactNode }) {
   return <div className="codeblock_header">{children}</div>;
@@ -13,18 +15,20 @@ function RightBox({ children }: { children: ReactNode }) {
   return <div className="box_right">{children}</div>;
 }
 
-function CopyButtonBox({ value, timeout = 1000 }: { value: string; timeout?: number }) {
+function CopyButtonBox({ value, timeout = 1000 }: { value?: string; timeout?: number }) {
   return (
     <div className="btn_area">
       <CopyButton value={value} timeout={timeout}>
         {({ copied, copy }) => (
           <>
-            <Button icon={<Icon type="copy" />} className="gray50" outline onClick={copy} title="Copy to clipboard" />
+            <Button size="xs" onClick={copy} variant="outline" title="Copy to clipboard">
+              <Icon icon={<Icons.IconCopy />} stroke="neutral.12" size={{ base: 'lg', lg: '2xl' }} />
+            </Button>
             {copied && (
-              <div className="toast_box shadow_l">
-                <Icon type="check" />
+              <Box className="toast_box shadow_l" fontSize="sm">
+                <Icon icon={<Icons.IconCopy />} stroke="#fff" position="start" size="lg" />
                 Copied
-              </div>
+              </Box>
             )}
           </>
         )}

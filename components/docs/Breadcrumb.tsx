@@ -1,11 +1,11 @@
 import Link from 'next/link';
-import { Icon } from '@/components';
+import { Icons, Icon } from 'yorkie-ui';
 
 export function Breadcrumb({ menus }: { menus: Array<{ name: string; href: string }> }) {
   return (
     <div className="docs_breadcrumbs">
       <button type="button" className="nav_btn">
-        <Icon type="menu" />
+        <Icon icon={<Icons.IconMenu />} />
       </button>
       {menus.map(({ name, href }) => (
         <Link href={href} key={name} className="docs_breadcrumbs_link">

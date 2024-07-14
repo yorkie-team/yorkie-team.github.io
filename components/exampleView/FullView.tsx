@@ -1,7 +1,8 @@
-import { Icon, Image } from '@/components';
+import { Image } from '@/components';
 import DashboardUserGreenSVG from '@/public/assets/icons/icon_dashboard_user_green.svg';
 import DashboardUserPurpleSVG from '@/public/assets/icons/icon_dashboard_user_purple.svg';
 import DashboardUserRedSVG from '@/public/assets/icons/icon_dashboard_user_red.svg';
+import { Icon, Icons } from 'yorkie-ui';
 
 const ExampleContent = () => {
   return (
@@ -79,7 +80,7 @@ const ExampleContent = () => {
             </li>
           </ol>
           <button type="button" className="btn btn_add">
-            <Icon type="plus" />
+            <Icon icon={<Icons.IconPlus />} />
             <span className="blind">추가 하기</span>
           </button>
         </div>
@@ -104,7 +105,7 @@ const ExampleContent = () => {
         <div className="mini_map_header">
           <p className="title">Mini Map</p>
           <button type="button" className="btn_minimize">
-            <Icon type="minimize" />
+            <Icon icon={<Icons.IconMinimize />} />
             <span className="blind">최소화</span>
           </button>
         </div>

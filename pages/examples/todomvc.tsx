@@ -1,3 +1,4 @@
+'use client';
 import { ExampleLayout } from '@/components';
 import {
   BasicExampleView,
