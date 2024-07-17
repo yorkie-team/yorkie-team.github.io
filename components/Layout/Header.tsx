@@ -70,7 +70,7 @@ export function Header(): ReactElement {
               </Button>
             </>
           ) : null}
-          <MobileGnbDropdown isLoggedIn={!isLoggedIn} />
+          <MobileGnbDropdown isLoggedIn={!!isLoggedIn} />
         </div>
       </div>
     </header>
