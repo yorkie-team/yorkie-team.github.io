@@ -62,7 +62,7 @@ After ingress addons are enabled, you will see the following output:
 After Minikube is configured, you need to install Istio for Yorkie cluster.
 Yorkie cluster uses Istio for L7 load balancing and traffic management.
 
-First, create the `yorkie` namespace:
+First, create the `yorkie` namespace with the following command:
 
 ```bash
 $ kubectl create namespace yorkie
@@ -112,6 +112,30 @@ Then, update your local repository with the following command:
 ```bash
 $ helm repo update
 ```
+
+### Setup MongoDB pod and service
+
+Before installing the Yorkie cluster with Helm chart, you need to set up a MongoDB pod and expose it as a service. This is crucial since internal MongoDB installation is no longer provided and it avoids errors during Yorkie server provisioning.
+
+First, create the `mongodb` namespace with the following command:
+
+```bash
+$ kubectl create namespace mongodb
+```
+
+Then, create a MongoDB pod named `mongodb` in the `mongodb` namespace with the following command:
+
+```bash
+$ kubectl run mongodb --image=mongo:latest --port=27017 -n mongodb
+```
+
+Next, expose the MongoDB pod as a service to allow other pods to access it with the following command:
+
+```bash
+$ kubectl expose pod mongodb --port=27017 --target-port=27017 --name=mongodb --type=ClusterIP -n mongodb
+```
+
+By following these steps, you ensure that the MongoDB pod is running and accessible to other pods within the cluster.
 
 ### Install Yorkie cluster with Helm chart
 
