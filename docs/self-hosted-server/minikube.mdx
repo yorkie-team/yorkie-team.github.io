@@ -62,7 +62,13 @@ After ingress addons are enabled, you will see the following output:
 After Minikube is configured, you need to install Istio for Yorkie cluster.
 Yorkie cluster uses Istio for L7 load balancing and traffic management.
 
-Install Istio with the following command:
+First, create the `yorkie` namespace:
+
+```bash
+$ kubectl create namespace yorkie
+```
+
+Then, install Istio with the following command:
 
 ```bash
 $ istioctl install -f <(curl -s https://raw.githubusercontent.com/yorkie-team/yorkie/main/build/charts/yorkie-cluster/istio-operator.yaml)
