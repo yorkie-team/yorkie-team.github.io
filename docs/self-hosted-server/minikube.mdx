@@ -97,25 +97,9 @@ Making this installation the default for injection and validation.
 Thank you for installing Istio 1.17.  Please take a few minutes to tell us about your install/upgrade experience!  https://forms.gle/hMHGiwZHPU7UQRWe9
 ```
 
-### Add yorkie-team Helm chart in your local repository
-
-After Istio is installed, you need to add yorkie-team Helm chart repository in your local repository to install Yorkie cluster.
-
-Add yorkie-team Helm chart repository in your local repository with the following command:
-
-```bash
-$ helm repo add yorkie-team https://yorkie-team.github.io/yorkie/helm-charts
-```
-
-Then, update your local repository with the following command:
-
-```bash
-$ helm repo update
-```
-
 ### Setup MongoDB pod and service
 
-Before installing the Yorkie cluster with Helm chart, you need to set up a MongoDB pod and expose it as a service. This is crucial since internal MongoDB installation is no longer provided and it avoids errors during Yorkie server provisioning.
+Before installing the Yorkie cluster with Helm chart, you need to set up a MongoDB pod and expose it as a service. This is crucial since internal MongoDB installation is no longer provided.
 
 First, create the `mongodb` namespace with the following command:
 
@@ -136,6 +120,22 @@ $ kubectl expose pod mongodb --port=27017 --target-port=27017 --name=mongodb --t
 ```
 
 By following these steps, you ensure that the MongoDB pod is running and accessible to other pods within the cluster.
+
+### Add yorkie-team Helm chart in your local repository
+
+After Istio is installed, you need to add yorkie-team Helm chart repository in your local repository to install Yorkie cluster.
+
+Add yorkie-team Helm chart repository in your local repository with the following command:
+
+```bash
+$ helm repo add yorkie-team https://yorkie-team.github.io/yorkie/helm-charts
+```
+
+Then, update your local repository with the following command:
+
+```bash
+$ helm repo update
+```
 
 ### Install Yorkie cluster with Helm chart
 
