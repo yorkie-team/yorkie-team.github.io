@@ -1,7 +1,9 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import { Button, Icon, Layout } from '@/components';
+import Link from 'next/link';
+import { Icon, Layout } from '@/components';
 import CommunitySVG from '@/public/assets/icons/community_help.svg';
+import { Button, Flex } from 'yorkie-ui-test';
 
 const Community: NextPage = () => {
   return (
@@ -25,30 +27,20 @@ const Community: NextPage = () => {
           <br className="br_mo" /> raise GitHub
           <br className="br_tablet" /> discussions.
         </p>
-        <Button.Box>
-          <Button
-            icon={<Icon type="discord" />}
-            href="https://discord.gg/MVEAwz9sBy"
-            className="gray50"
-            as="a"
-            outline
-            target="_blank"
-            rel="noreferrer"
-          >
-            Discord
+        <Flex order="4" gap="600" mt="800" width="full">
+          <Button asChild variant="outline" size="lg" colorPalette="gray" flex={{ base: '1', md: 'none' }}>
+            <Link href="https://discord.gg/MVEAwz9sBy" target="_blank" rel="noreferrer">
+              <Icon type="discord" />
+              Discord
+            </Link>
           </Button>
-          <Button
-            icon={<Icon type="github" />}
-            href="https://github.com/yorkie-team/dashboard/issues"
-            className="gray50"
-            as="a"
-            outline
-            target="_blank"
-            rel="noreferrer"
-          >
-            GitHub
+          <Button asChild variant="outline" size="lg" colorPalette="gray" flex={{ base: '1', md: 'none' }}>
+            <Link href="https://github.com/yorkie-team/dashboard/issues" target="_blank" rel="noreferrer">
+              <Icon type="github" />
+              GitHub
+            </Link>
           </Button>
-        </Button.Box>
+        </Flex>
       </div>
     </Layout>
   );
