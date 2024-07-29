@@ -1,7 +1,8 @@
 import { ReactElement, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { Button, Icon } from '@/components';
+import { Icon } from '@/components';
+import { Button, Flex } from 'yorkie-ui-test';
 import { isValidToken } from '@/utils/isValidToken';
 import { MobileGnbDropdown } from './MobileGnbDropdown';
 import LogoSVG from '@/public/assets/icons/logo_horizontal_xs.svg';
@@ -51,25 +52,25 @@ export function Header(): ReactElement {
           </ul>
         </nav>
         <div className="header_util">
-          {isLoggedIn ? (
-            <Button as="a" href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`} outline className="gray50">
-              Dashboard
-            </Button>
-          ) : isLoggedIn === false ? (
-            <>
-              <Button as="a" href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/login`} outline className="gray50">
-                Sign in
+          <Flex gap="200" hideBelow="md">
+            {!!isLoggedIn ? (
+              <Button asChild variant="outline" colorPalette="gray">
+                <Link href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`}>Dashboard</Link>
               </Button>
-              <Button
-                as="a"
-                href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup`}
-                className="orange_0"
-                icon={<Icon type="star" />}
-              >
-                Start for free
-              </Button>
-            </>
-          ) : null}
+            ) : (
+              <>
+                <Button asChild variant="outline" colorPalette="gray">
+                  <Link href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/login`}>Sign in</Link>
+                </Button>
+                <Button asChild>
+                  <Link href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup`}>
+                    <Icon type="star" />
+                    Start for free
+                  </Link>
+                </Button>
+              </>
+            )}
+          </Flex>
           <MobileGnbDropdown isLoggedIn={!!isLoggedIn} />
         </div>
       </div>
