@@ -19,7 +19,8 @@ import rehypeToc, { HtmlElementNode, ListItemNode } from '@jsdevtools/rehype-toc
 import rehypeImageMeta from '@/utils/rehypeImageMeta';
 import rehypeWrapContents from '@/utils/rehypeWrapContents';
 import rehypeVariables from '@/utils/rehypeVariables';
-import { Layout, Navigator, Button, Icon, CodeBlock, CodeBlockHeader, Image } from '@/components';
+import { Layout, Navigator, Icon, CodeBlock, CodeBlockHeader, Image } from '@/components';
+import { Button } from 'yorkie-ui-test';
 import { CustomLink, CustomCodeBlock, Breadcrumb, Caption, ImageWrap, Alert, Blockquote } from '@/components/docs';
 
 // Custom components/renderers to pass to MDX.
