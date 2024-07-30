@@ -1,7 +1,5 @@
 import { ReactElement, ReactNode, useState } from 'react';
 import Link from 'next/link';
-import classNames from 'classnames';
-import { Button, Icon } from '@/components';
 import LogoGnbSVG from '@/public/assets/icons/logo_gnb.svg';
 
 type ExampleViewType = 'full' | 'show' | 'grid' | 'split';
