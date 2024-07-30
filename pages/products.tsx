@@ -3,7 +3,8 @@ import type { NextPage } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
 import classNames from 'classnames';
-import { Button, Icon, Layout, CodeBlock, CodeBlockHeader } from '@/components';
+import { Button } from 'yorkie-ui-test';
+import { Icon, Layout, CodeBlock, CodeBlockHeader } from '@/components';
 import { StateSharingDetailMotion, FlexibleDocumentMotion } from '@/components/motions';
 import ProductBannerSVG from '@/public/assets/images/banner/img_product_banner.svg';
 import ProductAwarenessLeftSVG from '@/public/assets/images/banner/img_product_awareness_left.svg';
@@ -33,16 +34,12 @@ const Products: NextPage = () => {
               and Peer Awareness API. Dashboard allows for efficient management of documents <br className="br_pc" />
               as a document store.
             </p>
-            <Button.Box>
-              <Button
-                as="a"
-                href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`}
-                className="orange_0 btn_start"
-                icon={<Icon type="star" />}
-              >
+            <Button asChild size="lg" mt="800" width={{ base: 'full', md: 'fit' }}>
+              <Link href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`}>
+                <Icon type="star" />
                 Start for free
-              </Button>
-            </Button.Box>
+              </Link>
+            </Button>
           </div>
           <div className="img_box">
             <ProductBannerSVG />
@@ -178,10 +175,13 @@ const Products: NextPage = () => {
                 <strong className="product_card_title">Size optimization</strong>
                 <p className="product_card_desc">
                   Yorkie uses{' '}
-                  <a href="https://github.com/yorkie-team/yorkie/blob/main/design/garbage-collection.md" className="link">
+                  <a
+                    href="https://github.com/yorkie-team/yorkie/blob/main/design/garbage-collection.md"
+                    className="link"
+                  >
                     Garbage Collection
-                  </a>
-                  {' '}and{' '}
+                  </a>{' '}
+                  and{' '}
                   <a href="https://en.wikipedia.org/wiki/Lamport_timestamp" className="link">
                     Lamport timestamps
                   </a>{' '}
@@ -249,10 +249,6 @@ const Products: NextPage = () => {
                 Yorkie open-source package
               </strong>
             </div>
-            <Link href="/docs/self-hosted-server" className="btn gray800">
-              <Icon type="book" />
-              <span className="text">How to build self-hosted server</span>
-            </Link>
             <p className="sub_big_desc">
               Yorkie open-source package includes SDKs, a server, and a database, making it easy to implement the
               co-editing feature.
@@ -260,6 +256,20 @@ const Products: NextPage = () => {
             <div className="img_box">
               <ProductPackageSVG />
             </div>
+            <Button
+              asChild
+              mt={{ base: '800', md: '0' }}
+              width={{ base: 'full', md: 'fit' }}
+              colorPalette="gray"
+              position={{ base: 'static', md: 'absolute' }}
+              top={0}
+              right={0}
+            >
+              <Link href="/docs/self-hosted-server">
+                <Icon type="book" />
+                How to build self-hosted server
+              </Link>
+            </Button>
           </div>
         </section>
       </div>
