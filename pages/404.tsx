@@ -1,7 +1,9 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import { Button, Icon, Layout } from '@/components';
+import Link from 'next/link';
+import { Icon, Layout } from '@/components';
 import Error404SVG from '@/public/assets/icons/error_404.svg';
+import { Button, Flex } from 'yorkie-ui-test';
 
 const Custom404: NextPage = () => {
   return (
@@ -22,33 +24,26 @@ const Custom404: NextPage = () => {
           The page you are looking for might be
           <br className="br_mo" /> removed or is temporarily unavailable.
         </p>
-        <Button.Box>
-          <Button as="link" href="/" className="orange_0" icon={<Icon type="backHome" />}>
-            Back to home
+        <Flex order="4" gap="600" mt="800" wrap={{ base: 'wrap', md: 'nowrap' }}>
+          <Button asChild size="lg" width={{ base: 'full', md: 'none' }}>
+            <Link href="/">
+              <Icon type="backHome" />
+              Back to home
+            </Link>
           </Button>
-          <Button
-            as="a"
-            href="https://discord.gg/MVEAwz9sBy"
-            className="gray50"
-            outline
-            target="_blank"
-            rel="noreferrer"
-            icon={<Icon type="discord" />}
-          >
-            Discord
+          <Button asChild variant="outline" size="lg" colorPalette="gray" flex={{ base: '1', md: 'none' }}>
+            <Link href="https://discord.gg/MVEAwz9sBy" target="_blank" rel="noreferrer">
+              <Icon type="discord" />
+              Discord
+            </Link>
           </Button>
-          <Button
-            as="a"
-            href="https://github.com/yorkie-team/dashboard/issues"
-            className="gray50"
-            outline
-            target="_blank"
-            rel="noreferrer"
-            icon={<Icon type="github" />}
-          >
-            GitHub
+          <Button asChild variant="outline" size="lg" colorPalette="gray" flex={{ base: '1', md: 'none' }}>
+            <Link href="https://github.com/yorkie-team/dashboard/issues" target="_blank" rel="noreferrer">
+              <Icon type="github" />
+              GitHub
+            </Link>
           </Button>
-        </Button.Box>
+        </Flex>
       </div>
     </Layout>
   );
