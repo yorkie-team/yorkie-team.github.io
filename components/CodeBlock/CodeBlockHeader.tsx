@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
-import { CopyButton, Button, Icon } from '@/components';
+import { CopyButton, Icon } from '@/components';
+import { Button } from 'yorkie-ui-test';
 
 export function CodeBlockHeader({ children }: { children: ReactNode }) {
   return <div className="codeblock_header">{children}</div>;
@@ -19,7 +20,9 @@ function CopyButtonBox({ value, timeout = 1000 }: { value: string; timeout?: num
       <CopyButton value={value} timeout={timeout}>
         {({ copied, copy }) => (
           <>
-            <Button icon={<Icon type="copy" />} className="gray50" outline onClick={copy} title="Copy to clipboard" />
+            <Button variant="outline" colorPalette="transparent" onClick={copy} title="Copy to clipboard">
+              <Icon type="copy" />
+            </Button>
             {copied && (
               <div className="toast_box shadow_l">
                 <Icon type="check" />
