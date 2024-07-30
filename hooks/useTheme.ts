@@ -5,10 +5,8 @@ export type ThemeOption = 'system' | 'light' | 'dark';
 const handleTheme = (theme: 'light' | 'dark') => {
   if (theme === 'dark') {
     window.document.body.classList.add('dark');
-    window.document.body.classList.add('darkmode');
   } else if (theme === 'light') {
     window.document.body.classList.remove('dark');
-    window.document.body.classList.remove('darkmode');
   }
 };
 
