@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import { Layout, Button, Icon, CodeBlock, CodeBlockHeader, Accordion } from '@/components';
+import Link from 'next/link';
+import { Button, Flex } from 'yorkie-ui-test';
+import { Layout, Icon, CodeBlock, CodeBlockHeader, Accordion } from '@/components';
 import { ChartMotion, StateSharingMotion, ServerMotion, MainBannerMotion } from '@/components/motions';
 import UserGroupSVG from '@/public/assets/icons/icon_service_main_users_group.svg';
 import CollaboProfileSVG from '@/public/assets/icons/icon_collaborate_profile.svg';
@@ -55,18 +57,16 @@ const Home: NextPage = () => {
               </span>
               <span className="text">to your app</span>
             </h2>
-            <Button.Box>
-              <a
+            <Button asChild size="lg" mt={{ base: '2000', md: '1000' }} width={{ base: 'full', sm: 'fit' }}>
+              <Link
                 href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`}
-                className="btn orange_0 btn_start"
                 onPointerOver={() => setBannerActive(true)}
                 onPointerOut={() => setBannerActive(false)}
               >
-                <span className="bg"></span>
                 <Icon type="star" />
-                <span className="text">Start for free</span>
-              </a>
-            </Button.Box>
+                Start for free
+              </Link>
+            </Button>
             <p className="desc">
               Unlock the full potential of real-time collaboration with open-source SDKs and API package.
             </p>
@@ -90,14 +90,27 @@ const Home: NextPage = () => {
                 Easily add collaboration to your apps with our API-based services. <br /> Sign up now and start building
                 powerful, high-performance collaborative features in no time.
               </p>
-              <Button.Box>
-                <Button as="link" href="/docs/getting-started" className="orange_0" icon={<Icon type="book" />}>
-                  Getting Started
+              <Flex
+                gap={{ base: '500', sm: '600' }}
+                mt={{ base: '800', sm: '1200' }}
+                justifyContent="center"
+                position="relative"
+                zIndex="float"
+                wrap="wrap"
+              >
+                <Button asChild size="lg" width={{ base: 'full', sm: 'fit' }}>
+                  <Link href="/docs/getting-started">
+                    <Icon type="book" />
+                    Getting Started
+                  </Link>
                 </Button>
-                <Button as="link" href="/docs" outline icon={<Icon type="book" />}>
-                  Read documentation
+                <Button asChild size="lg" variant="outline" colorPalette="white" width={{ base: 'full', sm: 'fit' }}>
+                  <Link href="/docs">
+                    <Icon type="book" />
+                    Read documentation
+                  </Link>
                 </Button>
-              </Button.Box>
+              </Flex>
             </div>
           </div>
         </section>
@@ -226,11 +239,14 @@ const Home: NextPage = () => {
               <div className="draw_box"></div>
               <div className="draw_box"></div>
             </div>
-            <Button.Box>
-              <Button as="link" href="/examples" className="orange_0" icon={<Icon type="bulb" />}>
-                View all examples
+            <Flex width="full" justifyContent="center">
+              <Button asChild size="lg" mt={{ base: '800', sm: '1200' }} width={{ base: 'full', sm: 'fit' }}>
+                <Link href="/examples">
+                  <Icon type="bulb" />
+                  View all examples
+                </Link>
               </Button>
-            </Button.Box>
+            </Flex>
           </section>
         )}
         <section className="section">
@@ -255,13 +271,11 @@ const Home: NextPage = () => {
                     peer&apos;s awareness of the data being edited. It is used to track which users are currently
                     editing the document.
                   </p>
-                  <Button
-                    as="link"
-                    href="/products#document-and-presence"
-                    className="gray800"
-                    icon={<Icon type="book" />}
-                  >
-                    Learn more about Document and Presence
+                  <Button asChild mt="600" width={{ base: 'full', sm: 'fit' }} colorPalette="gray">
+                    <Link href="/products#document-and-presence">
+                      <Icon type="book" />
+                      Learn more about Document and Presence
+                    </Link>
                   </Button>
                 </div>
               </li>
@@ -276,8 +290,11 @@ const Home: NextPage = () => {
                     real-time. With Dashboard, users can quickly and easily supervise the data warehouse and ensure that
                     it is functioning properly.
                   </p>
-                  <Button as="link" href="/products#dashboard" className="gray800" icon={<Icon type="book" />}>
-                    Learn more about Dashboard
+                  <Button asChild mt="600" width={{ base: 'full', sm: 'fit' }} colorPalette="gray">
+                    <Link href="/products#dashboard">
+                      <Icon type="book" />
+                      Learn more about Dashboard
+                    </Link>
                   </Button>
                 </div>
               </li>
@@ -292,8 +309,11 @@ const Home: NextPage = () => {
                     own premises. Whether you want the convenience of cloud or the control of a self-hosted server,
                     Yorkie has you covered.
                   </p>
-                  <Button as="link" href="/products#self-hosted-server" className="gray800" icon={<Icon type="book" />}>
-                    Learn more about Self-Hosted Server
+                  <Button asChild mt="600" width={{ base: 'full', sm: 'fit' }} colorPalette="gray">
+                    <Link href="/products#self-hosted-server">
+                      <Icon type="book" />
+                      Learn more about Self-Hosted Server
+                    </Link>
                   </Button>
                 </div>
               </li>
@@ -354,26 +374,27 @@ const Home: NextPage = () => {
               </Accordion.Item>
             </Accordion>
           </div>
-          <Button.Box>
-            <Button
-              as="a"
-              href="https://discord.gg/MVEAwz9sBy"
-              outline
-              icon={<Icon type="smile" />}
-              target="_blank"
-              rel="noreferrer"
-            >
-              Contact
+          <Flex
+            gap={{ base: '500', sm: '600' }}
+            mt={{ base: '800', sm: '1200' }}
+            justifyContent="center"
+            position="relative"
+            zIndex="float"
+            wrap="wrap"
+          >
+            <Button asChild size="lg" width={{ base: 'full', sm: 'fit' }} colorPalette="white" variant="outline">
+              <Link href="https://discord.gg/MVEAwz9sBy" target="_blank" rel="noreferrer">
+                <Icon type="smile" />
+                Contact
+              </Link>
             </Button>
-            <Button
-              as="a"
-              href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`}
-              className="orange_0 btn_start"
-              icon={<Icon type="twinkle" />}
-            >
-              Start for free
+            <Button asChild size="lg" width={{ base: 'full', sm: 'fit' }}>
+              <Link href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`}>
+                <Icon type="twinkle" />
+                Start for free
+              </Link>
             </Button>
-          </Button.Box>
+          </Flex>
         </section>
       </div>
     </Layout>
