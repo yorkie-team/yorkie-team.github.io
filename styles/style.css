@@ -11551,11 +11551,11 @@ html {
   word-break: break-word;
 }
 .documentation_page .section_content_box ol,
-.documentation_page .section_content_box ul:not(.docs_breadcrumbs) {
+.documentation_page .section_content_box ul {
   margin: 16px 0 24px 16px;
 }
 .documentation_page .section_content_box ol li,
-.documentation_page .section_content_box ul:not(.docs_breadcrumbs) li {
+.documentation_page .section_content_box ul li {
   position: relative;
   padding-left: 20px;
   font-size: 1.6rem;
@@ -11564,11 +11564,11 @@ html {
   word-break: break-word;
 }
 .documentation_page .section_content_box ol li + li,
-.documentation_page .section_content_box ul:not(.docs_breadcrumbs) li + li {
+.documentation_page .section_content_box ul li + li {
   margin-top: 8px;
 }
 .documentation_page .section_content_box ol li::before,
-.documentation_page .section_content_box ul:not(.docs_breadcrumbs) li::before {
+.documentation_page .section_content_box ul li::before {
   display: block;
   position: absolute;
   top: 10px;
@@ -11590,7 +11590,7 @@ html {
   counter-increment: list;
   content: counter(list) '.';
 }
-.documentation_page .section_content_box a:not(.btn, .docs_breadcrumbs_link) {
+.documentation_page .section_content_box a:not(.btn) {
   display: -webkit-inline-box;
   display: -ms-inline-flexbox;
   display: inline-flex;
@@ -11600,7 +11600,7 @@ html {
   color: var(--orange-0);
   border-bottom: 1px solid var(--orange-0);
 }
-.documentation_page .section_content_box a:not(.btn, .docs_breadcrumbs_link).icon_link::after {
+.documentation_page .section_content_box a:not(.btn).icon_link::after {
   display: block;
   width: 13px;
   height: 13px;
@@ -11851,25 +11851,6 @@ html {
 }
 .documentation_page .section_content_box .btn_box .btn:hover {
   background: var(--gray-900);
-}
-.documentation_page .section_content_box .docs_breadcrumbs {
-  display: -webkit-inline-box;
-  display: -ms-inline-flexbox;
-  display: inline-flex;
-  position: relative;
-  margin-bottom: 8px;
-}
-.documentation_page .section_content_box .docs_breadcrumbs_link {
-  display: inline-block;
-  font-size: 1.6rem;
-  line-height: 1.5;
-  font-weight: 600;
-  color: var(--orange-dark);
-}
-.documentation_page .section_content_box .docs_breadcrumbs_link:not(:first-of-type)::before {
-  display: inline-block;
-  margin: 0 4px;
-  content: '-';
 }
 .documentation_page .toast_box {
   left: 0;

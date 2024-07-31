@@ -21,7 +21,7 @@ import rehypeWrapContents from '@/utils/rehypeWrapContents';
 import rehypeVariables from '@/utils/rehypeVariables';
 import { Layout, Navigator, Icon, CodeBlock, CodeBlockHeader, Image } from '@/components';
 import { Button } from 'yorkie-ui-test';
-import { CustomLink, CustomCodeBlock, Breadcrumb, Caption, ImageWrap, Alert, Blockquote } from '@/components/docs';
+import { CustomLink, CustomCodeBlock, Caption, ImageWrap, Alert, Blockquote } from '@/components/docs';
 
 // Custom components/renderers to pass to MDX.
 const components: MDXComponents = {
@@ -39,7 +39,6 @@ const components: MDXComponents = {
   ),
   Image,
   ImageWrap,
-  Breadcrumb,
   Caption,
   Alert,
   CodeBlock,
