@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import classNames from 'classnames';
+import Link from 'next/link';
 import { Icon } from '@/components';
 import { SidebarContextProvider, useSidebarContext } from './Sidebar.context';
 import { SidebarTabs, SidebarTabsList, SidebarTabsTab, SidebarTabsPanel } from './SidebarTabs';
+import { Button, Flex } from 'yorkie-ui-test';
 
 export function Sidebar({
   defaultOpened = true,
@@ -35,14 +37,19 @@ export function Sidebar({
 }
 
 function SidebarTop({ children }: { children?: React.ReactNode }) {
-  const ctx = useSidebarContext();
+  const { isOpened, setIsOpened } = useSidebarContext();
   return (
     <div className="sidebar_top">
       {children}
-      <button type="button" className="btn btn_toggle" onClick={() => ctx.setIsOpened((opened) => !opened)}>
-        <Icon type="arrow" />
-        <span className="blind">Close sidebar</span>
-      </button>
+      <Button
+        variant="outline"
+        size="sm"
+        colorPalette="transparent"
+        onClick={() => setIsOpened((opened) => !opened)}
+        ml={isOpened ? 'auto' : '0'}
+      >
+        {isOpened ? <Icon type="arrowLeft" /> : <Icon type="arrowRight" />}
+      </Button>
     </div>
   );
 }
@@ -56,19 +63,20 @@ function SidebarBottom({
   shareButton?: boolean;
   children?: React.ReactNode;
 }) {
-  const ctx = useSidebarContext();
   return (
     <div className="sidebar_bottom">
-      <div className={classNames('btn_box', { full_width: !ctx.wide })}>
-        <a href={codeURL} className="btn gray600" target="_blank" rel="noreferrer">
-          GitHub
-        </a>
+      <Flex gap="200" mt="400">
+        <Button asChild colorPalette="gray" flex="1">
+          <Link href={codeURL} target="_blank" rel="noreferrer">
+            GitHub
+          </Link>
+        </Button>
         {shareButton && (
-          <a href="#" className="btn gray900 btn_share">
-            Share to invite other
-          </a>
+          <Button asChild colorPalette="gray" flex="2">
+            <Link href="#">Share to invite other</Link>
+          </Button>
         )}
-      </div>
+      </Flex>
       {children}
     </div>
   );

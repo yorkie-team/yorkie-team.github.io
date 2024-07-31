@@ -61,6 +61,8 @@ const svgMap = {
   checkCircle: <CheckCircleSVG />,
   scenario: <ScenarioSVG />,
   arrow: <ArrowSVG />,
+  arrowLeft: <ArrowSVG style={{ rotate: '90deg' }} />,
+  arrowRight: <ArrowSVG style={{ rotate: '270deg' }} />,
   recorder: <RecorderSVG />,
   bulb: <BulbSVG />,
   twinkle: <TwinkleSVG />,

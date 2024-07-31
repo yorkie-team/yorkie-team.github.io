@@ -216,7 +216,7 @@ const Home: NextPage = () => {
                   ))}
                 </CodeBlockHeader.LeftBox>
                 <CodeBlockHeader.RightBox>
-                  <CodeBlockHeader.CopyButton value={activeFeatureCode.info.code} />
+                  <CodeBlockHeader.CopyButton value={activeFeatureCode.info.code} size="md" />
                 </CodeBlockHeader.RightBox>
               </CodeBlockHeader>
               <CodeBlock

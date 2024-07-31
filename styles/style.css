@@ -3848,6 +3848,7 @@
   -webkit-box-flex: 0;
   -ms-flex: none;
   flex: none;
+  margin-left: auto;
 }
 @media screen and (max-width: 1023px) {
   .header_service .header_util .btn {
@@ -3886,8 +3887,8 @@
     }
   }
 }
-.header_service .header_util .btn_menu .icon_close,
-.header_service .header_util .btn_menu .icon_menu {
+.header_service .header_util .icon_close,
+.header_service .header_util .icon_menu {
   display: none;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -3895,12 +3896,12 @@
   width: 16px;
   height: 16px;
 }
-.header_service .header_util .btn_menu .icon_close svg,
-.header_service .header_util .btn_menu .icon_menu svg {
+.header_service .header_util .icon_close svg,
+.header_service .header_util .icon_menu svg {
   width: 100%;
 }
-.header_service .header_util .btn_menu .icon_close.is_active,
-.header_service .header_util .btn_menu .icon_menu.is_active {
+.header_service .header_util .icon_close.is_active,
+.header_service .header_util .icon_menu.is_active {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;

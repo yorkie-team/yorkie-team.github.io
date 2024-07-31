@@ -1,8 +1,9 @@
-import { Icon } from '@/components';
-import classNames from 'classnames';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import yorkie from 'yorkie-js-sdk';
+import classNames from 'classnames';
 import UserContent from './UserContent';
+import { Icon } from '@/components';
+import { Button } from 'yorkie-ui-test';
 
 interface DocChangeInfo {
   type: 'update' | 'initialize' | 'presence';
@@ -99,25 +100,24 @@ export function BasicExampleView({
                   <span className={`icon gradient_180deg_${UserColors[userNumber % UserColors.length]}`}></span>
                   <span className="text">{`User ${userNumber}`}</span>
                 </span>
-                <div className="btn_box">
-                  <button
-                    type="button"
-                    className={classNames('btn btn_line btn_pin')}
-                    title="Pin"
-                    onClick={() => {
-                      deleteUser(userNumber);
-                    }}
-                  >
-                    <Icon type="close" />
-                  </button>
-                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  colorPalette="transparent"
+                  onClick={() => {
+                    deleteUser(userNumber);
+                  }}
+                  ml="600"
+                >
+                  <Icon type="close" />
+                </Button>
               </li>
             );
           })}
         </ul>
-        <button type="button" className="btn btn_add" onClick={addUser}>
+        <Button colorPalette="transparent" onClick={addUser} position="absolute" top={0} right={0} h="full">
           <Icon type="plus" />
-        </button>
+        </Button>
       </div>
       <ul className="grid_list2">
         {userList.map((userNumber) => {

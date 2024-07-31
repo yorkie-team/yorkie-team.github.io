@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import classNames from 'classnames';
 import { Popover, Icon } from 'components';
+import { Button } from 'yorkie-ui-test';
 
 export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
   const [gnbOpened, setGnbOpened] = useState(false);
@@ -22,11 +23,10 @@ export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
   return (
     <Popover opened={gnbOpened} onChange={setGnbOpened}>
       <Popover.Target>
-        <button className="btn_menu">
-          <span className="blind">Open menu</span>
+        <Button colorPalette="transparent" hideFrom="md">
           <Icon type="gnbMenu" className={classNames('icon_menu', { is_active: !gnbOpened })} />
           <Icon type="close" className={classNames('icon_close', { is_active: gnbOpened })} />
-        </button>
+        </Button>
       </Popover.Target>
       <Popover.Dropdown>
         <div className="menu_list_mo dropdown">

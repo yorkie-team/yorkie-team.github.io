@@ -78,7 +78,7 @@ const Examples: NextPage = () => {
                 <button type="button" className="btn btn_small filter_desc">
                   <span className="filter_title">Examples:</span>
                   <span className="text">All examples</span>
-                  <Icon type="scenario" className="icon_arrow" />
+                  <Icon type="arrow" className="icon_arrow" />
                 </button>
                 <div className="dropdown " style={{ display: 'none' }}>
                   <ul className="dropdown_list">

@@ -14,13 +14,21 @@ function RightBox({ children }: { children: ReactNode }) {
   return <div className="box_right">{children}</div>;
 }
 
-function CopyButtonBox({ value, timeout = 1000 }: { value: string; timeout?: number }) {
+function CopyButtonBox({
+  value,
+  size = 'sm',
+  timeout = 1000,
+}: {
+  value: string;
+  size?: 'sm' | 'md' | 'lg';
+  timeout?: number;
+}) {
   return (
     <div className="btn_area">
       <CopyButton value={value} timeout={timeout}>
         {({ copied, copy }) => (
           <>
-            <Button variant="outline" colorPalette="transparent" onClick={copy} title="Copy to clipboard">
+            <Button variant="outline" size={size} colorPalette="transparent" onClick={copy} title="Copy to clipboard">
               <Icon type="copy" />
             </Button>
             {copied && (
