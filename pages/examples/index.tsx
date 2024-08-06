@@ -1,9 +1,10 @@
-import { Button, Icon, Layout } from '@/components';
+import { Icon, Layout } from '@/components';
 import { ExampleThumbnailImage } from '@/components/exampleView';
 import ExampleBannerSVG from '@/public/assets/images/banner/img_example_banner.svg';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
+import { Button } from '@yorkie-ui/core';
 
 const Examples: NextPage = () => {
   return (
@@ -21,16 +22,12 @@ const Examples: NextPage = () => {
               Explore our examples and see how Yorkie can help you bring your products to the next level of
               collaboration.
             </p>
-            <Button.Box>
-              <Button
-                as="a"
-                href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`}
-                className="orange_0 btn_start"
-                icon={<Icon type="star" />}
-              >
+            <Button asChild size="lg" mt="800" width={{ base: 'full', md: 'fit' }}>
+              <Link href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`}>
+                <Icon type="star" />
                 Start for free
-              </Button>
-            </Button.Box>
+              </Link>
+            </Button>
           </div>
           <div className="img_box">
             <ExampleBannerSVG />
@@ -81,7 +78,7 @@ const Examples: NextPage = () => {
                 <button type="button" className="btn btn_small filter_desc">
                   <span className="filter_title">Examples:</span>
                   <span className="text">All examples</span>
-                  <Icon type="scenario" className="icon_arrow" />
+                  <Icon type="arrow" className="icon_arrow" />
                 </button>
                 <div className="dropdown " style={{ display: 'none' }}>
                   <ul className="dropdown_list">
