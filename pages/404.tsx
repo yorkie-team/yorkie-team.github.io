@@ -31,13 +31,13 @@ const Custom404: NextPage = () => {
               Back to home
             </Link>
           </Button>
-          <Button asChild variant="outline" size="lg" colorPalette="gray" flex={{ base: '1', md: 'none' }}>
+          <Button asChild variant="outline" size="lg" colorPalette="neutral" flex={{ base: '1', md: 'none' }}>
             <Link href="https://discord.gg/MVEAwz9sBy" target="_blank" rel="noreferrer">
               <Icon type="discord" />
               Discord
             </Link>
           </Button>
-          <Button asChild variant="outline" size="lg" colorPalette="gray" flex={{ base: '1', md: 'none' }}>
+          <Button asChild variant="outline" size="lg" colorPalette="neutral" flex={{ base: '1', md: 'none' }}>
             <Link href="https://github.com/yorkie-team/dashboard/issues" target="_blank" rel="noreferrer">
               <Icon type="github" />
               GitHub

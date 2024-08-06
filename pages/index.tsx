@@ -104,7 +104,7 @@ const Home: NextPage = () => {
                     Getting Started
                   </Link>
                 </Button>
-                <Button asChild size="lg" variant="outline" colorPalette="white" width={{ base: 'full', sm: 'fit' }}>
+                <Button asChild size="lg" variant="outline" colorPalette="neutral" width={{ base: 'full', sm: 'fit' }}>
                   <Link href="/docs">
                     <Icon type="book" />
                     Read documentation
@@ -271,7 +271,7 @@ const Home: NextPage = () => {
                     peer&apos;s awareness of the data being edited. It is used to track which users are currently
                     editing the document.
                   </p>
-                  <Button asChild mt="600" width={{ base: 'full', sm: 'fit' }} colorPalette="gray">
+                  <Button asChild mt="600" width={{ base: 'full', sm: 'fit' }} colorPalette="neutral">
                     <Link href="/products#document-and-presence">
                       <Icon type="book" />
                       Learn more about Document and Presence
@@ -290,7 +290,7 @@ const Home: NextPage = () => {
                     real-time. With Dashboard, users can quickly and easily supervise the data warehouse and ensure that
                     it is functioning properly.
                   </p>
-                  <Button asChild mt="600" width={{ base: 'full', sm: 'fit' }} colorPalette="gray">
+                  <Button asChild mt="600" width={{ base: 'full', sm: 'fit' }} colorPalette="neutral">
                     <Link href="/products#dashboard">
                       <Icon type="book" />
                       Learn more about Dashboard
@@ -309,7 +309,7 @@ const Home: NextPage = () => {
                     own premises. Whether you want the convenience of cloud or the control of a self-hosted server,
                     Yorkie has you covered.
                   </p>
-                  <Button asChild mt="600" width={{ base: 'full', sm: 'fit' }} colorPalette="gray">
+                  <Button asChild mt="600" width={{ base: 'full', sm: 'fit' }} colorPalette="neutral">
                     <Link href="/products#self-hosted-server">
                       <Icon type="book" />
                       Learn more about Self-Hosted Server
@@ -382,7 +382,7 @@ const Home: NextPage = () => {
             zIndex="float"
             wrap="wrap"
           >
-            <Button asChild size="lg" width={{ base: 'full', sm: 'fit' }} colorPalette="white" variant="outline">
+            <Button asChild size="lg" width={{ base: 'full', sm: 'fit' }} colorPalette="neutral" variant="outline">
               <Link href="https://discord.gg/MVEAwz9sBy" target="_blank" rel="noreferrer">
                 <Icon type="smile" />
                 Contact

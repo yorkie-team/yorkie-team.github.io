@@ -28,7 +28,7 @@ function CopyButtonBox({ value, timeout = 1000 }: { value: string; timeout?: num
       <CopyButton value={value} timeout={timeout}>
         {({ copied, copy }) => (
           <>
-            <Button size="sm" variant="outline" colorPalette="white" onClick={copy} title="Copy to clipboard">
+            <Button size="sm" variant="outline" colorPalette="neutral" onClick={copy} title="Copy to clipboard">
               <Icon type="copy" />
             </Button>
             {copied && (

@@ -66,13 +66,13 @@ function SidebarBottom({
   return (
     <div className="sidebar_bottom">
       <Flex gap="200" mt="400">
-        <Button asChild colorPalette="gray" flex="1">
+        <Button asChild colorPalette="neutral" flex="1">
           <Link href={codeURL} target="_blank" rel="noreferrer">
             GitHub
           </Link>
         </Button>
         {shareButton && (
-          <Button asChild colorPalette="gray" flex="2">
+          <Button asChild colorPalette="neutral" flex="2">
             <Link href="#">Share to invite other</Link>
           </Button>
         )}

@@ -54,12 +54,12 @@ export function Header(): ReactElement {
         <div className="header_util">
           <Flex gap="200" hideBelow="md">
             {!!isLoggedIn ? (
-              <Button asChild variant="outline" colorPalette="gray">
+              <Button asChild variant="outline" colorPalette="neutral">
                 <Link href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`}>Dashboard</Link>
               </Button>
             ) : (
               <>
-                <Button asChild variant="outline" colorPalette="gray">
+                <Button asChild variant="outline" colorPalette="neutral">
                   <Link href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/login`}>Sign in</Link>
                 </Button>
                 <Button asChild>

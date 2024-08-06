@@ -260,7 +260,7 @@ const Products: NextPage = () => {
               asChild
               mt={{ base: '800', md: '0' }}
               width={{ base: 'full', md: 'fit' }}
-              colorPalette="gray"
+              colorPalette="neutral"
               position={{ base: 'static', md: 'absolute' }}
               top={0}
               right={0}
