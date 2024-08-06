@@ -3,7 +3,7 @@ import yorkie from 'yorkie-js-sdk';
 import classNames from 'classnames';
 import UserContent from './UserContent';
 import { Icon } from '@/components';
-import { Button } from 'yorkie-ui-test';
+import { Button } from '@yorkie-ui/core';
 
 interface DocChangeInfo {
   type: 'update' | 'initialize' | 'presence';

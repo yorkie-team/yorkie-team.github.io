@@ -4,7 +4,7 @@ import ExampleBannerSVG from '@/public/assets/images/banner/img_example_banner.s
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
-import { Button } from 'yorkie-ui-test';
+import { Button } from '@yorkie-ui/core';
 
 const Examples: NextPage = () => {
   return (

@@ -3,7 +3,7 @@ import type { NextPage } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
 import classNames from 'classnames';
-import { Button } from 'yorkie-ui-test';
+import { Button } from '@yorkie-ui/core';
 import { Icon, Layout, CodeBlock, CodeBlockHeader } from '@/components';
 import { StateSharingDetailMotion, FlexibleDocumentMotion } from '@/components/motions';
 import ProductBannerSVG from '@/public/assets/images/banner/img_product_banner.svg';

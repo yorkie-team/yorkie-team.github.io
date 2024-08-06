@@ -3,7 +3,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { Icon, Layout } from '@/components';
 import CommunitySVG from '@/public/assets/icons/community_help.svg';
-import { Button, Flex } from 'yorkie-ui-test';
+import { Button, Flex } from '@yorkie-ui/core';
 
 const Community: NextPage = () => {
   return (

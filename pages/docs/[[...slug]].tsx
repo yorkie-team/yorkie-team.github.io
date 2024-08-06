@@ -20,7 +20,7 @@ import rehypeImageMeta from '@/utils/rehypeImageMeta';
 import rehypeWrapContents from '@/utils/rehypeWrapContents';
 import rehypeVariables from '@/utils/rehypeVariables';
 import { Layout, Navigator, Icon, CodeBlock, CodeBlockHeader, Image } from '@/components';
-import { Button } from 'yorkie-ui-test';
+import { Button } from '@yorkie-ui/core';
 import { CustomLink, CustomCodeBlock, Caption, ImageWrap, Alert, Blockquote } from '@/components/docs';
 
 // Custom components/renderers to pass to MDX.

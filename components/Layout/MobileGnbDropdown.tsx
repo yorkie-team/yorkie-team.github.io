@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import classNames from 'classnames';
 import { Popover, Icon } from 'components';
-import { Button } from 'yorkie-ui-test';
+import { Button } from '@yorkie-ui/core';
 
 export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
   const [gnbOpened, setGnbOpened] = useState(false);

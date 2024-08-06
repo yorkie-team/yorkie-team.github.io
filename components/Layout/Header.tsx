@@ -2,7 +2,7 @@ import { ReactElement, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { Icon } from '@/components';
-import { Button, Flex } from 'yorkie-ui-test';
+import { Button, Flex } from '@yorkie-ui/core';
 import { isValidToken } from '@/utils/isValidToken';
 import { MobileGnbDropdown } from './MobileGnbDropdown';
 import LogoSVG from '@/public/assets/icons/logo_horizontal_xs.svg';

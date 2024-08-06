@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { CopyButton, Icon } from '@/components';
-import { Button } from 'yorkie-ui-test';
+import { Button } from '@yorkie-ui/core';
 import { PrismCodeProps, PrismCode } from './PrismCode';
 
 export function CodeBlock({ withCopyButton, ...restProps }: { withCopyButton?: boolean } & PrismCodeProps) {

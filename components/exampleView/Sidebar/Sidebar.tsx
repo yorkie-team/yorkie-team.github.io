@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Icon } from '@/components';
 import { SidebarContextProvider, useSidebarContext } from './Sidebar.context';
 import { SidebarTabs, SidebarTabsList, SidebarTabsTab, SidebarTabsPanel } from './SidebarTabs';
-import { Button, Flex } from 'yorkie-ui-test';
+import { Button, Flex } from '@yorkie-ui/core';
 
 export function Sidebar({
   defaultOpened = true,

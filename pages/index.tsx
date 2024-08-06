@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
-import { Button, Flex } from 'yorkie-ui-test';
+import { Button, Flex } from '@yorkie-ui/core';
 import { Layout, Icon, CodeBlock, CodeBlockHeader, Accordion } from '@/components';
 import { ChartMotion, StateSharingMotion, ServerMotion, MainBannerMotion } from '@/components/motions';
 import UserGroupSVG from '@/public/assets/icons/icon_service_main_users_group.svg';

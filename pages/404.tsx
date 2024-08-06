@@ -3,7 +3,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { Icon, Layout } from '@/components';
 import Error404SVG from '@/public/assets/icons/error_404.svg';
-import { Button, Flex } from 'yorkie-ui-test';
+import { Button, Flex } from '@yorkie-ui/core';
 
 const Custom404: NextPage = () => {
   return (
@@ -25,7 +25,7 @@ const Custom404: NextPage = () => {
           <br className="br_mo" /> removed or is temporarily unavailable.
         </p>
         <Flex order="4" gap="600" mt="800" wrap={{ base: 'wrap', md: 'nowrap' }}>
-          <Button asChild size="lg" width={{ base: 'full', md: 'none' }}>
+          <Button asChild size="lg" width={{ base: 'full', md: 'fit' }}>
             <Link href="/">
               <Icon type="backHome" />
               Back to home
