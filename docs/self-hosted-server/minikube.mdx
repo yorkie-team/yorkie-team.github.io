@@ -235,42 +235,20 @@ Clone CodePair repository with the following command:
 $ git clone https://github.com/yorkie-team/codepair
 ```
 
-Then, change directory to codepair folder and install dependencies with the following command:
+Then, navigate to the frontend folder in the CodePair repository and change `VITE_YORKIE_API_ADDR` in `.env.development` file to your minikube IP address.
 
 ```bash
-$ cd codepair
-$ npm install
-```
-
-After dependencies are installed, change `VITE_APP_YORKIE_RPC_ADDR` in `.env.development` file to your minikube IP address.
-
-```bash
+$ cd codepair/frontend
 $ vi .env.development
 
-VITE_APP_YORKIE_RPC_ADDR=http://<minikube-ip>
-# If you are using macOS, you should set VITE_APP_YORKIE_RPC_ADDR to localhost instead of minikube-ip.
-# VITE_APP_YORKIE_RPC_ADDR=http://localhost
+VITE_YORKIE_API_ADDR=http://<minikube-ip>
+# If you are using macOS, you should set VITE_YORKIE_API_ADDR to localhost instead of minikube-ip.
+# VITE_YORKIE_API_ADDR=http://localhost
 ```
 
-<Alert status="warning">If you are using macOS, you should set `VITE_APP_YORKIE_RPC_ADDR` to `localhost` instead of `minikube ip`.</Alert>
+<Alert status="warning">If you are using macOS, you should set `VITE_YORKIE_API_ADDR` to `localhost` instead of `minikube ip`.</Alert>
 
-Then, start CodePair with the following command:
-
-```bash
-$ npm run dev
-
-> codepair@1.0.0 dev
-> vite --config ./config/vite.config.development.ts
-
-
-  VITE v4.3.0  ready in 257 ms
-
-  ➜  Local:   http://localhost:3000/
-  ➜  Network: use --host to expose
-  ➜  press h to show help
-```
-
-You can open several web browsers and access `http://localhost:3000` to test collaborative editing with CodePair.
+To continue with the setup, follow the detailed instructions in the [README](https://github.com/yorkie-team/codepair/blob/main/README.md).
 
 ### Clean up Yorkie cluster
 
@@ -304,7 +282,7 @@ Use `Ctrl + C` to stop minikube tunnel.
 Password:
 
 # Stop minikube tunnel
-$ 
+$ ^C
 
 ✋  Stopped tunnel for service yorkie.
 ```
