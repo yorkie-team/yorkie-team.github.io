@@ -340,13 +340,13 @@ For more information about `DocumentSyncStatus`, please refer to the [DocumentSy
 
 ##### Document.subscribe('status')
 
-You can subscribe to the status of the document using `doc.subscribe('status', callback)`. The possible values for `event.value` are `DocumentStatus.Attached` and `DocumentStatus.Detached`.
+You can subscribe to the status of the document using `doc.subscribe('status', callback)`. The possible values for `event.value.status` are `DocumentStatus.Attached` and `DocumentStatus.Detached`.
 
 ```javascript
 const unsubscribe = doc.subscribe('status', (event) => {
-  if (event.value === DocumentStatus.Attached) {
+  if (event.value.status === DocumentStatus.Attached) {
     // The document is attached to the client.
-  } else if (event.value === DocumentStatus.Detached) {
+  } else if (event.value.status === DocumentStatus.Detached) {
     // The document is detached from the client.
   }
 });
