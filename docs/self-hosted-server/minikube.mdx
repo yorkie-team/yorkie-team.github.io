@@ -8,7 +8,7 @@ order: 81
 Minikube is a tool that makes it easy to run Kubernetes locally.
 
 In this guide, you will install Yorkie cluster on minikube using Helm.
-Then, you will test Yorkie cluster with Quill, a collaborative code editor example.
+Then, you will test Yorkie cluster with Quill Example to see how collaborative editing works with Yorkie.
 
 ### Prerequisites
 
@@ -227,7 +227,7 @@ $ minikube ip
 
 ### Test Yorkie cluster
 
-Now that you have Yorkie cluster installed and exposed, you can test Yorkie cluster with [yorkie-js-sdk](https://github.com/yorkie-team/yorkie-js-sdk), an SDK for developing collaborative tools powered by Yorkie
+Now that you have Yorkie cluster installed and exposed, you can test Yorkie cluster with [yorkie-js-sdk](https://github.com/yorkie-team/yorkie-js-sdk), a JavaScript SDK for Yorkie.
 
 Clone yorkie-js-sdk repository with the following command:
 
@@ -242,7 +242,7 @@ $ cd yorkie-js-sdk
 $ pnpm i
 ```
 
-Then, to use Quill, a simple text editing example, navigate to the examples/vanilla-quill folder in the yorkie-js-sdk repository and change `VITE_YORKIE_API_ADDR` in the `.env` file to your minikube IP address.
+After dependencies are installed, you need to set `VITE_YORKIE_API_ADDR` in the `.env` file to your minikube IP address with the following command:
 
 ```bash
 $ cd examples/vanilla-quill
@@ -255,7 +255,7 @@ VITE_YORKIE_API_ADDR=http://<minikube-ip>
 
 <Alert status="warning">If you are using macOS, you should set `VITE_YORKIE_API_ADDR` to `localhost` instead of `minikube ip`.</Alert>
 
-Then, start Quill with the following command:
+Then, start Quill Example with the following command:
 
 ```bash
 $ cd ../..
@@ -286,8 +286,8 @@ You have now installed Yorkie cluster on your local machine, and tested collabor
 
 <Alert status="info">To learn about how to configure Yorkie Cluster in Helm Chart, see [Yorkie Cluster Helm Chart Repository](https://github.com/yorkie-team/yorkie/tree/main/build/charts/yorkie-cluster).</Alert>
 
-First, stop Quill and remove repository folder with the following command:
-Use `Ctrl + C` to stop Quill.
+First, stop Quill Example and remove repository folder with the following command:
+Use `Ctrl + C` to stop Quill Example.
 
 ```bash
   VITE v5.3.5  ready in 178 ms
