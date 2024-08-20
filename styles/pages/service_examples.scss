@@ -1,0 +1,165 @@
+@use '../base/normalize';
+@use '../base/common';
+@use '../base/service_common';
+@use '../base/mixins-lib';
+@use '../base/variables';
+
+.examples_page {
+  .top_banner {
+    padding-top: 54px;
+    padding-bottom: 100px;
+
+    @include mixins-lib.tabletStart() {
+      padding-top: 50px;
+      padding-bottom: variables.$spacing_32;
+    }
+
+    .img_box {
+      @include mixins-lib.tabletStart() {
+        width: 250px;
+        height: 298px;
+      }
+    }
+  }
+
+  .title_group {
+    padding-top: 70px;
+
+    @include mixins-lib.tabletStart() {
+      padding-top: 19px;
+    }
+  }
+
+  .content {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 120px variables.$spacing_40 240px;
+    box-sizing: border-box;
+
+    @include mixins-lib.tabletStart() {
+      width: 100%;
+      max-width: none;
+      padding: 80px variables.$spacing_32 160px;
+    }
+
+    @include mixins-lib.mobileStart() {
+      padding: 80px variables.$spacing_16 96px;
+    }
+
+    &_inner {
+      display: flex;
+      align-items: flex-start;
+
+      @include mixins-lib.tabletStart() {
+        flex-direction: column;
+      }
+    }
+  }
+
+  .navigator {
+    flex: 0 0 auto;
+    position: sticky;
+    top: 120px;
+    box-sizing: border-box;
+
+    &_list {
+      min-width: 248px;
+    }
+
+    @include mixins-lib.tabletStart() {
+      display: none;
+    }
+  }
+
+  .filter {
+    display: none;
+
+    @include mixins-lib.tabletStart() {
+      display: block;
+      margin-bottom: variables.$spacing_16;
+      padding: 0;
+    }
+
+    &_list {
+      @include mixins-lib.tabletStart() {
+        border-bottom: none;
+      }
+    }
+
+    &_desc {
+      @include mixins-lib.tabletStart() {
+        padding-left: 0;
+        padding-right: 0;
+      }
+    }
+
+    .dropdown {
+      @include mixins-lib.tabletStart() {
+        right: auto;
+        left: 0;
+        margin-top: 0;
+      }
+
+      @include mixins-lib.mobileStart() {
+        right: 0;
+      }
+    }
+  }
+
+  .grid {
+    &_list {
+      margin-left: 86px;
+
+      @include mixins-lib.tabletStart() {
+        margin-left: 0;
+      }
+    }
+
+    &_item {
+      max-width: 336px;
+
+      @include mixins-lib.tabletStart() {
+        max-width: none;
+      }
+
+      &:only-child {
+        min-width: 694px;
+
+        @include mixins-lib.tabletStart() {
+          min-width: auto;
+        }
+      }
+    }
+
+    &_card {
+      overflow: hidden;
+    }
+
+    &_thumbnail {
+      img {
+        width: 100%;
+        height: auto;
+        vertical-align: top;
+        aspect-ratio: 1200 / 750;
+        object-fit: cover;
+      }
+    }
+  }
+}
+
+.darkmode {
+  .examples_page {
+    .grid_thumbnail * {
+      &[fill='white'],
+      &[fill='#FEFDFB'],
+      &[fill='url(#pattern0)'],
+      &[fill='url(#pattern1)'] {
+        fill: var(--gray-000);
+      }
+
+      &[fill='#332E2B'] {
+        fill: var(--gray-50);
+      }
+    }
+  }
+}
