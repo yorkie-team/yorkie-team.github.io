@@ -45,7 +45,7 @@ const CalendarExampleView: NextPage = () => {
                 <ProjectCodes
                   files={FILE_INFO}
                   activeFile="/app/page.tsx"
-                  ignoreFiles={[...COMMON_IGNORE_FILES, '.env', 'vite.config.js', '/src/vite-env.d.ts']}
+                  ignoreFiles={[...COMMON_IGNORE_FILES, 'next.config.js']}
                 />
               </Sidebar.TabsPanel>
               <Sidebar.Bottom codeURL={EXAMPLE_CODE_URL + exampleKey} />

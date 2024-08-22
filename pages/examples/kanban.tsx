@@ -39,11 +39,7 @@ const KanbanExampleView: NextPage = () => {
                   Kanban Board is a tool for managing tasks and workflow. It is a visual way to manage tasks and
                   workflow.
                 </Sidebar.GuideDescription>
-                <ProjectCodes
-                  files={FILE_INFO}
-                  activeFile="/src/App.vue"
-                  ignoreFiles={[...COMMON_IGNORE_FILES, '.env']}
-                />
+                <ProjectCodes files={FILE_INFO} activeFile="/src/App.vue" ignoreFiles={COMMON_IGNORE_FILES} />
               </Sidebar.TabsPanel>
               <Sidebar.TabsPanel value="documentStructure">
                 <div className="codeblock_box">

@@ -41,11 +41,7 @@ const CodemirrorExampleView: NextPage = () => {
                   </a>
                   , a custom CRDT type from Yorkie.
                 </Sidebar.GuideDescription>
-                <ProjectCodes
-                  files={FILE_INFO}
-                  activeFile="/src/main.ts"
-                  ignoreFiles={[...COMMON_IGNORE_FILES, '.env', 'vite.config.js', '/src/vite-env.d.ts']}
-                />
+                <ProjectCodes files={FILE_INFO} activeFile="/src/main.ts" ignoreFiles={COMMON_IGNORE_FILES} />
               </Sidebar.TabsPanel>
               <Sidebar.Bottom codeURL={EXAMPLE_CODE_URL + exampleKey} />
             </Sidebar.Tabs>

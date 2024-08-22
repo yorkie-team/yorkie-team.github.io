@@ -1,6 +1,10 @@
 import fs from 'fs';
 import path from 'path';
+import dotenv from 'dotenv';
 import type { DirectoryInfo, FileInfo } from '../utils/exampleFileUtils';
+
+dotenv.config();
+const yorkieVersion = process.env.NEXT_PUBLIC_YORKIE_JS_VERSION;
 
 const makeDirectory = (dirPath: string) => {
   if (!fs.existsSync(dirPath)) {
@@ -68,10 +72,19 @@ const getFileLanguage = (filename: string): string => {
 };
 
 const getFileContent = (filePath: string): string => {
+  if (filePath.includes('.env.production')) {
+    return '';
+  }
+
   const extension = getFileExtension(filePath);
   // NOTE(chacha912): Image file is not supported.
   if (extension === 'ico' || extension === 'png' || extension === 'jpg') {
     return '';
+  }
+
+  if (filePath.includes('package.json')) {
+    const content = readFile(filePath);
+    return content.replace(/"yorkie-js-sdk": "workspace:\*"/g, `"yorkie-js-sdk": "^${yorkieVersion}"`);
   }
 
   return readFile(filePath);

@@ -33,7 +33,7 @@
     "rehype-slug": "^5.1.0",
     "remark-gfm": "^3.0.1",
     "unist-util-visit": "^4.1.1",
-    "yorkie-js-sdk": "^0.4.28"
+    "yorkie-js-sdk": "^0.4.31"
   },
   "devDependencies": {
     "@mdx-js/loader": "^2.1.5",
@@ -42,6 +42,7 @@
     "@types/node": "18.11.5",
     "@types/react": "18.0.23",
     "@types/react-dom": "18.0.7",
+    "dotenv": "^16.4.5",
     "eslint": "8.26.0",
     "eslint-config-next": "13.0.0",
     "postcss-path-replace": "^1.0.4",
