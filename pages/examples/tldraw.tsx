@@ -58,7 +58,7 @@ const TldrawExampleView: NextPage = () => {
                 <ProjectCodes
                   files={FILE_INFO}
                   activeFile="/src/hooks/useMultiplayerState.ts"
-                  ignoreFiles={[...COMMON_IGNORE_FILES, '.env', 'vite.config.js']}
+                  ignoreFiles={COMMON_IGNORE_FILES}
                 />
               </Sidebar.TabsPanel>
               <Sidebar.Bottom codeURL={EXAMPLE_CODE_URL + exampleKey} />

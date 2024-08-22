@@ -68,6 +68,10 @@ const getFileLanguage = (filename: string): string => {
 };
 
 const getFileContent = (filePath: string): string => {
+  if (filePath.includes('.env.production')) {
+    return '';
+  }
+
   const extension = getFileExtension(filePath);
   // NOTE(chacha912): Image file is not supported.
   if (extension === 'ico' || extension === 'png' || extension === 'jpg') {

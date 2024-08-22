@@ -34,11 +34,7 @@ const ProfileStackExampleView: NextPage = () => {
                   The profile stack shows the list of users currently accessing the Document. Try adding and deleting
                   users to see how the profile stack changes.
                 </Sidebar.GuideDescription>
-                <ProjectCodes
-                  files={FILE_INFO}
-                  activeFile="/main.js"
-                  ignoreFiles={[...COMMON_IGNORE_FILES, '.env', 'vite.config.js']}
-                />
+                <ProjectCodes files={FILE_INFO} activeFile="/main.js" ignoreFiles={COMMON_IGNORE_FILES} />
               </Sidebar.TabsPanel>
               <Sidebar.Bottom codeURL={EXAMPLE_CODE_URL + exampleKey} />
             </Sidebar.Tabs>

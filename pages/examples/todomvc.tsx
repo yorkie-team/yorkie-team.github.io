@@ -55,11 +55,7 @@ const TodoListExampleView: NextPage = () => {
                   </a>
                   .
                 </Sidebar.GuideDescription>
-                <ProjectCodes
-                  files={FILE_INFO}
-                  activeFile="/src/App.tsx"
-                  ignoreFiles={[...COMMON_IGNORE_FILES, '.env', '/src/vite-env.d.ts', 'tsconfig.node.json']}
-                />
+                <ProjectCodes files={FILE_INFO} activeFile="/src/App.tsx" ignoreFiles={COMMON_IGNORE_FILES} />
               </Sidebar.TabsPanel>
               <Sidebar.Bottom codeURL={EXAMPLE_CODE_URL + exampleKey} />
             </Sidebar.Tabs>

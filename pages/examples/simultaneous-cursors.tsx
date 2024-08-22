@@ -47,11 +47,7 @@ const SimultaneousExampleView: NextPage = () => {
                   </a>
                   .
                 </Sidebar.GuideDescription>
-                <ProjectCodes
-                  files={FILE_INFO}
-                  activeFile="/src/App.jsx"
-                  ignoreFiles={[...COMMON_IGNORE_FILES, '.env']}
-                />
+                <ProjectCodes files={FILE_INFO} activeFile="/src/App.jsx" ignoreFiles={COMMON_IGNORE_FILES} />
               </Sidebar.TabsPanel>
               <Sidebar.Bottom codeURL={EXAMPLE_CODE_URL + exampleKey} />
             </Sidebar.Tabs>
