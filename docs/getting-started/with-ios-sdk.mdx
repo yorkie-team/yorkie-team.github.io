@@ -27,7 +27,7 @@ dependencies: [
 First, create a Client with API key
 
 ```swift
-let client = Client(rpcAddress: RPCAddress(host: "{{API_HOST}}", port: {{API_PORT}}), options: ClientOptions(key: "xxxxxxxxxxxxxxxxxxxx"))
+let client = Client("https://{{API_HOST}}"), ClientOptions(key: "xxxxxxxxxxxxxxxxxxxx"))
 try await client.activate()
 ```
 
@@ -49,17 +49,22 @@ The document should be attached to the client in order to automatically synchron
 The created document is initially an empty object. You can create or update a key-value property you would like to share with peers using `Document.update()`.
 
 ```swift
-try await doc.update { root in
-  root.key = "Key value"
+try await doc.update{ root, _ in
+  root.todos = Array<String>()                    // {"todos":[]}
+  (root.todos as? JSONArray)?.append("todo-1")    // {"todos":["todo-1"]}
+  root.obj = ["name": "yorkie", "age": Int64(14)] // {"obj":{"name":"yorkie","age":14},"todos":["todo-1"]}
 }
 ```
 
 #### 4. Accessing Document
 
-If you want to access the document properties, you can use `Document.getRoot().get()`.
+If you want to access the document properties, you can use `doc.getRoot()`. Using a dot notation, you can access a key-value property you or your peers have set.
 
 ```swift
-let value = await doc.getRoot().get("key") as? String
+try await doc.update{ root, _ in
+  root.sharedMessage = "Hello World!"
+}
+await print(self.document.getRoot().sharedMessage!) // "Hello World!"
 ```
 
 #### 5. Subscribing to the changes that happen in the Document
