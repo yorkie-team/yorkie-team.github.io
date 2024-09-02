@@ -113,16 +113,14 @@ To use admin commands, you need to log in to the server. You can log in to the s
 
 ```bash
 $ yorkie user login -u <username> --rpc-addr api.yorkie.dev:443
-```
-```bash
 Enter Password:
 ```
 
-You will be asked for a password in the next line.The password is not visible, which is normal.
+The password is required in the next line. The password is not visible, which is normal.
 Username and password are the same as the ones you used to log in to the [dashboard](/dashboard).
 
 > If you are using the [self-hosted server](/docs/self-hosted-server), default username and password are `admin` and `admin`.
-> You can log in to the server using `yorkie login -u admin -p admin --insecure`.
+> You can log in to the server using `yorkie login -u admin --insecure`. The password is required in the next line.
 
 Once you log in to the server, the CLI stores the access token in the `~/.yorkie/config.json` file.
 You can check the context of the CLI using the `context` subcommand:
@@ -137,11 +135,27 @@ $ yorkie context ls
 If you want to log out from the server, you can use the `logout` subcommand:
 
 ```bash
-$ yorkie logout
+$ yorkie user logout
 $ yorkie context ls
  CURRENT  RPC ADDR            INSECURE  TOKEN                   
  *        api.yorkie.dev:443  false     eyJhbGciOi...DuhaUgofYg 
 
+```
+
+If you want to change your password, you can use the command `change-password`.
+
+```bash
+$ yorkie user change-password -u <username> --rpc-addr api.yorkie.dev:443
+Enter Password:
+Enter New Password:
+```
+
+If you want to delete your account, you can use the command `delete-account`.
+
+```bash
+$ yorkie user delete-account -u <username> --rpc-addr api.yorkie.dev:443
+Enter Password:
+WARNING:...
 ```
 
 ### Project
