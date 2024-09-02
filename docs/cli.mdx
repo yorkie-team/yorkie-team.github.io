@@ -112,9 +112,13 @@ Flags:
 To use admin commands, you need to log in to the server. You can log in to the server using the `login` subcommand:
 
 ```bash
-$ yorkie login -u <username> -p <password> --rpc-addr api.yorkie.dev:443
+$ yorkie user login -u <username> --rpc-addr api.yorkie.dev:443
+```
+```bash
+Enter Password:
 ```
 
+You will be asked for a password in the next line.The password is not visible, which is normal.
 Username and password are the same as the ones you used to log in to the [dashboard](/dashboard).
 
 > If you are using the [self-hosted server](/docs/self-hosted-server), default username and password are `admin` and `admin`.
