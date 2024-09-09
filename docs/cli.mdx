@@ -114,17 +114,18 @@ To use admin commands, you need to log in to the server. You can log in to the s
 ```bash
 $ yorkie login -u <username> -p <password> --rpc-addr api.yorkie.dev:443
 ```
-or like 
+Or like this:
 ```bash
 $ yorkie login -u <username> --rpc-addr api.yorkie.dev:443
 Enter Password:
 ```
 
-As you can see above, if you do not enter a password with -p flag, you must enter it in the next line. The password is not visible, which is normal.
+As shown above, if you do not enter a password with -p flag, you will need to enter it on the next line. 
+The password will not be visible, The password will not be visible, which is expected behavior.
 Username and password are the same as the ones you used to log in to the [dashboard](/dashboard).
 
 > If you are using the [self-hosted server](/docs/self-hosted-server), default username and password are `admin` and `admin`.
-> You can log in to the server using `yorkie login -u admin -p admin --insecure`. Or you can try like this. `yorkie login -u admin --insecure`. 
+> You can log in to the server using `$ yorkie login -u admin -p admin --insecure`. Or: `$ yorkie login -u admin --insecure`. 
 In this case, you will need to enter a password in the next line.
 
 Once you log in to the server, the CLI stores the access token in the `~/.yorkie/config.json` file.
@@ -151,7 +152,7 @@ $ yorkie context ls
 ```
 ### Change Password
 
-If you want to change your password, you can use the command `passwd`. The both passwords are not visible, which is normal.
+If you want to change your password, you can use the command `passwd`. The both passwords will not be visible, which is expected.
 
 ```bash
 $ yorkie passwd -u <username> --rpc-addr api.yorkie.dev:443
@@ -167,13 +168,13 @@ If you want to delete your account, you can use the command `delete-account`.
 $ yorkie delete-account -u <username> -p <password> --rpc-addr api.yorkie.dev:443
 Warning: ...
 ```
-or like
+Or:
 ```bash
 $ yorkie delete-account -u <username> --rpc-addr api.yorkie.dev:443
 Enter Password:
 WARNING: ...
 ```
-Likewise, it is normal that the password is not visible. If it fails, please double check if it is an existing account or a valid password.
+As before, it is expected that the password will not be visible. If the operation fails, please double-check if it the account exists and whether the password is correct.
 
 
 
