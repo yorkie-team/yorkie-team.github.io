@@ -112,15 +112,20 @@ Flags:
 To use admin commands, you need to log in to the server. You can log in to the server using the `login` subcommand:
 
 ```bash
-$ yorkie user login -u <username> --rpc-addr api.yorkie.dev:443
+$ yorkie login -u <username> -p <password> --rpc-addr api.yorkie.dev:443
+```
+or like 
+```bash
+$ yorkie login -u <username> --rpc-addr api.yorkie.dev:443
 Enter Password:
 ```
 
-The password is required in the next line. The password is not visible, which is normal.
+As you can see above, if you do not enter a password with -p flag, you must enter it in the next line. The password is not visible, which is normal.
 Username and password are the same as the ones you used to log in to the [dashboard](/dashboard).
 
 > If you are using the [self-hosted server](/docs/self-hosted-server), default username and password are `admin` and `admin`.
-> You can log in to the server using `yorkie login -u admin --insecure`. The password is required in the next line.
+> You can log in to the server using `yorkie login -u admin -p admin --insecure`. Or you can try like this. `yorkie login -u admin --insecure`. 
+In this case, you will need to enter a password in the next line.
 
 Once you log in to the server, the CLI stores the access token in the `~/.yorkie/config.json` file.
 You can check the context of the CLI using the `context` subcommand:
@@ -132,33 +137,45 @@ $ yorkie context ls
  *        localhost:8080      true      eyJhbGciOi...FUT3js73Mw 
 ```
 
-If you want to log out from the server, you can use the `logout` subcommand:
 
 ### Logout
+
+If you want to log out from the server, you can use the `logout` subcommand:
 ```bash
-$ yorkie user logout
+$ yorkie logout
 $ yorkie context ls
  CURRENT  RPC ADDR            INSECURE  TOKEN                   
  *        api.yorkie.dev:443  false     eyJhbGciOi...DuhaUgofYg 
 
+
 ```
 ### Change Password
-If you want to change your password, you can use the command `change-password`.
+
+If you want to change your password, you can use the command `passwd`. The both passwords are not visible, which is normal.
 
 ```bash
-$ yorkie user change-password -u <username> --rpc-addr api.yorkie.dev:443
+$ yorkie passwd -u <username> --rpc-addr api.yorkie.dev:443
 Enter Password:
 Enter New Password:
 ```
 
-If you want to delete your account, you can use the command `delete-account`.
 
 ### Delete Account
+
+If you want to delete your account, you can use the command `delete-account`.
 ```bash
-$ yorkie user delete-account -u <username> --rpc-addr api.yorkie.dev:443
-Enter Password:
-WARNING:...
+$ yorkie delete-account -u <username> -p <password> --rpc-addr api.yorkie.dev:443
+Warning: ...
 ```
+or like
+```bash
+$ yorkie delete-account -u <username> --rpc-addr api.yorkie.dev:443
+Enter Password:
+WARNING: ...
+```
+Likewise, it is normal that the password is not visible. If it fails, please double check if it is an existing account or a valid password.
+
+
 
 ### Project
 
