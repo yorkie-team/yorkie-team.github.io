@@ -168,46 +168,55 @@ yorkie-74969cc796-n9jtr   1/1     Running   2 (52s ago)   76s
 
 ### Test Yorkie cluster
 
-Now that you have Yorkie cluster installed and exposed, you can test Yorkie cluster with [CodePair](https://github.com/yorkie-team/codepair), a collaborative editing tool powered by Yorkie.
+Now that you have Yorkie cluster installed and exposed, you can test Yorkie cluster with [yorkie-js-sdk](https://github.com/yorkie-team/yorkie-js-sdk), a JavaScript SDK for Yorkie.
 
-Clone CodePair repository with the following command:
+Clone yorkie-js-sdk repository with the following command:
 
 ```bash
-$ git clone https://github.com/yorkie-team/codepair
+$ git clone https://github.com/yorkie-team/yorkie-js-sdk
 ```
 
-Then, change directory to codepair folder and install dependencies with the following command:
+Then, change directory to yorkie-js-sdk folder and install dependencies with the following command:
 
 ```bash
-$ cd codepair
-$ npm install
+$ cd yorkie-js-sdk
+$ pnpm i
 ```
 
-After dependencies are installed, change `VITE_APP_YORKIE_RPC_ADDR` in `.env.development` file to API Domain of Yorkie cluster you have configured above.
+After dependencies are installed, you need to set `VITE_YORKIE_API_ADDR` in the `.env` file to your AWS api domain name or IP address with the following command:
 
 ```bash
-$ vi .env.development
+$ cd examples/vanilla-quill
+$ vi .env
 
-VITE_APP_YORKIE_RPC_ADDR=http://{YOUR_API_DOMAIN_NAME}
+VITE_YORKIE_API_ADDR=http://<YOUR_API_DOMAIN_NAME or IP_ADDRESS>
 ```
 
-Then, start CodePair with the following command:
+Then, start Quill Example with the following command:
 
 ```bash
-$ npm run dev
+$ cd ../..
+$ pnpm vanilla-quill dev
 
-> codepair@1.0.0 dev
-> vite --config ./config/vite.config.development.ts
+> yorkie-js@0.0.0 vanilla-quill /yorkie-js-sdk
+> pnpm --filter=vanilla-quill "dev"
 
 
-  VITE v4.3.0  ready in 257 ms
+> vanilla-quill@0.0.0 dev /yorkie-js-sdk/examples/vanilla-quill
+> vite
 
-  ➜  Local:   http://localhost:3000/
+
+  VITE v5.3.5  ready in 178 ms
+
+  ➜  Local:   http://localhost:5173/
   ➜  Network: use --host to expose
-  ➜  press h to show help
+  ➜  press h + enter to show help
 ```
 
-You can open several web browsers and access `http://localhost:3000` to test collaborative editing with CodePair.
+You can open several web browsers and access `http://localhost:5173` to test collaborative editing with Quill.
+
+For more examples of collaborative tools developed with Yorkie, including Quill, take a look at [yorkie-js-sdk examples](https://github.com/yorkie-team/yorkie-js-sdk/tree/main/examples#examples).
+
 
 ### Clean up Yorkie cluster
 
