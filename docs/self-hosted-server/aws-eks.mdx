@@ -107,8 +107,8 @@ $ helm install yorkie-cluster yorkie-team/yorkie-cluster \
 	--set ingress.ingressClassName=alb \
 	--set ingress.hosts.enabled=true \
     --set ingress.hosts.apiHost={YOUR_API_DOMAIN_NAME} \
-    --set ingress.alb.enabled=true \
-    --set ingress.alb.certArn={YOUR_CERTIFICATE_ARN}
+    --set ingress.awsAlb.enabled=true \
+    --set ingress.awsAlb.certArn={YOUR_CERTIFICATE_ARN}
 
 # For example, for domain name `yorkie.dev` and certificate ARN 
 # `arn:aws:acm:ap-northeast-2:123412341234:certificate/12341234-1234-1234-1234-123412341234`, run the following command:
@@ -116,8 +116,8 @@ $ helm install yorkie-cluster yorkie-team/yorkie-cluster \
 	--set ingress.ingressClassName=alb \
 	--set ingress.hosts.enabled=true \
     --set ingress.hosts.apiHost=api.yorkie.dev \
-    --set ingress.alb.enabled=true \
-    --set ingress.alb.certArn=arn:aws:acm:ap-northeast-2:123412341234:certificate/12341234-1234-1234-1234-123412341234
+    --set ingress.awsAlb.enabled=true \
+    --set ingress.awsAlb.certArn=arn:aws:acm:ap-northeast-2:123412341234:certificate/12341234-1234-1234-1234-123412341234
 ```
 
 Replace `{YOUR_API_DOMAIN_NAME}` with your domain name. Also, replace `{YOUR_CERTIFICATE_ARN}` with your certificate ARN.
