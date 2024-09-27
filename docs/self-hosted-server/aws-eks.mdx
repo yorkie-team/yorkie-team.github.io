@@ -8,7 +8,7 @@ order: 82
 AWS's Elastic Kubernetes Service (EKS) is a managed service that lets you deploy, manage, and scale containerized applications on Kubernetes.
 
 In this guide, you will install Yorkie cluster on AWS EKS using Helm.
-Then, you will test Yorkie cluster with CodePair, a collaborative code editor.
+Then, you will test Yorkie cluster with Quill Example to see how collaborative editing works with Yorkie.
 
 <Alert status="danger">[AWS EKS clusters cost $0.10 per hour](https://aws.amazon.com/eks/pricing/), so you may incur charges by running this tutorial. The cost should be a few dollars at most, but be sure to delete your infrastructure promptly to avoid additional charges. We are not responsible for any charges you may incur.</Alert>
 
@@ -159,11 +159,11 @@ $ kubectl get pods -n yorkie --watch
 After all pods are ready, you will see the following output:
 
 ```
-NAME                      READY   STATUS    RESTARTS      AGE
-mongodb-0                 1/1     Running   0             76s
-yorkie-74969cc796-46s47   1/1     Running   2 (54s ago)   76s
-yorkie-74969cc796-c8zpt   1/1     Running   2 (50s ago)   76s
-yorkie-74969cc796-n9jtr   1/1     Running   2 (52s ago)   76s
+NAME                             READY   STATUS    RESTARTS   AGE
+yorkie-f595554db-48s9c           1/1     Running   0          8m18s
+yorkie-f595554db-nggr9           1/1     Running   0          8m18s
+yorkie-f595554db-z5jgs           1/1     Running   0          8m18s
+yorkie-gateway-844d8c87d-fqpsk   1/1     Running   0          9m55s
 ```
 
 ### Test Yorkie cluster
@@ -220,7 +220,7 @@ For more examples of collaborative tools developed with Yorkie, including Quill,
 
 ### Clean up Yorkie cluster
 
-You have now installed Yorkie cluster in AWS EKS, and tested collaborative editing with CodePair.
+You have now installed Yorkie cluster in AWS EKS, and tested collaborative editing with Quill.
 
 <Alert status="info">To learn about how to configure Yorkie Cluster in Helm Chart, see [Yorkie Cluster Helm Chart Repository](https://github.com/yorkie-team/yorkie/tree/main/build/charts/yorkie-cluster).</Alert>
 
