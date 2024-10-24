@@ -80,6 +80,29 @@ The initial values are partially applied. For each element in `initialRoot`:
 - If the key doesn't exist, the element will be applied.
 - If the key already exists in the Document, that element will be discarded. Users don't need to worry about overwriting existing valid counters.
 
+```javascript
+await client.attach(doc, {
+  initialRoot: {
+    list: [],
+  },
+});
+
+// Another client tries to attach with initialRoot option:
+await client.attach(doc, {
+  initialRoot: {
+    list: [1, 2, 3],    // this update will be discarded
+    counter: new yorkie.Counter(yorkie.IntType, 0), // this update will be applied
+  },
+});
+
+// final state
+// root = {
+//   list: [],
+//   counter: {}
+// }
+```
+
+We support element types for Primitives, and [Custom CRDT types](/js-sdk/#custom-crdt-types/).
 
 <Alert status="warning">
 Elements added by `initialRoot` are not sent to the server during the `attach` process. They are applied locally to the Document after push-pull during `attach`.
