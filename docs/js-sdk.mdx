@@ -26,6 +26,25 @@ await client.activate();
 
 > The API key is used to identify the project in Yorkie. You can get the API key of the project you created in the [Dashboard]({{DASHBOARD_PATH}}).
 
+##### Creating a Client with Auth Token
+
+You can configure authentication for the client by setting up an `authTokenInjector` to provide tokens for Auth Webhook verification.
+If a `codes.Unauthenticated` error occurs, the `authTokenInjector` will be called again with the webhook's response reason, enabling automatic token refresh.
+For more information about `Auth Webhook`, please refer to the [Auth Webhook](/docs/auth-webhook).
+
+```javascript
+const client = new yorkie.Client('{{API_ADDR}}', {
+  apiKey: 'xxxxxxxxxxxxxxxxxxxx',
+  authTokenInjector: async (reason) => {
+    // Handle token refresh logic based on webhook response
+    if (reason === 'token expired') {
+      return await refreshAccessToken();
+    }
+    return accessToken;
+  },
+});
+```
+
 ### Document
 
 `Document` is a primary data type in Yorkie, which provides a JSON-like updating experience that makes it easy to represent your application's model.
@@ -102,7 +121,7 @@ await client.attach(doc, {
 // }
 ```
 
-We support element types for Primitives, and [Custom CRDT types](/js-sdk/#custom-crdt-types/).
+We support element types for Primitives, and [Custom CRDT types](/docs/js-sdk/#custom-crdt-types/).
 
 <Alert status="warning">
 Elements added by `initialRoot` are not sent to the server during the `attach` process. They are applied locally to the Document after push-pull during `attach`.
@@ -405,8 +424,26 @@ For handle this, Yorkie provides one of housekeeping feature, `client-deactivate
 <br/>
 If the client is deactivated due to inactivity, the document will be detached from the client, and you will receive a `DocumentStatus.Detached` event through the `doc.subscribe('status', callback)` method.
 <br/>
-For more information about `client-deactivate-threshold`, please refer to the [Client Deactivate Threashold](/docs/cli#client-deactivate-threshold).
+For more information about `client-deactivate-threshold`, please refer to the [Client Deactivate Threshold](/docs/cli#client-deactivate-threshold).
 </Alert>
+
+##### Document.subscribe('auth-error')
+
+You can subscribe to authentication error events using `doc.subscribe('auth-error', callback)`.
+This event is triggered when an unauthenticated error occurs during `PushPull` or `WatchDocuments` operations,
+specifically when the system automatically refreshes the token and retries the operation.
+
+```javascript
+const unsubscribe = doc.subscribe('auth-error', (event) => {
+  console.log(event.value);
+  // event.value contains:
+  // - reason: string
+  // - method: 'PushPull' | 'WatchDocuments'
+});
+```
+
+This subscription allows you to monitor when token refreshes occur due to authentication errors.  
+For more information about `Auth Webhook`, please refer to the [Auth Webhook](/docs/auth-webhook).
 
 ##### Document.subscribe('all')
 

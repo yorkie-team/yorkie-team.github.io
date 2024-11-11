@@ -131,8 +131,8 @@ export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement
           </div>
           <div className="site">
             <strong className="title">
-              <Link href="/community" className="link">
-                Community
+              <Link href="/support" className="link">
+                Support
               </Link>
             </strong>
             <ul className="site_list">
@@ -144,6 +144,11 @@ export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement
               <li className="site_item">
                 <Link href="https://github.com/yorkie-team" className="link" target="_blank" rel="noreferrer">
                   GitHub
+                </Link>
+              </li>
+              <li className="site_item">
+                <Link href={process.env.NEXT_PUBLIC_STATUS_URL!} className="link" target="_blank" rel="noreferrer">
+                  System Status
                 </Link>
               </li>
             </ul>
