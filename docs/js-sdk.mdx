@@ -45,6 +45,26 @@ const client = new yorkie.Client('{{API_ADDR}}', {
 });
 ```
 
+##### Deactivate the Client
+
+When the client is no longer needed, you can deactivate it to release resources and disconnect from the server.
+
+```javascript
+await client.deactivate();
+```
+
+This will detach all documents attached to the client for efficient [garbage collection](https://github.com/yorkie-team/yorkie/blob/main/design/garbage-collection.md).
+
+> When the page is closed, the client should be deactivated for proper cleanup. For this, you can use the `beforeunload` event.
+> Using the `keepalive` option in `deactivate` request will remain open, even if the page that initiated the request is closed.
+> 
+> ```javascript
+> window.addEventListener('beforeunload', () => {
+>   client.deactivate({keepalive: true});
+> });
+> ```
+> For more information about `keepalive`, please refer to the https://css-tricks.com/send-an-http-request-on-page-exit/.
+
 ### Document
 
 `Document` is a primary data type in Yorkie, which provides a JSON-like updating experience that makes it easy to represent your application's model.
