@@ -34,7 +34,7 @@
     "rehype-slug": "^5.1.0",
     "remark-gfm": "^3.0.1",
     "unist-util-visit": "^4.1.1",
-    "yorkie-js-sdk": "^0.5.6"
+    "yorkie-js-sdk": "^0.5.7"
   },
   "devDependencies": {
     "@mdx-js/loader": "^2.1.5",
@@ -48,6 +48,7 @@
     "eslint-config-next": "13.0.0",
     "postcss-path-replace": "^1.0.4",
     "sass": "^1.77.8",
+    "ts-node": "^10.9.2",
     "typescript": "4.8.4"
   }
 }

@@ -25,6 +25,5 @@ for f in temp/examples/* ; do
     fi
 done
 
-npm i -g ts-node
-ts-node --esm scripts/fetchExamples.mts
+node --no-warnings=ExperimentalWarning --loader ts-node/esm scripts/fetchExamples.mts
 rm -rf temp
