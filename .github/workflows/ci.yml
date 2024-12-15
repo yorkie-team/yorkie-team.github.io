@@ -11,17 +11,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Detect package manager
         id: detect-package-manager
         uses: ./.github/actions/detect-package-manager
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: "16"
+          node-version: '20'
           cache: ${{ steps.detect-package-manager.outputs.manager }}
       - name: Setup Pages
-        uses: actions/configure-pages@v2
+        uses: actions/configure-pages@v4
         with:
           # Automatically inject basePath in your Next.js configuration file and disable
           # server side image optimization (https://nextjs.org/docs/api-reference/next/image#unoptimized).
@@ -29,7 +29,7 @@ jobs:
           # You may remove this line if you want to manage the configuration yourself.
           static_site_generator: next
       - name: Restore cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             .next/cache
@@ -43,10 +43,11 @@ jobs:
       - name: Build with Next.js
         run: ${{ steps.detect-package-manager.outputs.manager }} run build
       - name: Static HTML export with Next.js
+        # In versions of Next.js 13.3.0 and later, the next export command is no longer used. Instead, static exports can only be done with the next build. Therefore, the following steps may need to be removed or modified
         run: ${{ steps.detect-package-manager.outputs.runner }} next export
       - name: Optimize all static images after the Next.js static export
-        run: ${{ steps.detect-package-manager.outputs.runner }} next-image-export-optimizer  
+        run: ${{ steps.detect-package-manager.outputs.runner }} next-image-export-optimizer
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-pages-artifact@v3
         with:
           path: ./out
