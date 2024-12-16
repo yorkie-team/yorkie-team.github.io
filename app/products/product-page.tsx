@@ -1,6 +1,7 @@
+'use client';
+
 import { useState } from 'react';
 import type { NextPage } from 'next';
-import Head from 'next/head';
 import Link from 'next/link';
 import classNames from 'classnames';
 import { Button, Icon, Layout, CodeBlock, CodeBlockHeader } from '@/components';
@@ -17,9 +18,6 @@ const Products: NextPage = () => {
   const [documentType, setDocumentType] = useState<keyof typeof DOCUMENT_CODE>('common');
   return (
     <Layout className="product_page">
-      <Head>
-        <title>Products · Yorkie</title>
-      </Head>
       <div className="top_banner">
         <div className="top_banner_inner">
           <div className="title_group">
@@ -178,10 +176,13 @@ const Products: NextPage = () => {
                 <strong className="product_card_title">Size optimization</strong>
                 <p className="product_card_desc">
                   Yorkie uses{' '}
-                  <a href="https://github.com/yorkie-team/yorkie/blob/main/design/garbage-collection.md" className="link">
+                  <a
+                    href="https://github.com/yorkie-team/yorkie/blob/main/design/garbage-collection.md"
+                    className="link"
+                  >
                     Garbage Collection
-                  </a>
-                  {' '}and{' '}
+                  </a>{' '}
+                  and{' '}
                   <a href="https://en.wikipedia.org/wiki/Lamport_timestamp" className="link">
                     Lamport timestamps
                   </a>{' '}
