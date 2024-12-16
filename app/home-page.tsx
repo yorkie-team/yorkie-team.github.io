@@ -1,7 +1,8 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import type { NextPage } from 'next';
-import Head from 'next/head';
 import { Layout, Button, Icon, CodeBlock, CodeBlockHeader, Accordion } from '@/components';
 import { ChartMotion, StateSharingMotion, ServerMotion, MainBannerMotion } from '@/components/motions';
 import UserGroupSVG from '@/public/assets/icons/icon_service_main_users_group.svg';
@@ -38,9 +39,6 @@ const Home: NextPage = () => {
   // TODO(hackerwins): Remove examples condition when examples are ready.
   return (
     <Layout className="main_page">
-      <Head>
-        <title>Yorkie</title>
-      </Head>
       <div className="content">
         <section className="key_visual">
           <div className="kv_bg">
