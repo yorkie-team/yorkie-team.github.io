@@ -1,5 +1,7 @@
+'use client';
+
 import classNames from 'classnames';
-import { useRouter } from 'next/router';
+import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { type DocsOrderList } from '@/utils/mdxUtils';
 import ArrowSVG from '@/public/assets/icons/icon_arrow.svg';
@@ -13,16 +15,16 @@ export function Navigator({ navList }: { navList: DocsOrderList }) {
 }
 
 function NavList({ navList }: { navList: DocsOrderList }) {
-  const { asPath } = useRouter();
+  const pathname = usePathname();
 
   return (
     <ul className="navigator_list">
       {navList.map(({ title, href, subMenu }) => {
-        const isActive = href === '/docs' ? asPath === href : asPath.startsWith(href);
+        const isActive = href === '/docs' ? pathname === href : pathname?.startsWith(href) ?? false;
         return (
           <NavGroup key={href} isActive={isActive}>
             {subMenu.length === 0 ? (
-              <NavItem title={title} href={href} isActive={asPath.split('#')[0] === href} />
+              <NavItem title={title} href={href} isActive={pathname?.split('#')[0] === href} />
             ) : (
               <>
                 <NavMenu title={title} href={href} isActive={isActive} />

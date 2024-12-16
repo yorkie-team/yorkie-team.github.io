@@ -1,3 +1,5 @@
+'use client';
+
 import { Icon } from '@/components';
 import classNames from 'classnames';
 import { useCallback, useEffect, useRef, useState } from 'react';
