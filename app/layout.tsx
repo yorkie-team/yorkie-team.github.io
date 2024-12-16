@@ -1,7 +1,7 @@
 import { prefix } from '@/utils/prefix';
 import Script from 'next/script';
 import ThemeInitializer from './_components/theme-initializer';
-import '@/styles/style.css';
+import '@/styles/style.scss';
 import { Metadata, Viewport } from 'next';
 
 export const metadata: Metadata = {
