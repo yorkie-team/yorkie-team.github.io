@@ -1,14 +1,12 @@
+'use client';
+
 import type { NextPage } from 'next';
-import Head from 'next/head';
 import { Button, Icon, Layout } from '@/components';
 import Error404SVG from '@/public/assets/icons/error_404.svg';
 
 const Custom404: NextPage = () => {
   return (
     <Layout className="error_page" shortFooter>
-      <Head>
-        <title>Page not found · Yorkie</title>
-      </Head>
       <div className="content error_404">
         <h2 className="blind">404 : not found</h2>
         <div className="img_box">
