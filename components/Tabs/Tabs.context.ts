@@ -1,3 +1,5 @@
+'use client';
+
 import { createSafeContext } from '@/utils/createSafeContext';
 import { TABS_ERRORS } from './Tabs.errors';
 import { TabsValue } from './Tabs';

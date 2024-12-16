@@ -1,3 +1,5 @@
+'use client';
+
 import { createSafeContext } from '@/utils/createSafeContext';
 import { ACCORDION_ERRORS } from './Accordion.errors';
 import { AccordionIconPosition } from './Accordion';
