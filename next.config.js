@@ -10,9 +10,9 @@ const nextConfig = {
   env: {
     nextImageExportOptimizer_imageFolderPath: 'public/assets/images',
     nextImageExportOptimizer_exportFolderPath: 'out',
-    nextImageExportOptimizer_quality: 75,
-    nextImageExportOptimizer_storePicturesInWEBP: true,
-    nextImageExportOptimizer_generateAndUseBlurImages: true,
+    nextImageExportOptimizer_quality: '75',
+    nextImageExportOptimizer_storePicturesInWEBP: 'true',
+    nextImageExportOptimizer_generateAndUseBlurImages: 'true',
     NEXT_PUBLIC_BUILT_AT: new Date().toUTCString(),
   },
   basePath: process.env.NEXT_PUBLIC_BASE_PATH || '',
