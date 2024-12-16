@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react';
 import classNames from 'classnames';
 import { Tabs, TabsValue } from '@/components';

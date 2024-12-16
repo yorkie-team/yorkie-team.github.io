@@ -1,5 +1,8 @@
+'use client';
+
 import { ReactElement, useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
+import { usePathname } from 'next/navigation';
+
 import Link from 'next/link';
 import { Button, Icon } from '@/components';
 import { isValidToken } from '@/utils/isValidToken';
@@ -8,7 +11,7 @@ import LogoSVG from '@/public/assets/icons/logo_horizontal_xs.svg';
 import LogoGnbSVG from '@/public/assets/icons/logo_gnb.svg';
 
 export function Header(): ReactElement {
-  const { pathname } = useRouter();
+  const pathname = usePathname();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
 
   useEffect(() => {
