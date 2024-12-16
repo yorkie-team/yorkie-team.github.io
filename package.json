@@ -5,7 +5,6 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build && next-sitemap",
-    "export": "next build && next-sitemap && next export",
     "start": "next start",
     "lint": "next lint",
     "fetch:ui": "./scripts/fetch-ui.sh",
