@@ -1,3 +1,5 @@
+'use client';
+
 import type { NextPage } from 'next';
 import { Button, Icon, Layout } from '@/components';
 import CommunitySVG from '@/public/assets/icons/community_help.svg';
