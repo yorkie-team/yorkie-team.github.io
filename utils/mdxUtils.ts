@@ -82,10 +82,12 @@ export type DocsMeta = {
 type Docs = {
   content: string;
   meta: DocsMeta;
+  source: string;
 };
 
 export const getDocsFromSlug = (slug: string): Docs => {
   const docsFilePath = path.join(DOCS_PATH, `${slug}.mdx`);
+  const mdxSource = fs.readFileSync(docsFilePath, 'utf-8');
   const source = fs.readFileSync(docsFilePath);
   const { content, data } = matter(source);
 
@@ -96,6 +98,7 @@ export const getDocsFromSlug = (slug: string): Docs => {
       order: data.order || 0,
       phase: data.phase || '',
     },
+    source: mdxSource,
   };
 };
 
