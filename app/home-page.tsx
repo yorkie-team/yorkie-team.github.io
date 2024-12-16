@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import type { NextPage } from 'next';
-import { Layout, Button, Icon, CodeBlock, CodeBlockHeader, Accordion } from '@/components';
+import { Layout, Button, Icon, CodeBlock, CodeBlockHeader, Accordion, CodeBlockWrapper } from '@/components';
 import { ChartMotion, StateSharingMotion, ServerMotion, MainBannerMotion } from '@/components/motions';
 import UserGroupSVG from '@/public/assets/icons/icon_service_main_users_group.svg';
 import CollaboProfileSVG from '@/public/assets/icons/icon_collaborate_profile.svg';
@@ -181,7 +181,7 @@ const Home: NextPage = () => {
                 </>
               )}
             </ul>
-            <CodeBlock.Wrapper>
+            <CodeBlockWrapper>
               <CodeBlockHeader>
                 <CodeBlockHeader.LeftBox>
                   {FEATURES_CODE[activeFeatureCard].tabOrder.map((codeType) => (
@@ -209,7 +209,7 @@ const Home: NextPage = () => {
                 language={activeFeatureCode.info.language as any}
                 withLineNumbers
               />
-            </CodeBlock.Wrapper>
+            </CodeBlockWrapper>
           </div>
         </section>
         {process.env.NODE_ENV === 'development' && (

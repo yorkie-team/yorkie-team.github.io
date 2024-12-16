@@ -4,7 +4,7 @@ import { useState } from 'react';
 import type { NextPage } from 'next';
 import Link from 'next/link';
 import classNames from 'classnames';
-import { Button, Icon, Layout, CodeBlock, CodeBlockHeader } from '@/components';
+import { Button, Icon, Layout, CodeBlock, CodeBlockHeader, CodeBlockWrapper } from '@/components';
 import { StateSharingDetailMotion, FlexibleDocumentMotion } from '@/components/motions';
 import ProductBannerSVG from '@/public/assets/images/banner/img_product_banner.svg';
 import ProductAwarenessLeftSVG from '@/public/assets/images/banner/img_product_awareness_left.svg';
@@ -87,7 +87,7 @@ const Products: NextPage = () => {
               to enable complex application models while some CRDT libraries that only offer basic data types.
             </p>
             <div className="db_content">
-              <CodeBlock.Wrapper>
+              <CodeBlockWrapper>
                 <CodeBlockHeader>
                   <CodeBlockHeader.LeftBox>
                     <button
@@ -123,7 +123,7 @@ const Products: NextPage = () => {
                   </CodeBlockHeader.RightBox>
                 </CodeBlockHeader>
                 <CodeBlock code={DOCUMENT_CODE[documentType]} language="javascript" withLineNumbers />
-              </CodeBlock.Wrapper>
+              </CodeBlockWrapper>
               <div className="img_box">
                 <FlexibleDocumentMotion />
               </div>

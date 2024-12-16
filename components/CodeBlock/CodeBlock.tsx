@@ -1,3 +1,5 @@
+'use client';
+
 import { ReactNode } from 'react';
 import { CopyButton, Button, Icon } from '@/components';
 import { PrismCodeProps, PrismCode } from './PrismCode';
@@ -41,13 +43,13 @@ function CopyButtonBox({ value, timeout = 1000 }: { value: string; timeout?: num
   );
 }
 
-function Wrapper({ children }: { children: ReactNode }) {
+export function CodeBlockWrapper({ children }: { children: ReactNode }) {
   return <div className="codeblock_content">{children}</div>;
 }
 
-function ContentWrapper({ children }: { children: ReactNode }) {
+export function CodeBlockContentWrapper({ children }: { children: ReactNode }) {
   return <div className="codeblock_wrap">{children}</div>;
 }
 
-CodeBlock.Wrapper = Wrapper;
-CodeBlock.ContentWrapper = ContentWrapper;
+// CodeBlock.Wrapper = Wrapper;
+// CodeBlock.ContentWrapper = ContentWrapper;
