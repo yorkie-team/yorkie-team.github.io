@@ -1,5 +1,6 @@
+'use client';
+
 import { NextPage } from 'next';
-import Head from 'next/head';
 import { ExampleLayout } from '@/components';
 import {
   Sidebar,
@@ -9,19 +10,15 @@ import {
   EXAMPLE_CODE_URL,
   EXAMPLE_PREVIEW_URL,
 } from '@/components/exampleView';
-import { FILE_INFO } from '@/examples/vanilla-quill/fileInfo';
+import { FILE_INFO } from '@/examples/vanilla-codemirror6/fileInfo';
 
-const exampleKey = 'vanilla-quill';
-const exampleTitle = 'Quill';
-
-const QuillExampleView: NextPage = () => {
+const exampleKey = 'vanilla-codemirror6';
+const exampleTitle = 'CodeMirror';
+const CodemirrorExampleView: NextPage = () => {
   return (
     <ExampleLayout breadcrumbTitle={exampleTitle}>
       {() => (
         <>
-          <Head>
-            <title>{`${exampleTitle} · Yorkie Examples`}</title>
-          </Head>
           <Sidebar wide>
             <Sidebar.Tabs defaultTab="code">
               <Sidebar.Top>
@@ -32,19 +29,15 @@ const QuillExampleView: NextPage = () => {
               <Sidebar.TabsPanel value="code">
                 <Sidebar.GuideTitle>{exampleTitle}</Sidebar.GuideTitle>
                 <Sidebar.GuideDescription>
-                  This demo shows the real-time collaborative version of the{' '}
-                  <a href="https://quilljs.com/" className="link" target="_blank" rel="noreferrer">
-                    Quill
+                  This is a real-time collaborative example of the{' '}
+                  <a href="https://codemirror.net/" className="link" target="_blank" rel="noreferrer">
+                    CodeMirror 6
                   </a>{' '}
-                  editor with{' '}
-                  <a href="https://yorkie.dev/" className="link" target="_blank" rel="noreferrer">
-                    Yorkie
-                  </a>{' '}
-                  and{' '}
-                  <a href="https://vitejs.dev/" className="link" target="_blank" rel="noreferrer">
-                    Vite
+                  editor. It uses the{' '}
+                  <a href="https://yorkie.dev/docs/js-sdk#text" className="link" target="_blank" rel="noreferrer">
+                    Text
                   </a>
-                  .
+                  , a custom CRDT type from Yorkie.
                 </Sidebar.GuideDescription>
                 <ProjectCodes files={FILE_INFO} activeFile="/src/main.ts" ignoreFiles={COMMON_IGNORE_FILES} />
               </Sidebar.TabsPanel>
@@ -62,4 +55,5 @@ const QuillExampleView: NextPage = () => {
     </ExampleLayout>
   );
 };
-export default QuillExampleView;
+
+export default CodemirrorExampleView;

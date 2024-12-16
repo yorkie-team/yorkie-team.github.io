@@ -1,5 +1,6 @@
+'use client';
+
 import { NextPage } from 'next';
-import Head from 'next/head';
 import { ExampleLayout } from '@/components';
 import {
   Sidebar,
@@ -9,19 +10,16 @@ import {
   EXAMPLE_CODE_URL,
   EXAMPLE_PREVIEW_URL,
 } from '@/components/exampleView';
-import { FILE_INFO } from '@/examples/simultaneous-cursors/fileInfo';
+import { FILE_INFO } from '@/examples/vanilla-quill/fileInfo';
 
-const exampleKey = 'simultaneous-cursors';
-const exampleTitle = 'Simultaneous Cursors';
+const exampleKey = 'vanilla-quill';
+const exampleTitle = 'Quill';
 
-const SimultaneousExampleView: NextPage = () => {
+const QuillExampleView: NextPage = () => {
   return (
     <ExampleLayout breadcrumbTitle={exampleTitle}>
       {() => (
         <>
-          <Head>
-            <title>{`${exampleTitle} · Yorkie Examples`}</title>
-          </Head>
           <Sidebar wide>
             <Sidebar.Tabs defaultTab="code">
               <Sidebar.Top>
@@ -32,22 +30,21 @@ const SimultaneousExampleView: NextPage = () => {
               <Sidebar.TabsPanel value="code">
                 <Sidebar.GuideTitle>{exampleTitle}</Sidebar.GuideTitle>
                 <Sidebar.GuideDescription>
-                  This demo shows the real-time collaborative version of simple drawing, cursor animation with{' '}
+                  This demo shows the real-time collaborative version of the{' '}
+                  <a href="https://quilljs.com/" className="link" target="_blank" rel="noreferrer">
+                    Quill
+                  </a>{' '}
+                  editor with{' '}
                   <a href="https://yorkie.dev/" className="link" target="_blank" rel="noreferrer">
                     Yorkie
                   </a>{' '}
                   and{' '}
-                  <a
-                    href="https://reactjs.org/docs/create-a-new-react-app.html"
-                    className="link"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    React
+                  <a href="https://vitejs.dev/" className="link" target="_blank" rel="noreferrer">
+                    Vite
                   </a>
                   .
                 </Sidebar.GuideDescription>
-                <ProjectCodes files={FILE_INFO} activeFile="/src/App.jsx" ignoreFiles={COMMON_IGNORE_FILES} />
+                <ProjectCodes files={FILE_INFO} activeFile="/src/main.ts" ignoreFiles={COMMON_IGNORE_FILES} />
               </Sidebar.TabsPanel>
               <Sidebar.Bottom codeURL={EXAMPLE_CODE_URL + exampleKey} />
             </Sidebar.Tabs>
@@ -63,4 +60,4 @@ const SimultaneousExampleView: NextPage = () => {
     </ExampleLayout>
   );
 };
-export default SimultaneousExampleView;
+export default QuillExampleView;

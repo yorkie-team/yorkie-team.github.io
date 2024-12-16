@@ -1,5 +1,6 @@
+'use client';
+
 import { NextPage } from 'next';
-import Head from 'next/head';
 import { ExampleLayout, CodeBlock } from '@/components';
 import {
   Sidebar,
@@ -20,9 +21,6 @@ const KanbanExampleView: NextPage = () => {
     <ExampleLayout breadcrumbTitle={exampleTitle}>
       {() => (
         <>
-          <Head>
-            <title>{`${exampleTitle} · Yorkie Examples`}</title>
-          </Head>
           <Sidebar wide>
             <Sidebar.Tabs defaultTab="code">
               <Sidebar.Top>

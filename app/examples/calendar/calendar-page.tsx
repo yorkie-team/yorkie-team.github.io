@@ -1,5 +1,6 @@
+'use client';
+
 import { NextPage } from 'next';
-import Head from 'next/head';
 import { ExampleLayout } from '@/components';
 import {
   Sidebar,
@@ -19,9 +20,6 @@ const CalendarExampleView: NextPage = () => {
     <ExampleLayout breadcrumbTitle={exampleTitle}>
       {() => (
         <>
-          <Head>
-            <title>{`${exampleTitle} · Yorkie Examples`}</title>
-          </Head>
           <Sidebar wide>
             <Sidebar.Tabs defaultTab="code">
               <Sidebar.Top>

@@ -1,16 +1,14 @@
+'use client';
+
 import { Button, Icon, Layout } from '@/components';
 import { ExampleThumbnailImage } from '@/components/exampleView';
 import ExampleBannerSVG from '@/public/assets/images/banner/img_example_banner.svg';
 import type { NextPage } from 'next';
-import Head from 'next/head';
 import Link from 'next/link';
 
 const Examples: NextPage = () => {
   return (
     <Layout className="examples_page">
-      <Head>
-        <title>Examples · Yorkie</title>
-      </Head>
       <div className="top_banner">
         <div className="top_banner_inner">
           <div className="title_group">

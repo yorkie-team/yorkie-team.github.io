@@ -1,6 +1,7 @@
+'use client';
+
 import { useState } from 'react';
 import type { NextPage } from 'next';
-import Head from 'next/head';
 import { ExampleLayout, Accordion, CodeBlock } from '@/components';
 import { Sidebar, FullView, ShowView, GridView, DualView } from '@/components/exampleView';
 
@@ -12,9 +13,6 @@ const ExamplesView: NextPage = () => {
     <ExampleLayout breadcrumbTitle="Creating Webtoons" viewTypes={['full', 'show', 'grid']} defaultViewType="show">
       {({ viewType }) => (
         <>
-          <Head>
-            <title>Creating Webtoons · Yorkie Examples</title>
-          </Head>
           <Sidebar defaultOpened={viewType !== 'full'}>
             <Sidebar.Tabs defaultTab="about" onTabChange={setActiveTab}>
               <Sidebar.Top>

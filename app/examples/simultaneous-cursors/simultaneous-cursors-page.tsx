@@ -1,26 +1,25 @@
+'use client';
+
+import { NextPage } from 'next';
 import { ExampleLayout } from '@/components';
 import {
+  Sidebar,
   BasicExampleView,
+  ProjectCodes,
   COMMON_IGNORE_FILES,
   EXAMPLE_CODE_URL,
   EXAMPLE_PREVIEW_URL,
-  ProjectCodes,
-  Sidebar,
 } from '@/components/exampleView';
-import { FILE_INFO } from '@/examples/react-todomvc/fileInfo';
-import { NextPage } from 'next';
-import Head from 'next/head';
+import { FILE_INFO } from '@/examples/simultaneous-cursors/fileInfo';
 
-const exampleKey = 'react-todomvc';
-const exampleTitle = 'TodoMVC';
-const TodoListExampleView: NextPage = () => {
+const exampleKey = 'simultaneous-cursors';
+const exampleTitle = 'Simultaneous Cursors';
+
+const SimultaneousExampleView: NextPage = () => {
   return (
     <ExampleLayout breadcrumbTitle={exampleTitle}>
       {() => (
         <>
-          <Head>
-            <title>{`${exampleTitle} · Yorkie Examples`}</title>
-          </Head>
           <Sidebar wide>
             <Sidebar.Tabs defaultTab="code">
               <Sidebar.Top>
@@ -31,31 +30,22 @@ const TodoListExampleView: NextPage = () => {
               <Sidebar.TabsPanel value="code">
                 <Sidebar.GuideTitle>{exampleTitle}</Sidebar.GuideTitle>
                 <Sidebar.GuideDescription>
-                  This is an example of real-time collaborative{' '}
-                  <a href="https://todomvc.com" className="link" target="_blank" rel="noreferrer">
-                    TodoMVC
+                  This demo shows the real-time collaborative version of simple drawing, cursor animation with{' '}
+                  <a href="https://yorkie.dev/" className="link" target="_blank" rel="noreferrer">
+                    Yorkie
                   </a>{' '}
-                  using{' '}
+                  and{' '}
                   <a
                     href="https://reactjs.org/docs/create-a-new-react-app.html"
                     className="link"
                     target="_blank"
                     rel="noreferrer"
                   >
-                    CreateReactApp
-                  </a>{' '}
-                  and{' '}
-                  <a
-                    href="https://github.com/yorkie-team/yorkie-js-sdk"
-                    className="link"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Yorkie JS SDK
+                    React
                   </a>
                   .
                 </Sidebar.GuideDescription>
-                <ProjectCodes files={FILE_INFO} activeFile="/src/App.tsx" ignoreFiles={COMMON_IGNORE_FILES} />
+                <ProjectCodes files={FILE_INFO} activeFile="/src/App.jsx" ignoreFiles={COMMON_IGNORE_FILES} />
               </Sidebar.TabsPanel>
               <Sidebar.Bottom codeURL={EXAMPLE_CODE_URL + exampleKey} />
             </Sidebar.Tabs>
@@ -71,5 +61,4 @@ const TodoListExampleView: NextPage = () => {
     </ExampleLayout>
   );
 };
-
-export default TodoListExampleView;
+export default SimultaneousExampleView;
