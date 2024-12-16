@@ -1,14 +1,10 @@
 import type { NextPage } from 'next';
-import Head from 'next/head';
 import { Button, Icon, Layout } from '@/components';
 import CommunitySVG from '@/public/assets/icons/community_help.svg';
 
 const Community: NextPage = () => {
   return (
     <Layout className="community_page">
-      <Head>
-        <title>Community · Yorkie</title>
-      </Head>
       <div className="content">
         <div className="img_box">
           <CommunitySVG />
