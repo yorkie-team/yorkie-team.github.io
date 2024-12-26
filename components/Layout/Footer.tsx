@@ -78,16 +78,20 @@ export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement
                   JS SDK
                 </Link>
               </li>
-              <li className="site_item">
-                <Link href="/docs/ios-sdk" className="link">
-                  iOS SDK
-                </Link>
-              </li>
-              <li className="site_item">
-                <Link href="/docs/android-sdk" className="link">
-                  Android SDK
-                </Link>
-              </li>
+              {process.env.NODE_ENV === 'development' && (
+                <>
+                  <li className="site_item">
+                    <Link href="/docs/ios-sdk" className="link">
+                      iOS SDK
+                    </Link>
+                  </li>
+                  <li className="site_item">
+                    <Link href="/docs/android-sdk" className="link">
+                      Android SDK
+                    </Link>
+                  </li>
+                </>
+              )}
             </ul>
           </div>
           <div className="site">
