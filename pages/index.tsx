@@ -323,14 +323,13 @@ const Home: NextPage = () => {
                   Is the Yorkie production ready?
                 </Accordion.Control>
                 <Accordion.Panel>
-                  No, Yorkie is not yet production ready. <br />
+                  Yes, Yorkie is ready to use in production. <br />
                   <br />
-                  While the CRDT algorithm has been verified, not all of the code has been fully battle-tested. The
-                  developers of the service currently estimate that the right time to use it in a production environment
-                  will be <b>around summer of &apos;24</b>. Until then, it is recommended to carefully evaluate the
-                  service&apos;s capabilities and reliability before using it in a production setting. It is also
-                  important to note that the availability and features of the service may change without notice, so it
-                  is always best to check the latest information on the service&apos;s website before using it.
+                  Yorkie has achieved production-ready status and is currently operating as a stable and reliable
+                  service. Its robustness has been thoroughly validated through extensive testing at NAVER, establishing
+                  it as a dependable solution for production environments. But it is not a guarantee that there will be
+                  no issues or bugs when using the service. If you encounter any problems while using Yorkie, please
+                  report them to the Yorkie community so that they can be addressed as quickly as possible.
                 </Accordion.Panel>
               </Accordion.Item>
               <Accordion.Item value="faq3">
