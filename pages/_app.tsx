@@ -37,21 +37,6 @@ function MyApp({ Component, pageProps }: AppProps) {
           content="Easily add collaboration to your apps with our API-based services."
         />
       </Head>
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `
-            (function () {
-              const theme = window.localStorage.getItem('theme') || 'system';
-              const isDarkMode = theme === 'dark' ||
-                (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-              if (isDarkMode) {
-                window.document.documentElement.classList.add('darkmode');
-                window.document.documentElement.style.colorScheme = 'dark';
-              }
-            })();
-          `,
-        }}
-      />
       <Script src="https://www.googletagmanager.com/gtag/js?id=G-7KXWLDH8CH" strategy="afterInteractive" />
       <Script id="google-analytics" strategy="afterInteractive">
         {`
