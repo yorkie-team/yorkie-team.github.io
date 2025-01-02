@@ -1,30 +1,33 @@
 import { useState, useEffect } from 'react';
 
 export type ThemeOption = 'system' | 'light' | 'dark';
+const applyTheme = (theme: 'light' | 'dark') => {
+  if (theme === 'light') {
+    window.document.documentElement.classList.remove('darkmode');
+    window.document.documentElement.style.colorScheme = 'light';
+  } else {
+    window.document.documentElement.classList.add('darkmode');
+    window.document.documentElement.style.colorScheme = 'dark';
+  }
+};
 export function useTheme(initialTheme?: ThemeOption) {
   const [theme, setTheme] = useState<ThemeOption | undefined>(initialTheme);
 
   useEffect(() => {
     const mediaQueryList = window.matchMedia('(prefers-color-scheme: dark)');
     const handleSystemThemeChange = (e: MediaQueryListEvent) => {
-      if (e.matches) {
-        window.document.body.classList.add('darkmode');
-      } else {
-        window.document.body.classList.remove('darkmode');
-      }
+      applyTheme(e.matches ? 'dark' : 'light');
     };
 
     if (theme === 'dark') {
-      window.document.body.classList.add('darkmode');
+      applyTheme('dark');
       window.localStorage.setItem('theme', 'dark');
     } else if (theme === 'light') {
-      window.document.body.classList.remove('darkmode');
+      applyTheme('light');
       window.localStorage.setItem('theme', 'light');
     } else if (theme === 'system') {
       window.localStorage.setItem('theme', 'system');
-      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        window.document.body.classList.add('darkmode');
-      }
+      applyTheme(mediaQueryList.matches ? 'dark' : 'light');
       mediaQueryList.addEventListener('change', handleSystemThemeChange);
     }
     return () => {
