@@ -233,8 +233,10 @@ Examples:
 yorkie project update name [options]
 
 Flags:
-      --auth-webhook-url string              authorization-webhook update url
-      --client-deactivate-threshold string   client deactivate threshold for housekeeping
+      --auth-webhook-method-add stringArray   authorization-webhook methods to add ('ALL' for all methods)
+      --auth-webhook-method-rm stringArray    authorization-webhook methods to remove ('ALL' for all methods)
+      --auth-webhook-url string               authorization-webhook update url
+      --client-deactivate-threshold string    client deactivate threshold for housekeeping
   -h, --help                                 help for update
       --name string                          new project name
 ```
@@ -247,11 +249,38 @@ $ yorkie project update test-project --name new-test-project
 ```
 
 You can configure the project's Auth Webhook URL using the `--auth-webhook-url` flag.  
-For more details on how Auth Webhook works, please refer to the [auth-webhook](/docs/auth-webhook).
 
 ```bash
 $ yorkie project update [name] --auth-webhook-url http://localhost:3000/auth-webhook
 ```
+
+You can add or remove webhook methods using the `--auth-webhook-method-add` and `--auth-webhook-method-rm` flags.
+When updating methods, remove operations are always processed before add operations.
+The `ALL` keyword represents all available webhook methods.
+
+Here are some examples of managing webhook methods:
+
+```bash
+# Add a single method
+$ yorkie project update [name] --auth-webhook-method-add PushPull
+
+# Remove a method
+$ yorkie project update [name] --auth-webhook-method-rm PushPull
+
+# Add all available webhook methods using ALL keyword
+$ yorkie project update [name] --auth-webhook-method-add ALL
+
+# Remove all webhook methods using ALL keyword
+$ yorkie project update [name] --auth-webhook-method-rm ALL
+
+# Add multiple specific methods
+$ yorkie project update [name] \
+  --auth-webhook-method-add ActivateClient \
+  --auth-webhook-method-add PushPull \
+  --auth-webhook-method-add WatchDocuments
+```
+
+For more details on how Auth Webhook works, please refer to the [auth-webhook](/docs/auth-webhook).
 
 ### Document
 
