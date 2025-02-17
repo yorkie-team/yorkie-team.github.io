@@ -45,6 +45,19 @@ const client = new yorkie.Client('{{API_ADDR}}', {
 });
 ```
 
+##### Measuring MAU
+
+You can measure MAU(Monthly Active Users) by setting the `userID` metadata when creating a client. The `userID` should be a unique identifier for each user.
+
+```javascript
+const client = new yorkie.Client('{{API_ADDR}}', {
+  apiKey: 'xxxxxxxxxxxxxxxxxxxx',
+  metadata: { userID: 'user-1234' },
+});
+```
+
+You can check the MAU in the [Dashboard]({{DASHBOARD_PATH}}) by selecting the project and clicking the `overview` tab.
+
 ##### Deactivate the Client
 
 When the client is no longer needed, you can deactivate it to release resources and disconnect from the server.
