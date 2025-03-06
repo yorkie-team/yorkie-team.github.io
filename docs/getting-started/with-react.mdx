@@ -85,7 +85,7 @@ function TodoList() {
 
   return (
     // ...
-      <button onClick={() => update((, presence) => presence.set({color: 'red'}))}>
+      <button onClick={() => update((root, presence) => presence.set({color: 'red'}))}>
         Update Presence
       </button>
     // ...

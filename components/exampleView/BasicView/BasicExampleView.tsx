@@ -1,7 +1,7 @@
 import { Icon } from '@/components';
 import classNames from 'classnames';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import yorkie from 'yorkie-js-sdk';
+import yorkie from '@yorkie-js/sdk';
 import UserContent from './UserContent';
 
 interface DocChangeInfo {

@@ -1,5 +1,5 @@
 const PROFILE_JS = `
-import yorkie from 'yorkie-js-sdk';
+import yorkie from '@yorkie-js/sdk';
 
 async function main() {
   const client = new yorkie.Client('${process.env.NEXT_PUBLIC_API_ADDR}', {
@@ -30,7 +30,7 @@ main();
 `;
 
 const CURSOR_JS = ` 
-import yorkie from 'yorkie-js-sdk';
+import yorkie from '@yorkie-js/sdk';
 
 async function main() {
   const client = new yorkie.Client('${process.env.NEXT_PUBLIC_API_ADDR}', {
