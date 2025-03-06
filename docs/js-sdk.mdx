@@ -617,7 +617,7 @@ doc.update((root) => {
 To use the Document more strictly, you can use [type variable](https://www.typescriptlang.org/docs/handbook/2/generics.html) in TypeScript when creating a Document.
 
 ```typescript
-import yorkie, { JSONArray } from 'yorkie-js-sdk';
+import yorkie, { JSONArray } from '@yorkie-js/sdk';
 type DocType = {
   list: JSONArray<number>;
   text: yorkie.Text;
@@ -646,7 +646,7 @@ doc.update((root, presence) => {
 The Logger outputs events occurring within the SDK to the console for debugging purposes. To modify these options, you can use the `setLogLevel` function.
 
 ```typescript
-import { setLogLevel, LogLevel } from 'yorkie-js-sdk';
+import { setLogLevel, LogLevel } from '@yorkie-js/sdk';
 
 setLogLevel(LogLevel.Error); // Display logs with Error or higher
 ```

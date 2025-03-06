@@ -1,0 +1,166 @@
+---
+title: 'with React'
+order: 22
+---
+
+## Getting Started with React
+
+[@yorkie-js/react](https://www.npmjs.com/package/@yorkie-js/react) is a library that provides React hooks and components for integrating Yorkie into your [React](https://react.dev) applications.
+ It simplifies the process of sharing and syncing state across multiple clients in real-time.
+
+`@yorkie-js/react` provides two ways to integrate Yorkie into your React applications:
+  1. `Providers + Hooks`: Provider-based approach for managing Yorkie instances and shared documents.
+  2. `useYorkieDoc`: Hook for directly managing Yorkie documents without a provider.
+
+Both `Providers + Hooks` and `useYorkieDoc` provide flexible ways to integrate Yorkie into your React applications.
+Choose `Providers` when you need a global document context and `useYorkieDoc` for isolated, self-managed instances.
+
+### Installation
+
+Before using `YorkieProvider` and `DocumentProvider`, ensure you have installed the Yorkie SDK:
+
+```sh
+npm install @yorkie-js/react
+```
+
+> For now, `@yorkie-js/react` requires React 18 or later as a peer dependency. Make sure to install React if you haven't already.
+> ```sh
+> $ npm install react react-dom
+> ```
+
+### Usage
+
+#### Setting up YorkieProvider and DocumentProvider
+
+First, wrap your component tree with `YorkieProvider` and `DocumentProvider` to initialize the Yorkie Client and shared document.
+You can also provide an initial root object to the `DocumentProvider` to set the initial state of the shared document.
+
+```tsx
+import { YorkieProvider, DocumentProvider } from '@yorkie-js/react';
+
+function App() {
+  return (
+    <YorkieProvider apiKey="PROJECT_API_KEY">
+      <DocumentProvider docKey="my-todo" initialRoot={{ todos: [] }}>
+        <TodoList />
+      </DocumentProvider>
+    </YorkieProvider>
+  );
+}
+```
+
+#### Accessing Document Data
+
+Use `useDocument`, `useRoot`, or `usePresences` hooks inside components to interact with the shared document.
+
+##### useDocument
+
+The `useDocument` hook provides access to the document's root object, presence data, update function, and loading/error states.
+
+```tsx
+import { useDocument } from '@yorkie-js/react';
+
+function TodoList() {
+  const { root, update, loading, error } = useDocument<{ todos: string[] }>();
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error.message}</p>;
+
+  return (
+    <div>
+      <ul>
+        {root.todos.map((todo, index) => (
+          <li key={index}>{todo}</li>
+        ))}
+      </ul>
+      <button onClick={() => update((root) => root.todos.push('New Task'))}>
+        Add Task
+      </button>
+    </div>
+  );
+}
+```
+
+You can also use the `update` function to modify the presence data:
+
+```tsx
+import { useDocument } from '@yorkie-js/react';
+
+function TodoList() {
+  // ...
+
+  return (
+    // ...
+      <button onClick={() => update((root, presence) => presence.set({color: 'red'}))}>
+        Update Presence
+      </button>
+    // ...
+  );
+}
+```
+
+##### useRoot
+
+If you only need the root object, use `useRoot`:
+
+```tsx
+import { useRoot } from '@yorkie-js/react';
+
+function RootViewer() {
+  const { root } = useRoot<{ todos: string[] }>();
+  return <pre>{JSON.stringify(root, null, 2)}</pre>;
+}
+```
+
+##### usePresences
+
+To get the presence data of connected users:
+
+```tsx
+import { usePresences } from '@yorkie-js/react';
+
+function PresenceList() {
+  const users = usePresences();
+  return (
+    <ul>
+      {users.map((user) => (
+        <li key={user.clientID}>{JSON.stringify(user.presence)}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+### Alternative Hook: useYorkieDoc
+
+If you prefer not to use `DocumentProvider`, you can use `useYorkieDoc`, which directly initializes and manages the document without requiring a provider.
+
+```tsx
+import { useYorkieDoc } from '@yorkie-js/react';
+
+function StandaloneTodoList() {
+  const { root, update, loading, error } = useYorkieDoc(
+    'PROJECT_API_KEY',
+    'DOC_KEY',
+    { todos: [] }
+  );
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error.message}</p>;
+
+  return (
+    <div>
+      <ul>
+        {root.todos.map((todo, index) => (
+          <li key={index}>{todo}</li>
+        ))}
+      </ul>
+      <button onClick={() => update((root) => root.todos.push('New Task'))}>Add Task</button>
+    </div>
+  );
+}
+```
+
+### For More Information
+
+- [React TodoMVC Example](https://github.com/yorkie-team/yorkie-js-sdk/tree/main/examples/react-todomvc)
