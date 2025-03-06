@@ -5,11 +5,12 @@ order: 22
 
 ## Getting Started with React
 
-[React](https://react.dev/) is a popular JavaScript library for building user interfaces. `@yorkie-js/react` is a library that provides React hooks and components for integrating Yorkie into your React applications. It simplifies the process of sharing and syncing state across multiple clients in real-time.
+[@yorkie-js/react](https://www.npmjs.com/package/@yorkie-js/react) is a library that provides React hooks and components for integrating Yorkie into your [React](https://react.dev) applications.
+ It simplifies the process of sharing and syncing state across multiple clients in real-time.
 
-`@yorkie-js/react` provides two main ways to integrate Yorkie into your React applications:
-  - `Providers + Hooks`: Provider-based approach for managing Yorkie instances and shared documents.
-  - `useYorkieDoc` hook for directly managing Yorkie documents without a provider.
+`@yorkie-js/react` provides two ways to integrate Yorkie into your React applications:
+  1. `Providers + Hooks`: Provider-based approach for managing Yorkie instances and shared documents.
+  2. `useYorkieDoc`: Hook for directly managing Yorkie documents without a provider.
 
 Both `Providers + Hooks` and `useYorkieDoc` provide flexible ways to integrate Yorkie into your React applications.
 Choose `Providers` when you need a global document context and `useYorkieDoc` for isolated, self-managed instances.
@@ -21,6 +22,11 @@ Before using `YorkieProvider` and `DocumentProvider`, ensure you have installed 
 ```sh
 npm install @yorkie-js/react
 ```
+
+> For now, `@yorkie-js/react` requires React 18 or later as a peer dependency. Make sure to install React if you haven't already.
+> ```sh
+> $ npm install react react-dom
+> ```
 
 ### Usage
 
