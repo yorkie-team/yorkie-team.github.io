@@ -2,7 +2,6 @@ import { ReactElement, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { Button, Icon } from '@/components';
-import { isValidToken } from '@/utils/isValidToken';
 import { MobileGnbDropdown } from './MobileGnbDropdown';
 import LogoSVG from '@/public/assets/icons/logo_horizontal_xs.svg';
 import LogoGnbSVG from '@/public/assets/icons/logo_gnb.svg';
@@ -12,8 +11,23 @@ export function Header(): ReactElement {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
 
   useEffect(() => {
-    const isLoggedIn = isValidToken(localStorage.getItem('token'));
-    setIsLoggedIn(isLoggedIn);
+    async function checkLoginStatus() {
+      try {
+        const resp = await fetch(`${process.env.NEXT_PUBLIC_API_ADDR}/auth/me`, {
+          credentials: 'include',
+        });
+
+        if (resp.ok) {
+          setIsLoggedIn(true);
+        } else {
+          setIsLoggedIn(false);
+        }
+      } catch (error) {
+        console.error('Failed to check login status:', error);
+        setIsLoggedIn(false);
+      }
+    }
+    checkLoginStatus();
   }, [setIsLoggedIn]);
 
   return (
