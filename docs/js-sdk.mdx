@@ -492,6 +492,40 @@ const unsubscribe = doc.subscribe('all', (transactionEvent) => {
 });
 ```
 
+#### Broadcasting a Message
+
+Broadcasting allows clients to share custom events with other clients connected to the same document. Unlike document updates or presence changes, broadcasts are ephemeral messages that are not persisted in the document's state.
+
+```javascript
+// Broadcasting a message
+const payload = { message: 'Hello everyone!' };
+doc.broadcast('chat', payload);
+
+// Subscribing to broadcast messages
+doc.subscribe('broadcast', (event) => {
+  const { topic, payload, clientID } = event.value;
+  
+  if (topic === 'chat') {
+    console.log(`Message from ${clientID}: ${payload.message}`);
+  }
+});
+```
+
+The broadcast event contains:
+- `topic`: A string identifying the type of broadcast message
+- `payload`: The data being broadcast (must be JSON serializable)
+- `clientID`: The ID of the client that sent the broadcast
+
+This feature is useful for sending temporary messages or signals between clients, such as:
+- Chat messages
+- Cursor movement notifications 
+- Application-specific events
+- User action notifications
+
+<Alert status="warning">
+Broadcast messages are not persisted and are only delivered to clients currently connected to the document. Clients that connect later will not receive previous broadcast messages.
+</Alert>
+
 #### Changing Synchronization Mode
 
 To change the synchronization mode for a document, you can use `client.changeSyncMode(doc, syncMode)`.
