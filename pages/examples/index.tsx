@@ -168,9 +168,18 @@ const Examples: NextPage = () => {
                 </div>
                 <div className="grid_card_info">
                   <strong className="title">TodoMVC</strong>
-                  <p className="desc">
-                    This is an example of real-time collaborative TodoMVC using CreateReactApp and Yorkie JS SDK.
-                  </p>
+                  <p className="desc">This is an example of real-time collaborative TodoMVC using Yorkie React.</p>
+                </div>
+              </Link>
+            </li>
+            <li className="grid_item">
+              <Link href="/examples/react-flow" className="grid_card">
+                <div className="grid_thumbnail">
+                  <ExampleThumbnailImage fileName="react-flow.png" alt="react-flow" />
+                </div>
+                <div className="grid_card_info">
+                  <strong className="title">React Flow</strong>
+                  <p className="desc">This is an example of real-time collaborative React Flow using Yorkie React.</p>
                 </div>
               </Link>
             </li>
