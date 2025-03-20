@@ -2,6 +2,7 @@ import { ReactElement } from 'react';
 import Link from 'next/link';
 import LogoSVG from '@/public/assets/icons/logo_horizontal_s.svg';
 import { ThemeDropdown } from './ThemeDropdown';
+import { CATEGORY_CONFIG } from '@/pages/examples';
 
 const fullYear = new Date(process.env.NEXT_PUBLIC_BUILT_AT!).getFullYear();
 export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement {
@@ -101,36 +102,13 @@ export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement
               </Link>
             </strong>
             <ul className="site_list">
-              <li className="site_item">
-                <Link href="/examples/kanban" className="link">
-                  Kanban Board
-                </Link>
-              </li>
-              <li className="site_item">
-                <Link href="/examples/profile-stack" className="link">
-                  Profile Stack
-                </Link>
-              </li>
-              <li className="site_item">
-                <Link href="/examples/todomvc" className="link">
-                  TodoMVC
-                </Link>
-              </li>
-              <li className="site_item">
-                <Link href="/examples/codemirror" className="link">
-                  CodeMirror
-                </Link>
-              </li>
-              <li className="site_item">
-                <Link href="/examples/tldraw" className="link">
-                  tldraw
-                </Link>
-              </li>
-              <li className="site_item">
-                <Link href="/examples/quill" className="link">
-                  Quill
-                </Link>
-              </li>
+              {CATEGORY_CONFIG.map(({ id, label }) => (
+                <li key={id} className="site_item">
+                  <Link href={`/examples?category=${id}`} className="link">
+                    {label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
           <div className="site">

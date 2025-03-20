@@ -61,14 +61,15 @@
     color: var(--gray-800);
     text-align: start;
     word-break: break-all;
+    cursor: pointer;
+
+    &:hover {
+      background: var(--orange-alpha-light);
+    }
 
     &.is_active {
       border: 1px solid var(--orange-0);
       background: var(--orange-alpha-light);
-
-      .icon {
-        margin-right: variables.$spacing_8;
-      }
     }
 
     &.add_icon {
@@ -86,7 +87,7 @@
     }
 
     .icon {
-      margin-right: variables.$spacing_8;
+      margin-right: 10px;
     }
   }
 

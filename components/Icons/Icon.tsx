@@ -41,6 +41,9 @@ import CloudSVG from '@/public/assets/icons/icon_cloud_orange.svg';
 import FolderSVG from '@/public/assets/icons/icon_folder.svg';
 import FolderOpenSVG from '@/public/assets/icons/icon_folder_open.svg';
 import FileSVG from '@/public/assets/icons/icon_file.svg';
+import TextInputSVG from '@/public/assets/icons/icon_text_input.svg';
+import TransformSVG from '@/public/assets/icons/icon_transform.svg';
+import ReactLogoSVG from '@/public/assets/icons/icon_react_logo.svg';
 
 const svgMap = {
   star: <StarSVG />,
@@ -84,6 +87,9 @@ const svgMap = {
   folderClose: <FolderSVG />,
   folderOpen: <FolderOpenSVG />,
   file: <FileSVG />,
+  textInput: <TextInputSVG />,
+  transform: <TransformSVG />,
+  reactLogo: <ReactLogoSVG />,
 };
 type SVGType = keyof typeof svgMap;
 
