@@ -1,11 +1,123 @@
-import { Button, Icon, Layout } from '@/components';
+import { Button, Icon, Layout, Popover } from '@/components';
 import { ExampleThumbnailImage } from '@/components/exampleView';
 import ExampleBannerSVG from '@/public/assets/images/banner/img_example_banner.svg';
+import { useState } from 'react';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
+
+const CATEGORIES = {
+  ALL: 'all',
+  PRESENCE: 'presence',
+  EDITOR: 'editor',
+  CANVAS_TOOL: 'canvas-tool',
+  PRODUCTIVITY: 'productivity',
+  REACT: 'react-provider',
+} as const;
+const CATEGORY_CONFIG = [
+  { id: CATEGORIES.ALL, label: 'All examples', icon: 'diamond' },
+  { id: CATEGORIES.PRESENCE, label: 'Presence', icon: 'messageSmile' },
+  { id: CATEGORIES.EDITOR, label: 'Editor', icon: 'textInput' },
+  { id: CATEGORIES.CANVAS_TOOL, label: 'Canvas Tool', icon: 'transform' },
+  { id: CATEGORIES.PRODUCTIVITY, label: 'Productivity', icon: 'checkCircle' },
+  { id: CATEGORIES.REACT, label: 'React Provider', icon: 'reactLogo' },
+] as const;
+type CategoryType = (typeof CATEGORIES)[keyof typeof CATEGORIES];
+type Example = {
+  id: string;
+  title: string;
+  desc: string;
+  thumbnail: string;
+  category: CategoryType[];
+};
+const EXAMPLES: Example[] = [
+  {
+    id: 'profile-stack',
+    title: 'Profile Stack',
+    desc: 'Profile stack shows the list of users currently accessing the Document.',
+    thumbnail: 'profile-stack.jpg',
+    category: [CATEGORIES.PRESENCE],
+  },
+  {
+    id: 'simultaneous-cursors',
+    title: 'Simultaneous Cursors',
+    desc: 'This demo shows the real-time collaborative version of simple drawing, cursor animation with Yorkie and React.',
+    thumbnail: 'simultaneous-cursors.jpg',
+    category: [CATEGORIES.PRESENCE],
+  },
+  {
+    id: 'kanban',
+    title: 'Kanban Board',
+    desc: 'Kanban Board is a tool for managing tasks and workflow. It is a visual way to manage tasks and workflow.',
+    thumbnail: 'vuejs-kanban.jpg',
+    category: [CATEGORIES.PRODUCTIVITY],
+  },
+  {
+    id: 'todomvc',
+    title: 'TodoMVC',
+    desc: 'This is an example of real-time collaborative TodoMVC using Yorkie React.',
+    thumbnail: 'react-todomvc.jpg',
+    category: [CATEGORIES.PRODUCTIVITY, CATEGORIES.REACT],
+  },
+  {
+    id: 'react-flow',
+    title: 'React Flow',
+    desc: 'This is an example of real-time collaborative React Flow using Yorkie React.',
+    thumbnail: 'react-flow.png',
+    category: [CATEGORIES.CANVAS_TOOL, CATEGORIES.REACT],
+  },
+  {
+    id: 'codemirror',
+    title: 'CodeMirror',
+    desc: 'This is a real-time collaborative version of the CodeMirror editor. It uses the Text, a custom CRDT type from Yorkie.',
+    thumbnail: 'vanilla-codemirror6.jpg',
+    category: [CATEGORIES.EDITOR],
+  },
+  {
+    id: 'tldraw',
+    title: 'tldraw',
+    desc: 'This is a real-time collaboration example of the tldraw whiteboard editor with Yorkie.',
+    thumbnail: 'react-tldraw.jpg',
+    category: [CATEGORIES.CANVAS_TOOL],
+  },
+  {
+    id: 'quill',
+    title: 'Quill',
+    desc: 'This demo shows the real-time collaborative version of the Quill editor with Yorkie and Vite.',
+    thumbnail: 'vanilla-quill.jpg',
+    category: [CATEGORIES.EDITOR],
+  },
+  {
+    id: 'calendar',
+    title: 'Calendar',
+    desc: 'This demo shows the real-time collaborative version of the Calendar with Yorkie and Next.js.',
+    thumbnail: 'nextjs-scheduler.jpg',
+    category: [CATEGORIES.PRODUCTIVITY],
+  },
+];
 
 const Examples: NextPage = () => {
+  const [mobileFilterOpened, setMobileFilterOpened] = useState(false);
+  const router = useRouter();
+  const currentCategory = (router.query.category as CategoryType) || CATEGORIES.ALL;
+
+  const filteredExamples =
+    currentCategory === CATEGORIES.ALL
+      ? EXAMPLES
+      : EXAMPLES.filter((example) => example.category.includes(currentCategory));
+
+  const handleCategoryChange = (category: string) => {
+    router.push(
+      {
+        pathname: '/examples',
+        query: { category },
+      },
+      undefined,
+      { shallow: true },
+    );
+  };
+
   return (
     <Layout className="examples_page">
       <Head>
@@ -41,216 +153,70 @@ const Examples: NextPage = () => {
         <div className="content_inner">
           <nav className="navigator">
             <ul className="navigator_list">
-              <li className="navigator_group is_active ">
-                <a className="navigator_item add_icon">
-                  <Icon type="diamond" />
-                  All examples
-                </a>
-              </li>
-              {/*
-              <li className="navigator_group  ">
-                <a className="navigator_item add_icon">
-                  <Icon type="tool" />
-                  Basic tools
-                </a>
-              </li>
-              <li className="navigator_group  ">
-                <a className="navigator_item add_icon">
-                  <Icon type="messageSmile" />
-                  Communication
-                </a>
-              </li>
-              <li className="navigator_group  ">
-                <a className="navigator_item add_icon">
-                  <Icon type="checkCircle" />
-                  Productivity
-                </a>
-              </li>
-              <li className="navigator_group  ">
-                <a className="navigator_item add_icon">
-                  <Icon type="scenario" />
-                  Scenario examples
-                </a>
-              </li>
-                */}
+              {CATEGORY_CONFIG.map(({ id, label, icon }) => (
+                <li key={id} className="navigator_group">
+                  <a
+                    className={`navigator_item add_icon ${id === currentCategory ? 'is_active' : ''}`}
+                    onClick={() => handleCategoryChange(id)}
+                  >
+                    <Icon type={icon} />
+                    {label}
+                  </a>
+                </li>
+              ))}
             </ul>
           </nav>
           <div className="filter">
-            <ul className="filter_list">
-              <li className="filter_item">
-                <button type="button" className="btn btn_small filter_desc">
-                  <span className="filter_title">Examples:</span>
-                  <span className="text">All examples</span>
-                  <Icon type="scenario" className="icon_arrow" />
-                </button>
-                <div className="dropdown " style={{ display: 'none' }}>
-                  <ul className="dropdown_list">
-                    <li className="dropdown_item">
-                      <a href="#" className="dropdown_menu">
-                        <span className="icon orange_0">
-                          <svg
-                            width="12"
-                            height="12"
-                            viewBox="0 0 12 12"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              clipRule="evenodd"
-                              d="M10.3536 2.64645C10.5488 2.84171 10.5488 3.15829 10.3536 3.35355L4.85355 8.85355C4.65829 9.04882 4.34171 9.04882 4.14645 8.85355L1.64645 6.35355C1.45118 6.15829 1.45118 5.84171 1.64645 5.64645C1.84171 5.45118 2.15829 5.45118 2.35355 5.64645L4.5 7.79289L9.64645 2.64645C9.84171 2.45118 10.1583 2.45118 10.3536 2.64645Z"
-                              fill="#23C176"
-                            ></path>
-                          </svg>
-                        </span>
-                        <span className="dropdown_text">All examples</span>
-                      </a>
-                    </li>
-                    <li className="dropdown_item">
-                      <a href="#" className="dropdown_menu">
-                        <span className="icon orange_0"></span>
-                        <span className="dropdown_text">Basic tools</span>
-                      </a>
-                    </li>
-                    <li className="dropdown_item">
-                      <a href="#" className="dropdown_menu">
-                        <span className="icon orange_0"></span>
-                        <span className="dropdown_text">Communication</span>
-                      </a>
-                    </li>
-                    <li className="dropdown_item">
-                      <a href="#" className="dropdown_menu">
-                        <span className="icon orange_0"></span>
-                        <span className="dropdown_text">Productivity</span>
-                      </a>
-                    </li>
-                    <li className="dropdown_item">
-                      <a href="#" className="dropdown_menu">
-                        <span className="icon orange_0"></span>
-                        <span className="dropdown_text">Scenario examples</span>
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-              </li>
-            </ul>
+            <Popover opened={mobileFilterOpened} onChange={setMobileFilterOpened}>
+              <ul className="filter_list">
+                <li className="filter_item">
+                  <Popover.Target>
+                    <button type="button" className="btn btn_small filter_desc">
+                      <span className="filter_title">Examples:</span>
+                      <span className="text">{CATEGORY_CONFIG.find((c) => c.id === currentCategory)?.label}</span>
+                      <Icon type="arrow" className="icon_arrow" />
+                    </button>
+                  </Popover.Target>
+                  <Popover.Dropdown>
+                    <div className="dropdown">
+                      <ul className="dropdown_list">
+                        {CATEGORY_CONFIG.map(({ id, label }) => (
+                          <li key={id} className="dropdown_item">
+                            <a
+                              className="dropdown_menu"
+                              onClick={() => {
+                                handleCategoryChange(id);
+                                setMobileFilterOpened(false);
+                              }}
+                            >
+                              <span className={`icon orange_0 ${id === currentCategory ? 'with-check' : ''}`}>
+                                {id === currentCategory && <Icon type="check" />}
+                              </span>
+                              <span className="dropdown_text">{label}</span>
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </Popover.Dropdown>
+                </li>
+              </ul>
+            </Popover>
           </div>
           <ul className="grid_list">
-            <li className="grid_item">
-              <Link href="/examples/profile-stack" className="grid_card">
-                <div className="grid_thumbnail">
-                  <ExampleThumbnailImage fileName="profile-stack.jpg" alt="profile-stack" />
-                </div>
-                <div className="grid_card_info">
-                  <strong className="title">Profile Stack</strong>
-                  <p className="desc">Profile stack shows the list of users currently accessing the Document.</p>
-                </div>
-              </Link>
-            </li>
-            <li className="grid_item">
-              <Link href="/examples/kanban" className="grid_card">
-                <div className="grid_thumbnail">
-                  <ExampleThumbnailImage fileName="vuejs-kanban.jpg" alt="vuejs-kanban" />
-                </div>
-                <div className="grid_card_info">
-                  <strong className="title">Kanban Board</strong>
-                  <p className="desc">
-                    Kanban Board is a tool for managing tasks and workflow. It is a visual way to manage tasks and
-                    workflow.
-                  </p>
-                </div>
-              </Link>
-            </li>
-            <li className="grid_item">
-              <Link href="/examples/todomvc" className="grid_card">
-                <div className="grid_thumbnail">
-                  <ExampleThumbnailImage fileName="react-todomvc.jpg" alt="react-todomvc" />
-                </div>
-                <div className="grid_card_info">
-                  <strong className="title">TodoMVC</strong>
-                  <p className="desc">This is an example of real-time collaborative TodoMVC using Yorkie React.</p>
-                </div>
-              </Link>
-            </li>
-            <li className="grid_item">
-              <Link href="/examples/react-flow" className="grid_card">
-                <div className="grid_thumbnail">
-                  <ExampleThumbnailImage fileName="react-flow.png" alt="react-flow" />
-                </div>
-                <div className="grid_card_info">
-                  <strong className="title">React Flow</strong>
-                  <p className="desc">This is an example of real-time collaborative React Flow using Yorkie React.</p>
-                </div>
-              </Link>
-            </li>
-            <li className="grid_item">
-              <Link href="/examples/codemirror" className="grid_card">
-                <div className="grid_thumbnail">
-                  <ExampleThumbnailImage fileName="vanilla-codemirror6.jpg" alt="vanilla-codemirror6" />
-                </div>
-                <div className="grid_card_info">
-                  <strong className="title">CodeMirror</strong>
-                  <p className="desc">
-                    This is a real-time collaborative version of the CodeMirror editor. It uses the Text, a custom CRDT
-                    type from Yorkie.
-                  </p>
-                </div>
-              </Link>
-            </li>
-            <li className="grid_item">
-              <Link href="/examples/tldraw" className="grid_card">
-                <div className="grid_thumbnail">
-                  <ExampleThumbnailImage fileName="react-tldraw.jpg" alt="react-tldraw" />
-                </div>
-                <div className="grid_card_info">
-                  <strong className="title">tldraw</strong>
-                  <p className="desc">
-                    This is a real-time collaboration example of the tldraw whiteboard editor with CreateReactApp and
-                    Yorkie JS SDK
-                  </p>
-                </div>
-              </Link>
-            </li>
-            <li className="grid_item">
-              <Link href="/examples/quill" className="grid_card">
-                <div className="grid_thumbnail">
-                  <ExampleThumbnailImage fileName="vanilla-quill.jpg" alt="vanilla-quill" />
-                </div>
-                <div className="grid_card_info">
-                  <strong className="title">Quill</strong>
-                  <p className="desc">
-                    This demo shows the real-time collaborative version of the Quill editor with Yorkie and Vite.
-                  </p>
-                </div>
-              </Link>
-            </li>
-            <li className="grid_item">
-              <Link href="/examples/calendar" className="grid_card">
-                <div className="grid_thumbnail">
-                  <ExampleThumbnailImage fileName="nextjs-scheduler.jpg" alt="nextjs-scheudler" />
-                </div>
-                <div className="grid_card_info">
-                  <strong className="title">Calendar</strong>
-                  <p className="desc">
-                    This demo shows the real-time collaborative version of the Calendar with Yorkie and Next.js.
-                  </p>
-                </div>
-              </Link>
-            </li>
-            <li className="grid_item">
-              <Link href="/examples/simultaneous-cursors" className="grid_card">
-                <div className="grid_thumbnail">
-                  <ExampleThumbnailImage fileName="simultaneous-cursors.jpg" alt="simultaneous-cursors" />
-                </div>
-                <div className="grid_card_info">
-                  <strong className="title">Simultaneous Cursors</strong>
-                  <p className="desc">
-                    This demo shows the real-time collaborative version of simple drawing, cursor animation with Yorkie
-                    and React.
-                  </p>
-                </div>
-              </Link>
-            </li>
+            {filteredExamples.map(({ id, title, desc, thumbnail }) => (
+              <li key={id} className="grid_item">
+                <Link href={`/examples/${id}`} className="grid_card">
+                  <div className="grid_thumbnail">
+                    <ExampleThumbnailImage fileName={thumbnail} alt={id} />
+                  </div>
+                  <div className="grid_card_info">
+                    <strong className="title">{title}</strong>
+                    <p className="desc">{desc}</p>
+                  </div>
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
       </div>
