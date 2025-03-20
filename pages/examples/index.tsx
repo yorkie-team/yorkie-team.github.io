@@ -15,7 +15,7 @@ const CATEGORIES = {
   PRODUCTIVITY: 'productivity',
   REACT: 'react-provider',
 } as const;
-const CATEGORY_CONFIG = [
+export const CATEGORY_CONFIG = [
   { id: CATEGORIES.ALL, label: 'All examples', icon: 'diamond' },
   { id: CATEGORIES.PRESENCE, label: 'Presence', icon: 'messageSmile' },
   { id: CATEGORIES.EDITOR, label: 'Editor', icon: 'textInput' },
