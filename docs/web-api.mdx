@@ -1,0 +1,255 @@
+---
+title: 'Web API'
+order: 90
+---
+
+## AdminService Web API
+
+Yorkie AdminService Web API allows developers to interact programmatically with their Yorkie documents without using Yorkie SDK. It is convinient for managing documents in server-side applications.
+
+The API is implemented using [Connect protocol](https://connectrpc.com/docs/protocol/), which means all requests are made using HTTP POST method to a specific service endpoint. The API accepts JSON-encoded request bodies, returns JSON-encoded responses, and uses standard HTTP response codes.
+
+**Base URL**: `https://api.yorkie.dev/yorkie.v1.AdminService/`
+
+### Authentication
+
+For APIs that require authentication, you need to add your Project SecretKey to the request's authorization header.
+
+```bash
+curl 'https://api.yorkie.dev/yorkie.v1.AdminService/ListProjects' \
+  -H 'content-type: application/json' \
+  -H 'authorization: PROJECT_SECRET_KEY' \
+  --data-raw '{}'
+```
+
+### Documents Manement
+
+#### POST /yorkie.v1.AdminService/ListDocuments
+
+This endpoint returns a list of documents in a project. There is a pagination mechanism to retrieve documents in batches.
+You can provide the `previous_id` of the last document in the previous page to get the next page of documents.
+
+If you want to get the snapshot of the document, you can set the `include_snapshot` parameter to `true`.
+
+##### Request
+
+Parameters:
+- `project_name`: The name of the project.
+- `previous_id`: The ID of the last document in the previous page. If not provided, the first page will be returned.
+- `page_size`: The number of documents to return.
+- `is_forward`: Whether to return documents in ascending order.
+- `include_snapshot`: Whether to include snapshots in the response.
+
+```bash
+curl 'https://api.yorkie.dev/yorkie.v1.AdminService/ListDocuments' \
+  -H 'content-type: application/json' \
+  -H 'authorization: PROJECT_SECRET_KEY' \
+  --data-raw '{
+    "project_name": "my-project",
+    "previous_id": "doc_last_id",
+    "page_size": 20,
+    "is_forward": true,
+    "include_snapshot": false
+  }'
+```
+
+##### Response
+```json
+{
+  "documents": [
+    {
+      "id": "doc_12345",
+      "key": "document-1",
+      "project_name": "my-project",
+      "created_at": "2025-03-24T12:00:00.000Z",
+      "updated_at": "2025-03-24T13:00:00.000Z",
+      "snapshot": "..."
+    },
+    {
+      "id": "doc_67890",
+      "key": "document-2",
+      "project_name": "my-project",
+      "created_at": "2025-03-23T10:00:00.000Z",
+      "updated_at": "2025-03-24T09:30:00.000Z",
+      "snapshot": "..."
+    }
+  ]
+}
+```
+
+#### POST /yorkie.v1.AdminService/GetDocument
+
+This endpoint returns a document by its key.
+
+##### Request
+
+Parameters:
+- `project_name`: The name of the project.
+- `document_key`: The key of the document.
+
+```bash
+curl 'https://api.yorkie.dev/yorkie.v1.AdminService/GetDocument' \
+  -H 'content-type: application/json' \
+  -H 'authorization: PROJECT_SECRET_KEY' \
+  --data-raw '{
+    "project_name": "my-project",
+    "document_key": "document-1"
+  }'
+```
+
+##### Response
+```json
+{
+  "document": {
+    "id": "doc_12345",
+    "key": "document-1",
+    "project_name": "my-project",
+    "created_at": "2025-03-24T12:00:00.000Z",
+    "updated_at": "2025-03-24T13:00:00.000Z"
+  }
+}
+```
+
+#### POST /yorkie.v1.AdminService/GetDocuments
+
+Get multiple documents by their keys.
+
+##### Request
+
+Parameters:
+- `project_name`: The name of the project.
+- `document_keys`: An array of document keys.
+- `include_snapshot`: Whether to include snapshots in the response.
+
+```bash
+curl 'https://api.yorkie.dev/yorkie.v1.AdminService/GetDocuments' \
+  -H 'content-type: application/json' \
+  -H 'authorization: PROJECT_SECRET_KEY' \
+  --data-raw '{
+    "project_name": "my-project",
+    "document_keys": ["document-1", "document-2"],
+    "include_snapshot": false
+  }'
+```
+
+##### Response
+```json
+{
+  "documents": [
+    {
+      "id": "doc_12345",
+      "key": "document-1",
+      "project_name": "my-project",
+      "created_at": "2025-03-24T12:00:00.000Z",
+      "updated_at": "2025-03-24T13:00:00.000Z"
+    },
+    {
+      "id": "doc_67890",
+      "key": "document-2",
+      "project_name": "my-project",
+      "created_at": "2025-03-23T10:00:00.000Z",
+      "updated_at": "2025-03-24T09:30:00.000Z"
+    }
+  ]
+}
+```
+
+#### POST /yorkie.v1.AdminService/RemoveDocumentByAdmin
+
+Remove a document.
+
+- `project_name`: The name of the project.
+- `document_key`: The key of the document.
+- `force`: Whether to force remove the document event if they are attached to clients.
+
+##### Request
+```bash
+curl 'https://api.yorkie.dev/yorkie.v1.AdminService/RemoveDocumentByAdmin' \
+  -H 'content-type: application/json' \
+  -H 'authorization: PROJECT_SECRET_KEY' \
+  --data-raw '{
+    "project_name": "my-project",
+    "document_key": "document-1",
+    "force": false
+  }'
+```
+
+##### Response
+Empty response with success status code.
+
+#### POST /yorkie.v1.AdminService/GetSnapshotMeta
+Get snapshot metadata for a document.
+
+##### Request
+
+Parameters:
+- `project_name`: The name of the project.
+- `document_key`: The key of the document.
+- `server_seq`: The server sequence number of the snapshot.
+
+```bash
+curl 'https://api.yorkie.dev/yorkie.v1.AdminService/GetSnapshotMeta' \
+  -H 'content-type: application/json' \
+  -H 'authorization: PROJECT_SECRET_KEY' \
+  --data-raw '{
+    "project_name": "my-project",
+    "document_key": "document-1",
+    "server_seq": 42
+  }'
+```
+
+##### Response
+```json
+{
+  "snapshot": "base64-encoded-snapshot-data",
+  "lamport": 42,
+  "version_vector": {
+    "client1": 5,
+    "client2": 3
+  }
+}
+```
+
+#### POST /yorkie.v1.AdminService/SearchDocuments
+Search for documents in a project.
+
+##### Request
+
+Parameters:
+- `project_name`: The name of the project.
+- `query`: The prefix of the document key to search for.
+- `page_size`: The number of documents to return.
+
+```bash
+curl 'https://api.yorkie.dev/yorkie.v1.AdminService/SearchDocuments' \
+  -H 'content-type: application/json' \
+  -H 'authorization: PROJECT_SECRET_KEY' \
+  --data-raw '{
+    "project_name": "my-project",
+    "query": "search term",
+    "page_size": 20
+  }'
+```
+
+##### Response
+```json
+{
+  "total_count": 5,
+  "documents": [
+    {
+      "id": "doc_12345",
+      "key": "document-1",
+      "project_name": "my-project",
+      "created_at": "2025-03-24T12:00:00.000Z",
+      "updated_at": "2025-03-24T13:00:00.000Z"
+    },
+    {
+      "id": "doc_67890",
+      "key": "document-2",
+      "project_name": "my-project",
+      "created_at": "2025-03-23T10:00:00.000Z",
+      "updated_at": "2025-03-24T09:30:00.000Z"
+    }
+  ]
+}
+```
