@@ -61,6 +61,13 @@ const EXAMPLES: Example[] = [
     category: [CATEGORIES.PRODUCTIVITY, CATEGORIES.REACT],
   },
   {
+    id: 'todolist',
+    title: 'Todo List',
+    desc: 'This is an example of real-time collaborative todo list using Yorkie React.',
+    thumbnail: 'nextjs-todolist.jpg',
+    category: [CATEGORIES.PRODUCTIVITY, CATEGORIES.REACT],
+  },
+  {
     id: 'react-flow',
     title: 'React Flow',
     desc: 'This is an example of real-time collaborative React Flow using Yorkie React.',
