@@ -178,10 +178,13 @@ const Products: NextPage = () => {
                 <strong className="product_card_title">Size optimization</strong>
                 <p className="product_card_desc">
                   Yorkie uses{' '}
-                  <a href="https://github.com/yorkie-team/yorkie/blob/main/design/garbage-collection.md" className="link">
+                  <a
+                    href="https://github.com/yorkie-team/yorkie/blob/main/design/garbage-collection.md"
+                    className="link"
+                  >
                     Garbage Collection
-                  </a>
-                  {' '}and{' '}
+                  </a>{' '}
+                  and{' '}
                   <a href="https://en.wikipedia.org/wiki/Lamport_timestamp" className="link">
                     Lamport timestamps
                   </a>{' '}
@@ -191,7 +194,7 @@ const Products: NextPage = () => {
               <li className="product_card_item">
                 <strong className="product_card_title">Security</strong>
                 <p className="product_card_desc">
-                  <Link href="/docs/cli#auth-webhook" className="link">
+                  <Link href="/docs/security#auth-webhook" className="link">
                     Auth Webhook
                   </Link>{' '}
                   allows users to verify the authorization of clients to access documents from an external service.
