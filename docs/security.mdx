@@ -1,0 +1,131 @@
+---
+title: 'Security'
+order: 80
+---
+
+## Security
+
+### Allowed Origins
+
+By default, Yorkie allows requests from any origin. To enhance security, you can restrict access to specific domains by configuring the allowed origins.
+
+Each project in Yorkie can have its own allowed origins settings, which can be managed through the [Dashboard]({{DASHBOARD_PATH}}).
+
+<Alert status="warning"> Allowed origins settings are project-specific and may take up to **10 minutes** to be applied due to caching. </Alert>
+
+#### Configuring Allowed Origins
+
+1. Open the Project Settings page in the Dashboard.
+1. Navigate to the Security section.
+1. Specify the domains that should be allowed to access your Yorkie server.
+
+<Image alt="setting allowed-origins" src="/assets/images/docs/allowed-origins-dashboard.png" width={1300} height={640} style={{ maxWidth: '1000px' }} />
+
+### Auth Webhook
+
+The Auth Webhook provides fine-grained access control by validating client requests through an external authentication server. This allows you to enforce custom authorization logic, ensuring that only authorized users can access and modify Yorkie documents.
+
+```
+(5) Response            (4) Handle request
+     ┌─────────────────┐  ┌──┐
+     │                 │  │  │   (3) Response
+     ▼                 │  ▼  │    - allowed
+ ┌──────┐             ┌┴─────┤    - reason   ┌───────────────┐
+ │Client├────────────►│Server│◄──────────────┤External Server│
+ └──────┘ (1)Request  └────┬─┘               └───────────────┘
+           - token         │                      ▲
+           - dockey        └──────────────────────┘
+                               (2) Call webhook
+                                - token
+                                - dockey
+                                - verb: r or rw
+```
+
+The authentication process follows these steps:
+
+1. The client sends a request with an authentication token.
+1. The Yorkie server forwards the request details to the webhook server.
+1. The webhook server validates the request and sends a response.
+1. Based on the webhook response, Yorkie either processes or rejects the request.
+1. The final response is sent back to the client.
+
+#### Setup and Configuration
+
+##### 1. Configure the Auth Webhook
+
+You can easily set up the Auth Webhook via the the [Dashboard]({{DASHBOARD_PATH}}):
+- Go to the Project Settings page.
+- Set the webhook URL and define which methods require authentication.
+
+<Image alt="setting auth-webhook" src="/assets/images/docs/auth-webhook-dashboard.png" width={1300} height={840} style={{ maxWidth: '1000px' }} />
+
+Alternatively, you can configure the webhook using the Yorkie CLI. See updating the project for details. Refer to the [updating the project](/docs/cli#updating-the-project).
+
+<Alert status="warning"> Changes to the configuration may take up to 10 minutes to take effect. </Alert>
+
+##### 2. Client Configuration
+
+To provide authentication tokens dynamically, use the `authTokenInjector` option when creating a Yorkie client:
+
+```javascript
+const client = new yorkie.Client('{{API_ADDR}}', {
+  authTokenInjector: async (reason) => {
+    // Handle token refresh logic based on webhook response
+    if (reason === 'token expired') {
+      return await refreshAccessToken();
+    }
+    return accessToken;
+  },
+});
+```
+
+If an authentication error (`codes.Unauthenticated`) occurs, the authTokenInjector will be triggered again with the webhook's response reason, allowing the system to refresh the token.
+
+##### 3. Webhook Request Format
+
+When a client makes a request, the Yorkie server sends the following JSON payload to your webhook server:
+
+```json
+{
+  "token": "SOME_TOKEN",          // Token from authTokenInjector
+  "method": "PushPull",           // Method being called: ActivateClient, DeactivateClient, AttachDocument, DetachDocument, WatchDocuments
+  "documentAttributes": [{
+    "key": "DOCUMENT_KEY",        // Document key
+    "verb": "r"                   // Access level: 'r' or 'rw'
+  }]
+}
+```
+
+##### 4. Webhook Response Format
+
+The webhook server should return a JSON response in the following format:
+
+```json
+{
+  "allowed": true,    // Authorization decision
+  "reason": "ok"      // Optional explanation
+}
+```
+
+HTTP Status Codes:
+- `200 OK`: Request is authorized
+- `401 Unauthenticated`: Token is invalid or missing
+- `403 Permission Denied`: Token is valid but lacks required permissions
+
+##### 5. Error Handling and Recovery
+
+Yorkie handles authentication failures based on the webhook response and HTTP status codes:
+
+| Status Code | Meaning | Action Taken |
+|------------|---------|--------------|
+| 200 OK | Request is authorized (allowed: true) | The request proceeds normally |
+| 401 Unauthenticated | The token is invalid or missing (allowed: false) | Yorkie attempts to refresh the token via `authTokenInjector` |
+| 403 Permission Denied | The token is valid but lacks the required permissions (allowed: false) | The request is rejected with `codes.PermissionDenied` |
+
+##### Token Refresh & Retry Behavior
+For `PushPull`(realtime sync) and `WatchDocuments`: 
+- Yorkie automatically retries the request after refreshing the token.
+- Notifies via [`document.subscribe('auth-error')`](/docs/js-sdk#documentsubscribeauth-error)
+
+For other API calls:
+- The system does not automatically retry; the client must manually handle the `codes.Unauthenticated` error and retry the request.
