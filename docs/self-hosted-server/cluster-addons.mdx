@@ -15,6 +15,8 @@ Currently, Yorkie addons include:
 - [Grafana](https://grafana.com/) for monitoring Yorkie cluster via Grafana dashboard.
 - [Loki](https://grafana.com/oss/loki/) for logging aggregation.
 - [ArgoCD](https://argoproj.github.io/argo-cd/) for managing Yorkie cluster via GitOps.
+- [Kafka](https://kafka.apache.org/) for analytics of usage of Yorkie cluster.
+- [StarRocks](https://starrocks.com/) for analytics of usage of Yorkie cluster.
 
 ### Prerequisites
 
@@ -305,9 +307,129 @@ Once you are logged in, you will see the following dashboard:
 
 <Alert status="warning">You need to configure your own devops repository to use ArgoCD. For more information, see [ArgoCD Helm documentation](https://argo-cd.readthedocs.io/en/stable/user-guide/helm/).</Alert>
 
+### Install Yorkie Analytics with Helm chart
+
+You can install Yorkie analytics addon to enable analytics features. Yorkie analytics addon includes Kafka and StarRocks to perform analytics of usage of Yorkie cluster.
+
+Install Yorkie analytics addon with the following command:
+
+```bash
+$ helm install yorkie-analytics yorkie-team/yorkie-analytics -n analytics --create-namespace
+```
+
+This will install `yorkie-analytics` release.
+
+After Yorkie analytics is installed, you will see the following output:
+
+```bash
+NAME: yorkie-analytics
+LAST DEPLOYED: Tue May  2 16:06:03 2023
+NAMESPACE: analytics
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+NOTES:
+--- Install Complete ---
+yorkie-analytics successfully installed!
+
+For next steps, follow:
+  $ curl https://github.com/yorkie-team/yorkie/tree/main/build/charts/yorkie-analytics
+
+To learn more about the release, try:
+  $ helm status yorkie-analytics -n analytics
+  $ helm get all yorkie-analytics -n analytics
+```
+
+It will take a few minutes for pods to be ready, so wait until all pods are ready. You can check the status of pods with the following command:
+
+```bash
+$ kubectl get pods -n analytics --watch
+```
+
+After all pods are ready, you will see the following output:
+
+```bash
+NAME                                                 READY   STATUS      RESTARTS   AGE
+kube-starrocks-be-0                                  1/1     Running     0          2m53s
+kube-starrocks-fe-0                                  1/1     Running     0          2m53s
+kube-starrocks-operator-5898f6dc55-8m2fz             1/1     Running     0          2m53s
+yorkie-analytics-init-kafka-topics-job-mhqlt         0/1     Completed   0          2m53s
+yorkie-analytics-init-starrocks-database-job-8m5d2   0/1     Completed   0          2m53s
+yorkie-analytics-kafka-controller-0                  1/1     Running     0          2m53s
+```
+
+To access StarRocks MySQL client, you can use the following command:
+
+```bash
+$ kubectl exec -it pod/kube-starrocks-fe-0 -n analytics -- mysql -P9030 -h127.0.0.1 -u root --prompt="StarRocks >"
+
+StarRocks > use yorkie;
+StarRocks > show routine load\G
+```
+
+Then you can see the following output with the running routine load:
+
+```sql
+*************************** 1. row ***************************
+                  Id: 11063
+                Name: events
+          CreateTime: 2025-04-09 16:49:58
+           PauseTime: NULL
+             EndTime: NULL
+              DbName: yorkie
+           TableName: user_events
+               State: RUNNING
+      DataSourceType: KAFKA
+      CurrentTaskNum: 1
+       JobProperties: {"partitions":"*","partial_update":"false","columnToColumnExpr":"*","maxBatchIntervalS":"10","partial_update_mode":"null","whereExpr":"*","dataFormat":"json","timezone":"Asia/Shanghai","format":"json","log_rejected_record_num":"0","taskTimeoutSecond":"60","json_root":"","pause_on_fatal_parse_error":"false","maxFilterRatio":"1.0","strict_mode":"false","jsonpaths":"","taskConsumeSecond":"15","desireTaskConcurrentNum":"1","maxErrorNum":"0","strip_outer_array":"false","currentTaskConcurrentNum":"1","maxBatchRows":"200000"}
+DataSourceProperties: {"topic":"user-events","currentKafkaPartitions":"0","brokerList":"yorkie-analytics-kafka.analytics.svc.cluster.local:9092"}
+    CustomProperties: {"group.id":"user_events_group"}
+           Statistic: {"receivedBytes":28999,"errorRows":0,"committedTaskNum":106,"loadedRows":154,"loadRowsRate":2,"abortedTaskNum":0,"totalRows":154,"unselectedRows":0,"receivedBytesRate":521,"taskExecuteTimeMs":55554}
+            Progress: {"0":"158"}
+   TimestampProgress: {"0":"1744627675913"}
+ReasonOfStateChanged:
+        ErrorLogUrls:
+         TrackingSQL:
+            OtherMsg: [2025-04-14 19:51:31] [task id: 61ac06c9-2892-419b-800a-153b9b9f8ad3] [txn id: -1] there is no new data in kafka, wait for 10 seconds to schedule again
+LatestSourcePosition: {"0":"159"}
+           OffsetLag: {"0":"1"}
+1 row in set (0.00 sec)
+```
+
+### Connect Yorkie cluster to Yorkie analytics
+
+Now you have Yorkie analytics installed, you can connect Yorkie cluster to Yorkie analytics.
+You need to set up the following arguments in your Yorkie cluster:
+
+```bash
+helm upgrade yorkie yorkie-team/yorkie \
+  --set yorkie.kafkaAddresses=yorkie-analytics-kafka.analytics.svc.cluster.local:9092
+  --set yorkie.kafkaTopic=user-events
+  --set yorkie.kafkaWriteTimeout=5s
+  --set yorkie.starrocksDSN=root:@tcp(kube-starrocks-fe-search.analytics.svc.cluster.local:9030)/yorkie
+```
+
+If clients are connected to Yorkie cluster with `userID`([Mesasuring MAU](/docs/js-sdk#measuring-mau)), you can see the user events are collected in StarRocks database.
+
+```bash
+StarRocks > use yorkie;
+StarRocks > select * from user_events;
+```
+
+Then you will see the following output:
+
+```sql
++--------------------------+----------------------------+------------------+--------------------------+----------------------------+
+| user_id                  | timestamp                  | event_type       | project_id               | user_agent                 |
++--------------------------+----------------------------+------------------+--------------------------+----------------------------+
+| XXX                      | 2025-04-14 04:57:26.494445 | client-activated | 67f150814b8be3e231395358 | @yorkie-js/sdk/0.6.6       |
++--------------------------+----------------------------+------------------+--------------------------+----------------------------+
+1 rows in set (0.01 sec)
+```
+
 ### Clean up cluster addons
 
-You have now installed Yorkie monitoring and ArgoCD, and viewed Yorkie metrics on Grafana dashboard and Yorkie GitOps on ArgoCD web UI.
+You **have** now installed Yorkie monitoring and ArgoCD, and viewed Yorkie metrics on Grafana dashboard and Yorkie GitOps on ArgoCD web UI.
 
 To learn about how to configure Yorkie Monitoring and Yorkie ArgoCD in Helm Chart, see [Yorkie Chart Repository](https://github.com/yorkie-team/yorkie/tree/main/build/charts/).
 
@@ -338,6 +460,14 @@ $ kubectl delete serviceaccounts --all -n monitoring
 
 # (Optional) Delete monitoring namespace
 $ kubectl delete namespace monitoring
+```
+
+Then, uninstall Yorkie analytics with the following command:
+
+```bash
+# Uninstall Yorkie analytics helm chart release
+$ helm uninstall yorkie-analytics -n analytics
+$ kubectl delete namespace analytics
 ```
 
 ### Next Steps
