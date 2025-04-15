@@ -71,16 +71,13 @@ export function Header(): ReactElement {
             </Button>
           ) : isLoggedIn === false ? (
             <>
-              <Button as="a" href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/login`} outline className="gray50">
-                Sign in
-              </Button>
               <Button
                 as="a"
-                href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup`}
+                href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/login`}
                 className="orange_0"
                 icon={<Icon type="star" />}
               >
-                Start for free
+                Sign in
               </Button>
             </>
           ) : null}

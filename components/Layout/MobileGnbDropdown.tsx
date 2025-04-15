@@ -184,28 +184,16 @@ export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
                 </a>
               </li>
             ) : (
-              <>
-                <li className="dropdown_item">
-                  <a
-                    href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/login`}
-                    className={classNames('dropdown_menu', {
-                      is_active: asPath.split('#')[0] === `${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/login`,
-                    })}
-                  >
-                    <span className="dropdown_text">Sign in</span>
-                  </a>
-                </li>
-                <li className="dropdown_item">
-                  <a
-                    href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup`}
-                    className={classNames('dropdown_menu', {
-                      is_active: asPath.split('#')[0] === `${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/signup`,
-                    })}
-                  >
-                    <span className="dropdown_text">Start for free</span>
-                  </a>
-                </li>
-              </>
+              <li className="dropdown_item">
+                <a
+                  href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/login`}
+                  className={classNames('dropdown_menu', {
+                    is_active: asPath.split('#')[0] === `${process.env.NEXT_PUBLIC_DASHBOARD_PATH}/login`,
+                  })}
+                >
+                  <span className="dropdown_text">Sign in</span>
+                </a>
+              </li>
             )}
           </ul>
         </div>
