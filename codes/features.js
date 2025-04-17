@@ -2,7 +2,8 @@ const PROFILE_JS = `
 import yorkie from '@yorkie-js/sdk';
 
 async function main() {
-  const client = new yorkie.Client('${process.env.NEXT_PUBLIC_API_ADDR}', {
+  const client = new yorkie.Client({
+    rpcAddr: '${process.env.NEXT_PUBLIC_API_ADDR}',
     apiKey: 'MY_API_KEY',
   });
   await client.activate();
@@ -33,7 +34,8 @@ const CURSOR_JS = `
 import yorkie from '@yorkie-js/sdk';
 
 async function main() {
-  const client = new yorkie.Client('${process.env.NEXT_PUBLIC_API_ADDR}', {
+  const client = new yorkie.Client({
+    rpcAddr: '${process.env.NEXT_PUBLIC_API_ADDR}',
     apiKey: 'MY_API_KEY',
   });
   await client.activate();

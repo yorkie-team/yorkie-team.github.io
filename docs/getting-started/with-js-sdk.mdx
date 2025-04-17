@@ -42,7 +42,8 @@ First, create a Client with API key.
 ```js
 async function main() {
   // 01. create a new client instance and connect to the yorkie server.
-  const client = new yorkie.Client('{{API_ADDR}}', {
+  const client = new yorkie.Client({
+    rpcAddr: '{{API_ADDR}}',
     apiKey: 'xxxxxxxxxxxxxxxxxxxx',
   });
   await client.activate();

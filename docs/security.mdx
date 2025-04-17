@@ -68,7 +68,8 @@ Alternatively, you can configure the webhook using the Yorkie CLI. See updating 
 To provide authentication tokens dynamically, use the `authTokenInjector` option when creating a Yorkie client:
 
 ```javascript
-const client = new yorkie.Client('{{API_ADDR}}', {
+const client = new yorkie.Client({
+  rpcAddr: '{{API_ADDR}}',
   authTokenInjector: async (reason) => {
     // Handle token refresh logic based on webhook response
     if (reason === 'token expired') {

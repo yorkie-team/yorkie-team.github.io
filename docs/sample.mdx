@@ -213,7 +213,8 @@ Describe about this section briefly. Lorem ipsum dolor sit amet, consectetur adi
     <CodeBlock code={`import yorkie from '@yorkie-js/sdk';
 
 async function main() {
-  const client = new yorkie.Client('http://localhost:8080', {
+  const client = new yorkie.Client({
+    rpcAddr: 'http://localhost:8080',
     apiKey: 'MY_API_KEY',
   });
   await client.activate();
