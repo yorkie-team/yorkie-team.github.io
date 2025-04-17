@@ -31,7 +31,7 @@ export function BasicExampleView({
     let unsubscribeDoc: Function;
 
     const activate = async () => {
-      const client = new yorkie.Client(rpcAddr, { apiKey });
+      const client = new yorkie.Client({ rpcAddr, apiKey });
       await client.activate();
       const doc = new yorkie.Document(documentKey);
       await client.attach(doc);
