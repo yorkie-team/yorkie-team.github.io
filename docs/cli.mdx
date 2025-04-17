@@ -214,7 +214,8 @@ $ yorkie project create test-project
 If you create a Client with `public_key` of the Project as `apiKey`, you can manage the Client in the Project.
 
 ```javascript
-const client = new yorkie.Client('{{API_ADDR}}', {
+const client = new yorkie.Client({
+  rpcAddr: '{{API_ADDR}}',
   apiKey: 'cfurtei6qdop9v48o0v0', // public_key of the project
 });
 ```

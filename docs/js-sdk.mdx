@@ -18,7 +18,8 @@ If you want to install the SDK, refer to the [Getting Started with JS SDK](/docs
 You can create a Client using `new yorkie.Client()`. After the Client has been activated, it is connected to the server and ready to use.
 
 ```javascript
-const client = new yorkie.Client('{{API_ADDR}}', {
+const client = new yorkie.Client({
+  rpcAddr: '{{API_ADDR}}',
   apiKey: 'xxxxxxxxxxxxxxxxxxxx',
 });
 await client.activate();
@@ -33,7 +34,8 @@ If a `codes.Unauthenticated` error occurs, the `authTokenInjector` will be calle
 For more information about `Auth Webhook`, please refer to the [Auth Webhook](/docs/security#auth-webhook).
 
 ```javascript
-const client = new yorkie.Client('{{API_ADDR}}', {
+const client = new yorkie.Client({
+  rpcAddr: '{{API_ADDR}}',
   apiKey: 'xxxxxxxxxxxxxxxxxxxx',
   authTokenInjector: async (reason) => {
     // Handle token refresh logic based on webhook response
@@ -50,7 +52,8 @@ const client = new yorkie.Client('{{API_ADDR}}', {
 You can measure MAU(Monthly Active Users) by setting the `userID` metadata when creating a client. The `userID` should be a unique identifier for each user.
 
 ```javascript
-const client = new yorkie.Client('{{API_ADDR}}', {
+const client = new yorkie.Client({
+  rpcAddr: '{{API_ADDR}}',
   apiKey: 'xxxxxxxxxxxxxxxxxxxx',
   metadata: { userID: 'user-1234' },
 });
@@ -67,16 +70,6 @@ await client.deactivate();
 ```
 
 This will detach all documents attached to the client for efficient [garbage collection](https://github.com/yorkie-team/yorkie/blob/main/design/garbage-collection.md).
-
-> When the page is closed, the client should be deactivated for proper cleanup. For this, you can use the `beforeunload` event.
-> Using the `keepalive` option in `deactivate` request will remain open, even if the page that initiated the request is closed.
-> 
-> ```javascript
-> window.addEventListener('beforeunload', () => {
->   client.deactivate({keepalive: true});
-> });
-> ```
-> For more information about `keepalive`, please refer to the https://css-tricks.com/send-an-http-request-on-page-exit/.
 
 ### Document
 
@@ -576,20 +569,6 @@ When you modify limit settings in the dashboard, the changes may take up to 10 m
 When you attach a document, the server keeps track of the number of clients subscribed to it. The `Max Attachments per Document` setting determines how many clients can be attached to a single document simultaneously. If a client attempts to attach when this limit is reached, the server will reject the attachment with an error.
 
 If the attachment fails due to the limit, the client will need to retry the attachment by either reloading the SDK or calling `attach` again, as there is no automatic retry mechanism. 
-
-<Alert status="warning">
-In cases where clients terminate abnormally (browser crashes or network issues etc.), their attachments may remain until the server's housekeeping process removes them.
-
-To properly handle client termination and cleanup of document attachment resources, you can add an event listener to the page.
-
-```javascript
-window.addEventListener('beforeunload', () => {
-  client.deactivate({keepalive: true});
-  // or for detaching specific documents
-  // client.detach(doc, {keepalive: true});
-});
-```
-</Alert>
 
 #### Max Subscribers per Document
 When a client attaches to a document, it creates a subscription stream to receive real-time updates. The `Max Subscribers per Document` setting determines how many clients can maintain subscription streams simultaneously for a single document. If a client attempts to create a subscription stream when this limit is reached, the server will reject the request.
