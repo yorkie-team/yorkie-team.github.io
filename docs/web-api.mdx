@@ -24,12 +24,50 @@ curl 'https://api.yorkie.dev/yorkie.v1.AdminService/ListProjects' \
 
 ### Documents Manement
 
+#### POST /yorkie.v1.AdminService/CreateDocument
+
+This endpoint creates a new document in the specified project with an initial root.
+
+##### Request
+
+Parameters:
+
+- `project_name`: The name of the project.
+- `document_key`: A unique key for the new document.
+- `initial_root`: The initial root(YSON string) of the document.
+
+```bash
+curl 'https://api.yorkie.dev/yorkie.v1.AdminService/CreateDocument' \
+  -H 'content-type: application/json' \
+  -H 'authorization: PROJECT_SECRET_KEY' \
+  --data-raw '{
+    "project_name": "my-project",
+    "document_key": "document-1",
+    "initial_root": "{\"type\":\"doc\",\"content\":[]}"
+  }'
+```
+
+Response
+
+```bash
+{
+  "document": {
+    "id": "doc_abcdef",
+    "key": "document-1",
+    "project_name": "my-project",
+    "snapshot": "{\"content\":[],\"type\":\"doc\"}"
+    "created_at": "2025-05-12T10:00:00.000Z",
+    "updated_at": "2025-05-12T10:00:00.000Z"
+  }
+}
+```
+
 #### POST /yorkie.v1.AdminService/ListDocuments
 
 This endpoint returns a list of documents in a project. There is a pagination mechanism to retrieve documents in batches.
 You can provide the `previous_id` of the last document in the previous page to get the next page of documents.
 
-If you want to get the snapshot of the document, you can set the `include_snapshot` parameter to `true`.
+If you want to get the snapshot of the document, you can set the `include_snapshot` parameter to `true`**.**
 
 ##### Request
 
