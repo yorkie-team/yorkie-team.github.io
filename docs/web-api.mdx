@@ -9,14 +9,14 @@ Yorkie AdminService Web API allows developers to interact programmatically with 
 
 The API is implemented using [Connect protocol](https://connectrpc.com/docs/protocol/), which means all requests are made using HTTP POST method to a specific service endpoint. The API accepts JSON-encoded request bodies, returns JSON-encoded responses, and uses standard HTTP response codes.
 
-**Base URL**: `https://api.yorkie.dev/yorkie.v1.AdminService/`
+**Base URL**: `{{API_ADDR}}/yorkie.v1.AdminService/`
 
 ### Authentication
 
 For APIs that require authentication, you need to add your Project SecretKey to the request's authorization header.
 
 ```bash
-curl 'https://api.yorkie.dev/yorkie.v1.AdminService/ListProjects' \
+curl '{{API_ADDR}}/yorkie.v1.AdminService/ListProjects' \
   -H 'content-type: application/json' \
   -H 'authorization: PROJECT_SECRET_KEY' \
   --data-raw '{}'
@@ -37,7 +37,7 @@ Parameters:
 - `initial_root`: The initial root(YSON string) of the document.
 
 ```bash
-curl 'https://api.yorkie.dev/yorkie.v1.AdminService/CreateDocument' \
+curl '{{API_ADDR}}/yorkie.v1.AdminService/CreateDocument' \
   -H 'content-type: application/json' \
   -H 'authorization: PROJECT_SECRET_KEY' \
   --data-raw '{
@@ -67,7 +67,7 @@ Response
 This endpoint returns a list of documents in a project. There is a pagination mechanism to retrieve documents in batches.
 You can provide the `previous_id` of the last document in the previous page to get the next page of documents.
 
-If you want to get the snapshot of the document, you can set the `include_snapshot` parameter to `true`**.**
+If you want to get the snapshot of the document, you can set the `include_snapshot` parameter to `true`.
 
 ##### Request
 
@@ -79,7 +79,7 @@ Parameters:
 - `include_snapshot`: Whether to include snapshots in the response.
 
 ```bash
-curl 'https://api.yorkie.dev/yorkie.v1.AdminService/ListDocuments' \
+curl '{{API_ADDR}}/yorkie.v1.AdminService/ListDocuments' \
   -H 'content-type: application/json' \
   -H 'authorization: PROJECT_SECRET_KEY' \
   --data-raw '{
@@ -126,7 +126,7 @@ Parameters:
 - `document_key`: The key of the document.
 
 ```bash
-curl 'https://api.yorkie.dev/yorkie.v1.AdminService/GetDocument' \
+curl '{{API_ADDR}}/yorkie.v1.AdminService/GetDocument' \
   -H 'content-type: application/json' \
   -H 'authorization: PROJECT_SECRET_KEY' \
   --data-raw '{
@@ -160,7 +160,7 @@ Parameters:
 - `include_snapshot`: Whether to include snapshots in the response.
 
 ```bash
-curl 'https://api.yorkie.dev/yorkie.v1.AdminService/GetDocuments' \
+curl '{{API_ADDR}}/yorkie.v1.AdminService/GetDocuments' \
   -H 'content-type: application/json' \
   -H 'authorization: PROJECT_SECRET_KEY' \
   --data-raw '{
@@ -202,7 +202,7 @@ Remove a document.
 
 ##### Request
 ```bash
-curl 'https://api.yorkie.dev/yorkie.v1.AdminService/RemoveDocumentByAdmin' \
+curl '{{API_ADDR}}/yorkie.v1.AdminService/RemoveDocumentByAdmin' \
   -H 'content-type: application/json' \
   -H 'authorization: PROJECT_SECRET_KEY' \
   --data-raw '{
@@ -226,7 +226,7 @@ Parameters:
 - `server_seq`: The server sequence number of the snapshot.
 
 ```bash
-curl 'https://api.yorkie.dev/yorkie.v1.AdminService/GetSnapshotMeta' \
+curl '{{API_ADDR}}/yorkie.v1.AdminService/GetSnapshotMeta' \
   -H 'content-type: application/json' \
   -H 'authorization: PROJECT_SECRET_KEY' \
   --data-raw '{
@@ -259,7 +259,7 @@ Parameters:
 - `page_size`: The number of documents to return.
 
 ```bash
-curl 'https://api.yorkie.dev/yorkie.v1.AdminService/SearchDocuments' \
+curl '{{API_ADDR}}/yorkie.v1.AdminService/SearchDocuments' \
   -H 'content-type: application/json' \
   -H 'authorization: PROJECT_SECRET_KEY' \
   --data-raw '{
