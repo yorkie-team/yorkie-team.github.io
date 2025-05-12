@@ -26,7 +26,8 @@ curl '{{API_ADDR}}/yorkie.v1.AdminService/ListProjects' \
 
 #### POST /yorkie.v1.AdminService/CreateDocument
 
-This endpoint creates a new document in the specified project with an initial root.
+This endpoint creates a new document in the specified project. If `initial_root`
+is provided, it will be used as the initial content of the document. Otherwise, an empty document will be created.
 
 ##### Request
 
@@ -58,6 +59,44 @@ Response
     "snapshot": "{\"content\":[],\"type\":\"doc\"}"
     "created_at": "2025-05-12T10:00:00.000Z",
     "updated_at": "2025-05-12T10:00:00.000Z"
+  }
+}
+```
+
+#### POST /yorkie.v1.AdminService/UpdateDocument
+
+This endpoint updates the content of an existing document.
+
+##### Request
+
+Parameters:
+
+- `project_name`: The name of the project.
+- `document_key`: The key of the document to update.
+- `root`: The new root content (YSON string) of the document.
+
+```bash
+curl '{{API_ADDR}}/yorkie.v1.AdminService/UpdateDocument' \
+  -H 'content-type: application/json' \
+  -H 'authorization: PROJECT_SECRET_KEY' \
+  --data-raw '{
+    "project_name": "my-project",
+    "document_key": "document-1",
+    "root": "{\"type\":\"doc\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"text\":\"Updated content\",\"type\":\"text\"}]}]}"
+  }'
+```
+
+##### Response
+
+```json
+{
+  "document": {
+    "id": "doc_12345",
+    "key": "document-1",
+    "project_name": "my-project",
+    "snapshot": "{\"type\":\"doc\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"text\":\"Updated content\",\"type\":\"text\"}]}]}",
+    "created_at": "2025-03-24T12:00:00.000Z",
+    "updated_at": "2025-05-12T11:30:00.000Z"
   }
 }
 ```
