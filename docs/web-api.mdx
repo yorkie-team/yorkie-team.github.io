@@ -3,26 +3,103 @@ title: 'Web API'
 order: 90
 ---
 
-## AdminService Web API
+## Web API
 
-Yorkie AdminService Web API allows developers to interact programmatically with their Yorkie documents without using Yorkie SDK. It is convinient for managing documents in server-side applications.
+Yorkie Web API allows developers to interact programmatically with their Yorkie documents without using Yorkie SDK. It is convinient for managing documents in server-side applications.
 
 The API is implemented using [Connect protocol](https://connectrpc.com/docs/protocol/), which means all requests are made using HTTP POST method to a specific service endpoint. The API accepts JSON-encoded request bodies, returns JSON-encoded responses, and uses standard HTTP response codes.
 
-**Base URL**: `https://api.yorkie.dev/yorkie.v1.AdminService/`
+**Base URL**: `{{API_ADDR}}/yorkie.v1.AdminService/`
 
 ### Authentication
 
 For APIs that require authentication, you need to add your Project SecretKey to the request's authorization header.
 
 ```bash
-curl 'https://api.yorkie.dev/yorkie.v1.AdminService/ListProjects' \
+curl '{{API_ADDR}}/yorkie.v1.AdminService/ListProjects' \
   -H 'content-type: application/json' \
   -H 'authorization: PROJECT_SECRET_KEY' \
   --data-raw '{}'
 ```
 
 ### Documents Manement
+
+#### POST /yorkie.v1.AdminService/CreateDocument
+
+This endpoint creates a new document in the specified project. If `initial_root`
+is provided, it will be used as the initial content of the document. Otherwise, an empty document will be created.
+
+##### Request
+
+Parameters:
+
+- `project_name`: The name of the project.
+- `document_key`: A unique key for the new document.
+- `initial_root`: The initial root([YSON string](/docs/web-api#yson)) of the document.
+
+```bash
+curl '{{API_ADDR}}/yorkie.v1.AdminService/CreateDocument' \
+  -H 'content-type: application/json' \
+  -H 'authorization: PROJECT_SECRET_KEY' \
+  --data-raw '{
+    "project_name": "my-project",
+    "document_key": "document-1",
+    "initial_root": "{\"type\":\"doc\",\"content\":[]}"
+  }'
+```
+
+Response
+
+```bash
+{
+  "document": {
+    "id": "doc_abcdef",
+    "key": "document-1",
+    "project_name": "my-project",
+    "snapshot": "{\"content\":[],\"type\":\"doc\"}",
+    "created_at": "2025-05-12T10:00:00.000Z",
+    "updated_at": "2025-05-12T10:00:00.000Z"
+  }
+}
+```
+
+#### POST /yorkie.v1.AdminService/UpdateDocument
+
+This endpoint updates the content of an existing document.
+
+##### Request
+
+Parameters:
+
+- `project_name`: The name of the project.
+- `document_key`: The key of the document to update.
+- `root`: The new root content ([YSON string](/docs/web-api#yson)) of the document.
+
+```bash
+curl '{{API_ADDR}}/yorkie.v1.AdminService/UpdateDocument' \
+  -H 'content-type: application/json' \
+  -H 'authorization: PROJECT_SECRET_KEY' \
+  --data-raw '{
+    "project_name": "my-project",
+    "document_key": "document-1",
+    "root": "{\"type\":\"doc\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"text\":\"Updated content\",\"type\":\"text\"}]}]}"
+  }'
+```
+
+##### Response
+
+```json
+{
+  "document": {
+    "id": "doc_12345",
+    "key": "document-1",
+    "project_name": "my-project",
+    "snapshot": "{\"type\":\"doc\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"text\":\"Updated content\",\"type\":\"text\"}]}]}",
+    "created_at": "2025-03-24T12:00:00.000Z",
+    "updated_at": "2025-05-12T11:30:00.000Z"
+  }
+}
+```
 
 #### POST /yorkie.v1.AdminService/ListDocuments
 
@@ -41,7 +118,7 @@ Parameters:
 - `include_snapshot`: Whether to include snapshots in the response.
 
 ```bash
-curl 'https://api.yorkie.dev/yorkie.v1.AdminService/ListDocuments' \
+curl '{{API_ADDR}}/yorkie.v1.AdminService/ListDocuments' \
   -H 'content-type: application/json' \
   -H 'authorization: PROJECT_SECRET_KEY' \
   --data-raw '{
@@ -88,7 +165,7 @@ Parameters:
 - `document_key`: The key of the document.
 
 ```bash
-curl 'https://api.yorkie.dev/yorkie.v1.AdminService/GetDocument' \
+curl '{{API_ADDR}}/yorkie.v1.AdminService/GetDocument' \
   -H 'content-type: application/json' \
   -H 'authorization: PROJECT_SECRET_KEY' \
   --data-raw '{
@@ -122,7 +199,7 @@ Parameters:
 - `include_snapshot`: Whether to include snapshots in the response.
 
 ```bash
-curl 'https://api.yorkie.dev/yorkie.v1.AdminService/GetDocuments' \
+curl '{{API_ADDR}}/yorkie.v1.AdminService/GetDocuments' \
   -H 'content-type: application/json' \
   -H 'authorization: PROJECT_SECRET_KEY' \
   --data-raw '{
@@ -164,7 +241,7 @@ Remove a document.
 
 ##### Request
 ```bash
-curl 'https://api.yorkie.dev/yorkie.v1.AdminService/RemoveDocumentByAdmin' \
+curl '{{API_ADDR}}/yorkie.v1.AdminService/RemoveDocumentByAdmin' \
   -H 'content-type: application/json' \
   -H 'authorization: PROJECT_SECRET_KEY' \
   --data-raw '{
@@ -188,7 +265,7 @@ Parameters:
 - `server_seq`: The server sequence number of the snapshot.
 
 ```bash
-curl 'https://api.yorkie.dev/yorkie.v1.AdminService/GetSnapshotMeta' \
+curl '{{API_ADDR}}/yorkie.v1.AdminService/GetSnapshotMeta' \
   -H 'content-type: application/json' \
   -H 'authorization: PROJECT_SECRET_KEY' \
   --data-raw '{
@@ -221,7 +298,7 @@ Parameters:
 - `page_size`: The number of documents to return.
 
 ```bash
-curl 'https://api.yorkie.dev/yorkie.v1.AdminService/SearchDocuments' \
+curl '{{API_ADDR}}/yorkie.v1.AdminService/SearchDocuments' \
   -H 'content-type: application/json' \
   -H 'authorization: PROJECT_SECRET_KEY' \
   --data-raw '{
@@ -251,5 +328,104 @@ curl 'https://api.yorkie.dev/yorkie.v1.AdminService/SearchDocuments' \
       "updated_at": "2025-03-24T09:30:00.000Z"
     }
   ]
+}
+```
+
+### YSON
+
+YSON(Yorkie Structured Object Notation) is a structured data format used by Yorkie to represent documents. It is similar to JSON but extends it with additional data types optimized for collaborative editing.
+
+#### Data Types
+
+YSON supports standard JSON types and adds specialized types for collaborative applications. Each YSON type has specific use cases and representation formats:
+
+| Type | Description | Format Example | Use Case |
+|------|-------------|----------------|----------|
+| String | UTF-8 encoded text | `"value1"` | Text content |
+| Number | Standard numeric value | `42.5` | Generic numeric values |
+| Boolean | True or false | `true` | Flags and boolean states |
+| Null | Null value | `null` | Absent or undefined values |
+| Object | Collection of key-value pairs | `{"key": "value"}` | Structured data |
+| Array | Ordered list of values | `[1, 2, 3]` | Sequential collections |
+| Int | 32-bit integer | `Int(42)` | Precise integer values |
+| Long | 64-bit integer | `Long(64)` | Large integer values |
+| Date | ISO 8601 timestamp | `Date("2025-01-02T15:04:05.058Z")` | Time values |
+| BinData | Binary data with Base64 encoding | `BinData("AQID")` | Binary content |
+| Counter | Concurrent counter | `Counter(Int(10))` | Collaborative counting |
+| Text | List-based Rich Text | `Text({"type":"p",...})` | List-based Rich Text Editor, e.g) Quill |
+| Tree | Tree-based Rich Text | `Tree({"type":"p",...})` | Tree-based Rich Text Editor |
+
+#### Custom Types Details
+
+##### Int and Long
+
+YSON provides explicit integer types to ensure consistent handling across platforms:
+
+- `Int(number)`: A 32-bit integer type (-2,147,483,648 to 2,147,483,647)
+- `Long(number)`: A 64-bit integer type for larger numbers
+
+These types help ensure that numeric values are interpreted consistently when sharing documents across different programming languages.
+
+##### Date
+YSON Date represents a timestamp value in ISO 8601 format:
+
+```json
+Date("2025-01-02T15:04:05.058Z")
+```
+
+Dates in YSON are stored as strings in ISO format for consistent representation across systems.
+
+##### BinData
+Binary data in YSON is represented using Base64 encoding:
+
+```json
+BinData("AQID")  // Base64 encoded binary data
+```
+
+This allows binary content to be safely represented and transmitted as text.
+
+##### Counter
+
+`Counter` type is specifically designed for collaborative counting operations where multiple users might modify a numeric value concurrently:
+
+```json
+Counter(Int(10))  // A counter with initial value of 10
+```
+
+Using Counter instead of a regular number prevents conflicts when multiple users increment or decrement values simultaneously.
+
+##### Text
+The Text type is designed for rich text editing, allowing for complex formatting and attributes:
+
+```json
+Text([{"val":"Hello","attrs":{"color":"red"}},{"val":"World","attrs":{"color":"blue"}}])
+```
+
+This structure allows for a list of text segments, each with its own attributes, enabling rich text editing capabilities.
+
+##### Tree
+The Tree type provides a specialized structure for representing hierarchical data, particularly useful for rich text editing:
+
+```json
+Tree({"type":"p","children":[{"type":"text","value":"Tree in object"}]})
+```
+
+This structure allows for a tree-based representation of rich text, where each node can have its own type and attributes.
+
+#### Example Document
+
+```json
+{
+  "str": "value1",        // Standard string
+  "num": 42 ,             // Standard number(float64)
+  "int": Int(42),         // 32-bit integer
+  "long": Long(64),        // 64-bit integer
+  "null": null,            // Standard null
+  "bool": true,            // Standard boolean
+  "bytes": BinData("AQID"), // Binary data (Base64)
+  "date": Date("2025-01-02T15:04:05.058Z"), // Date and time
+  "counter": Counter(Int(10)), // Counter with integer value
+  "text": Text([{"val":"Hello","attrs":{"color":"red"}},{"val":"World","attrs":{"color":"blue"}}]), // List-based Rich Text
+  "tree": Tree({"type":"p","attrs":{"align":"center"},"children":[{"type":"text","value":"Hello World"}]}) // Tree-based Rich Text
 }
 ```
