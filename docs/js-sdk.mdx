@@ -588,6 +588,20 @@ doc.subscribe('connection', (event) => {
 ```
 </Alert>
 
+#### Max Document Size Limit
+When a client attaches to a document, the maximum allowed size is determined by the `maxSizePerDocument` setting of the associated project. This limit is evaluated at each attachment, so the same document may be subject to different size constraints depending on the client's project configuration.
+
+A document’s size consists of two main components: **live data** and **garbage-collected (GC) data**. Each of these includes both **content data** (e.g., visible text or structured objects) and **meta data** (e.g., CRDT metadata for synchronization and conflict resolution). As a result, the actual document size may exceed what is visibly rendered in the editor.  
+For a breakdown of how data size is measured, see [resource.ts](https://github.com/yorkie-team/yorkie-js-sdk/blob/main/packages/sdk/src/util/resource.ts).
+
+The size limit is strictly enforced during local updates. If an update causes the document to exceed the limit, it is rejected locally and **not pushed to the server**.
+
+However, **remote updates are not subject to this limit** and are always applied, regardless of size. This ensures **state convergence** across clients—a critical requirement for distributed collaborative systems.
+
+Garbage-collected data is automatically reduced over time through system-managed garbage collection. While manual GC is not exposed, the system triggers GC under certain conditions. For instance, clients that remain inactive beyond the configured *Client Deactivate Threshold* are automatically deactivated, improving GC efficiency and reducing document GC size over time.  
+For details on GC and housekeeping, refer to the [housekeeping design document](https://github.com/yorkie-team/yorkie/blob/main/design/housekeeping.md).
+
+
 ### Custom CRDT types
 
 Custom CRDT types are data types that can be used for special applications such as text editors and counters, unlike general JSON data types such as `Object` and `Array`. Custom CRDT types can be created in the callback function of `document.update`.
