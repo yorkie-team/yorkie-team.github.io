@@ -147,7 +147,7 @@ await client.attach(doc, {
 // }
 ```
 
-We support element types for Primitives, and [Custom CRDT types](/docs/js-sdk/#custom-crdt-types/).
+We support element types for Primitives, and [Custom CRDT types](/docs/js-sdk/#custom-crdt-types).
 
 <Alert status="warning">
 Elements added by `initialRoot` are not sent to the server during the `attach` process. They are applied locally to the Document after push-pull during `attach`.
@@ -445,8 +445,8 @@ const unsubscribe = doc.subscribe('status', (event) => {
 For more information about `DocumentStatus`, please refer to the [DocumentStatus](https://yorkie.dev/yorkie-js-sdk/api-reference/enums/DocumentStatus.html).
 
 <Alert status="warning">
-In Web-based applications, it is hard to detect when the user closes the browser or navigates to another page. In such cases, the document may remain attached to the client, which can lead to unefficient storage and memory usage.
-For handle this, Yorkie provides one of housekeeping feature, `client-deactivate-threshold`, which is a time interval to automatically deactivate the clients that have not been used for a certain period.
+In Web-based applications, it is hard to detect when the user closes the browser or navigates to another page. In such cases, the document may remain attached to the client, which can lead to inefficient storage and memory usage.
+To handle this, Yorkie provides one of housekeeping feature, `client-deactivate-threshold`, which is a time interval to automatically deactivate the clients that have not been used for a certain period.
 <br/>
 If the client is deactivated due to inactivity, the document will be detached from the client, and you will receive a `DocumentStatus.Detached` event through the `doc.subscribe('status', callback)` method.
 <br/>
@@ -531,7 +531,7 @@ Yorkie offers four SyncModes:
 
 - `SyncMode.RealtimeSyncOff`: Changes are not synchronized, but the watch stream remains active.
 
-- `SyncMode.Manual`: Synchronization no longer occurs in real-time, and the watch stream is disconneted. Manual handling is required for synchronization.
+- `SyncMode.Manual`: Synchronization no longer occurs in real-time, and the watch stream is disconnected. Manual handling is required for synchronization.
 
 ```javascript
 // Enable automatic synchronization of both local and remote changes.
@@ -543,7 +543,7 @@ await client.changeSyncMode(doc, SyncMode.RealtimePushOnly);
 // Synchronization turned off, but the watch stream remains active.
 await client.changeSyncMode(doc, SyncMode.RealtimeSyncOff);
 
-// Synchronization turned off, and the watch stream is disconneted.
+// Synchronization turned off, and the watch stream is disconnected.
 await client.changeSyncMode(doc, SyncMode.Manual);
 await client.sync(doc); // Trigger synchronization manually using the sync function.
 ```
