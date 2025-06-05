@@ -426,10 +426,10 @@ let payload = Payload([
 ])
 
 // Broadcasting a message
-await doc.broadcast(topic: "chat", payload: payload)
+try await doc.broadcast(topic: "chat", payload: payload)
 
 // Subscribing to broadcast messages
-await doc.subscribeBroadcast { event, _ in
+try await doc.subscribeBroadcast { event, _ in
     guard let broadcastEvent = event as? BroadcastEvent else {
         return
     }
