@@ -28,7 +28,7 @@ dependencies: [
 First, create a Client with API key
 
 ```swift
-let client = Client("https://{{API_HOST}}"), ClientOptions(key: "xxxxxxxxxxxxxxxxxxxx"))
+let client = Client("https://{{API_HOST}}", ClientOptions(apiKey: "xxxxxxxxxxxxxxxxxxxx"))
 try await client.activate()
 ```
 
