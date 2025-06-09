@@ -19,13 +19,46 @@ If you want to install the SDK, refer to the [Getting Started with iOS SDK](/doc
 We can create a Client using `Client()`. After the Client has been activated, it is connected to the server and ready to use.
 
 ```swift
-let client = Client("https://{{API_HOST}}"), ClientOptions(
+let client = Client("{{API_ADDR}}"), ClientOptions(
     apiKey: "xxxxxxxxxxxxxxxxxxxx"
 ))
 try await client.activate()
 ```
 
 > The API key is used to identify the project in Yorkie. You can get the API key of the project you created in the [Dashboard]({{DASHBOARD_PATH}}).
+
+
+
+##### Creating a Client with Auth Token
+
+You can configure authentication for the client by setting up an `authTokenInjector` to provide tokens for Auth Webhook verification.
+If a `codes.Unauthenticated` error occurs, the `authTokenInjector` will be called again with the webhook's response reason, enabling automatic token refresh.
+For more information about `Auth Webhook`, please refer to the [Auth Webhook](/docs/security#auth-webhook).
+
+```swift
+struct MyAuthTokenInjector: AuthTokenInjector {
+    func getToken(reason: String?) async throws -> String {
+        if reason == "token expired" {
+            return await refreshAccessToken()
+        }
+        return accessToken
+    }
+}
+
+let client = Client("{{API_ADDR}}", ClientOptions(apiKey: "xxxxxxxxxxxxxxxxxxxx", authTokenInjector: MyAuthTokenInjector()))
+```
+
+
+
+##### Deactivate the Client
+
+When the client is no longer needed, you can deactivate it to release resources and disconnect from the server.
+
+```swift
+try await client.deactivate()
+```
+
+This will detach all documents attached to the client for efficient [garbage collection](https://github.com/yorkie-team/yorkie/blob/main/design/garbage-collection.md).
 
 #### Document
 
@@ -60,6 +93,40 @@ The second argument is options.
 ```swift
 try await clientA.attach(doc, ["color: "blue", "cursor": ["x": 0, "y": 0]], .manual)
 ```
+
+#### Initializing root
+
+The root is used to manage the application's data, such as primitives, arrays, Counters, and Text in a form within the `Document`. You can set the initial values when calling `Document.attach()` using the `initialRoot` option.
+
+```swift
+try await client.attach(doc, initialRoot: [
+    "list": [Int32(1), Int32(2), Int32(3)]
+])
+```
+
+The initial values are partially applied. For each element in `initialRoot`:
+- If the key doesn't exist, the element will be applied.
+- If the key already exists in the Document, that element will be discarded. Users don't need to worry about overwriting existing valid counters.
+
+```swift
+// Another client tries to attach with initialRoot option:
+try await client2.attach(doc, initialRoot: [
+    "list": [],                                  // this update will be discarded
+    "counter": JSONCounter(value: Int32(0))      // this update will be applied
+])
+
+// final state
+// root = {
+//   list: [1, 2, 3],
+//   counter: 0
+// }
+```
+
+We support element types for Primitives, and [Custom CRDT types](/docs/js-sdk/#custom-crdt-types/).
+
+<Alert status="warning">
+Elements added by `initialRoot` are not sent to the server during the `attach` process. They are applied locally to the Document after push-pull during `attach`.
+</Alert>
 
 #### Updating presence
 
@@ -331,6 +398,65 @@ await self.document.subscribeSync { event, _ in
 ```
 
 For more information about `DocumentSyncStatus`, please refer to the [DocumentSyncStatus](https://yorkie.dev/yorkie-ios-sdk/documentation/yorkie/documentsyncstatus).
+
+##### Document.subscribeAuthError()
+You can subscribe to authentication error events using `doc.subscribeAuthError()`.
+This event is triggered when an unauthenticated error occurs during `PushPull` or `WatchDocuments` operations,
+specifically when the system automatically refreshes the token and retries the operation.
+
+```swift
+await doc.subscribeAuthError { event, _ in
+    guard let authErrorEvent = event as? AuthErrorEvent else { return }
+    // authErrorEvent.value contains:
+    // - reason: string
+    // - method: 'PushPull' | 'WatchDocuments'
+}
+```
+
+This subscription allows you to monitor when token refreshes occur due to authentication errors.  
+For more information about `Auth Webhook`, please refer to the [Auth Webhook](/docs/security#auth-webhook).
+
+#### Broadcasting a Message
+
+Broadcasting allows clients to share custom events with other clients connected to the same document. Unlike document updates or presence changes, broadcasts are ephemeral messages that are not persisted in the document's state.
+
+```swift
+let payload = Payload([
+    "message": "Hello everyone!"
+])
+
+// Broadcasting a message
+try await doc.broadcast(topic: "chat", payload: payload)
+
+// Subscribing to broadcast messages
+try await doc.subscribeBroadcast { event, _ in
+    guard let broadcastEvent = event as? BroadcastEvent else {
+        return
+    }
+    let clientID = broadcastEvent.value.clientID
+    let topic = broadcastEvent.value.topic
+    let message: String = broadcastEvent.value.payload["message"] ?? ""
+
+    if topic == "chat" {
+        print("Message from \(clientID): \(message)")
+    }
+}      
+```
+
+The broadcast event contains:
+- `topic`: A string identifying the type of broadcast message
+- `payload`: The data being broadcast (must be JSON serializable)
+- `clientID`: The ID of the client that sent the broadcast
+
+This feature is useful for sending temporary messages or signals between clients, such as:
+- Chat messages
+- Cursor movement notifications 
+- Application-specific events
+- User action notifications
+
+<Alert status="warning">
+Broadcast messages are not persisted and are only delivered to clients currently connected to the document. Clients that connect later will not receive previous broadcast messages.
+</Alert>
 
 #### Changing Synchronization Mode
 
