@@ -107,6 +107,15 @@ Flags:
       --rpc-port int                                    RPC port (default 8080)
 ```
 
+### Signup
+
+You can sign up for a new account using the `signup` command.
+
+```bash
+$ yorkie signup -u <username> --rpc-addr api.yorkie.dev:443
+Enter Password:
+```
+
 ### Login
 
 To use admin commands, you need to log in to the server. You can log in to the server using the `login` subcommand:
@@ -358,6 +367,42 @@ $ yorkie document ls default --forward
  6482ce9fc38d5a06529bba85  test-document-3  ...         ...          ...         ...
  6482cea0c38d5a06529bba96  test-document-4  ...         ...          ...         ...
  6482cea1c38d5a06529bbaa7  test-document-5  ...         ...          ...         ...
+```
+
+#### Creating a Document
+
+You can create a new document using `create`.
+
+```
+Usage:
+  yorkie document create [project name] [document key]
+
+Flags:
+  -h, --help                 help for create
+      --initial-root string  YSON-formatted string to initialize the document root. Default: `{}`
+```
+
+```bash
+$ yorkie document create test-project test-document
+ Document created: test-document (686e2aa9666f9626c2d62cb4)
+```
+
+#### Updating a Document
+
+You can update the root of an existing document using the `update` subcommand:
+
+```
+Usage:
+  yorkie document update [project name] [document key] [flags]
+
+Flags:
+  -h, --help    help for remove
+      --root    Content of the updated root in YSON format (required)
+```
+
+```bash
+$ yorkie document update test-project test-document --root '{"abs": true}'
+ Document updated: test-document (686e2aa9666f9626c2d62cb4)
 ```
 
 #### Removing a Document
