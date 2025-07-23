@@ -330,7 +330,7 @@ Flags:
 
 ```bash
 $ yorkie document ls test-project 
- ID                        KEY              CREATED AT  ACCESSED AT  UPDATED AT  SNAPSHOT       
+ ID                        KEY              CREATED AT  ACCESSED AT  UPDATED AT  ROOT       
  6482cea1c38d5a06529bbaa7  test-document-5  ...         ...          ...         ...
  6482cea0c38d5a06529bba96  test-document-4  ...         ...          ...         ...
  6482ce9fc38d5a06529bba85  test-document-3  ...         ...          ...         ...
@@ -344,7 +344,7 @@ You can use `--size` flag to limit the number of documents to output per page.
 
 ```bash
 $ yorkie document ls default --size 1
- ID                        KEY              CREATED AT  ACCESSED AT  UPDATED AT  SNAPSHOT       
+ ID                        KEY              CREATED AT  ACCESSED AT  UPDATED AT  ROOT       
  6482cea1c38d5a06529bbaa7  test-document-5  ...         ...          ...         ...
 ```
 
@@ -352,7 +352,7 @@ You can use `--previous-id` flag to start after a specific document.
 
 ```bash
 $ yorkie document ls default --previous-id 6482ce9fc38d5a06529bba85
- ID                        KEY              CREATED AT  ACCESSED AT  UPDATED AT  SNAPSHOT       
+ ID                        KEY              CREATED AT  ACCESSED AT  UPDATED AT  ROOT       
  6482ce9dc38d5a06529bba69  test-document-2  ...         ...          ...         ...
  6482ce97c38d5a06529bba1b  test-document-1  ...         ...          ...         ...
 ```
@@ -361,7 +361,7 @@ You can use `--forward` flag to search forward or backward.
 
 ```bash
 $ yorkie document ls default --forward
- ID                        KEY              CREATED AT  ACCESSED AT  UPDATED AT  SNAPSHOT       
+ ID                        KEY              CREATED AT  ACCESSED AT  UPDATED AT  ROOT       
  6482ce97c38d5a06529bba1b  test-document-1  ...         ...          ...         ...
  6482ce9dc38d5a06529bba69  test-document-2  ...         ...          ...         ...
  6482ce9fc38d5a06529bba85  test-document-3  ...         ...          ...         ...
