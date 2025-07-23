@@ -56,7 +56,7 @@ Response
     "id": "doc_abcdef",
     "key": "document-1",
     "project_name": "my-project",
-    "snapshot": "{\"content\":[],\"type\":\"doc\"}",
+    "root": "{\"content\":[],\"type\":\"doc\"}",
     "created_at": "2025-05-12T10:00:00.000Z",
     "updated_at": "2025-05-12T10:00:00.000Z"
   }
@@ -94,7 +94,7 @@ curl '{{API_ADDR}}/yorkie.v1.AdminService/UpdateDocument' \
     "id": "doc_12345",
     "key": "document-1",
     "project_name": "my-project",
-    "snapshot": "{\"type\":\"doc\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"text\":\"Updated content\",\"type\":\"text\"}]}]}",
+    "root": "{\"type\":\"doc\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"text\":\"Updated content\",\"type\":\"text\"}]}]}",
     "created_at": "2025-03-24T12:00:00.000Z",
     "updated_at": "2025-05-12T11:30:00.000Z"
   }
@@ -106,7 +106,7 @@ curl '{{API_ADDR}}/yorkie.v1.AdminService/UpdateDocument' \
 This endpoint returns a list of documents in a project. There is a pagination mechanism to retrieve documents in batches.
 You can provide the `previous_id` of the last document in the previous page to get the next page of documents.
 
-If you want to get the snapshot of the document, you can set the `include_snapshot` parameter to `true`.
+If you want to get the root of the document, you can set the `include_root` parameter to `true`.
 
 ##### Request
 
@@ -115,7 +115,7 @@ Parameters:
 - `previous_id`: The ID of the last document in the previous page. If not provided, the first page will be returned.
 - `page_size`: The number of documents to return.
 - `is_forward`: Whether to return documents in ascending order.
-- `include_snapshot`: Whether to include snapshots in the response.
+- `include_root`: Whether to include root in the response.
 
 ```bash
 curl '{{API_ADDR}}/yorkie.v1.AdminService/ListDocuments' \
@@ -126,7 +126,7 @@ curl '{{API_ADDR}}/yorkie.v1.AdminService/ListDocuments' \
     "previous_id": "doc_last_id",
     "page_size": 20,
     "is_forward": true,
-    "include_snapshot": false
+    "include_root": false
   }'
 ```
 
@@ -140,7 +140,7 @@ curl '{{API_ADDR}}/yorkie.v1.AdminService/ListDocuments' \
       "project_name": "my-project",
       "created_at": "2025-03-24T12:00:00.000Z",
       "updated_at": "2025-03-24T13:00:00.000Z",
-      "snapshot": "..."
+      "root": "..."
     },
     {
       "id": "doc_67890",
@@ -148,7 +148,7 @@ curl '{{API_ADDR}}/yorkie.v1.AdminService/ListDocuments' \
       "project_name": "my-project",
       "created_at": "2025-03-23T10:00:00.000Z",
       "updated_at": "2025-03-24T09:30:00.000Z",
-      "snapshot": "..."
+      "root": "..."
     }
   ]
 }
@@ -196,7 +196,8 @@ Get multiple documents by their keys.
 Parameters:
 - `project_name`: The name of the project.
 - `document_keys`: An array of document keys.
-- `include_snapshot`: Whether to include snapshots in the response.
+- `include_root`: Whether to include root in the response.
+- `include_presences`: Whether to include presences in the response.
 
 ```bash
 curl '{{API_ADDR}}/yorkie.v1.AdminService/GetDocuments' \
@@ -205,7 +206,8 @@ curl '{{API_ADDR}}/yorkie.v1.AdminService/GetDocuments' \
   --data-raw '{
     "project_name": "my-project",
     "document_keys": ["document-1", "document-2"],
-    "include_snapshot": false
+    "include_root": false,
+    "include_presences": false
   }'
 ```
 
@@ -218,14 +220,18 @@ curl '{{API_ADDR}}/yorkie.v1.AdminService/GetDocuments' \
       "key": "document-1",
       "project_name": "my-project",
       "created_at": "2025-03-24T12:00:00.000Z",
-      "updated_at": "2025-03-24T13:00:00.000Z"
+      "updated_at": "2025-03-24T13:00:00.000Z",
+      "root": "...",
+      "presences": "..."
     },
     {
       "id": "doc_67890",
       "key": "document-2",
       "project_name": "my-project",
       "created_at": "2025-03-23T10:00:00.000Z",
-      "updated_at": "2025-03-24T09:30:00.000Z"
+      "updated_at": "2025-03-24T09:30:00.000Z",
+      "root": "...",
+      "presences": "..."
     }
   ]
 }
