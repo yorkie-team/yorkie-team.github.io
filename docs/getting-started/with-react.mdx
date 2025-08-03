@@ -53,7 +53,7 @@ function App() {
 
 #### Accessing Document Data
 
-Use `useDocument`, `useRoot`, or `usePresences` hooks inside components to interact with the shared document.
+Use `useDocument`, `useRoot`, `usePresences`, or `useConnection` hooks inside components to interact with the shared document.
 
 ##### useDocument
 
@@ -132,6 +132,21 @@ function PresenceList() {
   );
 }
 ```
+
+##### useConnection
+
+To get the connection status of the document:
+
+```tsx
+import { useConnection } from '@yorkie-js/react';
+
+function ConnectionStatus() {
+  // "connected" or "disconnected"
+  const connection = useConnection();
+  return <p>Connection Status: {connection}</p>;
+}
+```
+
 
 ### Alternative Hook: useYorkieDoc
 
