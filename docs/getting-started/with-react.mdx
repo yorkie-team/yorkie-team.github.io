@@ -159,7 +159,7 @@ function StandaloneTodoList() {
   const { root, update, loading, error } = useYorkieDoc(
     'PROJECT_API_KEY',
     'DOC_KEY',
-    { todos: [] }
+    { initialRoot: { todos: [] } }
   );
 
   if (loading) return <p>Loading...</p>;
