@@ -70,41 +70,64 @@ Usage:
   yorkie server [options] [flags]
 
 Flags:
-      --auth-webhook-cache-auth-ttl duration            TTL value to set when caching authorized webhook response. (default 10s)
+      --auth-github-auth-url string                     GitHub OAuth2 authorization URL (default "https://github.com/login/oauth/authorize")
+      --auth-github-callback-redirect-url string        GitHub OAuth callback redirect URL (default "http://localhost:5173/dashboard")
+      --auth-github-client-id string                    GitHub OAuth Client ID
+      --auth-github-client-secret string                GitHub OAuth Client Secret
+      --auth-github-device-auth-url string              GitHub OAuth2 device authorization URL (default "https://github.com/login/device/code")
+      --auth-github-redirect-url string                 GitHub OAuth callback URL (default "http://localhost:8080/auth/github/callback")
+      --auth-github-token-url string                    GitHub OAuth2 token URL (default "https://github.com/login/oauth/access_token")
+      --auth-github-user-url string                     GitHub User API URL (default "https://api.github.com/user")
+      --auth-webhook-cache-auth-ttl duration            TTL value to set when caching authorization webhook response. (default 10s)
       --auth-webhook-cache-size int                     The cache size of the authorization webhook. (default 5000)
-      --auth-webhook-cache-unauth-ttl duration          TTL value to set when caching unauthorized webhook response. (default 10s)
-      --auth-webhook-max-retries uint                   Maximum number of retries for an authorization webhook. (default 10)
-      --auth-webhook-max-wait-interval duration         Maximum wait interval for authorization webhook. (default 3s)
+      --auth-webhook-max-retries uint                   Maximum number of retries for authorization webhook. (default 10)
+      --auth-webhook-max-wait-interval duration         Maximum wait interval between retries(exponential backoff). (default 3s)
+      --auth-webhook-min-wait-interval duration         Minimum wait interval between retries(exponential backoff). (default 100ms)
+      --auth-webhook-request-timeout duration           Timeout for each authorization webhook request. (default 3s)
       --backend-admin-password string                   The password of the default admin. (default "admin")
       --backend-admin-token-duration duration           The duration of the admin authentication token. (default 168h0m0s)
       --backend-admin-user string                       The name of the default admin user, who has full permissions. (default "admin")
+      --backend-gateway-addr string                     Gateway address (default "localhost:8080")
       --backend-secret-key string                       The secret key for signing authentication tokens for admin users. (default "yorkie-secret")
-      --backend-snapshot-interval int                   Interval of changes to create a snapshot. (default 1000)
+      --backend-snapshot-disable-gc                     Whether to disable garbage collection of snapshots.
+      --backend-snapshot-interval int                   Interval of changes to create a snapshot. (default 500)
       --backend-snapshot-threshold int                  Threshold that determines if changes should be sent with snapshot when the number of changes is greater than this value. (default 500)
-      --backend-snapshot-with-purging-changes           Whether to delete previous changes when the snapshot is created.
       --backend-use-default-project                     Whether to use the default project. Even if public key is not provided from the client, the default project will be used for the request. (default true)
       --client-deactivate-threshold string              Deactivate threshold of clients in specific project for housekeeping. (default "24h")
   -c, --config string                                   Config path
-      --pprof-enabled                                   Enable runtime profiling data via HTTP server.
-      --etcd-dial-timeout duration                      ETCD's dial timeout (default 5s)
-      --etcd-endpoints strings                          Comma separated list of etcd endpoints
-      --etcd-lock-lease-time duration                   ETCD's lease time for lock (default 30s)
-      --etcd-password string                            ETCD's password
-      --etcd-username string                            ETCD's user name
+      --event-webhook-max-retries uint                  Maximum number of retries for event webhook. (default 10)
+      --event-webhook-max-wait-interval duration        Maximum wait interval between retries(exponential backoff). (default 3s)
+      --event-webhook-min-wait-interval duration        Minimum wait interval between retries(exponential backoff). (default 100ms)
+      --event-webhook-request-timeout duration          Timeout for each event webhook request. (default 3s)
   -h, --help                                            help for server
       --hostname string                                 Yorkie Server Hostname
       --housekeeping-candidates-limit-per-project int   candidates limit per project for a single housekeeping run (default 500)
+      --housekeeping-compaction-min-changes int         minimum number of changes to compact a document for housekeeping run (default 1000)
       --housekeeping-interval duration                  housekeeping interval between housekeeping runs (default 30s)
+      --housekeeping-project-fetch-size int             housekeeping project fetch size for a single housekeeping run (default 100)
+      --kafka-addresses string                          Comma-separated list of Kafka addresses (e.g., localhost:9092,localhost:9093)
+      --kafka-topic string                              Kafka topic name to publish events (default "user-events")
+      --kafka-write-timeout duration                    Timeout for writing messages to Kafka (default 5s)
   -l, --log-level string                                Log level: debug, info, warn, error, panic, fatal (default "info")
       --mongo-connection-timeout duration               Mongo DB's connection timeout (default 5s)
       --mongo-connection-uri string                     MongoDB's connection URI
+      --mongo-monitoring-enabled                        Enable MongoDB query monitoring
+      --mongo-monitoring-slow-query-threshold string    Threshold for logging slow MongoDB queries (e.g. '100ms', '1s') (default "100ms")
       --mongo-ping-timeout duration                     Mongo DB's ping timeout (default 5s)
       --mongo-yorkie-database string                    Yorkie's database name in MongoDB (default "yorkie-meta")
+      --pprof-enabled                                   Enable runtime profiling data via HTTP server.
       --profiling-port int                              Profiling port (default 8081)
+      --project-info-cache-size int                     The cache size of the project info. (default 256)
+      --project-info-cache-ttl duration                 TTL value to set when caching project info. (default 10m0s)
       --rpc-cert-file string                            RPC certification file's path
       --rpc-key-file string                             RPC key file's path
-      --rpc-max-requests-bytes uint                     Maximum client request size in bytes the server will accept. (default 4194304)
       --rpc-port int                                    RPC port (default 8080)
+      --snapshot-cache-size int                         The cache size of the snapshots. (default 1000)
+      --starrocks-dsn string                            StarRocks DSN for the analytics
+
+Global Flags:
+  -o, --output string     One of 'yaml' or 'json'.
+      --rpc-addr string   Address of the rpc server (default "localhost:8080")
 ```
 
 ### Signup
@@ -196,6 +219,10 @@ Available Commands:
 Flags:
   -h, --help   help for project
 
+Global Flags:
+  -o, --output string     One of 'yaml' or 'json'.
+      --rpc-addr string   Address of the rpc server (default "localhost:8080")
+
 Use "yorkie project [command] --help" for more information about a command.
 ```
 
@@ -243,12 +270,21 @@ Examples:
 yorkie project update name [options]
 
 Flags:
-      --auth-webhook-method-add stringArray   authorization-webhook methods to add ('ALL' for all methods)
-      --auth-webhook-method-rm stringArray    authorization-webhook methods to remove ('ALL' for all methods)
-      --auth-webhook-url string               authorization-webhook update url
-      --client-deactivate-threshold string    client deactivate threshold for housekeeping
-  -h, --help                                 help for update
-      --name string                          new project name
+      --auth-webhook-method-add stringArray    authorization-webhook methods to add ('ALL' for all methods)
+      --auth-webhook-method-rm stringArray     authorization-webhook methods to remove ('ALL' for all methods)
+      --auth-webhook-url string                authorization-webhook update url
+      --client-deactivate-threshold string     client deactivate threshold for housekeeping
+      --event-webhook-events-add stringArray   event-webhook events to add ('ALL' for all events)
+      --event-webhook-events-rm stringArray    event-webhook events to remove ('ALL' for all events)
+      --event-webhook-url string               event-webhook update url
+  -h, --help                                   help for update
+      --max-attachments-per-document int       max attachments per document
+      --max-subscribers-per-document int       max subscribers per document
+      --name string                            new project name
+
+Global Flags:
+  -o, --output string     One of 'yaml' or 'json'.
+      --rpc-addr string   Address of the rpc server (default "localhost:8080")
 ```
 
 You can update the name of the Project with `--name` flag.
