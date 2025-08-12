@@ -1,4 +1,5 @@
 import { useClipboard } from 'hooks';
+import { cleanCliValue } from '@/utils/clipboardUtils';
 
 export function CopyButton({
   children,
@@ -10,7 +11,10 @@ export function CopyButton({
   value: string;
 }) {
   const clipboard = useClipboard({ timeout });
-  const copy = () => clipboard.copy(value);
+  const copy = () => {
+    const cleanedValue = cleanCliValue(value);
+    clipboard.copy(cleanedValue);
+  };
 
   return <>{children({ copy, copied: clipboard.copied })}</>;
 }
