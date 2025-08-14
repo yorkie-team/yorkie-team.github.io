@@ -64,13 +64,7 @@ const TldrawExampleView: NextPage = () => {
               <Sidebar.Bottom codeURL={EXAMPLE_CODE_URL + exampleKey} />
             </Sidebar.Tabs>
           </Sidebar>
-          <BasicExampleView
-            rpcAddr={process.env.NEXT_PUBLIC_API_ADDR || ''}
-            apiKey={process.env.NEXT_PUBLIC_EXAMPLES_API_KEY || ''}
-            documentKey={exampleKey}
-            iframeURL={EXAMPLE_PREVIEW_URL + exampleKey}
-            userMaxCount={30}
-          />
+          <BasicExampleView iframeURL={EXAMPLE_PREVIEW_URL + exampleKey} />
         </>
       )}
     </ExampleLayout>
