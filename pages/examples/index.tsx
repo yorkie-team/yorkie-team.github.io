@@ -92,14 +92,14 @@ const EXAMPLES: Example[] = [
     id: 'quill',
     title: 'Quill',
     desc: 'This demo shows the real-time collaborative version of the Quill editor with Yorkie and Vite.',
-    thumbnail: 'vanilla-quill.jpg',
+    thumbnail: 'vanilla-quill.png',
     category: [CATEGORIES.EDITOR],
   },
   {
     id: 'calendar',
     title: 'Calendar',
     desc: 'This demo shows the real-time collaborative version of the Calendar with Yorkie and Next.js.',
-    thumbnail: 'nextjs-scheduler.jpg',
+    thumbnail: 'nextjs-scheduler.png',
     category: [CATEGORIES.PRODUCTIVITY],
   },
 ];
