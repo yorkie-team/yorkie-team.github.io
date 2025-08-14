@@ -1,64 +1,12 @@
-import { Icon } from '@/components';
+import { useCallback, useState } from 'react';
 import classNames from 'classnames';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import yorkie from '@yorkie-js/sdk';
+import { Icon } from '@/components';
 import UserContent from './UserContent';
-
-interface DocChangeInfo {
-  type: 'update' | 'initialize' | 'presence';
-  content: string;
-}
 
 export const UserColors = ['red', 'yellow', 'green', 'orange', 'blue', 'purple'];
 
-export function BasicExampleView({
-  rpcAddr,
-  apiKey,
-  documentKey,
-  iframeURL,
-  userMaxCount = 4,
-}: {
-  rpcAddr: string;
-  apiKey: string;
-  documentKey: string;
-  iframeURL: string;
-  userMaxCount?: number;
-}) {
-  const [docChangeInfos, setDocChangeInfos] = useState<DocChangeInfo[]>([]);
+export function BasicExampleView({ iframeURL, userMaxCount = 4 }: { iframeURL: string; userMaxCount?: number }) {
   const [userList, setUserList] = useState<number[]>([1, 2]);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    let unsubscribeDoc: Function;
-
-    const activate = async () => {
-      const client = new yorkie.Client({ rpcAddr, apiKey });
-      await client.activate();
-      const doc = new yorkie.Document(documentKey);
-      await client.attach(doc);
-
-      setDocChangeInfos((prev) => [...prev, { type: 'initialize', content: 'Connection has been established!' }]);
-      unsubscribeDoc = doc.subscribe((event) => {
-        if (event.type === 'remote-change') {
-          const { operations } = event.value;
-          for (const op of operations) {
-            setDocChangeInfos((prev) => [...prev, { type: 'update', content: op.path }]);
-          }
-        }
-      });
-    };
-    activate();
-
-    return () => {
-      if (unsubscribeDoc) unsubscribeDoc();
-    };
-  }, [rpcAddr, documentKey, apiKey]);
-
-  const scrollToBottom = useCallback(() => {
-    if (!messagesEndRef.current) return;
-    messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-  }, [messagesEndRef]);
-
-  useEffect(scrollToBottom, [docChangeInfos, scrollToBottom]);
 
   const deleteUser = useCallback(
     (userId: number) => {
@@ -124,21 +72,6 @@ export function BasicExampleView({
           return <UserContent key={userNumber} userNumber={userNumber} iframeURL={iframeURL} />;
         })}
       </ul>
-      <div className="log_box">
-        <div className="log_inner">
-          <div className="log_title">Event Log</div>
-          <div style={{ overflowY: 'auto', paddingLeft: 3, maxHeight: 113 - 18 - 5, fontSize: 12 }}>
-            {docChangeInfos.map((changeInfo, index) => (
-              <div className="log_desc" key={index}>
-                <span style={{ fontWeight: 'bold' }}>event</span> -
-                {changeInfo.type === 'update' && <span style={{ opacity: 0.5 }}>modification occurred at </span>}
-                <span>{changeInfo.content}</span>
-              </div>
-            ))}
-            <div ref={messagesEndRef} />
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
