@@ -414,35 +414,37 @@ For more information about `StreamConnectionStatus`, please refer to the [Stream
 ##### Document.subscribe('sync')
 
 If the document is attached to the client in `SyncMode.Realtime`, the document is automatically synchronized with the server in real-time.
-Under this mode, the document executes synchronization in the background, and you can track the synchronization status using the `sync` event. The possible `event.value` values are: `DocumentSyncStatus.Synced` and `DocumentSyncStatus.SyncFailed`.
+Under this mode, the document executes synchronization in the background, and you can track the synchronization status using the `sync` event. The possible `event.value` values are: `DocSyncStatus.Synced` and `DocSyncStatus.SyncFailed`.
 
 ```javascript
 const unsubscribe = doc.subscribe('sync', (event) => {
-  if (event.value === DocumentSyncStatus.Synced) {
+  if (event.value === DocSyncStatus.Synced) {
     // The document is synchronized with the server.
-  } else if (event.value === DocumentSyncStatus.SyncFailed) {
+  } else if (event.value === DocSyncStatus.SyncFailed) {
     // The document failed to synchronize with the server.
   }
 });
 ```
 
-For more information about `DocumentSyncStatus`, please refer to the [DocumentSyncStatus](https://yorkie.dev/yorkie-js-sdk/api-reference/enums/DocumentSyncStatus.html).
+For more information about `DocSyncStatus`, please refer to the [DocSyncStatus](https://yorkie.dev/yorkie-js-sdk/api-reference/enums/DocSyncStatus.html).
 
 ##### Document.subscribe('status')
 
-You can subscribe to the status of the document using `doc.subscribe('status', callback)`. The possible values for `event.value.status` are `DocumentStatus.Attached` and `DocumentStatus.Detached`.
+You can subscribe to the status of the document using `doc.subscribe('status', callback)`. The possible values for `event.value.status` are `DocStatus.Attached`, `DocStatus.Detached`, and `DocStatus.Removed`.
 
 ```javascript
 const unsubscribe = doc.subscribe('status', (event) => {
-  if (event.value.status === DocumentStatus.Attached) {
+  if (event.value.status === DocStatus.Attached) {
     // The document is attached to the client.
-  } else if (event.value.status === DocumentStatus.Detached) {
+  } else if (event.value.status === DocStatus.Detached) {
     // The document is detached from the client.
+  } else if (event.value.status === DocStatus.Removed) {
+    // The document is removed and cannot be edited
   }
 });
 ```
 
-For more information about `DocumentStatus`, please refer to the [DocumentStatus](https://yorkie.dev/yorkie-js-sdk/api-reference/enums/DocumentStatus.html).
+For more information about `DocStatus`, please refer to the [DocStatus](https://yorkie.dev/yorkie-js-sdk/api-reference/enums/DocStatus.html).
 
 <Alert status="warning">
 In Web-based applications, it is hard to detect when the user closes the browser or navigates to another page. In such cases, the document may remain attached to the client, which can lead to inefficient storage and memory usage.

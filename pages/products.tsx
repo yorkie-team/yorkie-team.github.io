@@ -79,7 +79,7 @@ const Products: NextPage = () => {
           </div>
           <div className="section_content">
             <strong className="sub_title" id="flexible-database">
-              Document
+              <a href="#flexible-database">Document</a>
             </strong>
             <p className="sub_desc">
               Yorkie provides a general-purpose JSON-like{' '}
@@ -137,7 +137,7 @@ const Products: NextPage = () => {
             </strong>
             <p className="sub_desc">
               You can build a sense of presence by tracking the status of users who are editing the same document with{' '}
-              <Link href="/docs/js-sdk#presence" className="link">
+              <Link href="/docs/js-sdk#getting-presence" className="link">
                 Presence
               </Link>
               .

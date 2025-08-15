@@ -113,8 +113,8 @@ export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement
           </div>
           <div className="site">
             <strong className="title">
-              <Link href="/support" className="link">
-                Support
+              <Link href="/community" className="link">
+                Community
               </Link>
             </strong>
             <ul className="site_list">
