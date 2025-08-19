@@ -10,7 +10,7 @@ import { useRouter } from 'next/router';
 const CATEGORIES = {
   ALL: 'all',
   PRESENCE: 'presence',
-  EDITOR: 'editor',
+  EDITOR: 'text-editor',
   CANVAS_TOOL: 'canvas-tool',
   PRODUCTIVITY: 'productivity',
   REACT: 'react-provider',
@@ -18,7 +18,7 @@ const CATEGORIES = {
 export const CATEGORY_CONFIG = [
   { id: CATEGORIES.ALL, label: 'All examples', icon: 'diamond' },
   { id: CATEGORIES.PRESENCE, label: 'Presence', icon: 'messageSmile' },
-  { id: CATEGORIES.EDITOR, label: 'Editor', icon: 'textInput' },
+  { id: CATEGORIES.EDITOR, label: 'Text Editor', icon: 'textInput' },
   { id: CATEGORIES.CANVAS_TOOL, label: 'Canvas Tool', icon: 'transform' },
   { id: CATEGORIES.PRODUCTIVITY, label: 'Productivity', icon: 'checkCircle' },
   { id: CATEGORIES.REACT, label: 'React Provider', icon: 'reactLogo' },
@@ -43,8 +43,8 @@ const EXAMPLES: Example[] = [
     id: 'simultaneous-cursors',
     title: 'Simultaneous Cursors',
     desc: 'This demo shows the real-time collaborative version of simple drawing, cursor animation with Yorkie and React.',
-    thumbnail: 'simultaneous-cursors.jpg',
-    category: [CATEGORIES.PRESENCE],
+    thumbnail: 'simultaneous-cursors.png',
+    category: [CATEGORIES.PRESENCE, CATEGORIES.REACT],
   },
   {
     id: 'kanban',
