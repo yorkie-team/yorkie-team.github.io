@@ -323,6 +323,24 @@ console.log(root.obj.name); // "yorkie"
 console.log(root.counter.getValue()); // 1
 ```
 
+#### Converting Document Data to Plain JavaScript Objects
+
+You can convert Yorkie's JSONObject types to plain JavaScript objects using the `toJS()` method. This is useful when you need to serialize document data or integrate with other libraries that expect plain objects.
+
+```javascript
+const root = doc.getRoot();
+
+// Converting the entire root to a plain object
+const plainObject = root.toJS();
+console.log(plainObject); // Plain JavaScript object
+
+// Converting specific nested objects
+const plainTodos = root.todos.toJS();
+const plainObj = root.obj.toJS();
+```
+
+<Alert status="info"> The `toJS()` method creates a deep copy of the data as a plain JavaScript object, removing all Yorkie-specific metadata and proxies. </Alert>
+
 #### Subscribing to Document
 
 You can subscribe to various events occurring in the Document, such as changes, connection status, synchronization status, and all events by using the `document.subscribe()` method.
@@ -557,6 +575,19 @@ If the document is no longer used, it should be detached to increase the efficie
 ```javascript
 await client.detach(doc);
 ```
+
+When detaching a document, you can provide additional options to control the detachment behavior:
+
+```javascript
+await client.detach(doc, {
+  removeIfNotAttached: true
+});
+```
+
+Available options:
+- `removeIfNotAttached` (Optional, boolean): When set to true, the document will be completely removed from the server if no other clients are attached to it. This is useful for cleaning up temporary documents or sessions. Default is false.
+
+<Alert status="warning"> Use `removeIfNotAttached: true` carefully, as it will permanently delete the document from the server if no other clients are currently attached. This action cannot be undone. </Alert>
 
 ### Document Limits
 
