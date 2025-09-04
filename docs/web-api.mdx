@@ -13,12 +13,12 @@ The API is implemented using [Connect protocol](https://connectrpc.com/docs/prot
 
 ### Authentication
 
-For APIs that require authentication, you need to add your Project SecretKey to the request's authorization header.
+For APIs that require authentication, you need to add your Project SecretKey to the request's authorization header using the API-Key scheme.
 
 ```bash
 curl '{{API_ADDR}}/yorkie.v1.AdminService/ListProjects' \
   -H 'content-type: application/json' \
-  -H 'authorization: PROJECT_SECRET_KEY' \
+  -H 'authorization: API-Key PROJECT_SECRET_KEY' \
   --data-raw '{}'
 ```
 
@@ -33,16 +33,14 @@ is provided, it will be used as the initial content of the document. Otherwise, 
 
 Parameters:
 
-- `project_name`: The name of the project.
 - `document_key`: A unique key for the new document.
 - `initial_root`: The initial root([YSON string](/docs/web-api#yson)) of the document.
 
 ```bash
 curl '{{API_ADDR}}/yorkie.v1.AdminService/CreateDocument' \
   -H 'content-type: application/json' \
-  -H 'authorization: PROJECT_SECRET_KEY' \
+  -H 'authorization: API-Key PROJECT_SECRET_KEY' \
   --data-raw '{
-    "project_name": "my-project",
     "document_key": "document-1",
     "initial_root": "{\"type\":\"doc\",\"content\":[]}"
   }'
@@ -71,16 +69,14 @@ This endpoint updates the content of an existing document.
 
 Parameters:
 
-- `project_name`: The name of the project.
 - `document_key`: The key of the document to update.
 - `root`: The new root content ([YSON string](/docs/web-api#yson)) of the document.
 
 ```bash
 curl '{{API_ADDR}}/yorkie.v1.AdminService/UpdateDocument' \
   -H 'content-type: application/json' \
-  -H 'authorization: PROJECT_SECRET_KEY' \
+  -H 'authorization: API-Key PROJECT_SECRET_KEY' \
   --data-raw '{
-    "project_name": "my-project",
     "document_key": "document-1",
     "root": "{\"type\":\"doc\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"text\":\"Updated content\",\"type\":\"text\"}]}]}"
   }'
@@ -111,7 +107,6 @@ If you want to get the root of the document, you can set the `include_root` para
 ##### Request
 
 Parameters:
-- `project_name`: The name of the project.
 - `previous_id`: The ID of the last document in the previous page. If not provided, the first page will be returned.
 - `page_size`: The number of documents to return.
 - `is_forward`: Whether to return documents in ascending order.
@@ -120,9 +115,8 @@ Parameters:
 ```bash
 curl '{{API_ADDR}}/yorkie.v1.AdminService/ListDocuments' \
   -H 'content-type: application/json' \
-  -H 'authorization: PROJECT_SECRET_KEY' \
+  -H 'authorization: API-Key PROJECT_SECRET_KEY' \
   --data-raw '{
-    "project_name": "my-project",
     "previous_id": "doc_last_id",
     "page_size": 20,
     "is_forward": true,
@@ -161,15 +155,13 @@ This endpoint returns a document by its key.
 ##### Request
 
 Parameters:
-- `project_name`: The name of the project.
 - `document_key`: The key of the document.
 
 ```bash
 curl '{{API_ADDR}}/yorkie.v1.AdminService/GetDocument' \
   -H 'content-type: application/json' \
-  -H 'authorization: PROJECT_SECRET_KEY' \
+  -H 'authorization: API-Key PROJECT_SECRET_KEY' \
   --data-raw '{
-    "project_name": "my-project",
     "document_key": "document-1"
   }'
 ```
@@ -194,7 +186,6 @@ Get multiple documents by their keys.
 ##### Request
 
 Parameters:
-- `project_name`: The name of the project.
 - `document_keys`: An array of document keys.
 - `include_root`: Whether to include root in the response.
 - `include_presences`: Whether to include presences in the response.
@@ -202,9 +193,8 @@ Parameters:
 ```bash
 curl '{{API_ADDR}}/yorkie.v1.AdminService/GetDocuments' \
   -H 'content-type: application/json' \
-  -H 'authorization: PROJECT_SECRET_KEY' \
+  -H 'authorization: API-Key PROJECT_SECRET_KEY' \
   --data-raw '{
-    "project_name": "my-project",
     "document_keys": ["document-1", "document-2"],
     "include_root": false,
     "include_presences": false
@@ -241,7 +231,6 @@ curl '{{API_ADDR}}/yorkie.v1.AdminService/GetDocuments' \
 
 Remove a document.
 
-- `project_name`: The name of the project.
 - `document_key`: The key of the document.
 - `force`: Whether to force remove the document event if they are attached to clients.
 
@@ -249,9 +238,8 @@ Remove a document.
 ```bash
 curl '{{API_ADDR}}/yorkie.v1.AdminService/RemoveDocumentByAdmin' \
   -H 'content-type: application/json' \
-  -H 'authorization: PROJECT_SECRET_KEY' \
+  -H 'authorization: API-Key PROJECT_SECRET_KEY' \
   --data-raw '{
-    "project_name": "my-project",
     "document_key": "document-1",
     "force": false
   }'
@@ -266,16 +254,14 @@ Get snapshot metadata for a document.
 ##### Request
 
 Parameters:
-- `project_name`: The name of the project.
 - `document_key`: The key of the document.
 - `server_seq`: The server sequence number of the snapshot.
 
 ```bash
 curl '{{API_ADDR}}/yorkie.v1.AdminService/GetSnapshotMeta' \
   -H 'content-type: application/json' \
-  -H 'authorization: PROJECT_SECRET_KEY' \
+  -H 'authorization: API-Key PROJECT_SECRET_KEY' \
   --data-raw '{
-    "project_name": "my-project",
     "document_key": "document-1",
     "server_seq": 42
   }'
@@ -299,16 +285,14 @@ Search for documents in a project.
 ##### Request
 
 Parameters:
-- `project_name`: The name of the project.
 - `query`: The prefix of the document key to search for.
 - `page_size`: The number of documents to return.
 
 ```bash
 curl '{{API_ADDR}}/yorkie.v1.AdminService/SearchDocuments' \
   -H 'content-type: application/json' \
-  -H 'authorization: PROJECT_SECRET_KEY' \
+  -H 'authorization: API-Key PROJECT_SECRET_KEY' \
   --data-raw '{
-    "project_name": "my-project",
     "query": "search term",
     "page_size": 20
   }'
