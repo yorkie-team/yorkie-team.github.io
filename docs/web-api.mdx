@@ -46,7 +46,7 @@ curl '{{API_ADDR}}/yorkie.v1.AdminService/CreateDocument' \
   }'
 ```
 
-Response
+##### Response
 
 ```bash
 {
@@ -231,10 +231,12 @@ curl '{{API_ADDR}}/yorkie.v1.AdminService/GetDocuments' \
 
 Remove a document.
 
-- `document_key`: The key of the document.
-- `force`: Whether to force remove the document event if they are attached to clients.
-
 ##### Request
+
+Parameters:
+- `document_key`: The key of the document.
+- `force`: Whether to force remove the document even if it is attached to clients.
+
 ```bash
 curl '{{API_ADDR}}/yorkie.v1.AdminService/RemoveDocumentByAdmin' \
   -H 'content-type: application/json' \
@@ -249,6 +251,7 @@ curl '{{API_ADDR}}/yorkie.v1.AdminService/RemoveDocumentByAdmin' \
 Empty response with success status code.
 
 #### POST /yorkie.v1.AdminService/GetSnapshotMeta
+
 Get snapshot metadata for a document.
 
 ##### Request
