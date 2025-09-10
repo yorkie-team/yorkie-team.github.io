@@ -591,10 +591,10 @@ Available options:
 
 ##### Project-level Remove on Detach Setting
 
-The `Remove on Detach` setting is a project-level configuration that automatically applies the document removal behavior to all documents within the project, without requiring explicit `removeIfNotAttached: true` in individual detach calls.
+The `Remove on Detach` setting is a project-level configuration that enforces server-side removal when a detach leaves the document with zero attached clients. It automatically applies to all documents in the project; you don't need to pass `removeIfNotAttached: true` on individual detach calls.
 
 <Alert status="warning">
-When `Remove on Detach` setting is enabled, it takes precedence over any `removeIfNotAttached` values you might pass to individual `client.detach()` calls. Even if you explicitly set `removeIfNotAttached: false` in your code, documents will still be removed if no other clients are attached.
+When the `Remove on Detach` setting is enabled, it overrides any `removeIfNotAttached` value passed to `client.detach()`. Even if you set `removeIfNotAttached: false`, the server will remove the document once no other clients are attached at detach time.
 </Alert>
 
 ### Document Limits
