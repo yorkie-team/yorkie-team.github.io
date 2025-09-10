@@ -589,6 +589,14 @@ Available options:
 
 <Alert status="warning"> Use `removeIfNotAttached: true` carefully, as it will permanently delete the document from the server if no other clients are currently attached. This action cannot be undone. </Alert>
 
+##### Project-level Remove on Detach Setting
+
+The `Remove on Detach` setting is a project-level configuration that automatically applies the document removal behavior to all documents within the project, without requiring explicit `removeIfNotAttached: true` in individual detach calls.
+
+<Alert status="warning">
+When `Remove on Detach` setting is enabled, it takes precedence over any `removeIfNotAttached` values you might pass to individual `client.detach()` calls. Even if you explicitly set `removeIfNotAttached: false` in your code, documents will still be removed if no other clients are attached.
+</Alert>
+
 ### Document Limits
 
 Yorkie enforces certain limits on document operations to ensure system stability and optimal performance. These limits can be configured through the Yorkie Dashboard's Project Settings.
@@ -633,7 +641,6 @@ However, **remote updates are not subject to this limit** and are always applied
 
 Garbage-collected data is automatically reduced over time through system-managed garbage collection. While manual GC is not exposed, the system triggers GC under certain conditions. For instance, clients that remain inactive beyond the configured *Client Deactivate Threshold* are automatically deactivated, improving GC efficiency and reducing document GC size over time.  
 For details on GC and housekeeping, refer to the [housekeeping design document](https://github.com/yorkie-team/yorkie/blob/main/design/housekeeping.md).
-
 
 ### Custom CRDT types
 
