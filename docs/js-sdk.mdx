@@ -754,6 +754,176 @@ doc.update((root, presence) => {
 });
 ```
 
+### Presence (Dedicated Version)
+
+`Presence` is a lightweight, standalone counter for tracking online users in real-time. Unlike Document presence which is tied to document editing, Presence is designed for simple user counting scenarios like showing "3 users online" in your application.
+
+#### Key Differences from Document Presence
+
+The key distinction between Document Presence and Presence:
+
+| Feature | Document Presence | Presence (Dedicated Version) |
+|---------|------------------|------------------|
+| **Purpose** | Share editing state (cursor, selection) | Count online users |
+| **Data Type** | Custom object (any JSON) | Simple number counter |
+| **Attachment** | Attached to Document | Attached to Client directly |
+| **Use Case** | Collaborative editing | User presence tracking |
+
+#### Creating a Presence
+
+You can create a Presence using `new yorkie.Presence()` with a unique key:
+
+```javascript
+const presence = new yorkie.Presence('room-123');
+```
+
+> The presence key is used to identify the presence room. It is a string that can be freely defined by the user, similar to document keys.
+
+#### Attaching the Presence
+
+When you attach a presence to the client, the server registers this client as participating in the presence room and returns the current count:
+
+```javascript
+await client.attach(presence);
+console.log(presence.getCount()); // 1 (if you're the first user)
+```
+
+#### Synchronization Modes: Realtime vs Manual
+
+Presence supports two synchronization modes to fit different use cases:
+
+##### Realtime Mode (Default)
+
+In **realtime mode**, count updates are automatically received through a watch stream. This is ideal for applications that need instant updates:
+
+```javascript
+// Realtime mode - count updates automatically
+await client.attach(presence);
+
+// Subscribe to count changes
+const unsubscribe = presence.subscribe((event) => {
+  console.log(`Current count: ${presence.getCount()}`);
+});
+```
+
+When another user joins or leaves, your presence automatically updates without any additional calls.
+
+##### Manual Mode
+
+In **manual mode**, you have explicit control over when to refresh the count. This is useful for reducing network traffic or when you want to update on-demand:
+
+```javascript
+// Manual mode - you control when to sync
+await client.attach(presence, { isRealtime: false });
+
+// Count doesn't update automatically
+// You must call sync() to refresh
+await client.sync(presence);
+console.log(presence.getCount()); // Updated count
+```
+
+<Alert status="warning">
+In manual mode, you must call `client.sync(presence)` within **60 seconds** to keep the presence alive. The server maintains a TTL (Time To Live) of 60 seconds for each presence. If you don't sync within this time, the server will consider the client as disconnected and remove it from the count.
+</Alert>
+
+```javascript
+// Example: Periodic sync to maintain presence
+const keepAlive = setInterval(async () => {
+  await client.sync(presence);
+}, 30000); // Sync every 30 seconds (well within the 60-second TTL)
+
+// Don't forget to clear the interval when done
+clearInterval(keepAlive);
+```
+
+<Alert status="info">
+Use **realtime mode** for live dashboards and real-time indicators where instant updates are critical. Use **manual mode** for less time-sensitive scenarios or to optimize network usage, but remember to sync regularly to maintain the connection.
+</Alert>
+
+#### Getting the Current Count
+
+You can get the current count at any time:
+
+```javascript
+const currentCount = presence.getCount();
+console.log(`${currentCount} users online`);
+```
+
+#### Subscribing to Count Changes
+
+In realtime mode, you can subscribe to presence events to react to count changes:
+
+```javascript
+const unsubscribe = presence.subscribe((event) => {
+  if (event.type === 'initialized') {
+    // Fired when the watch stream is first established
+    updateUI(event.count);
+  }
+  
+  if (event.type === 'changed') {
+    // Fired when the count changes (user joined/left)
+    updateUI(event.count);
+  }
+});
+
+// Don't forget to unsubscribe when done
+unsubscribe();
+```
+
+#### Detaching the Presence
+
+When a user leaves the room or when cleaning up resources, detach the presence:
+
+```javascript
+await client.detach(presence);
+```
+
+This decrements the count and notifies other users in realtime mode.
+
+#### Example Use Cases
+
+Presence is perfect for scenarios where you need simple user counting:
+
+- **Game Lobbies**: Show how many players are waiting in a game lobby
+- **Live Streaming**: Display real-time viewer count for live streams
+- **Chat Rooms**: Show active participants in a chat room
+- **Dashboards**: Real-time active users indicator
+- **Virtual Events**: Track attendance in virtual conferences or webinars
+
+#### Complete Example
+
+Here's a complete example of using Presence in a chat room:
+
+```javascript
+const client = new yorkie.Client({
+  rpcAddr: '{{API_ADDR}}',
+  apiKey: 'xxxxxxxxxxxxxxxxxxxx',
+});
+await client.activate();
+
+// Create and attach presence for a chat room
+const roomPresence = new yorkie.Presence('chat-room-general');
+await client.attach(roomPresence);
+
+// Update UI with current count
+const updateUserCount = (count) => {
+  document.getElementById('user-count').textContent = `${count} users online`;
+};
+
+// Subscribe to count changes
+const unsubscribe = roomPresence.subscribe((event) => {
+  updateUserCount(roomPresence.getCount());
+});
+
+// When user leaves the room
+const leaveRoom = async () => {
+  unsubscribe();
+  await client.detach(roomPresence);
+};
+```
+
+For a complete working example, see: [Presence Example](https://github.com/yorkie-team/yorkie-js-sdk/tree/main/packages/sdk/public/presence.html)
+
 ### Logger Options
 
 The Logger outputs events occurring within the SDK to the console for debugging purposes. To modify these options, you can use the `setLogLevel` function.
