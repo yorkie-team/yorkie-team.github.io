@@ -42,6 +42,34 @@ $ npm run fetch:examples
 
 This command will fetch the fileInfo of examples from JS SDK repository and copy them to the `/examples` directory.
 
+### Building example applications
+
+The example applications are built and served directly from the homepage. To build all examples:
+
+```
+$ npm run build:examples
+```
+
+This will:
+
+1. Use yorkie-js-sdk's pnpm build system (from `/temp` directory)
+2. Read API configuration from `.env` and `.env.production` environment variables
+3. Build static examples using `pnpm build:examples`
+4. Copy built files to `public/apps/`
+
+**Environment Variables:**
+
+- `NEXT_PUBLIC_API_ADDR`: Yorkie API server address (default: https://api.yorkie.dev)
+- `NEXT_PUBLIC_EXAMPLES_API_KEY`: API key for examples (optional)
+
+For full production build including examples:
+
+```
+$ npm run build:full
+```
+
+**Note:** Make sure to run `npm run fetch:examples` first to clone the yorkie-js-sdk repository to the `/temp` directory.
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 <details>

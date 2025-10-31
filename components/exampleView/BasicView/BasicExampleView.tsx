@@ -8,6 +8,10 @@ export const UserColors = ['red', 'yellow', 'green', 'orange', 'blue', 'purple']
 export function BasicExampleView({ iframeURL, userMaxCount = 4 }: { iframeURL: string; userMaxCount?: number }) {
   const [userList, setUserList] = useState<number[]>([1, 2]);
 
+  // Ensure iframe URL ends with /index.html for locally built examples
+  const normalizedIframeURL =
+    iframeURL.startsWith('/apps/') && !iframeURL.endsWith('.html') ? `${iframeURL}/index.html` : iframeURL;
+
   const deleteUser = useCallback(
     (userId: number) => {
       if (userList.length === 1) {
@@ -69,7 +73,7 @@ export function BasicExampleView({ iframeURL, userMaxCount = 4 }: { iframeURL: s
       </div>
       <ul className="grid_list2">
         {userList.map((userNumber) => {
-          return <UserContent key={userNumber} userNumber={userNumber} iframeURL={iframeURL} />;
+          return <UserContent key={userNumber} userNumber={userNumber} iframeURL={normalizedIframeURL} />;
         })}
       </ul>
     </div>

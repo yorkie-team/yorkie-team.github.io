@@ -3,6 +3,12 @@
 export $(grep -v '^#' .env | xargs)
 version=$NEXT_PUBLIC_YORKIE_JS_VERSION
 
+# Clean up temp directory if it exists
+if [ -d "temp" ]; then
+    echo "Cleaning up existing temp directory..."
+    rm -rf temp
+fi
+
 git clone https://github.com/yorkie-team/yorkie-js-sdk.git temp
 cd temp
 git fetch origin refs/tags/v$version
@@ -25,5 +31,4 @@ for f in temp/examples/* ; do
     fi
 done
 
-node --no-warnings=ExperimentalWarning --loader ts-node/esm scripts/fetchExamples.mts
-rm -rf temp
+node --no-warnings=ExperimentalWarning --loader ts-node/esm scripts/fetch-examples.mts
