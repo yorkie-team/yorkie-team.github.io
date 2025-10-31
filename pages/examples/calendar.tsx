@@ -57,4 +57,5 @@ const CalendarExampleView: NextPage = () => {
     </ExampleLayout>
   );
 };
+
 export default CalendarExampleView;
