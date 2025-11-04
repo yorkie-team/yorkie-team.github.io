@@ -3,9 +3,20 @@ import path from 'path';
 import { execSync } from 'child_process';
 import dotenv from 'dotenv';
 
-// Load environment variables
-dotenv.config({ path: '.env' });
-dotenv.config({ path: '.env.production', override: true });
+// Load environment variables with proper precedence:
+// 1. Command line variables (highest priority - already in process.env)
+// 2. Environment-specific file based on NODE_ENV
+// 3. .env (base defaults - lowest priority)
+
+const nodeEnv = process.env.NODE_ENV || 'development';
+
+// Load environment-specific file first (higher priority)
+if (nodeEnv === 'production') {
+  dotenv.config({ path: '.env.production', override: false });
+}
+
+// Load base .env file last (lower priority)
+dotenv.config({ path: '.env', override: false });
 
 const YORKIE_SDK_PATH = path.join(process.cwd(), 'temp');
 const EXAMPLES_OUTPUT_PATH = path.join(process.cwd(), 'public/apps');
@@ -84,6 +95,8 @@ const buildAllExamples = async () => {
         ...process.env,
         NODE_ENV: 'production',
       } as Record<string, string>;
+
+      createEnvFile(`${YORKIE_SDK_PATH}/examples/${name}`);
 
       if (name.startsWith('nextjs-')) {
         buildEnv.NEXT_PUBLIC_BASE_PATH = `/apps/${name}`;
