@@ -96,6 +96,8 @@ const buildAllExamples = async () => {
         NODE_ENV: 'production',
       } as Record<string, string>;
 
+      createEnvFile(`${YORKIE_SDK_PATH}/examples/${name}`);
+
       if (name.startsWith('nextjs-')) {
         buildEnv.NEXT_PUBLIC_BASE_PATH = `/apps/${name}`;
         console.log(`Setting NEXT_PUBLIC_BASE_PATH=${buildEnv.NEXT_PUBLIC_BASE_PATH}`);
