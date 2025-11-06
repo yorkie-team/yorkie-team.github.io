@@ -155,7 +155,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
           rehypeToc,
           {
             position: 'afterend',
-            headings: ['h3', 'h4', 'h5', 'h6'],
+            headings: ['h3', 'h4'],
             customizeTOC: (toc: HtmlElementNode) => {
               const children = toc.children || [];
               const contents = (children[0] as any)?.children?.length;

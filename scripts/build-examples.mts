@@ -40,11 +40,13 @@ const createEnvFile = (sdkPath: string) => {
 
   const envContent = `VITE_YORKIE_API_ADDR='${apiAddr}'
 VITE_YORKIE_API_KEY='${apiKey}'
+NEXT_PUBLIC_YORKIE_API_ADDR='${apiAddr}'
+NEXT_PUBLIC_YORKIE_API_KEY='${apiKey}'
 `;
 
   // Create .env.production in yorkie-js-sdk root for all examples
   fs.writeFileSync(path.join(sdkPath, '.env.production'), envContent);
-  console.log(`✅ Created .env.production in yorkie-js-sdk`);
+  console.log(`✅ Created .env.production in ${sdkPath}`);
 };
 
 const copyBuiltExamples = () => {
@@ -82,7 +84,9 @@ const buildAllExamples = async () => {
     // Install dependencies if needed
     if (!fs.existsSync(path.join(YORKIE_SDK_PATH, 'node_modules'))) {
       console.log('📥 Installing dependencies...');
-      execSync('pnpm install', { cwd: YORKIE_SDK_PATH, stdio: 'inherit' });
+      // Use --prod=false to install devDependencies even when NODE_ENV=production
+      // This is needed because prepare scripts may require dev dependencies (e.g., husky)
+      execSync('pnpm install --prod=false', { cwd: YORKIE_SDK_PATH, stdio: 'inherit' });
     }
 
     // Build examples using pnpm
@@ -91,10 +95,10 @@ const buildAllExamples = async () => {
       console.log(`\n--- Building example: ${name} ---`);
 
       // Set NEXT_PUBLIC_BASE_PATH for Next.js examples
-      const buildEnv: Record<string, string> = {
+      const buildEnv: NodeJS.ProcessEnv = {
         ...process.env,
         NODE_ENV: 'production',
-      } as Record<string, string>;
+      };
 
       createEnvFile(`${YORKIE_SDK_PATH}/examples/${name}`);
 

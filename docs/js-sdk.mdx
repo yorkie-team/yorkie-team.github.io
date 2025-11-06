@@ -505,40 +505,6 @@ const unsubscribe = doc.subscribe('all', (transactionEvent) => {
 });
 ```
 
-#### Broadcasting a Message
-
-Broadcasting allows clients to share custom events with other clients connected to the same document. Unlike document updates or presence changes, broadcasts are ephemeral messages that are not persisted in the document's state.
-
-```javascript
-// Broadcasting a message
-const payload = { message: 'Hello everyone!' };
-doc.broadcast('chat', payload);
-
-// Subscribing to broadcast messages
-doc.subscribe('broadcast', (event) => {
-  const { topic, payload, clientID } = event.value;
-  
-  if (topic === 'chat') {
-    console.log(`Message from ${clientID}: ${payload.message}`);
-  }
-});
-```
-
-The broadcast event contains:
-- `topic`: A string identifying the type of broadcast message
-- `payload`: The data being broadcast (must be JSON serializable)
-- `clientID`: The ID of the client that sent the broadcast
-
-This feature is useful for sending temporary messages or signals between clients, such as:
-- Chat messages
-- Cursor movement notifications 
-- Application-specific events
-- User action notifications
-
-<Alert status="warning">
-Broadcast messages are not persisted and are only delivered to clients currently connected to the document. Clients that connect later will not receive previous broadcast messages.
-</Alert>
-
 #### Changing Synchronization Mode
 
 To change the synchronization mode for a document, you can use `client.changeSyncMode(doc, syncMode)`.
@@ -597,7 +563,7 @@ The `Remove on Detach` setting is a project-level configuration that enforces se
 When the `Remove on Detach` setting is enabled, it overrides any `removeIfNotAttached` value passed to `client.detach()`. Even if you set `removeIfNotAttached: false`, the server will remove the document once no other clients are attached at detach time.
 </Alert>
 
-### Document Limits
+#### Document Limits
 
 Yorkie enforces certain limits on document operations to ensure system stability and optimal performance. These limits can be configured through the Yorkie Dashboard's Project Settings.
 
@@ -606,12 +572,12 @@ When you modify limit settings in the dashboard, the changes may take up to 10 m
 </Alert>
 
 
-#### Max Attachments per Document
+##### Max Attachments per Document
 When you attach a document, the server keeps track of the number of clients subscribed to it. The `Max Attachments per Document` setting determines how many clients can be attached to a single document simultaneously. If a client attempts to attach when this limit is reached, the server will reject the attachment with an error.
 
 If the attachment fails due to the limit, the client will need to retry the attachment by either reloading the SDK or calling `attach` again, as there is no automatic retry mechanism. 
 
-#### Max Subscribers per Document
+##### Max Subscribers per Document
 When a client attaches to a document, it creates a subscription stream to receive real-time updates. The `Max Subscribers per Document` setting determines how many clients can maintain subscription streams simultaneously for a single document. If a client attempts to create a subscription stream when this limit is reached, the server will reject the request.
 
 Unlike attachment limits, the SDK automatically handles subscription limit errors by retrying the connection (1 retry per second).
@@ -629,7 +595,7 @@ doc.subscribe('connection', (event) => {
 ```
 </Alert>
 
-#### Max Document Size Limit
+##### Max Document Size Limit
 When a client attaches to a document, the maximum allowed size is determined by the `maxSizePerDocument` setting of the associated project. This limit is evaluated at each attachment, so the same document may be subject to different size constraints depending on the client's project configuration.
 
 A document’s size consists of two main components: **live data** and **garbage-collected (GC) data**. Each of these includes both **content data** (e.g., visible text or structured objects) and **meta data** (e.g., CRDT metadata for synchronization and conflict resolution). As a result, the actual document size may exceed what is visibly rendered in the editor.  
@@ -642,11 +608,11 @@ However, **remote updates are not subject to this limit** and are always applied
 Garbage-collected data is automatically reduced over time through system-managed garbage collection. While manual GC is not exposed, the system triggers GC under certain conditions. For instance, clients that remain inactive beyond the configured *Client Deactivate Threshold* are automatically deactivated, improving GC efficiency and reducing document GC size over time.  
 For details on GC and housekeeping, refer to the [housekeeping design document](https://github.com/yorkie-team/yorkie/blob/main/design/housekeeping.md).
 
-### Custom CRDT types
+#### Custom CRDT types
 
 Custom CRDT types are data types that can be used for special applications such as text editors and counters, unlike general JSON data types such as `Object` and `Array`. Custom CRDT types can be created in the callback function of `document.update`.
 
-#### Text
+##### Text
 
 `Text` provides supports for collaborative text editing. In addition, contents in `Text` can have attributes; for example, characters can be bold, italic, or underlined.
 
@@ -712,7 +678,7 @@ Please refer to the following example for a complete code:
 - An example of Text co-editing with CodeMirror: [CodeMirror example](https://github.com/yorkie-team/yorkie-js-sdk/blob/main/examples/vanilla-codemirror6)
 - An example of Text co-editing with Quill: [Quill example](https://github.com/yorkie-team/yorkie-js-sdk/blob/main/examples/vanilla-quill)
 
-#### Counter
+##### Counter
 
 `Counter` supports integer types changing with addition and subtraction. If an integer data needs to be modified simultaneously, `Counter` should be used instead of primitives.
 
@@ -725,7 +691,7 @@ doc.update((root) => {
 });
 ```
 
-### TypeScript Support
+#### TypeScript Support
 
 To use the Document more strictly, you can use [type variable](https://www.typescriptlang.org/docs/handbook/2/generics.html) in TypeScript when creating a Document.
 
@@ -754,173 +720,97 @@ doc.update((root, presence) => {
 });
 ```
 
-### Presence (Dedicated Version)
+### Channel
 
-`Presence` is a lightweight, standalone counter for tracking online users in real-time. Unlike Document presence which is tied to document editing, Presence is designed for simple user counting scenarios like showing "3 users online" in your application.
+`Channel` is a communication channel that enables real-time pub/sub messaging and presence tracking between clients. Unlike Documents which persist and synchronize data, Channels are designed for ephemeral, real-time communication such as chat messages, notifications, and presence indicators.
 
-#### Key Differences from Document Presence
+#### Creating a Channel
 
-The key distinction between Document Presence and Presence:
-
-| Feature | Document Presence | Presence (Dedicated Version) |
-|---------|------------------|------------------|
-| **Purpose** | Share editing state (cursor, selection) | Count online users |
-| **Data Type** | Custom object (any JSON) | Simple number counter |
-| **Attachment** | Attached to Document | Attached to Client directly |
-| **Use Case** | Collaborative editing | User presence tracking |
-
-#### Creating a Presence
-
-You can create a Presence using `new yorkie.Presence()` with a unique key:
+You can create a Channel with a unique identifier and attach it to the Client:
 
 ```javascript
-const presence = new yorkie.Presence('room-123');
+const channel = new yorkie.Channel('room-123');
+await client.attach(channel);
 ```
 
-> The presence key is used to identify the presence room. It is a string that can be freely defined by the user, similar to document keys.
+> The channel key is used to identify the Channel in Yorkie. Clients with the same channel key can communicate with each other through pub/sub messaging.
 
-#### Attaching the Presence
+#### Publishing and Subscribing to Messages
 
-When you attach a presence to the client, the server registers this client as participating in the presence room and returns the current count:
-
-```javascript
-await client.attach(presence);
-console.log(presence.getCount()); // 1 (if you're the first user)
-```
-
-#### Synchronization Modes: Realtime vs Manual
-
-Presence supports two synchronization modes to fit different use cases:
-
-##### Realtime Mode (Default)
-
-In **realtime mode**, count updates are automatically received through a watch stream. This is ideal for applications that need instant updates:
+Channels support a pub/sub pattern for broadcasting ephemeral messages to all connected clients:
 
 ```javascript
-// Realtime mode - count updates automatically
-await client.attach(presence);
-
-// Subscribe to count changes
-const unsubscribe = presence.subscribe((event) => {
-  console.log(`Current count: ${presence.getCount()}`);
+// Subscribe to messages on a specific topic
+const unsubscribe = channel.subscribe('chat', (event) => {
+  console.log(`[${event.topic}] ${event.payload.message}`);
+  console.log(`From: ${event.publisher}`);
 });
+
+// Broadcast a message to all clients in the same channel
+await channel.broadcast('chat', { message: 'Hello, world!' });
 ```
 
-When another user joins or leaves, your presence automatically updates without any additional calls.
+The event object contains:
+- `topic`: The topic name you subscribed to
+- `payload`: The message data (must be JSON serializable)
+- `publisher`: The client ID of the message sender
 
-##### Manual Mode
-
-In **manual mode**, you have explicit control over when to refresh the count. This is useful for reducing network traffic or when you want to update on-demand:
+You can subscribe to multiple topics on the same channel:
 
 ```javascript
-// Manual mode - you control when to sync
-await client.attach(presence, { isRealtime: false });
+// Subscribe to different topics
+channel.subscribe('chat', (event) => {
+  console.log('Chat message:', event.payload);
+});
 
-// Count doesn't update automatically
-// You must call sync() to refresh
-await client.sync(presence);
-console.log(presence.getCount()); // Updated count
+channel.subscribe('notification', (event) => {
+  console.log('Notification:', event.payload);
+});
+
+// Broadcast to different topics
+await channel.broadcast('chat', { message: 'Hello!' });
+await channel.broadcast('notification', { type: 'user-joined', user: 'Alice' });
 ```
 
 <Alert status="warning">
-In manual mode, you must call `client.sync(presence)` within **60 seconds** to keep the presence alive. The server maintains a TTL (Time To Live) of 60 seconds for each presence. If you don't sync within this time, the server will consider the client as disconnected and remove it from the count.
+Broadcast messages are ephemeral and only delivered to clients currently connected to the channel. Messages are not persisted or stored, so clients that join later will not receive previous messages.
 </Alert>
 
-```javascript
-// Example: Periodic sync to maintain presence
-const keepAlive = setInterval(async () => {
-  await client.sync(presence);
-}, 30000); // Sync every 30 seconds (well within the 60-second TTL)
+#### Tracking Online Presence
 
-// Don't forget to clear the interval when done
-clearInterval(keepAlive);
-```
-
-<Alert status="info">
-Use **realtime mode** for live dashboards and real-time indicators where instant updates are critical. Use **manual mode** for less time-sensitive scenarios or to optimize network usage, but remember to sync regularly to maintain the connection.
-</Alert>
-
-#### Getting the Current Count
-
-You can get the current count at any time:
+Channels automatically track the number of connected clients, making it easy to display "users online" counters:
 
 ```javascript
-const currentCount = presence.getCount();
-console.log(`${currentCount} users online`);
-```
-
-#### Subscribing to Count Changes
-
-In realtime mode, you can subscribe to presence events to react to count changes:
-
-```javascript
-const unsubscribe = presence.subscribe((event) => {
-  if (event.type === 'initialized') {
-    // Fired when the watch stream is first established
-    updateUI(event.count);
-  }
-  
-  if (event.type === 'changed') {
-    // Fired when the count changes (user joined/left)
-    updateUI(event.count);
-  }
+// Subscribe to presence changes
+const unsubscribe = channel.subscribe('presence', (event) => {
+  console.log(`Users online: ${event.count}`);
 });
 
-// Don't forget to unsubscribe when done
-unsubscribe();
+// Get the current presence count
+const count = channel.getPresenceCount();
+console.log(`Currently ${count} users online`);
 ```
 
-#### Detaching the Presence
+The presence count is automatically updated when clients connect or disconnect from the channel.
 
-When a user leaves the room or when cleaning up resources, detach the presence:
+#### Detaching a Channel
+
+When you're done with a channel, detach it to clean up resources and stop receiving messages:
 
 ```javascript
-await client.detach(presence);
+await client.detach(channel);
 ```
 
-This decrements the count and notifies other users in realtime mode.
+#### Use Cases
 
-#### Example Use Cases
+Channels are ideal for:
+- **Chat applications**: Real-time messaging without persistence
+- **Live notifications**: Temporary alerts and updates
+- **Presence indicators**: Showing who's online or in a room
+- **Cursor sharing**: Broadcasting cursor positions in collaborative tools
+- **Event broadcasting**: Sending signals or triggers between clients
 
-Presence is perfect for scenarios where you need simple user counting:
-
-- **Game Lobbies**: Show how many players are waiting in a game lobby
-- **Live Streaming**: Display real-time viewer count for live streams
-- **Chat Rooms**: Show active participants in a chat room
-
-#### Complete Example
-
-Here's a complete example of using Presence in a chat room:
-
-```javascript
-const client = new yorkie.Client({
-  rpcAddr: '{{API_ADDR}}',
-  apiKey: 'xxxxxxxxxxxxxxxxxxxx',
-});
-await client.activate();
-
-// Create and attach presence for a chat room
-const roomPresence = new yorkie.Presence('chat-room-general');
-await client.attach(roomPresence);
-
-// Update UI with current count
-const updateUserCount = (count) => {
-  document.getElementById('user-count').textContent = `${count} users online`;
-};
-
-// Subscribe to count changes
-const unsubscribe = roomPresence.subscribe((event) => {
-  updateUserCount(roomPresence.getCount());
-});
-
-// When user leaves the room
-const leaveRoom = async () => {
-  unsubscribe();
-  await client.detach(roomPresence);
-};
-```
-
-For a complete working example, see: [Presence Example](https://github.com/yorkie-team/yorkie-js-sdk/tree/main/packages/sdk/public/presence.html)
+For persistent data that needs to be synchronized and stored, use [Document](#document) instead.
 
 ### Logger Options
 

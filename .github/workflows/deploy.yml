@@ -66,6 +66,8 @@ jobs:
         run: ${{ steps.detect-package-manager.outputs.manager }} run fetch:examples
       - name: Build examples
         run: ${{ steps.detect-package-manager.outputs.manager }} run build:examples
+        env:
+          NODE_ENV: production
       - name: Build with Next.js
         run: ${{ steps.detect-package-manager.outputs.manager }} run build
       - name: Static HTML export with Next.js
