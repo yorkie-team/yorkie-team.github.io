@@ -10,11 +10,11 @@ if [ -d "temp" ]; then
 fi
 
 git clone https://github.com/yorkie-team/yorkie-js-sdk.git temp
-cd temp
-git fetch origin refs/tags/v$version
-git checkout tags/v$version
-echo "Checked out to tag v$version."
-cd ..
+# cd temp
+# git fetch origin refs/tags/v$version
+# git checkout tags/v$version
+# echo "Checked out to tag v$version."
+# cd ..
 
 for f in temp/examples/* ; do
     if [ -d "$f" ]; then

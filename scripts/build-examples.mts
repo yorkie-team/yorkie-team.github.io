@@ -84,9 +84,12 @@ const buildAllExamples = async () => {
     // Install dependencies if needed
     if (!fs.existsSync(path.join(YORKIE_SDK_PATH, 'node_modules'))) {
       console.log('📥 Installing dependencies...');
-      // Use --prod=false to install devDependencies even when NODE_ENV=production
-      // This is needed because prepare scripts may require dev dependencies (e.g., husky)
-      execSync('pnpm install --prod=false', { cwd: YORKIE_SDK_PATH, stdio: 'inherit' });
+      // Skip prepare scripts (especially SDK build) to prevent OOM in CI
+      // The examples don't need the SDK to be built from source
+      execSync('pnpm install --prod=false --ignore-scripts', {
+        cwd: YORKIE_SDK_PATH,
+        stdio: 'inherit',
+      });
     }
 
     // Build examples using pnpm
