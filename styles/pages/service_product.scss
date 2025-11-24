@@ -486,6 +486,27 @@
       }
     }
   }
+
+  .presence_images {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+
+    svg {
+      flex: 1;
+      max-width: 50%;
+      height: auto;
+    }
+
+    @include mixins-lib.tabletStart() {
+      flex-direction: column;
+      gap: 16px;
+
+      svg {
+        max-width: 100%;
+      }
+    }
+  }
 }
 
 .darkmode {

@@ -14,7 +14,6 @@
 <circle cx="379.539" cy="119" r="5.38462" fill="#FEFDFB"/>
 <path d="M354.154 132.077C354.154 132.077 357.231 139.769 368 139.769C378.77 139.769 381.847 132.077 381.847 132.077" stroke="#FEFDFB" stroke-width="5.83334" stroke-linecap="round"/>
 </g>
-<rect x="0.25" y="0.25" width="511.5" height="256.5" rx="3.75" stroke="#C2BDBA" stroke-width="0.5"/>
 <defs>
 <linearGradient id="paint0_linear_6003_196865" x1="144" y1="89" x2="144" y2="169" gradientUnits="userSpaceOnUse">
 <stop stop-color="#FC94D8"/>

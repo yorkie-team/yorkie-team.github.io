@@ -37,9 +37,59 @@ doc.update((root) => {
 });
 `;
 
+const PRESENCE_WATCH_CODE = `
+doc.subscribe('presence', (event) => {
+  if (event.type === 'presence-changed') {
+    // { clientID: '...', presence: { name: 'Alice' } }
+    renderPresences(event.value);
+  }
+});
+`;
+
+const PRESENCE_UPDATE_CODE = `
+// Share your presence with other users
+client.attach(doc, {
+  initialPresence: { name: 'Alice', cursor: { x: 0, y: 0 } },
+});
+
+doc.update((root, presence) => {
+  presence.set({ cursor: { x: 10, y: 20 } });
+});
+`;
+
+const CHANNEL_PRESENCE_CODE = `
+// Subscribe to a channel and track online users
+const channel = client.subscribe('my-channel');
+
+channel.on('presence-changed', (event) => {
+  console.log(\`\${event.count} users online\`);
+});
+`;
+
+const CHANNEL_BROADCAST_CODE = `
+// Publish messages to all subscribers
+const channel = client.subscribe('my-channel');
+
+channel.publish('chat', { user: 'Alice', message: 'Hello everyone!' });
+
+channel.on('chat', (event) => {
+  console.log(event.data.message);
+});
+`;
+
 export const DOCUMENT_CODE = {
   common: COMMON_CODE,
   text: TEXT_CODE,
   richText: RICHTEXT_CODE,
   counter: COUNTER_CODE,
+};
+
+export const PRESENCE_CODE = {
+  watch: PRESENCE_WATCH_CODE,
+  update: PRESENCE_UPDATE_CODE,
+};
+
+export const CHANNEL_CODE = {
+  presence: CHANNEL_PRESENCE_CODE,
+  broadcast: CHANNEL_BROADCAST_CODE,
 };
