@@ -1091,7 +1091,7 @@ export const MainBannerMotion = ({ bannerActive }: { bannerActive: boolean }) =>
                 strokeWidth="0.5"
               />
               <rect x="604" y="121" width="50" height="24" rx="2" fill="url(#paint27_linear_6449_212729)" />
-              <text x="629" y="137" textAnchor="middle" fill="#FEFDFB" fontSize="9" fontWeight="400">
+              <text x="629" y="137" textAnchor="middle" fontSize="9" fontWeight="400" style={{ fill: '#FEFDFB' }}>
                 hackerwins
               </text>
             </g>
@@ -1107,7 +1107,7 @@ export const MainBannerMotion = ({ bannerActive }: { bannerActive: boolean }) =>
                 strokeWidth="0.5"
               />
               <rect x="939" y="145" width="46" height="24" rx="2" fill="url(#paint29_linear_6449_212729)" />
-              <text x="962" y="161" textAnchor="middle" fill="#FEFDFB" fontSize="12" fontWeight="400">
+              <text x="962" y="161" textAnchor="middle" fontSize="12" fontWeight="400" style={{ fill: '#FEFDFB' }}>
                 chacha
               </text>
             </g>
@@ -1162,8 +1162,8 @@ export const MainBannerMotion = ({ bannerActive }: { bannerActive: boolean }) =>
               />
             </g>
             <g filter="url(#filter27_d_6449_212729)">
-              <rect x="1223.05" y="223" width="58" height="24" rx="2" fill="url(#paint32_linear_6449_212729)" />
-              <text x="1252.05" y="239" textAnchor="middle" fill="#FEFDFB" fontSize="10" fontWeight="400">
+              <rect x="1223.05" y="223" width="58" height="24" rx="2" style={{ fill: 'url(#paint32_linear_6449_212729)' }}/>
+              <text x="1252.05" y="239" textAnchor="middle" fontSize="10" fontWeight="400" style={{ fill: '#FEFDFB' }}>
                 mojosoeun
               </text>
             </g>
@@ -1195,7 +1195,7 @@ export const MainBannerMotion = ({ bannerActive }: { bannerActive: boolean }) =>
                 fill="url(#paint35_linear_6449_212729)"
                 shapeRendering="crispEdges"
               />
-              <text x="1455.05" y="122" textAnchor="middle" fill="#FEFDFB" fontSize="8" fontWeight="400">
+              <text x="1455.05" y="122" textAnchor="middle" fontSize="8" fontWeight="400" style={{ fill: '#FEFDFB' }}>
                 raararaara
               </text>
             </g>
