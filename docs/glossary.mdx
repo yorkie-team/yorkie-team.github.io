@@ -11,9 +11,10 @@ These words are used in the Yorkie project and the community. Understanding thes
 | ---- | ----------- |
 | Yorkie | An open-source document store for building real-time collaborative applications. Sometimes it refers to the [main repository](https://github.com/yorkie-team/yorkie). |
 | Client | An regular client that communicates with the Yorkie server, synchronizing document changes for real-time collaboration. |
-| Server | The central component that manages documents, stores changes, and facilitates communication between clients. |
-| Project | A logical grouping of documents and clients, allowing multiple independent services within a single Yorkie installation. |
-| Document | The primary data structure in Yorkie. It contains a presence and a root. |
+| Server | The central component that manages documents and channels, stores changes, and facilitates communication between clients. |
+| Project | A logical grouping of documents, channels, and clients, allowing multiple independent services within a single Yorkie installation. |
+| Document | The primary data structure in Yorkie for persistent, collaborative data. It contains a presence and a root, and is stored in the database. Documents support offline editing and conflict-free synchronization using CRDTs. For more details, see [Document Concept](/docs/concepts/document). |
+| Channel | A lightweight, memory-only communication layer for real-time features like presence tracking and message broadcasting. Unlike Documents, Channels do not persist data to the database and are designed for ephemeral data. For more details, see [Channel Concept](/docs/concepts/channel). |
 | Presence | A data structure representing a user's current state within a document (e.g., cursor position, selection). |
 | Root | The main JSON-like data structure(CRDT) within a document that can be shared and edited by multiple users. |
 | Change | A representation of modifications made to a document, created by calling `Document.Update()`. |

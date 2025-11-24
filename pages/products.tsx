@@ -4,17 +4,17 @@ import Head from 'next/head';
 import Link from 'next/link';
 import classNames from 'classnames';
 import { Button, Icon, Layout, CodeBlock, CodeBlockHeader } from '@/components';
-import { StateSharingDetailMotion, FlexibleDocumentMotion } from '@/components/motions';
+import { StateSharingDetailMotion, FlexibleDocumentMotion, PresenceMotion } from '@/components/motions';
 import ProductBannerSVG from '@/public/assets/images/banner/img_product_banner.svg';
-import ProductAwarenessLeftSVG from '@/public/assets/images/banner/img_product_awareness_left.svg';
-import ProductAwarenessRightSVG from '@/public/assets/images/banner/img_product_awareness_right.svg';
 import ProductPCSVG from '@/public/assets/images/banner/img_product_pc.svg';
 import ProductMobileSVG from '@/public/assets/images/banner/img_product_mobile.svg';
 import ProductPackageSVG from '@/public/assets/images/banner/img_product_package.svg';
-import { DOCUMENT_CODE } from '@/codes/document';
+import { DOCUMENT_CODE, PRESENCE_CODE, CHANNEL_CODE } from '@/codes/document';
 
 const Products: NextPage = () => {
   const [documentType, setDocumentType] = useState<keyof typeof DOCUMENT_CODE>('common');
+  const [presenceType, setPresenceType] = useState<keyof typeof PRESENCE_CODE>('update');
+  const [channelType, setChannelType] = useState<keyof typeof CHANNEL_CODE>('presence');
   return (
     <Layout className="product_page">
       <Head>
@@ -131,7 +131,7 @@ const Products: NextPage = () => {
               </div>
             </div>
           </div>
-          <div className="section_content collaboration">
+          <div className="section_content">
             <strong className="sub_title" id="collaboration-awareness">
               <a href="#collaboration-awareness">Presence</a>
             </strong>
@@ -142,14 +142,80 @@ const Products: NextPage = () => {
               </Link>
               .
             </p>
-            <div className="img_group">
+            <div className="db_content">
+              <CodeBlock.Wrapper>
+                <CodeBlockHeader>
+                  <CodeBlockHeader.LeftBox>
+                    <button
+                      type="button"
+                      className={classNames('btn_item', { is_active: presenceType === 'update' })}
+                      onClick={() => {
+                        setPresenceType('update');
+                      }}
+                    >
+                      Update
+                    </button>
+                    <button
+                      type="button"
+                      className={classNames('btn_item', { is_active: presenceType === 'watch' })}
+                      onClick={() => {
+                        setPresenceType('watch');
+                      }}
+                    >
+                      Watch
+                    </button>
+                  </CodeBlockHeader.LeftBox>
+                  <CodeBlockHeader.RightBox>
+                    <CodeBlockHeader.CopyButton value={PRESENCE_CODE[presenceType]} />
+                  </CodeBlockHeader.RightBox>
+                </CodeBlockHeader>
+                <CodeBlock code={PRESENCE_CODE[presenceType]} language="javascript" withLineNumbers />
+              </CodeBlock.Wrapper>
               <div className="img_box">
-                <ProductAwarenessLeftSVG />
-              </div>
-              <div className="img_box">
-                <ProductAwarenessRightSVG />
+                <PresenceMotion />
               </div>
             </div>
+          </div>
+          <div className="section_content">
+            <strong className="sub_title" id="channel">
+              <a href="#channel">Channel</a>
+            </strong>
+            <p className="sub_desc">
+              <Link href="/docs/js-sdk#channel" className="link">
+                Channel
+              </Link>{' '}
+              provides lightweight real-time communication without database persistence. Perfect for tracking online
+              users, broadcasting messages, and handling ephemeral real-time data like chat messages or live
+              notifications.
+            </p>
+            <CodeBlock.Wrapper>
+              <CodeBlockHeader>
+                <CodeBlockHeader.LeftBox>
+                  <button
+                    type="button"
+                    className={classNames('btn_item', { is_active: channelType === 'presence' })}
+                    onClick={() => {
+                      setChannelType('presence');
+                    }}
+                  >
+                    Presence
+                  </button>
+                  <button
+                    type="button"
+                    className={classNames('btn_item', { is_active: channelType === 'broadcast' })}
+                    onClick={() => {
+                      setChannelType('broadcast');
+                    }}
+                  >
+                    Broadcast
+                  </button>
+                </CodeBlockHeader.LeftBox>
+                <CodeBlockHeader.RightBox>
+                  <CodeBlockHeader.CopyButton value={CHANNEL_CODE[channelType]} />
+                </CodeBlockHeader.RightBox>
+              </CodeBlockHeader>
+              <CodeBlock code={CHANNEL_CODE[channelType]} language="javascript" withLineNumbers />
+            </CodeBlock.Wrapper>
           </div>
           <div className="section_content">
             <strong className="sub_title" id="more-features">

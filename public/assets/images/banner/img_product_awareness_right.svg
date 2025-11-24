@@ -21,7 +21,6 @@
 <rect x="370" y="68" width="32" height="32" fill="url(#pattern2)"/>
 </g>
 <rect x="378" y="104" width="40" height="40" fill="url(#pattern3)"/>
-<rect x="0.25" y="0.25" width="511.5" height="256.5" rx="3.75" stroke="#C2BDBA" stroke-width="0.5"/>
 <defs>
 <filter id="filter0_d_6003_196889" x="393.224" y="149.855" width="49.5678" height="49.5688" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
 <feFlood flood-opacity="0" result="BackgroundImageFix"/>
