@@ -16,18 +16,206 @@ If you want to install the SDK, refer to the [Getting Started with Android SDK](
 
 #### Creating a Client
 
-We can create a Client using `Client(context: Context, rpcHost: String, rpcPort: Int, usePlainText: Boolean, options: Options)`. After the Client has been activated, it is connected to the server and ready to use.
+Create a new client instance with the server host and configuration options.
 
 ```kotlin
-val client = Client(context, "{{API_HOST}}", {{API_PORT}}, Options(apiKey = "xxxxx"), false)
-// Declare your own CoroutineScope
+val client = Client(
+    host = "your-yorkie-server-url",
+    options = Client.Options(
+        apiKey = "your-api-key",
+        key = "your-client-key"
+    )
+)
+```
+
+> The API key is used to identify the project in Yorkie. You can get the API key of the project you created in the [Dashboard]({{DASHBOARD_PATH}}).
+
+#### Activating a Client
+
+Activates the client by registering it with the server. The server assigns a unique client ID that is used to distinguish different clients. After activation, the client is ready to attach documents and communicate with the server.
+
+```kotlin
 scope.launch {
-  client.activateAsync().await	
+    client.activateAsync().await()
 }
 ```
-> The API key is used to identify the project in Yorkie. You can get the API key of the project you created in the [Dashboard]({{DASHBOARD_PATH}}).
-<br /><br />
-> usePlainText should be set false unless you use it for testing. For more information, please refer to [usePlainText](https://grpc.github.io/grpc-java/javadoc/io/grpc/ManagedChannelBuilder.html#usePlaintext--).
+
+#### Client Status
+
+**isActive**
+
+Returns `true` if the client is currently activated, `false` otherwise. Use this to check if the client is ready to use.
+
+```kotlin
+if (client.isActive) {
+    // Client is ready to use
+}
+```
+
+**status**
+
+Monitor client status changes with a `StateFlow`. The status can be either `Status.Activated` (with client ID) or `Status.Deactivated`.
+
+```kotlin
+scope.launch {
+    client.status.collect { status ->
+        when (status) {
+            is Client.Status.Activated -> {
+                println("Client activated with ID: ${status.clientId}")
+            }
+            is Client.Status.Deactivated -> {
+                println("Client is deactivated")
+            }
+        }
+    }
+}
+```
+
+#### Attaching Documents
+
+Attaches a document to the client. Once attached, the client will synchronize the document with the server and other clients. You can set initial presence data and choose the synchronization mode.
+
+**Parameters:**
+- `document`: The document to attach
+- `initialPresence`: Initial presence data (default: empty map)
+- `syncMode`: Synchronization mode (default: `Realtime`)
+- `schema`: Optional schema key for document validation
+
+```kotlin
+val document = Document(Document.Key("my-doc"))
+scope.launch {
+    client.attachAsync(
+        document,
+        initialPresence = mapOf("name" to "Alice", "color" to "blue"),
+        syncMode = Client.SyncMode.Realtime
+    ).await()
+}
+```
+
+#### Detaching Documents
+
+Detaches a document from the client. The client will no longer synchronize the document with the server. This is important for garbage collection to clean up CRDT tombstones.
+
+**Parameters:**
+- `document`: The document to detach
+- `keepalive`: If `true`, ensures the detach request completes even if the app terminates (optional, default: `false`)
+
+```kotlin
+scope.launch {
+    client.detachAsync(document).await()
+}
+```
+
+#### Synchronizing Documents
+
+Manually pushes local changes to the server and pulls remote changes. Useful when using `Manual` sync mode or when you need to force synchronization.
+
+**Parameters:**
+- `document`: Specific document to sync. If `null`, syncs all attached documents (optional)
+
+```kotlin
+// Sync a specific document
+scope.launch {
+    client.syncAsync(document).await()
+}
+
+// Sync all attached documents
+scope.launch {
+    client.syncAsync().await()
+}
+```
+
+#### Changing Synchronization Mode
+
+Changes the synchronization mode of an attached document. This allows you to dynamically control how the document synchronizes with the server.
+
+**Yorkie offers four SyncModes:**
+- `Client.SyncMode.Realtime`: Local changes are automatically pushed to the server, and remote changes are pulled from the server.
+- `Client.SyncMode.RealtimePushOnly`: Only push local changes automatically.
+- `Client.SyncMode.RealtimeSyncOff`: Changes are not synchronized, but the watch stream remains active.
+- `Client.SyncMode.Manual`: Synchronization no longer occurs in real-time, and the watch stream is disconnected.
+
+**Parameters:**
+- `document`: The document to update
+- `syncMode`: The new synchronization mode
+
+```kotlin
+// Switch to manual sync mode
+client.changeSyncMode(document, Client.SyncMode.Manual)
+
+// Switch back to realtime sync
+client.changeSyncMode(document, Client.SyncMode.Realtime)
+```
+
+#### Broadcasting Messages
+
+Broadcasts a message to other clients subscribed to the document. This is useful for sending ephemeral messages that don't need to be stored in the document (e.g., notifications, alerts, or temporary states).
+
+**Parameters:**
+- `document`: The document to broadcast to
+- `topic`: The topic/channel of the message
+- `payload`: The message payload as a string (can be JSON)
+- `options`: Broadcast options including retry configuration (optional)
+
+```kotlin
+scope.launch {
+    client.broadcast(
+        document,
+        topic = "cursor-moved",
+        payload = """{"x": 100, "y": 200}"""
+    ).await()
+}
+```
+
+#### Removing Documents
+
+Permanently removes a document from the server. This operation is irreversible and will delete the document for all clients.
+
+**Parameters:**
+- `document`: The document to remove
+
+```kotlin
+scope.launch {
+    client.removeAsync(document).await()
+}
+```
+
+#### Deactivating a Client
+
+Deactivates the client and disconnects from the server. All attached documents will be detached automatically.
+
+**Parameters:**
+- `keepalive`: If `true`, ensures the deactivation request completes even if the app terminates (optional, default: `false`)
+
+```kotlin
+scope.launch {
+    client.deactivateAsync().await()
+}
+```
+
+#### Client Options
+
+When creating a client, you can configure various options:
+
+- `key`: Client identifier (default: random UUID)
+- `apiKey`: API key for the Yorkie project
+- `metadata`: Additional client metadata as key-value pairs
+- `fetchAuthToken`: Optional function to fetch authentication tokens when needed
+- `syncLoopDuration`: Duration between sync loops (default: 50ms)
+- `reconnectStreamDelay`: Delay before reconnecting after stream disconnect (default: 1000ms)
+
+```kotlin
+val client = Client(
+    host = "https://api.yorkie.dev",
+    options = Client.Options(
+        key = "my-client",
+        apiKey = "your-api-key",
+        metadata = mapOf("device" to "mobile"),
+        syncLoopDuration = 100.milliseconds,
+        reconnectStreamDelay = 2.seconds
+    )
+)
+```
 
 
 ### Document
@@ -37,308 +225,795 @@ A `Document` can be updated without being attached to the client, and its change
 
 #### Creating a Document
 
-We can create a Document using `Document()`. Let's create a Document with a key and attach it to the Client.
+Creates a new document instance with a unique key. The document can be modified locally before being attached to a client.
+
+**Parameters:**
+- `key`: Unique identifier for the document
+- `options`: Optional configuration (e.g., disable garbage collection)
 
 ```kotlin
-val document = Document(Document.Key("doc-1"))
+val document = Document(Document.Key("my-document"))
 ```
 
 > The document key is used to identify the Document in Yorkie. It is a string that can be freely defined by the user.
- > However, it is allowed to use only `a-z`, `A-Z`, `0-9`, `-`, `.`, `_`, `~` and must be less than 120 characters.
+> However, it is allowed to use only `a-z`, `A-Z`, `0-9`, `-`, `.`, `_`, `~` and must be between 4-120 characters.
 
+#### Attaching a Document
 
-#### Attaching the document
-
-When you attach, the client notifies the server that it is subscribing to this document.
-If the document does not exist on the server, it will be created, and any local changes that occurred will be updated to the server's document.
-If the server already has a document associated with the provided key, it sends the existing changes to the client, which are then applied to synchronize the document.
-
-Once attached, the document becomes synchronized with other clients.
-This ensures that any modifications made by one client are instantly propagated to other clients collaborating on the same document.
-
- The second argument is options.
- - `initialPresence`: Sets the initial presence of the client that attaches the document. The presence is shared with other users participating in the document. It must be serializable to JSON.
-- `syncMode`(Optional): Specifies synchronization modes. The default value is `SyncMode.Realtime`, which automatically pushes and pulls changes. If you set it to `SyncMode.Manual`, you'll need to manually handle synchronization.
+Attaches the document to a client. Once attached, the document will be synchronized with the server and other clients. You can set initial presence and choose the sync mode.
 
 ```kotlin
-// Declare your own CoroutineScope
 scope.launch {
-  client.attachAsync(
-    document,
-    initialPresences = mapOf("name" to "a"),
-    syncMode = SyncMode.Manual,
-  )
+    client.attachAsync(
+        document,
+        initialPresence = mapOf("name" to "Alice", "color" to "blue"),
+        syncMode = Client.SyncMode.Realtime
+    ).await()
 }
 ```
 
-#### Updating presence
+#### Document Status
 
-The `Document.updateAsync()` method allows you to make changes to the state of the current user's presence.
-
-Specific properties provided will be changed. The existing presence object will be updated by merging the new changes. In other words, properties not specified in the update function will remain unchanged. 
+The document can be in one of three states:
+- `DocStatus.Attached`: Document is attached to a client and synchronized
+- `DocStatus.Detached`: Document is not attached to a client
+- `DocStatus.Removed`: Document has been permanently removed
 
 ```kotlin
-// Declare your own CoroutineScope
+when (document.status) {
+    DocStatus.Attached -> println("Document is attached")
+    DocStatus.Detached -> println("Document is detached")
+    DocStatus.Removed -> println("Document is removed")
+}
+```
+
+#### Updating a Document
+
+Updates the document structure and/or presence. The updater function provides access to the document root and presence. Changes are automatically synchronized with other clients when attached.
+
+**Parameters:**
+- `message`: Optional description of the change
+- `updater`: Lambda function to modify the document root and/or presence
+
+```kotlin
 scope.launch {
-  document.updateAsync { _, presence ->
-    presence.put(mapOf("name" to "b"))
-  }.await()
+    document.updateAsync("Add user data") { root, _ ->
+        root.setNewObject("user")
+        root.getAs<JsonObject>("user")["name"] = "Alice"
+        root.getAs<JsonObject>("user")["age"] = 30
+    }.await()
 }
-// final state
-// presence = { "name": "b" }
-// we can see that the changes made were merged and the final state of the current user's presence is as we desire
 ```
 
-#### Getting Presence
+#### Getting Document Content
 
-##### Document.presences
+**getRoot()**
 
-It returns `StateFlow` emitting all the clients currently particiting in the document and their presences.
+Returns a proxy of the document's root object that you can use to read values.
 
 ```kotlin
-document.presences.value.forEach { (clientID, presence) ->
-	// Do something
-}
-```
-
-##### Document.Event.PresenceChange
-
-It includes all the presence-related events.
-By subscribing to it, you can be notified whenever clients watch, unwatch, or modify their presence.
-
-The `Initialized` event occurs when the client list needs to be initialized.
-For example, this happens when you first connect a watch stream to a document, when the connection is lost, or when it is reconnected.
-
-<Alert status="warning">
-Subscribe before attaching the document to ensure you receive the initial `Initialized` event.
-</Alert>
-
-```Kotlin
-// Declare your own CoroutineScope
 scope.launch {
-  document.events.filterIsInstance<PresenceChange>().collect { event ->
-    when (event) {
-      is MyPresence.Initialized -> { // users currently participating in the document }
-      is Others.Watched -> { // a user has joined the document editing in online }
-      is Others.Unwatched -> { // a user has left the document editing }
-      is Others.PresenceChanged -> { // a user has updated the presence }
-    }
-  }
+    val root = document.getRoot()
+    val user = root.getAs<JsonObject>("user")
+    println("User name: ${user["name"]}")
 }
 ```
 
-You can also subscribe to specific types of presence changes to distinguish between your own events and those of others.
+**getValueByPath()**
 
-- `document.event.filterIsInstance<PresenceChange.MyPresnece>`: `Initialized`, `PresenceChanged`
-- `document.event.filterIsInstance<PresenceChange.Others>`: `Watched`, `Unwatched`, `PresenceChanged`
+Gets a value at a specific JSON path. The path must start with `$` which represents the document root.
 
-#### Editing the Document
-
-`Document.updateAsync(message, updater)` enables you to modify a Document. The optional `message` allows you to add a description to the change. If the Document is attached to the Client, all changes are automatically synchronized with other Clients.
+**Parameters:**
+- `path`: JSON path (e.g., `$.user.name`, `$.todos[0]`)
 
 ```kotlin
-// Declare your own CoroutineScope
 scope.launch {
-  val message = "update document for test"
-  document.updateAsync(message) { root ->
-    root.setNewObject("obj")                                       // {"obj":{}}
-    root.getAs<JsonObject>("obj")["num"] = 1                       // {"obj":{"num":1}}
-    root.getAs<JsonObject>("obj").setNewObject("obj")["str"] = "a" // {"obj":{"num":1,"obj":{"str":"a"}}}
-    root.getAs<JsonObject>("obj").setNewArray("arr").apply {       // {"obj":{"num":1,"obj":{"str":"a"},"arr":[1,2]}}
-      put(1)
-      put(2)
-    } 
-  }.await()
+    val userName = document.getValueByPath("$.user.name")
+    println("User: $userName")
 }
 ```
 
-Under the hood, `root` in the `updateAsync()` function creates a `change`, a set of operations, using a JavaScript proxy. Every element has its unique ID, created by the logical clock. This ID is used by Yorkie to track which object is which.
+**toJson()**
 
-You can get the contents of the Document using `document.getRoot()`.
+Converts the entire document to a JSON string representation.
 
 ```kotlin
-val root = document.getRoot()
-println(root["obj"])                          // {"num":1,"obj":{"str":"a"},"arr":[1,2]}
-println(root.getAs<JsonObject>("obj")["num"]) // 1
-println(root.getAs<JsonObject>("obj")["obj"]) // {"str":"a"}
-println(root.getAs<JsonObject>("obj")["arr"]) // [1,2]
+val json = document.toJson()
+println("Document JSON: $json")
 ```
 
-#### Subscribing to Document
+#### Subscribing to Document Events
 
-A Document can be modified by changes generated remotely or locally in Yorkie.
+Subscribe to document events to be notified when changes occur, either locally or from other clients.
 
-Whenever the Document is modified, change events are triggered and we can subscribe to these events using the `document.events`.
-
-The events are triggered with an event object, and the event type indicates the source of the change, which can be one of the following values: `LocalChange`, `RemoteChange`, or `Snapshot`.
-
+**Event Types:**
+- `Snapshot`: Document snapshot received from server
+- `LocalChange`: Document changed by current client
+- `RemoteChange`: Document changed by another client
+- `PresenceChanged`: Presence data changed (see [Presence](#presence) section)
+- `SyncStatusChanged`: Sync status changed (`Synced`, `SyncFailed`)
+- `StreamConnectionChanged`: Connection status changed (`Connected`, `Disconnected`)
+- `DocumentStatusChanged`: Document status changed
+- `Broadcast`: Broadcast message received
+- `AuthError`: Authentication error occurred
 
 ```kotlin
-// Declare your own CoroutineScope
 scope.launch {
     document.events.collect { event ->
         when (event) {
             is Document.Event.Snapshot -> {
-                // Update with data from the Yorkie Document.
+                // Update with data from the Yorkie Document
             }
-
             is Document.Event.LocalChange -> {
-                println(event)
+                println("Local change: ${event.changeInfo.message}")
             }
-
             is Document.Event.RemoteChange -> {
-                event.changeInfo.operations.forEach { op ->
-                    if (op is OperationInfo.IncreaseOpInfo) {
-                        // Do something...
-                    }
-                }
+                println("Remote change from: ${event.changeInfo.actorID}")
             }
         }
     }
 }
 ```
 
-When the event type is `LocalChange` or `RemoteChange`, it passes changeInfo, which has `operations` and `messages` properties.
-For more information about changeInfo for document events, please refer to the [ChangeInfo](https://yorkie.dev/yorkie-js-sdk/api-reference/interfaces/ChangeInfo.html).
+**events(targetPath)**
 
-The `Snapshot` event is triggered when a snapshot is received from the server.
-This occurs when the changes that a document needs to fetch from the server exceed a certain `SnapshotThreshold`.
-Instead of sending numerous changes, the server sends a snapshot of the document.
-In such cases, it is essential to update with data from the Yorkie Document.
+Subscribe to changes for a specific path in the document. Only events affecting the target path or its nested values will be emitted.
 
-<Alert status="warning">
-If a client has not synchronized for a prolonged period and then makes a sync request, it might receive a `Snapshot` event.
-Ensure your application processes these snapshot events correctly to maintain document synchronization.
-</Alert>
-
-Additionally, you can subscribe to changes for a specific path in the Document using `document.events(path)` with a path argument, such as `$.todos`, where the `$` sign indicates the root of the document.
-The events are delivered when the target path and its nested values are changed.
-
-With this feature, you can easily subscribe to changes for a specific part of the document and perform different actions based on the updated values.
+**Parameters:**
+- `targetPath`: JSON path to subscribe to (e.g., `$.todos`, `$.user.name`)
 
 ```kotlin
-// Declare your own CoroutineScope
 scope.launch {
-  document.events("$.todos").collect { event ->
-    // Events will be delivered when the root.todos or its nested values change.
-    val target = document.getValueByPath("$.todos")
-    // Do something...
-  }
-
+    document.events("$.todos").collect { event ->
+        // Events will be delivered when the root.todos or its nested values change
+        val todos = document.getValueByPath("$.todos")
+        // Handle the change
+    }
+}
 ```
+
+<Alert status="warning">
+    If a client has not synchronized for a prolonged period and then makes a sync request, it might receive a `Snapshot`
+    event.
+    Ensure your application processes these snapshot events correctly to maintain document synchronization.
+</Alert>
 
 #### Changing Synchronization Mode
 
-To change the synchronization mode for a document, you can use `client.changeSyncMode(doc, syncMode)`
-
-Yorkie offers four SyncModes:
-- `SyncMode.Realtime`: Local changes are automatically pushed to the server, and remote changes are pulled from the server.
-
-- `SyncMode.RealtimePushOnly`: Only 
-
-- `SyncMode.RealtimeSyncOff`: Changes are not synchronized, but the watch stream remains active.
-
-- `SyncMode.Manual`: Synchronization no longer occurs in real-time, and the watch stream is disconneted. 
+Changes how the document synchronizes with the server. See the [Client Changing Synchronization Mode](#changing-synchronization-mode) section for available modes and their descriptions.
 
 ```kotlin
-// Enable automatic synchronization of both local and remote changes.
-client.changeSyncMode(doc, SyncMode.Realtime)
+// Enable automatic synchronization of both local and remote changes
+client.changeSyncMode(document, Client.SyncMode.Realtime)
 
-// Only push local changes automatically.
-client.changeSyncMode(doc, SyncMode.RealtimePushOnly)
+// Only push local changes automatically
+client.changeSyncMode(document, Client.SyncMode.RealtimePushOnly)
 
-// Synchronization turned off, but the watch stream remains active.
-client.changeSyncMode(doc, SyncMode.RealtimeSyncOff)
+// Synchronization turned off, but the watch stream remains active
+client.changeSyncMode(document, Client.SyncMode.RealtimeSyncOff)
 
-// Synchronization turned off, and the watch stream is disconneted.
-client.changeSyncMode(doc, SyncMode.Manual)
-client.syncAsync(doc).await() // Trigger synchronization manually using the sync function.
-
-```
-
-#### Detaching the Document
-
-If the document is no longer used, it should be detached to increase the efficiency of GC removing [CRDT tombstones](https://crdt.tech/glossary). For more information about GC, please refer to [Garbage Collection](https://github.com/yorkie-team/yorkie/blob/main/design/garbage-collection.md).
-
-```kotlin
-// Declare your own CoroutineScope
+// Synchronization turned off, and the watch stream is disconnected
+client.changeSyncMode(document, Client.SyncMode.Manual)
 scope.launch {
-  client.detachAsync(document).await()
+    client.syncAsync(document).await() // Trigger synchronization manually
 }
 ```
 
-### Custom CRDT types
+#### Detaching a Document
 
-Custom CRDT types are data types that can be used for special applications such as text editors and counters, unlike general JSON data types such as `JsonObject` and `JsonArray`. Custom CRDT types can be created in the callback function of `document.updateAsync()`.
+Detaches the document from the client. The document will no longer be synchronized with the server. This is important for efficient garbage collection to remove [CRDT tombstones](https://crdt.tech/glossary).
+
+```kotlin
+scope.launch {
+    client.detachAsync(document).await()
+}
+```
+
+### Json Types
+
+Yorkie provides several JSON-based data types that can be used to model your application's data. These types are CRDT-based, ensuring automatic conflict resolution in collaborative environments.
+
+#### JsonObject
+
+`JsonObject` is a key-value data structure, similar to a JSON object or Kotlin Map. It can contain any JSON-compatible values including other objects, arrays, primitives, and custom CRDT types.
+
+**Creating and Using JsonObject:**
+
+```kotlin
+scope.launch {
+    document.updateAsync { root, _ ->
+        // Create nested objects
+        root.setNewObject("user")
+        root.getAs<JsonObject>("user")["name"] = "Alice"
+        root.getAs<JsonObject>("user")["age"] = 30
+        root.getAs<JsonObject>("user").setNewObject("address")
+
+        val address = root.getAs<JsonObject>("user").getAs<JsonObject>("address")
+        address["city"] = "Seoul"
+        address["country"] = "South Korea"
+    }.await()
+}
+```
+
+**Accessing Values:**
+
+```kotlin
+scope.launch {
+    val root = document.getRoot()
+    val user = root.getAs<JsonObject>("user")
+    val name = user["name"]  // "Alice"
+    val age = user["age"]    // 30
+
+    // Check if key exists
+    val hasEmail = user.has("email")  // false
+
+    // Get value or null
+    val email = user.getOrNull("email")  // null
+}
+```
+
+**Removing Values:**
+
+```kotlin
+scope.launch {
+    document.updateAsync { root, _ ->
+        val user = root.getAs<JsonObject>("user")
+        user.remove("age")
+    }.await()
+}
+```
+
+#### JsonArray
+
+`JsonArray` is an ordered collection of values, similar to a JSON array or Kotlin List. It supports adding, removing, and accessing elements by index.
+
+**Creating and Using JsonArray:**
+
+```kotlin
+scope.launch {
+    document.updateAsync { root, _ ->
+        // Create an array with primitives
+        root.setNewArray("items").apply {
+            put("Apple")
+            put("Banana")
+            put("Cherry")
+        }
+
+        // Create an array with nested structures
+        root.setNewArray("users").apply {
+            putNewObject().apply {
+                set("name", "Alice")
+                set("age", 30)
+            }
+            putNewObject().apply {
+                set("name", "Bob")
+                set("age", 25)
+            }
+        }
+    }.await()
+}
+```
+
+**Accessing and Modifying Elements:**
+
+```kotlin
+scope.launch {
+    document.updateAsync { root, _ ->
+        val items = root.getAs<JsonArray>("items")
+
+        // Access by index
+        val first = items[0]  // "Apple"
+
+        // Update value
+        items[1] = "Blueberry"
+
+        // Remove element
+        items.removeAt(2)
+
+        // Add at specific position
+        items.insertAt(0, "Avocado")
+
+        // Get array size
+        val size = items.length
+    }.await()
+}
+```
+
+**Nested Arrays:**
+
+```kotlin
+scope.launch {
+    document.updateAsync { root, _ ->
+        root.setNewArray("matrix").apply {
+            putNewArray().apply {
+                put(1)
+                put(2)
+                put(3)
+            }
+            putNewArray().apply {
+                put(4)
+                put(5)
+                put(6)
+            }
+        }
+    }.await()
+}
+```
 
 #### JsonText
-`JsonText` provides supports for collaborative text editing. In addition, contents in `JsonText` can have attributes; for example, characters can be bold, italic, or underlined.
+
+`JsonText` is a specialized CRDT type for collaborative text editing. It supports text operations like insert, delete, and styling, making it ideal for building rich text editors.
+
+**Creating and Editing Text:**
 
 ```kotlin
-// Declare your own CoroutineScope
 scope.launch {
-  target.updateAsync { root ->
-    root.setNewText("text")                                           // {"text":[]}
-    root.getAs<JsonText>("text").edit(0, 0, "hello")                  // {"text":["val":"hello"]}
-    root.getAs<JsonText>("text").edit(0, 1, "H")                      // {"text":[{"val":"H"},{"val":"ello"}]}
-    root.getAs<JsonText>("text").select(0, 1)
-    root.getAs<JsonText>("text").style(0, 1, mapOf("bold" to "true")) // {"text":[{"attrs":{"bold":"true"},"val":"H"},{"val":"ello"}]}
-  }.await()
+    document.updateAsync { root, _ ->
+        root.setNewText("content")
+        root.getAs<JsonText>("content").edit(0, 0, "Hello World")
+    }.await()
 }
 ```
 
-An example of TextEditor: [Text Editor example](https://github.com/yorkie-team/yorkie-android-sdk/tree/main/examples/texteditor)
+**Text Operations:**
 
-#### Selection using presence
-
-The temporary client information, such as text selection, does not need to be stored in the document permanently.
-Instead, it can be effectively shared using `presence`.
-
-When transmitting text selection information, it is essential to convert the `index`, which can vary based on the text state, into the `position` used by `JsonText`.
-This converted position selection can then be sent and applied through presence.
-
-Here is an example where presence is used to share text selection between users in CodeMirror editor.
-
-- When the text selection is changed:
 ```kotlin
+scope.launch {
+    document.updateAsync { root, _ ->
+        val text = root.getAs<JsonText>("content")
+
+        // Insert text at position
+        text.edit(0, 0, "Hello")
+
+        // Replace text range
+        text.edit(0, 5, "Hi")  // Replace "Hello" with "Hi"
+
+        // Delete text range
+        text.edit(0, 2, "")    // Delete "Hi"
+
+        // Delete with helper method
+        text.delete(0, 5)
+
+        // Clear all text
+        text.clear()
+    }.await()
+}
+```
+
+**Styling Text:**
+
+```kotlin
+scope.launch {
+    document.updateAsync { root, _ ->
+        val text = root.getAs<JsonText>("content")
+        text.edit(0, 0, "Hello World")
+
+        // Apply styles to text range
+        text.style(0, 5, mapOf("bold" to "true"))
+        text.style(6, 11, mapOf("italic" to "true", "color" to "blue"))
+    }.await()
+}
+```
+
+**Edit with Attributes:**
+
+```kotlin
+scope.launch {
+    document.updateAsync { root, _ ->
+        val text = root.getAs<JsonText>("content")
+
+        // Insert text with attributes
+        text.edit(0, 0, "Bold text", mapOf("bold" to "true"))
+    }.await()
+}
+```
+
+**Getting Text Properties:**
+
+```kotlin
+val text = document.getRoot().getAs<JsonText>("content")
+val length = text.length
+val textValue = text.toString()
+val values = text.values  // List of TextWithAttributes
+```
+
+**Text Selection and Presence:**
+
+For sharing text cursor positions between users, convert index positions to CRDT positions:
+
+```kotlin
+// Convert index range to position range (for presence)
 document.updateAsync { root, presence ->
-  val text = root.getAs<JsonText>("content")
-  val indexRange = text.edit(from, to, content)
-  val posRange = text.indexRangeToPosRange(range)
-  presence.put(mapOf("selection" to gson.toJson(posRange))) // Serialize posRange as a JSON string
+    val text = root.getAs<JsonText>("content")
+    val indexRange = text.edit(from, to, content)
+    val posRange = text.indexRangeToPosRange(indexRange)
+    posRange?.let {
+        presence.put(mapOf("selection" to gson.toJson(posRange)))
+    }
+}
+
+// Convert position range back to index range
+document.events.filterIsInstance<Document.Event.PresenceChanged.Others>().collect { event ->
+    if (event is Document.Event.PresenceChanged.Others.PresenceChanged) {
+        val (clientID, presence) = event.changed
+        val selectionJson = presence["selection"] as? String
+        selectionJson?.let {
+            val posRange = gson.fromJson(it, TextPosStructRange::class.java)
+            val indexRange = document.getRoot()
+                .getAs<JsonText>("content")
+                .posRangeToIndexRange(posRange)
+            // Update editor selection UI
+        }
+    }
 }
 ```
-
-- When applying other user's selection changes:
-```kotlin
-document.events.filterIsInstance<Others>().collect { event ->
-  if (event is Others.PresenceChanged) {
-    val (clientID, presence) = event.changed
-    val range = document.getRoot().getAs<JsonText>("content").posRangeToIndexRange(presence["selection"])
-    // handle the updated selection in the editor
-  }
-}
-```
-
-Text selection can be efficiently shared using presence.
-Please refer to the following example for a complete code:
-
-An example of Text Editor: [Text Editor example](https://github.com/yorkie-team/yorkie-android-sdk/tree/main/examples/texteditor)
-
 
 #### JsonCounter
 
-`JsonCounter` supports integer types changing with addition and subtraction. If an integer data needs to be modified simultaneously, `JsonCounter` should be used instead of primitives.
+`JsonCounter` is a CRDT type that supports atomic increment and decrement operations. It automatically resolves conflicts when multiple clients modify the counter simultaneously.
+
+**Creating and Using Counter:**
 
 ```kotlin
-// Declare your own CoroutineScope
 scope.launch {
-  target.updateAsync { root ->
-    root.setNewCounter("counter", 1)                // {"counter":1}
-    root.getAs<JsonCounter>("counter").increase(3)  // {"counter":4}
-    root.getAs<JsonCounter>("counter").increase(6)  // {"counter":10}
-    root.getAs<JsonCounter>("counter").increase(-3) // {"counter":7}
-  }.await()
+    document.updateAsync { root, _ ->
+        // Create counter with initial value
+        root.setNewCounter("likes", 0)
+        root.setNewCounter("views", 100)
+    }.await()
+}
+```
+
+**Incrementing and Decrementing:**
+
+```kotlin
+scope.launch {
+    document.updateAsync { root, _ ->
+        val likes = root.getAs<JsonCounter>("likes")
+
+        // Increase by positive number
+        likes.increase(1)
+        likes.increase(5)
+
+        // Decrease by negative number
+        likes.increase(-2)
+    }.await()
+}
+```
+
+**Getting Counter Value:**
+
+```kotlin
+val root = document.getRoot()
+val likes = root.getAs<JsonCounter>("likes")
+val count = likes.value  // CounterValue (Int or Long)
+```
+
+**Use Cases:**
+
+JsonCounter is ideal for:
+- Like counts
+- View counts
+- Vote tallies
+- Collaborative counters
+- Any numeric value that multiple users might modify simultaneously
+
+#### JsonTree
+
+`JsonTree` is a CRDT-based tree structure designed for representing hierarchical document structures like HTML or XML. It's ideal for building rich text editors with complex formatting (e.g., ProseMirror, Quill).
+
+**Creating a Tree:**
+
+```kotlin
+import dev.yorkie.document.json.TreeBuilder.element
+import dev.yorkie.document.json.TreeBuilder.text
+
+scope.launch {
+    document.updateAsync { root, _ ->
+        root.setNewTree(
+            "content",
+            element("doc") {
+                element("p") {
+                    text { "Hello World" }
+                }
+                element("p") {
+                    text { "Second paragraph" }
+                }
+            }
+        )
+    }.await()
+}
+```
+
+**Tree with Attributes:**
+
+```kotlin
+scope.launch {
+    document.updateAsync { root, _ ->
+        root.setNewTree(
+            "content",
+            element("doc") {
+                element("p") {
+                    text { "Bold text" }
+                    attr { "bold" to true }
+                }
+                element("a") {
+                    text { "Click here" }
+                    attr {
+                        "href" to "https://example.com"
+                        "target" to "_blank"
+                    }
+                }
+            }
+        )
+    }.await()
+}
+```
+
+**Editing Tree:**
+
+```kotlin
+scope.launch {
+    document.updateAsync { root, _ ->
+        val tree = root.getAs<JsonTree>("content")
+
+        // Insert nodes at position
+        tree.edit(
+            7, 7,  // position range
+            element("p") {
+                text { "New paragraph" }
+            }
+        )
+
+        // Delete nodes
+        tree.edit(0, 5)  // Delete nodes in range
+    }.await()
+}
+```
+
+**Styling Tree Nodes:**
+
+```kotlin
+scope.launch {
+    document.updateAsync { root, _ ->
+        val tree = root.getAs<JsonTree>("content")
+
+        // Apply styles to nodes in range
+        tree.style(0, 5, mapOf("color" to "red", "fontSize" to "16"))
+    }.await()
+}
+```
+
+**Getting Tree Properties:**
+
+```kotlin
+val root = document.getRoot()
+val tree = root.getAs<JsonTree>("content")
+val size = tree.size
+val rootNode = tree.rootTreeNode
+val xml = tree.toXml()  // Convert tree to XML string
+```
+
+**Tree Structure:**
+
+JsonTree consists of two types of nodes:
+- `ElementNode`: Represents an element with a type, attributes, and children
+- `TextNode`: Represents a text node with a value
+
+**Complex Tree Example:**
+
+```kotlin
+scope.launch {
+    document.updateAsync { root, _ ->
+        root.setNewTree(
+            "article",
+            element("doc") {
+                element("h1") {
+                    text { "Article Title" }
+                }
+                element("p") {
+                    text { "This is " }
+                    element("strong") {
+                        text { "bold" }
+                    }
+                    text { " and this is " }
+                    element("em") {
+                        text { "italic" }
+                    }
+                    text { "." }
+                }
+                element("ul") {
+                    element("li") {
+                        text { "First item" }
+                    }
+                    element("li") {
+                        text { "Second item" }
+                    }
+                }
+            }
+        )
+    }.await()
+}
+```
+
+### Presence
+
+Presence is a feature that allows you to share the temporary state of online users in real-time. Unlike document data, presence information is not stored permanently and is only maintained while users are connected. This makes it ideal for showing user cursors, selections, online status, or any other ephemeral user state.
+
+#### Setting Initial Presence
+
+When attaching a document, you can set the initial presence for the client using the `initialPresence` parameter:
+
+**Function Signature:**
+
+```kotlin
+fun attachAsync(
+    document: Document,
+    initialPresence: P = emptyMap(),
+    syncMode: Client.SyncMode = Client.SyncMode.Realtime,
+    schema: String? = null
+): Deferred<OperationResult>
+```
+
+**Parameters:**
+- `initialPresence: P` - Initial presence data as a map of string key-value pairs (default: empty map)
+
+**Example:**
+
+```kotlin
+scope.launch {
+    client.attachAsync(
+        document,
+        initialPresence = mapOf(
+            "name" to "Alice",
+            "color" to "#FF5733",
+            "status" to "online",
+            "avatar" to "https://example.com/avatar.png"
+        )
+    ).await()
+}
+```
+
+#### Updating Presence
+
+You can update presence at any time using `document.updateAsync()`. The `presence` parameter in the updater function is a `Presence` instance.
+
+**Function Signature:**
+
+```kotlin
+fun updateAsync(
+    message: String? = null,
+    updater: suspend (root: JsonObject, presence: Presence) -> Unit
+): Deferred<OperationResult>
+```
+
+**Parameters:**
+- `updater: suspend (root: JsonObject, presence: Presence) -> Unit` - Lambda with `presence` parameter for updates
+
+**Example:**
+
+```kotlin
+scope.launch {
+    // Update presence only (no document changes)
+    document.updateAsync { _, presence ->
+        presence.put(mapOf(
+            "cursor" to "100,200",
+            "status" to "typing"
+        ))
+    }.await()
+}
+```
+
+**Merge Behavior:**
+
+Presence changes are merged, not replaced. Only the specified keys are updated:
+
+```kotlin
+// Initial presence: { "name": "Alice", "color": "blue" }
+
+scope.launch {
+    document.updateAsync { _, presence ->
+        presence.put(mapOf("status" to "typing"))
+    }.await()
+}
+// Result: { "name": "Alice", "color": "blue", "status": "typing" }
+```
+
+**Updating Multiple Keys:**
+
+```kotlin
+scope.launch {
+    document.updateAsync { _, presence ->
+        presence.put(mapOf(
+            "cursor" to "200,300",
+            "selection" to "5,10",
+            "status" to "editing",
+            "lastActivity" to System.currentTimeMillis().toString()
+        ))
+    }.await()
+}
+```
+
+**Updating Document and Presence Together:**
+
+```kotlin
+scope.launch {
+    document.updateAsync { root, presence ->
+        // Update document
+        root.getAs<JsonText>("content").edit(0, 0, "Hello")
+
+        // Update presence
+        presence.put(mapOf(
+            "cursor" to "5",
+            "status" to "typing"
+        ))
+    }.await()
+}
+```
+
+#### Presence Events
+
+Presence events notify you when users join, leave, or update their presence. These events are part of `Document.Event.PresenceChanged`.
+
+##### MyPresence Events
+
+Events related to the current client:
+
+- **`MyPresence.Initialized`**: Emitted when the presence state is initialized. Contains all currently online users and their presences.
+- **`MyPresence.PresenceChanged`**: Emitted when the current client updates their own presence.
+
+##### Others Events
+
+Events related to other clients:
+
+- **`Others.Watched`**: Emitted when another client joins the document.
+- **`Others.Unwatched`**: Emitted when another client leaves the document.
+- **`Others.PresenceChanged`**: Emitted when another client updates their presence.
+
+##### Subscribing to Presence Events
+
+Subscribe to presence events before attaching the document to ensure you receive the initial state:
+
+```kotlin
+scope.launch {
+    document.events
+        .filterIsInstance<Document.Event.PresenceChanged>()
+        .collect { event ->
+            when (event) {
+                is Document.Event.PresenceChanged.MyPresence.Initialized -> {
+                    // Initial presence state loaded from server
+                    val onlineUsers = event.initialized
+                    println("Online users: ${onlineUsers.size}")
+                    onlineUsers.forEach { (clientID, presence) ->
+                        println("${presence["name"]} is online")
+                    }
+                }
+
+                is Document.Event.PresenceChanged.Others.Watched -> {
+                    // Another client joined
+                    val (clientID, presence) = event.changed
+                    println("${presence["name"]} joined")
+                }
+
+                is Document.Event.PresenceChanged.Others.Unwatched -> {
+                    // Another client left
+                    val (clientID, presence) = event.changed
+                    println("${presence["name"]} left")
+                }
+
+                is Document.Event.PresenceChanged.Others.PresenceChanged -> {
+                    // Another client updated their presence
+                    val (clientID, presence) = event.changed
+                    println("${presence["name"]} updated: ${presence["status"]}")
+                }
+
+                is Document.Event.PresenceChanged.MyPresence.PresenceChanged -> {
+                    // Current client's presence updated
+                    val (clientID, presence) = event.changed
+                    println("My presence updated: $presence")
+                }
+            }
+        }
 }
 ```
 

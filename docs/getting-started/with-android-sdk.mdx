@@ -8,6 +8,11 @@ phase: development
 
 Welcome to Yorkie Android SDK! In this guide, we will walk you through the steps to get started with the Android SDK.
 
+### Prerequisite
+
+- **Kotlin**: 1.9.24 or higher
+- **Android Gradle Plugin**: 8.x or higher
+
 ### Using in your projects
 
 The library is published to [Maven Central](https://repo1.maven.org/maven2/dev/yorkie/yorkie-android/), so you can simply add the following line to your dependencies.
@@ -43,11 +48,19 @@ Add a dependency to the `<dependencies>` element.
 First, create a Client instance with API key and connect it to the yorkie server.
 
 ```kotlin
-val client = Client(context, "{{API_HOST}}", {{API_PORT}}, Options(apiKey = "xxxxxxxxxxxxxxxxxxxx"))
+val client = Client(
+  host = {{YORKIE_SERVER_URL}},
+  options = Options(apiKey = "xxxxxxxxxxxxxxxxxxxx"),
+)
 
 // Declare your own CoroutineScope
 scope.launch {
-  client.activateAsync().await	
+  client.activateAsync().await()
+}
+
+// Do not forget to deactivate it when you no longer need it
+scope.launch {
+  client.deactivateAsync().await()
 }
 ```
 
@@ -63,6 +76,11 @@ val document = Document(Key("my-doc"))
 // Declare your own CoroutineScope
 scope.launch {
   client.attachAsync(document).await()
+}
+
+// Do not forget to detach it when you no longer need it
+scope.launch {
+  client.detachAsync(document).await()
 }
 ```
 
@@ -109,7 +127,7 @@ scope.launch {
 ```
 
 You can execute different actions depending on the source of change.
- 
+
 
 ```kotlin
 // Declare your own CoroutineScope
@@ -124,13 +142,13 @@ scope.launch {
 
 #### 6. Viewing the presence of other peers
 
-You can also subscribe to the presence of users participating in the document using `doc.events.filterIsInstance<PresenceChange>()`. 
+You can also subscribe to the presence of users participating in the document using `doc.events.filterIsInstance<PresenceChange>()`.
 You can use `doc.presences` to get the list of users who are currently involved in the document.
 
 ```kotlin
 // Declare your own CoroutineScope
 scope.launch {
-  document.filterIsInstance<PresenceChange>.collect {
+  document.events.filterIsInstance<PresenceChange>.collect {
     val users = document.presences.value
     println("There are currently ${users.length} users online.")
   }
