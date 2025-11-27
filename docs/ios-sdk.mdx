@@ -13,13 +13,14 @@ If you want to install the SDK, refer to the [Getting Started with iOS SDK](/doc
 ### Client
 
 `Client` is a normal client that can communicate with the server. It has Documents and sends changes of the Document from local to the server to synchronize with other replicas remotely.
+For more information about `Client`, please refer to the [Client](https://yorkie.dev/yorkie-ios-sdk/documentation/yorkie/client).
 
 #### Creating a Client
 
 We can create a Client using `Client()`. After the Client has been activated, it is connected to the server and ready to use.
 
 ```swift
-let client = Client("{{API_ADDR}}"), ClientOptions(
+let client = Client("{{API_ADDR}}", ClientOptions(
     apiKey: "xxxxxxxxxxxxxxxxxxxx"
 ))
 try await client.activate()
@@ -27,7 +28,13 @@ try await client.activate()
 
 > The API key is used to identify the project in Yorkie. You can get the API key of the project you created in the [Dashboard]({{DASHBOARD_PATH}}).
 
+> For CLI users, you can create Clients without an API key. In this case, the Client will be created with a local rpcAddr
+```swift
+let client = Client("http://localhost:{{port}}")
+try await client.activate()
+```
 
+For more information about `CLI`, please refer to the [CLI](https://github.com/yorkie-team/yorkie-team.github.io/blob/main/docs/cli.mdx).
 
 ##### Creating a Client with Auth Token
 
@@ -47,7 +54,12 @@ struct MyAuthTokenInjector: AuthTokenInjector {
 
 let client = Client("{{API_ADDR}}", ClientOptions(apiKey: "xxxxxxxxxxxxxxxxxxxx", authTokenInjector: MyAuthTokenInjector()))
 ```
+#### Syncing Documents if needed
+In `SyncMode.manual`, the client does not automatically synchronize documents with the server. Therefore, you need to manually call the `sync(document:)` method to synchronize the document when necessary.
 
+```swift
+try await client.sync(doc)
+```
 
 
 ##### Deactivate the Client
@@ -60,10 +72,12 @@ try await client.deactivate()
 
 This will detach all documents attached to the client for efficient [garbage collection](https://github.com/yorkie-team/yorkie/blob/main/design/garbage-collection.md).
 
-#### Document
+### Document
 
 `Document` is a primary data type in Yorkie, which provides a JSON-like updating experience that makes it easy to represent your application's model.
 A `Document` can be updated without being attached to the client, and its changes are automatically propagated to other clients when the `Document` is attached to the `Client` or when the network is restored.
+
+For more information about `Document`, please refer to the [Document](https://yorkie.dev/yorkie-ios-sdk/documentation/yorkie/document).
 
 #### Creating a Document
 
@@ -74,7 +88,7 @@ let doc = Document(key: "doc-1")
 ```
 
 > The document key is used to identify the Document in Yorkie. It is a string that can be freely defined by the user.
-> However, it is allowed to use only `a-z`, `A-Z`, `0-9`, `-`, `.`, `_`, `~` and must be less than 120 characters.
+> However, it is allowed to use only `a-z`, `A-Z`, `0-9`, `-`, `.`, `_`, `~` and must be less than 120 characters (and more than 4 characters).
 
 
 #### Attaching the Document
@@ -91,7 +105,7 @@ The second argument is options.
 - `syncMode`(Optional): Specifies synchronization modes. The default value is `SyncMode.realtime`, which automatically pushes and pulls changes. If you set it to `SyncMode.manual`, you'll need to manually handle synchronization.
 
 ```swift
-try await clientA.attach(doc, ["color: "blue", "cursor": ["x": 0, "y": 0]], .manual)
+try await clientA.attach(doc, ["color": "blue", "cursor": ["x": 0, "y": 0]], .manual)
 ```
 
 #### Initializing root
@@ -144,57 +158,40 @@ try await doc.update { root, presence in
 ```
 
 <Alert status="warning">
-Note, the properties provided will be replaced entirely and not merely updated.
+**Important**: Properties in presence are replaced entirely, not merged. 
 
-For example:
+To preserve nested properties, include all fields in your update:
 
 ```swift
-// let's say 'color' is a property of cursor
-try await client.attach(doc, ["cursor": ["x": 0, "y": 0, "color": "red"]])
+// ❌ This loses the 'color' property
+presence.set(["cursor": ["x": 1, "y": 1]])
 
-try await doc.update { root, presence in 
-  // we want to change the x y coordinates of our cursor
-    presence.set(["cursor": ["x": 1, "y": 1]])
-}
-
-// final state
-// presence = { cursor: { x: 1, y: 1 } } 
-// we can see that all properties inside cursor get replaced (i.e. we lose the property 'color')
+// ✅ This preserves all properties
+presence.set(["cursor": ["x": 1, "y": 1, "color": "red"]])
 ```
 </Alert>
 
 #### Getting presence
 
-You can get the presences of the current client and other clients participating in the document.
+You can retrieve presence information for clients participating in the document.
 
-##### Document.getPresence(clientID) 
-
-It returns the presence of a specific client.
+**Getting specific client presence:**
 
 ```swift
-await doc.getPresence(client.id!) // ["color": "blue", "cursor": ["x": 1, "y": 1]]
+await doc.getPresence(client.id!) 
 ```
 
-##### Document.getMyPresence() 
-
- It returns the presence of the current client that has attached to the document.
+**Getting your own presence:**
 
 ```swift
-await doc.getMyPresence() // ["color": "blue", "cursor": ["x": 1, "y": 1]]
+await doc.getMyPresence()
 ```
 
-##### Document.getPresences() 
-
-It returns an array about all clients currently participating in the document.
-Each entry in the array includes the client's id and presence.
+**Getting all presences:**
 
 ```swift
 let users = await doc.getPresences()
-for (clientID, presence) in users {
-    // Do somethins
-}
 ```
-
 ##### Document.subscribePresence(.presence)
 
 This method allows you to subscribe to presence-related changes. You'll be notified whenever clients watch, unwatch, or modify their presence.
@@ -303,7 +300,9 @@ By subscribing to these events, you can update the UI in real-time and handle ex
 A Document can be modified by changes generated remotely or locally in Yorkie. Whenever the Document is modified, change events are triggered and you can subscribe to these events using the `document.subscribe(callback)` method.
 By subscribing to changes in the Document, you can receive updates in real-time, which is useful for updating the UI when the Document changes.
 
-The callback is called with an event object, and the `event.type` property indicates the source of the change, which can be one of the following values: `localChange`, `remoteChange`, or `snapshot`.
+The callback is called with an event object, and the `event.type` property indicates the source of the change, which can be one of the following values: `statusChanged`, `connectionChanged`, `syncStatusChanged`, `snapshot`, `localChange`, `remoteChange`, `initialized`, `watched`, `unwatched`, `presenceChanged`, `broadcast`, `localBroadcast` or `authError`.
+
+For more information about document events, please refer to the [DocEvent](https://yorkie.dev/yorkie-ios-sdk/documentation/yorkie/docevent).
 
 ```swift
 await self.document.subscribe { event, _ in
@@ -326,6 +325,8 @@ await self.document.subscribe { event, _ in
                 break
             }
         }
+    } else {
+        // others case...
     }
 }
 ```
@@ -337,6 +338,20 @@ The `snapshot` event is triggered when a snapshot is received from the server.
 This occurs when the changes that a document needs to fetch from the server exceed a certain `SnapshotThreshold`.
 Instead of sending numerous changes, the server sends a snapshot of the document.
 In such cases, it is essential to update with data from the Yorkie Document.
+
+The available Event Types are:
+| Event Types                   | Description                                               |
+|-------------------------------|-----------------------------------------------------------|
+| `Snapshot`                    | Document snapshot received from server                    |
+| `LocalChange`                 | Document changed by current client                        |
+| `RemoteChange`                | Document changed by another client                        |
+| `PresenceChanged`             | Presence data changed (see [Presence](#presence) section) |
+| `SyncStatusChanged`           | Sync status changed (`Synced`, `SyncFailed`)              |
+| `StreamConnectionChanged`     | Connection status changed (`Connected`, `Disconnected`)   |
+| `DocumentStatusChanged`       | Document status changed                                   |
+| `Broadcast`                   | Broadcast message received                                |
+| `AuthError`                   | Authentication error occurred                             |
+
 
 <Alert status="warning">
 If a client has not synchronized for a prolonged period and then makes a sync request, it might receive a `snapshot` event.
@@ -421,26 +436,17 @@ For more information about `Auth Webhook`, please refer to the [Auth Webhook](/d
 Broadcasting allows clients to share custom events with other clients connected to the same document. Unlike document updates or presence changes, broadcasts are ephemeral messages that are not persisted in the document's state.
 
 ```swift
-let payload = Payload([
-    "message": "Hello everyone!"
-])
+// Step 1: Define your message structure
+let payload = Payload(["message": "Hello!"])
 
-// Broadcasting a message
+// Step 2: Broadcast to topic
 try await doc.broadcast(topic: "chat", payload: payload)
 
-// Subscribing to broadcast messages
+// Step 3: Subscribe and handle
 try await doc.subscribeBroadcast { event, _ in
-    guard let broadcastEvent = event as? BroadcastEvent else {
-        return
-    }
-    let clientID = broadcastEvent.value.clientID
-    let topic = broadcastEvent.value.topic
-    let message: String = broadcastEvent.value.payload["message"] ?? ""
-
-    if topic == "chat" {
-        print("Message from \(clientID): \(message)")
-    }
-}      
+    guard let event = event as? BroadcastEvent else { return }
+    print("Received: \(event.value.payload["message"] ?? "")")
+}
 ```
 
 The broadcast event contains:
@@ -600,6 +606,83 @@ The available log levels for `setLogLevel` are:
 | `LogLevel.Fatal`    | Critical errors, may lead to termination |
 
 Adjust the log level for flexible control over log verbosity in your application.
+
+### Performance Best Practices
+
+- Use `SyncMode.realtimePushOnly` for write-heavy operations
+- Batch updates within single `doc.update()` call
+- Detach documents when switching contexts
+- Use `Logger.logLevel = .error` in production
+
+### Common Use Cases
+
+#### Real-time Collaborative Text Editing
+
+```swift
+// Initialize text
+try await doc.update { root, _ in
+    root.content = JSONText()
+}
+
+// Handle text changes
+try await doc.update { root, presence in
+    (root.content as? JSONText)?.edit(0, 0, "Hello")
+    
+    // Share cursor position
+    if let range = try? (root.content as? JSONText)?.indexRangeToPosRange((0, 5)) {
+        presence.set(["selection": ["from": range.0, "to": range.1]])
+    }
+}
+```
+
+#### Shared Counter
+
+```swift
+try await doc.update { root, _ in
+    root.likes = JSONCounter(value: Int64(0))
+}
+
+// Increment likes
+try await doc.update { root, _ in
+    (root.likes as? JSONCounter<Int64>)?.increase(value: 1)
+}
+```
+
+#### Live Cursor Tracking
+
+```swift
+// Update cursor position
+try await doc.update { root, presence in
+    presence.set(["cursor": ["x": 100, "y": 200]])
+}
+
+// Subscribe to others' cursors
+await doc.subscribePresence(.others) { event in
+    if event.type == .presenceChanged {
+        // Update UI with new cursor positions
+    }
+}
+```
+
+### Troubleshooting
+
+#### Document Not Syncing
+
+- Verify `SyncMode` is set to `.realtime`
+- Check network connection using `subscribeConnection()`
+- Ensure client is properly activated
+
+#### Presence Not Updating
+
+- Subscribe to presence events before attaching document
+- Verify presence data is JSON serializable
+- Check that document is attached to client
+
+#### Memory Issues
+
+- Detach unused documents
+- Set appropriate `Logger.logLevel`
+- Monitor document size and consider splitting large documents
 
 ### Reference
 
