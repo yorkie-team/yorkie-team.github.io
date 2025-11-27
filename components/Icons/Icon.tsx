@@ -44,6 +44,7 @@ import FileSVG from '@/public/assets/icons/icon_file.svg';
 import TextInputSVG from '@/public/assets/icons/icon_text_input.svg';
 import TransformSVG from '@/public/assets/icons/icon_transform.svg';
 import ReactLogoSVG from '@/public/assets/icons/icon_react_logo.svg';
+import AndroidLogoSVG from '@/public/assets/icons/icon_android_logo.svg';
 
 const svgMap = {
   star: <StarSVG />,
@@ -90,6 +91,7 @@ const svgMap = {
   textInput: <TextInputSVG />,
   transform: <TransformSVG />,
   reactLogo: <ReactLogoSVG />,
+  androidLogo: <AndroidLogoSVG />,
 };
 type SVGType = keyof typeof svgMap;
 

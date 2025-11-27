@@ -28,7 +28,20 @@ export function ProjectCodes({
   const [activeFileInfo, setActiveFileInfo] = useState<FileInfo | null>(
     activeFile ? getFileInfo(files, activeFile) : null,
   );
-  const [isFolderOpen, setIsFolderOpen] = useState<boolean>(true);
+  // Track open state for each folder by path
+  const [openFolders, setOpenFolders] = useState<Set<string>>(new Set());
+
+  const toggleFolder = useCallback((folderPath: string) => {
+    setOpenFolders((prev) => {
+      const next = new Set(prev);
+      if (next.has(folderPath)) {
+        next.delete(folderPath);
+      } else {
+        next.add(folderPath);
+      }
+      return next;
+    });
+  }, []);
 
   const onClickFile = useCallback(
     (targetFile: string) => {
@@ -53,6 +66,21 @@ export function ProjectCodes({
     initialFileInfo = directoryInfoResult;
     setActiveFileInfo(openedFile);
     setFileInfo(initialFileInfo);
+    
+    // Initialize all folders as open
+    const allFolderPaths = new Set<string>();
+    const collectFolderPaths = (info: DirectoryInfo) => {
+      if (!info.isFile) {
+        allFolderPaths.add(info.path);
+        info.children.forEach((child) => {
+          if (!child.isFile) {
+            collectFolderPaths(child);
+          }
+        });
+      }
+    };
+    collectFolderPaths(initialFileInfo);
+    setOpenFolders(allFolderPaths);
   }, [files, activeFile, ignoreFiles]);
 
   return (
@@ -62,8 +90,9 @@ export function ProjectCodes({
           if (isEmptyDirectory(child)) {
             return null;
           }
+          const isOpen = openFolders.has(child.path);
           return (
-            <li key={child.name} className={classNames('folder_item', { is_active: child.isFile && child.isOpen })}>
+            <li key={child.path} className={classNames('folder_item', { is_active: child.isFile && child.isOpen })}>
               <button
                 type="button"
                 className="btn_folder"
@@ -71,20 +100,27 @@ export function ProjectCodes({
                   if (child.isFile) {
                     onClickFile(child.path);
                   } else {
-                    setIsFolderOpen(!isFolderOpen);
+                    toggleFolder(child.path);
                   }
                 }}
               >
                 {child.isFile ? (
                   <Icon type="file" />
-                ) : isFolderOpen ? (
+                ) : isOpen ? (
                   <Icon type="folderOpen" />
                 ) : (
                   <Icon type="folderClose" />
                 )}
                 <span className="name"> {child.name}</span>
               </button>
-              {!child.isFile && isFolderOpen && <SubFolderCodes fileList={child.children} onClickFile={onClickFile} />}
+              {!child.isFile && isOpen && (
+                <SubFolderCodes 
+                  fileList={child.children} 
+                  onClickFile={onClickFile}
+                  openFolders={openFolders}
+                  toggleFolder={toggleFolder}
+                />
+              )}
             </li>
           );
         })}
@@ -106,19 +142,23 @@ export function ProjectCodes({
 function SubFolderCodes({
   fileList,
   onClickFile,
+  openFolders,
+  toggleFolder,
 }: {
   fileList: Array<CodeInfo>;
   onClickFile: (targetFile: string) => void;
+  openFolders: Set<string>;
+  toggleFolder: (folderPath: string) => void;
 }) {
-  const [isFolderOpen, setIsFolderOpen] = useState<boolean>(true);
   return (
     <ul className="folder_sub_list">
       {fileList.map((child) => {
         if (isEmptyDirectory(child)) {
           return null;
         }
+        const isOpen = openFolders.has(child.path);
         return (
-          <li className={classNames('folder_item', { is_active: child.isFile && child.isOpen })} key={child.name}>
+          <li className={classNames('folder_item', { is_active: child.isFile && child.isOpen })} key={child.path}>
             <button
               type="button"
               className="btn_folder"
@@ -126,20 +166,27 @@ function SubFolderCodes({
                 if (child.isFile) {
                   onClickFile(child.path);
                 } else {
-                  setIsFolderOpen(!isFolderOpen);
+                  toggleFolder(child.path);
                 }
               }}
             >
               {child.isFile ? (
                 <Icon type="file" />
-              ) : isFolderOpen ? (
+              ) : isOpen ? (
                 <Icon type="folderOpen" />
               ) : (
                 <Icon type="folderClose" />
               )}
               <span className="name">{child.name}</span>
             </button>
-            {!child.isFile && isFolderOpen && <SubFolderCodes fileList={child.children} onClickFile={onClickFile} />}
+            {!child.isFile && isOpen && (
+              <SubFolderCodes 
+                fileList={child.children} 
+                onClickFile={onClickFile}
+                openFolders={openFolders}
+                toggleFolder={toggleFolder}
+              />
+            )}
           </li>
         );
       })}

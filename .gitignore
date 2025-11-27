@@ -87,3 +87,6 @@ robots.txt
 # Built example apps
 /public/apps
 /temp
+
+# idea
+.idea

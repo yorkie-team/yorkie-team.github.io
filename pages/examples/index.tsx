@@ -1,11 +1,11 @@
-import { Button, Icon, Layout, Popover } from '@/components';
-import { ExampleThumbnailImage } from '@/components/exampleView';
+import {Button, Icon, Layout, Popover} from '@/components';
+import {ExampleThumbnailImage} from '@/components/exampleView';
 import ExampleBannerSVG from '@/public/assets/images/banner/img_example_banner.svg';
-import { useState } from 'react';
-import type { NextPage } from 'next';
+import {useState} from 'react';
+import type {NextPage} from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
+import {useRouter} from 'next/router';
 
 const CATEGORIES = {
   ALL: 'all',
@@ -14,14 +14,16 @@ const CATEGORIES = {
   CANVAS_TOOL: 'canvas-tool',
   PRODUCTIVITY: 'productivity',
   REACT: 'react-provider',
+  ANDROID: 'android',
 } as const;
 export const CATEGORY_CONFIG = [
-  { id: CATEGORIES.ALL, label: 'All examples', icon: 'diamond' },
-  { id: CATEGORIES.PRESENCE, label: 'Presence', icon: 'messageSmile' },
-  { id: CATEGORIES.EDITOR, label: 'Text Editor', icon: 'textInput' },
-  { id: CATEGORIES.CANVAS_TOOL, label: 'Canvas Tool', icon: 'transform' },
-  { id: CATEGORIES.PRODUCTIVITY, label: 'Productivity', icon: 'checkCircle' },
-  { id: CATEGORIES.REACT, label: 'React Provider', icon: 'reactLogo' },
+  {id: CATEGORIES.ALL, label: 'All examples', icon: 'diamond'},
+  {id: CATEGORIES.PRESENCE, label: 'Presence', icon: 'messageSmile'},
+  {id: CATEGORIES.EDITOR, label: 'Text Editor', icon: 'textInput'},
+  {id: CATEGORIES.CANVAS_TOOL, label: 'Canvas Tool', icon: 'transform'},
+  {id: CATEGORIES.PRODUCTIVITY, label: 'Productivity', icon: 'checkCircle'},
+  {id: CATEGORIES.REACT, label: 'React Provider', icon: 'reactLogo'},
+  {id: CATEGORIES.ANDROID, label: 'Android', icon: 'androidLogo'},
 ] as const;
 type CategoryType = (typeof CATEGORIES)[keyof typeof CATEGORIES];
 type Example = {
@@ -47,6 +49,13 @@ const EXAMPLES: Example[] = [
     category: [CATEGORIES.PRESENCE, CATEGORIES.REACT],
   },
   {
+    id: 'simultaneous-cursors-android',
+    title: 'Simultaneous Cursors Android',
+    desc: 'This demo shows the real-time collaborative version of simple drawing, cursor animation with Yorkie and Android.',
+    thumbnail: 'android-simultaneous-cursors.webp',
+    category: [CATEGORIES.PRESENCE, CATEGORIES.ANDROID],
+  },
+  {
     id: 'kanban',
     title: 'Kanban Board',
     desc: 'Kanban Board is a tool for managing tasks and workflow. It is a visual way to manage tasks and workflow.',
@@ -59,6 +68,13 @@ const EXAMPLES: Example[] = [
     desc: 'This is an example of real-time collaborative TodoMVC using Yorkie React.',
     thumbnail: 'react-todomvc.jpg',
     category: [CATEGORIES.PRODUCTIVITY, CATEGORIES.REACT],
+  },
+  {
+    id: 'todomvc-android',
+    title: 'TodoMVC Android',
+    desc: 'This is an example of real-time collaborative TodoMVC using Yorkie Android.',
+    thumbnail: 'android-todomvc.webp',
+    category: [CATEGORIES.PRODUCTIVITY, CATEGORIES.ANDROID],
   },
   {
     id: 'todolist',
@@ -96,11 +112,25 @@ const EXAMPLES: Example[] = [
     category: [CATEGORIES.EDITOR],
   },
   {
+    id: 'rich-text-editor-android',
+    title: 'Rich Text Editor',
+    desc: 'This demo shows the real-time collaborative version of the rich text editor with Yorkie and Android.',
+    thumbnail: 'android-rich-text-editor.webp',
+    category: [CATEGORIES.EDITOR, CATEGORIES.ANDROID],
+  },
+  {
     id: 'calendar',
     title: 'Calendar',
     desc: 'This demo shows the real-time collaborative version of the Calendar with Yorkie and Next.js.',
     thumbnail: 'nextjs-scheduler.png',
     category: [CATEGORIES.PRODUCTIVITY],
+  },
+  {
+    id: 'scheduler-android',
+    title: 'Scheduler Android',
+    desc: 'This demo shows the real-time collaborative version of the Scheduler with Yorkie and Android.',
+    thumbnail: 'android-scheduler.webp',
+    category: [CATEGORIES.PRODUCTIVITY, CATEGORIES.ANDROID],
   },
 ];
 
@@ -118,10 +148,10 @@ const Examples: NextPage = () => {
     router.push(
       {
         pathname: '/examples',
-        query: { category },
+        query: {category},
       },
       undefined,
-      { shallow: true },
+      {shallow: true},
     );
   };
 
@@ -134,7 +164,7 @@ const Examples: NextPage = () => {
         <div className="top_banner_inner">
           <div className="title_group">
             <h2 className="title">
-              Explore examples <br /> built by Yorkie
+              Explore examples <br/> built by Yorkie
             </h2>
             <p className="desc">
               Explore our examples and see how Yorkie can help you bring your products to the next level of
@@ -145,14 +175,14 @@ const Examples: NextPage = () => {
                 as="a"
                 href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`}
                 className="orange_0 btn_start"
-                icon={<Icon type="star" />}
+                icon={<Icon type="star"/>}
               >
                 Start for free
               </Button>
             </Button.Box>
           </div>
           <div className="img_box">
-            <ExampleBannerSVG />
+            <ExampleBannerSVG/>
           </div>
         </div>
       </div>
@@ -160,13 +190,13 @@ const Examples: NextPage = () => {
         <div className="content_inner">
           <nav className="navigator">
             <ul className="navigator_list">
-              {CATEGORY_CONFIG.map(({ id, label, icon }) => (
+              {CATEGORY_CONFIG.map(({id, label, icon}) => (
                 <li key={id} className="navigator_group">
                   <a
                     className={`navigator_item add_icon ${id === currentCategory ? 'is_active' : ''}`}
                     onClick={() => handleCategoryChange(id)}
                   >
-                    <Icon type={icon} />
+                    <Icon type={icon}/>
                     {label}
                   </a>
                 </li>
@@ -181,13 +211,13 @@ const Examples: NextPage = () => {
                     <button type="button" className="btn btn_small filter_desc">
                       <span className="filter_title">Examples:</span>
                       <span className="text">{CATEGORY_CONFIG.find((c) => c.id === currentCategory)?.label}</span>
-                      <Icon type="arrow" className="icon_arrow" />
+                      <Icon type="arrow" className="icon_arrow"/>
                     </button>
                   </Popover.Target>
                   <Popover.Dropdown>
                     <div className="dropdown">
                       <ul className="dropdown_list">
-                        {CATEGORY_CONFIG.map(({ id, label }) => (
+                        {CATEGORY_CONFIG.map(({id, label}) => (
                           <li key={id} className="dropdown_item">
                             <a
                               className="dropdown_menu"
@@ -197,7 +227,7 @@ const Examples: NextPage = () => {
                               }}
                             >
                               <span className={`icon orange_0 ${id === currentCategory ? 'with-check' : ''}`}>
-                                {id === currentCategory && <Icon type="check" />}
+                                {id === currentCategory && <Icon type="check"/>}
                               </span>
                               <span className="dropdown_text">{label}</span>
                             </a>
@@ -211,11 +241,11 @@ const Examples: NextPage = () => {
             </Popover>
           </div>
           <ul className="grid_list">
-            {filteredExamples.map(({ id, title, desc, thumbnail }) => (
+            {filteredExamples.map(({id, title, desc, thumbnail}) => (
               <li key={id} className="grid_item">
                 <Link href={`/examples/${id}`} className="grid_card">
                   <div className="grid_thumbnail">
-                    <ExampleThumbnailImage fileName={thumbnail} alt={id} />
+                    <ExampleThumbnailImage fileName={thumbnail} alt={id}/>
                   </div>
                   <div className="grid_card_info">
                     <strong className="title">{title}</strong>
