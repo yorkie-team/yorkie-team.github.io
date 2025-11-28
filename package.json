@@ -11,7 +11,8 @@
     "start": "next start",
     "lint": "next lint",
     "fetch:ui": "./scripts/fetch-ui.sh",
-    "fetch:examples": "./scripts/fetch-examples.sh"
+    "fetch:examples": "./scripts/fetch-examples.sh",
+    "fetch:android-examples": "./scripts/fetch-android-examples.sh"
   },
   "dependencies": {
     "@jsdevtools/rehype-toc": "^3.0.2",

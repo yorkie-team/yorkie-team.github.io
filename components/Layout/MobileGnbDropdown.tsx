@@ -87,30 +87,26 @@ export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
                       JS SDK
                     </Link>
                   </li>
-                  {process.env.NODE_ENV === 'development' && (
-                    <>
-                      <li className="navigator_group">
-                        <Link
-                          href="/docs/ios-sdk"
-                          className={classNames('navigator_item', 'add_icon', {
-                            is_active: asPath.startsWith(`/docs/ios-sdk`),
-                          })}
-                        >
-                          iOS SDK
-                        </Link>
-                      </li>
-                      <li className="navigator_group">
-                        <Link
-                          href="/docs/android-sdk"
-                          className={classNames('navigator_item', 'add_icon', {
-                            is_active: asPath.startsWith(`/docs/android-sdk`),
-                          })}
-                        >
-                          Android SDK
-                        </Link>
-                      </li>
-                    </>
-                  )}
+                  <li className="navigator_group">
+                    <Link
+                      href="/docs/ios-sdk"
+                      className={classNames('navigator_item', 'add_icon', {
+                        is_active: asPath.startsWith(`/docs/ios-sdk`),
+                      })}
+                    >
+                      iOS SDK
+                    </Link>
+                  </li>
+                  <li className="navigator_group">
+                    <Link
+                      href="/docs/android-sdk"
+                      className={classNames('navigator_item', 'add_icon', {
+                        is_active: asPath.startsWith(`/docs/android-sdk`),
+                      })}
+                    >
+                      Android SDK
+                    </Link>
+                  </li>
                   <li className="navigator_group">
                     <Link
                       href="/docs/devtools"

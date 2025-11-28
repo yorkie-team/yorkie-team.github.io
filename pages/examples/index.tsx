@@ -14,6 +14,7 @@ const CATEGORIES = {
   CANVAS_TOOL: 'canvas-tool',
   PRODUCTIVITY: 'productivity',
   REACT: 'react-provider',
+  ANDROID: 'android',
 } as const;
 export const CATEGORY_CONFIG = [
   { id: CATEGORIES.ALL, label: 'All examples', icon: 'diamond' },
@@ -22,6 +23,7 @@ export const CATEGORY_CONFIG = [
   { id: CATEGORIES.CANVAS_TOOL, label: 'Canvas Tool', icon: 'transform' },
   { id: CATEGORIES.PRODUCTIVITY, label: 'Productivity', icon: 'checkCircle' },
   { id: CATEGORIES.REACT, label: 'React Provider', icon: 'reactLogo' },
+  { id: CATEGORIES.ANDROID, label: 'Android', icon: 'androidLogo' },
 ] as const;
 type CategoryType = (typeof CATEGORIES)[keyof typeof CATEGORIES];
 type Example = {
@@ -47,6 +49,13 @@ const EXAMPLES: Example[] = [
     category: [CATEGORIES.PRESENCE, CATEGORIES.REACT],
   },
   {
+    id: 'simultaneous-cursors-android',
+    title: 'Simultaneous Cursors Android',
+    desc: 'This demo shows the real-time collaborative version of simple drawing, cursor animation with Yorkie and Android.',
+    thumbnail: 'android-simultaneous-cursors.webp',
+    category: [CATEGORIES.PRESENCE, CATEGORIES.ANDROID],
+  },
+  {
     id: 'kanban',
     title: 'Kanban Board',
     desc: 'Kanban Board is a tool for managing tasks and workflow. It is a visual way to manage tasks and workflow.',
@@ -59,6 +68,13 @@ const EXAMPLES: Example[] = [
     desc: 'This is an example of real-time collaborative TodoMVC using Yorkie React.',
     thumbnail: 'react-todomvc.jpg',
     category: [CATEGORIES.PRODUCTIVITY, CATEGORIES.REACT],
+  },
+  {
+    id: 'todomvc-android',
+    title: 'TodoMVC Android',
+    desc: 'This is an example of real-time collaborative TodoMVC using Yorkie Android.',
+    thumbnail: 'android-todomvc.webp',
+    category: [CATEGORIES.PRODUCTIVITY, CATEGORIES.ANDROID],
   },
   {
     id: 'todolist',
@@ -90,17 +106,31 @@ const EXAMPLES: Example[] = [
   },
   {
     id: 'quill',
-    title: 'Quill',
+    title: 'Rich Text Editor',
     desc: 'This demo shows the real-time collaborative version of the Quill editor with Yorkie and Vite.',
     thumbnail: 'vanilla-quill.png',
     category: [CATEGORIES.EDITOR],
   },
   {
+    id: 'rich-text-editor-android',
+    title: 'Rich Text Editor Android',
+    desc: 'This demo shows the real-time collaborative version of the rich text editor with Yorkie and Android.',
+    thumbnail: 'android-rich-text-editor.webp',
+    category: [CATEGORIES.EDITOR, CATEGORIES.ANDROID],
+  },
+  {
     id: 'calendar',
-    title: 'Calendar',
-    desc: 'This demo shows the real-time collaborative version of the Calendar with Yorkie and Next.js.',
+    title: 'Scheduler',
+    desc: 'This demo shows the real-time collaborative version of the Scheduler with Yorkie and Next.js.',
     thumbnail: 'nextjs-scheduler.png',
     category: [CATEGORIES.PRODUCTIVITY],
+  },
+  {
+    id: 'scheduler-android',
+    title: 'Scheduler Android',
+    desc: 'This demo shows the real-time collaborative version of the Scheduler with Yorkie and Android.',
+    thumbnail: 'android-scheduler.webp',
+    category: [CATEGORIES.PRODUCTIVITY, CATEGORIES.ANDROID],
   },
 ];
 

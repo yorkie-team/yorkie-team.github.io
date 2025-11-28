@@ -12,7 +12,7 @@ import {
 import { FILE_INFO } from '@/examples/nextjs-scheduler/fileInfo';
 
 const exampleKey = 'nextjs-scheduler';
-const exampleTitle = 'Calendar';
+const exampleTitle = 'Scheluder';
 
 const CalendarExampleView: NextPage = () => {
   return (
