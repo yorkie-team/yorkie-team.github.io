@@ -12,7 +12,7 @@ import {
 import { FILE_INFO } from '@/examples/vanilla-quill/fileInfo';
 
 const exampleKey = 'vanilla-quill';
-const exampleTitle = 'Quill';
+const exampleTitle = 'Rich Text Editor';
 
 const QuillExampleView: NextPage = () => {
   return (
