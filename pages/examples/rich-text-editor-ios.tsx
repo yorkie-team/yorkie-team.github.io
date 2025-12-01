@@ -1,15 +1,11 @@
 import { ExampleLayout } from '@/components';
-import {
-  EXAMPLE_IOS_CODE_URL,
-  ProjectCodes,
-  Sidebar,
-} from '@/components/exampleView';
-import { FILE_INFO } from '@/examples/ios-rich-text-editor/fileInfo';
+import { EXAMPLE_IOS_CODE_URL, ProjectCodes, Sidebar } from '@/components/exampleView';
+import { FILE_INFO } from '@/examples/ios-richtexteditor/fileInfo';
 import { NextPage } from 'next';
 import Head from 'next/head';
-import { VideoPlayer } from "@/components/exampleView/BasicView/VideoPlayer";
+import { VideoPlayer } from '@/components/exampleView/BasicView/VideoPlayer';
 
-const exampleKey = 'rich-text-editor';
+const exampleKey = 'RichTextEditor';
 const exampleTitle = 'Rich Text Editor iOS';
 const RichTextEditorIOSExampleView: NextPage = () => {
   return (
@@ -30,7 +26,12 @@ const RichTextEditorIOSExampleView: NextPage = () => {
                 <Sidebar.GuideTitle>{exampleTitle}</Sidebar.GuideTitle>
                 <Sidebar.GuideDescription>
                   This is an example of real-time collaborative{' '}
-                  <a href="https://developer.apple.com/documentation/uikit/uitextview" className="link" target="_blank" rel="noreferrer">
+                  <a
+                    href="https://developer.apple.com/documentation/uikit/uitextview"
+                    className="link"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
                     Rich Text Editor
                   </a>{' '}
                   using{' '}
@@ -44,7 +45,7 @@ const RichTextEditorIOSExampleView: NextPage = () => {
                   </a>
                   .
                 </Sidebar.GuideDescription>
-                <ProjectCodes files={FILE_INFO} activeFile="/Sources/RichTextEditor/RichTextEditorApp.swift" />
+                <ProjectCodes files={FILE_INFO} activeFile="/RichTextEditor/RichTextEditorApp.swift" />
               </Sidebar.TabsPanel>
               <Sidebar.Bottom codeURL={EXAMPLE_IOS_CODE_URL + exampleKey} />
             </Sidebar.Tabs>

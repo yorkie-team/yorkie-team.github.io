@@ -1,15 +1,11 @@
 import { ExampleLayout } from '@/components';
-import {
-  EXAMPLE_IOS_CODE_URL,
-  ProjectCodes,
-  Sidebar,
-} from '@/components/exampleView';
+import { EXAMPLE_IOS_CODE_URL, ProjectCodes, Sidebar } from '@/components/exampleView';
 import { FILE_INFO } from '@/examples/ios-scheduler/fileInfo';
 import { NextPage } from 'next';
 import Head from 'next/head';
-import { VideoPlayer } from "@/components/exampleView/BasicView/VideoPlayer";
+import { VideoPlayer } from '@/components/exampleView/BasicView/VideoPlayer';
 
-const exampleKey = 'scheduler';
+const exampleKey = 'Scheduler';
 const exampleTitle = 'Scheduler iOS';
 const SchedulerIOSExampleView: NextPage = () => {
   return (
@@ -44,7 +40,7 @@ const SchedulerIOSExampleView: NextPage = () => {
                   </a>
                   .
                 </Sidebar.GuideDescription>
-                <ProjectCodes files={FILE_INFO} activeFile="/Sources/Scheduler/SchedulerApp.swift" />
+                <ProjectCodes files={FILE_INFO} activeFile="/Scheduler/SchedulerApp.swift" />
               </Sidebar.TabsPanel>
               <Sidebar.Bottom codeURL={EXAMPLE_IOS_CODE_URL + exampleKey} />
             </Sidebar.Tabs>

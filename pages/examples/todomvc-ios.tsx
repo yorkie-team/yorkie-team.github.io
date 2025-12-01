@@ -1,15 +1,11 @@
 import { ExampleLayout } from '@/components';
-import {
-  EXAMPLE_IOS_CODE_URL,
-  ProjectCodes,
-  Sidebar,
-} from '@/components/exampleView';
+import { EXAMPLE_IOS_CODE_URL, ProjectCodes, Sidebar } from '@/components/exampleView';
 import { FILE_INFO } from '@/examples/ios-todomvc/fileInfo';
 import { NextPage } from 'next';
 import Head from 'next/head';
-import { VideoPlayer } from "@/components/exampleView/BasicView/VideoPlayer";
+import { VideoPlayer } from '@/components/exampleView/BasicView/VideoPlayer';
 
-const exampleKey = 'todomvc';
+const exampleKey = 'Todomvc';
 const exampleTitle = 'TodoMVC iOS';
 const TodoMVCIOSExampleView: NextPage = () => {
   return (
@@ -44,7 +40,7 @@ const TodoMVCIOSExampleView: NextPage = () => {
                   </a>
                   .
                 </Sidebar.GuideDescription>
-                <ProjectCodes files={FILE_INFO} activeFile="/Sources/TodoMVC/TodoMVCApp.swift" />
+                <ProjectCodes files={FILE_INFO} activeFile="/TODO/TodomvcApp.swift" />
               </Sidebar.TabsPanel>
               <Sidebar.Bottom codeURL={EXAMPLE_IOS_CODE_URL + exampleKey} />
             </Sidebar.Tabs>

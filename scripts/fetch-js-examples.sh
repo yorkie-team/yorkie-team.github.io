@@ -31,4 +31,4 @@ for f in temp/examples/* ; do
     fi
 done
 
-node --no-warnings=ExperimentalWarning --loader ts-node/esm scripts/fetch-examples.mts
+node --no-warnings=ExperimentalWarning --loader ts-node/esm scripts/fetch-js-examples.mts

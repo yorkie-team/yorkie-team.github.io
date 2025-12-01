@@ -1,15 +1,11 @@
 import { ExampleLayout } from '@/components';
-import {
-  EXAMPLE_IOS_CODE_URL,
-  ProjectCodes,
-  Sidebar,
-} from '@/components/exampleView';
-import { FILE_INFO } from '@/examples/ios-simultaneous-cursors/fileInfo';
+import { EXAMPLE_IOS_CODE_URL, ProjectCodes, Sidebar } from '@/components/exampleView';
+import { FILE_INFO } from '@/examples/ios-simutaneouscurcors/fileInfo';
 import { NextPage } from 'next';
 import Head from 'next/head';
-import { VideoPlayer } from "@/components/exampleView/BasicView/VideoPlayer";
+import { VideoPlayer } from '@/components/exampleView/BasicView/VideoPlayer';
 
-const exampleKey = 'simultaneous-cursors';
+const exampleKey = 'SimutaneousCurcors';
 const exampleTitle = 'Simultaneous Cursors iOS';
 const SimultaneousCursorsIOSExampleView: NextPage = () => {
   return (
@@ -40,7 +36,7 @@ const SimultaneousCursorsIOSExampleView: NextPage = () => {
                   </a>
                   .
                 </Sidebar.GuideDescription>
-                <ProjectCodes files={FILE_INFO} activeFile="/Sources/SimultaneousCursors/SimultaneousCursorsApp.swift" />
+                <ProjectCodes files={FILE_INFO} activeFile="/SimutaneousCursors/SimutaneousCurcorsApp.swift" />
               </Sidebar.TabsPanel>
               <Sidebar.Bottom codeURL={EXAMPLE_IOS_CODE_URL + exampleKey} />
             </Sidebar.Tabs>
