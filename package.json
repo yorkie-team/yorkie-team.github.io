@@ -5,13 +5,15 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build && next-sitemap",
-    "build:full": "npm run fetch:examples && npm run build:examples && npm run build",
-    "build:examples": "node --no-warnings=ExperimentalWarning --loader ts-node/esm scripts/build-examples.mts",
+    "build:full": "npm run fetch:examples && npm run build:js-examples && npm run build",
+    "build:examples": "node --no-warnings=ExperimentalWarning --loader ts-node/esm scripts/build-js-examples.mts",
     "export": "next build && next-sitemap && next export",
     "start": "next start",
     "lint": "next lint",
     "fetch:ui": "./scripts/fetch-ui.sh",
-    "fetch:examples": "./scripts/fetch-examples.sh",
+    "fetch:examples": "./scripts/fetch-android-examples.sh && ./scripts/fetch-ios-examples.sh && ./scripts/fetch-js-examples.sh",
+    "fetch:js-examples": "./scripts/fetch-js-examples.sh",
+    "fetch:ios-examples": "./scripts/fetch-ios-examples.sh",
     "fetch:android-examples": "./scripts/fetch-android-examples.sh"
   },
   "dependencies": {

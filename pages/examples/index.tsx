@@ -15,6 +15,7 @@ const CATEGORIES = {
   PRODUCTIVITY: 'productivity',
   REACT: 'react-provider',
   ANDROID: 'android',
+  IOS: 'ios',
 } as const;
 export const CATEGORY_CONFIG = [
   { id: CATEGORIES.ALL, label: 'All examples', icon: 'diamond' },
@@ -24,6 +25,7 @@ export const CATEGORY_CONFIG = [
   { id: CATEGORIES.PRODUCTIVITY, label: 'Productivity', icon: 'checkCircle' },
   { id: CATEGORIES.REACT, label: 'React Provider', icon: 'reactLogo' },
   { id: CATEGORIES.ANDROID, label: 'Android', icon: 'androidLogo' },
+  {id: CATEGORIES.IOS, label: 'iOS', icon: 'appleLogo'},
 ] as const;
 type CategoryType = (typeof CATEGORIES)[keyof typeof CATEGORIES];
 type Example = {
@@ -131,6 +133,34 @@ const EXAMPLES: Example[] = [
     desc: 'This demo shows the real-time collaborative version of the Scheduler with Yorkie and Android.',
     thumbnail: 'android-scheduler.webp',
     category: [CATEGORIES.PRODUCTIVITY, CATEGORIES.ANDROID],
+  },
+  {
+    id: 'scheduler-ios',
+    title: 'Scheduler iOS',
+    desc: 'This demo shows the real-time collaborative version of the Scheduler with Yorkie and iOS.',
+    thumbnail: 'ios-scheduler.webp',
+    category: [CATEGORIES.PRODUCTIVITY, CATEGORIES.IOS],
+  },
+  {
+    id: 'rich-text-editor-ios',
+    title: 'Rich Text Editor iOS',
+    desc: 'This demo shows the real-time collaborative version of the rich text editor with Yorkie and iOS.',
+    thumbnail: 'ios-rich-text-editor.webp',
+    category: [CATEGORIES.EDITOR, CATEGORIES.IOS],
+  },
+  {
+    id: 'simultaneous-cursors-ios',
+    title: 'Simultaneous Cursors iOS',
+    desc: 'This demo shows the real-time collaborative version of simple drawing, cursor animation with Yorkie and iOS.',
+    thumbnail: 'ios-simultaneous-cursors.webp',
+    category: [CATEGORIES.PRESENCE, CATEGORIES.IOS],
+  },
+  {
+    id: 'todomvc-ios',
+    title: 'TodoMVC iOS',
+    desc: 'This is an example of real-time collaborative TodoMVC using Yorkie iOS SDK.',
+    thumbnail: 'todomvc-ios.webp',
+    category: [CATEGORIES.PRODUCTIVITY, CATEGORIES.IOS],
   },
 ];
 
