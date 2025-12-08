@@ -159,16 +159,31 @@ $ kubectl get pods -n yorkie --watch
 After all pods are ready, you will see the following output:
 
 ```
-NAME                             READY   STATUS    RESTARTS   AGE
-yorkie-f595554db-48s9c           1/1     Running   0          8m18s
-yorkie-f595554db-nggr9           1/1     Running   0          8m18s
-yorkie-f595554db-z5jgs           1/1     Running   0          8m18s
-yorkie-gateway-844d8c87d-fqpsk   1/1     Running   0          9m55s
+NAME                                             READY   STATUS      RESTARTS   AGE
+mongodb-cfg-0                                    1/1     Running     0          91s
+mongodb-mongos-0                                 1/1     Running     0          54s
+mongodb-rs0-0                                    1/1     Running     0          90s
+mongodb-rs1-0                                    1/1     Running     0          90s
+mongodb-sharding-setup-76xg4                     0/1     Completed   0          91s
+yorkie-6958b5d5cd-22jk9                          1/1     Running     0          91s
+yorkie-6958b5d5cd-788c9                          1/1     Running     0          91s
+yorkie-6958b5d5cd-bzf5x                          1/1     Running     0          91s
+yorkie-cluster-psmdb-operator-545db784b9-89qsz   1/1     Running     0          91s
+yorkie-gateway-d8cbfd477-swnfr                   1/1     Running     0          2m9s
 ```
 
 ### Test Yorkie cluster
 
-Now that you have Yorkie cluster installed and exposed, you can test Yorkie cluster with [yorkie-js-sdk](https://github.com/yorkie-team/yorkie-js-sdk), a JavaScript SDK for Yorkie.
+Now that Yorkie cluster is exposed, you can test Yorkie cluster with [Yorkie CLI](/docs/cli).
+
+```bash
+$ yorkie login -u admin -p admin --rpc-addr http://<YOUR_API_DOMAIN_NAME or IP_ADDRESS>
+$ yorkie project ls
+ NAME     PUBLIC KEY    SECRET KEY    CREATED AT 
+ default  <public-key>  <secret-key>  2 minutes
+```
+
+Then, you can test Yorkie cluster with [yorkie-js-sdk](https://github.com/yorkie-team/yorkie-js-sdk), a JavaScript SDK for Yorkie.
 
 Clone yorkie-js-sdk repository with the following command:
 

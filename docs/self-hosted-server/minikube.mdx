@@ -97,30 +97,6 @@ Making this installation the default for injection and validation.
 Thank you for installing Istio 1.17.  Please take a few minutes to tell us about your install/upgrade experience!  https://forms.gle/hMHGiwZHPU7UQRWe9
 ```
 
-### Setup MongoDB pod and service
-
-Before installing the Yorkie cluster with Helm chart, you need to set up a MongoDB pod and expose it as a service. This is crucial since internal MongoDB installation is no longer provided.
-
-First, create the `mongodb` namespace with the following command:
-
-```bash
-$ kubectl create namespace mongodb
-```
-
-Then, create a MongoDB pod named `mongodb` in the `mongodb` namespace with the following command:
-
-```bash
-$ kubectl run mongodb --image=mongo:latest --port=27017 -n mongodb
-```
-
-Next, expose the MongoDB pod as a service to allow other pods to access it with the following command:
-
-```bash
-$ kubectl expose pod mongodb --port=27017 --target-port=27017 --name=mongodb --type=ClusterIP -n mongodb
-```
-
-By following these steps, you ensure that the MongoDB pod is running and accessible to other pods within the cluster.
-
 ### Add yorkie-team Helm chart in your local repository
 
 After Istio is installed, you need to add yorkie-team Helm chart repository in your local repository to install Yorkie cluster.
@@ -184,11 +160,17 @@ $ kubectl get pods -n yorkie --watch
 After all pods are ready, you will see the following output:
 
 ```
-NAME                             READY   STATUS    RESTARTS   AGE
-yorkie-f595554db-48s9c           1/1     Running   0          8m18s
-yorkie-f595554db-nggr9           1/1     Running   0          8m18s
-yorkie-f595554db-z5jgs           1/1     Running   0          8m18s
-yorkie-gateway-844d8c87d-fqpsk   1/1     Running   0          9m55s
+NAME                                             READY   STATUS      RESTARTS   AGE
+mongodb-cfg-0                                    1/1     Running     0          91s
+mongodb-mongos-0                                 1/1     Running     0          54s
+mongodb-rs0-0                                    1/1     Running     0          90s
+mongodb-rs1-0                                    1/1     Running     0          90s
+mongodb-sharding-setup-76xg4                     0/1     Completed   0          91s
+yorkie-6958b5d5cd-22jk9                          1/1     Running     0          91s
+yorkie-6958b5d5cd-788c9                          1/1     Running     0          91s
+yorkie-6958b5d5cd-bzf5x                          1/1     Running     0          91s
+yorkie-cluster-psmdb-operator-545db784b9-89qsz   1/1     Running     0          91s
+yorkie-gateway-d8cbfd477-swnfr                   1/1     Running     0          2m9s
 ```
 
 ### Expose Yorkie cluster with Minikube tunnel
@@ -227,7 +209,16 @@ $ minikube ip
 
 ### Test Yorkie cluster
 
-Now that you have Yorkie cluster installed and exposed, you can test Yorkie cluster with [yorkie-js-sdk](https://github.com/yorkie-team/yorkie-js-sdk), a JavaScript SDK for Yorkie.
+Now that Yorkie cluster is exposed, you can test Yorkie cluster with [Yorkie CLI](/docs/cli).
+
+```bash
+$ yorkie login -u admin -p admin --insecure --rpc-addr localhost
+$ yorkie project ls
+ NAME     PUBLIC KEY    SECRET KEY    CREATED AT 
+ default  <public-key>  <secret-key>  2 minutes
+```
+
+Then, you can test Yorkie cluster with [yorkie-js-sdk](https://github.com/yorkie-team/yorkie-js-sdk), a JavaScript SDK for Yorkie.
 
 Clone yorkie-js-sdk repository with the following command:
 
@@ -251,6 +242,7 @@ $ vi .env
 VITE_YORKIE_API_ADDR=http://<minikube-ip>
 # If you are using macOS, you should set VITE_YORKIE_API_ADDR to localhost instead of minikube-ip.
 # VITE_YORKIE_API_ADDR=http://localhost
+VITE_YORKIE_API_KEY=<your-project-public-key>
 ```
 
 <Alert status="warning">If you are using macOS, you should set `VITE_YORKIE_API_ADDR` to `localhost` instead of `minikube ip`.</Alert>
