@@ -103,7 +103,7 @@ Now you have added yorkie-team Helm chart repository in your local repository, y
 Install Yorkie cluster with the following command:
 
 ```bash
-$ helm install yorkie-cluster yorkie-team/yorkie-cluster \
+$ helm install yorkie-cluster yorkie-team/yorkie-cluster --namespace yorkie \
 	--set ingress.ingressClassName=alb \
 	--set ingress.hosts.enabled=true \
     --set ingress.hosts.apiHost={YOUR_API_DOMAIN_NAME} \
@@ -112,7 +112,7 @@ $ helm install yorkie-cluster yorkie-team/yorkie-cluster \
 
 # For example, for domain name `yorkie.dev` and certificate ARN 
 # `arn:aws:acm:ap-northeast-2:123412341234:certificate/12341234-1234-1234-1234-123412341234`, run the following command:
-$ helm install yorkie-cluster yorkie-team/yorkie-cluster \
+$ helm install yorkie-cluster yorkie-team/yorkie-cluster --namespace yorkie \
 	--set ingress.ingressClassName=alb \
 	--set ingress.hosts.enabled=true \
     --set ingress.hosts.apiHost=api.yorkie.dev \
@@ -242,7 +242,7 @@ You have now installed Yorkie cluster in AWS EKS, and tested collaborative editi
 First, uninstall Yorkie cluster with the following command:
 
 ```bash
-$ helm uninstall yorkie-cluster
+$ helm uninstall yorkie-cluster --namespace yorkie
 release "yorkie-cluster" uninstalled
 ```
 

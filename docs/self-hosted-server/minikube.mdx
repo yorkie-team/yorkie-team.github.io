@@ -120,7 +120,7 @@ Now you have added yorkie-team Helm chart repository in your local repository, y
 Install Yorkie cluster with the following command:
 
 ```bash
-$ helm install yorkie-cluster yorkie-team/yorkie-cluster
+$ helm install yorkie-cluster yorkie-team/yorkie-cluster --namespace yorkie
 ```
 
 This will install `yorkie-cluster` release in minikube cluster.
@@ -312,7 +312,7 @@ $ ^C
 Then, uninstall Yorkie cluster with the following command:
 
 ```bash
-$ helm uninstall yorkie-cluster
+$ helm uninstall yorkie-cluster --namespace yorkie
 release "yorkie-cluster" uninstalled
 ```
 
