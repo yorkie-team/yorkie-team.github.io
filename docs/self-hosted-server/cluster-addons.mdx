@@ -369,10 +369,10 @@ StarRocks > show routine load\G
 
 Then you can see the following output with the running routine load:
 
-```sql
+```sh
 *************************** 1. row ***************************
                   Id: 11063
-                Name: events
+                Name: user_events
           CreateTime: 2025-04-09 16:49:58
            PauseTime: NULL
              EndTime: NULL
@@ -393,7 +393,8 @@ ReasonOfStateChanged:
             OtherMsg: [2025-04-14 19:51:31] [task id: 61ac06c9-2892-419b-800a-153b9b9f8ad3] [txn id: -1] there is no new data in kafka, wait for 10 seconds to schedule again
 LatestSourcePosition: {"0":"159"}
            OffsetLag: {"0":"1"}
-1 row in set (0.00 sec)
+*************************** 2. row ***************************
+...
 ```
 
 ### Connect Yorkie cluster to Yorkie analytics
@@ -402,11 +403,10 @@ Now you have Yorkie analytics installed, you can connect Yorkie cluster to Yorki
 You need to set up the following arguments in your Yorkie cluster:
 
 ```bash
-helm upgrade yorkie yorkie-team/yorkie \
-  --set yorkie.kafkaAddresses=yorkie-analytics-kafka.analytics.svc.cluster.local:9092
-  --set yorkie.kafkaTopic=user-events
-  --set yorkie.kafkaWriteTimeout=5s
-  --set yorkie.starrocksDSN=root:@tcp(kube-starrocks-fe-search.analytics.svc.cluster.local:9030)/yorkie
+helm upgrade yorkie yorkie-team/yorkie --namespace yorkie \
+  --set yorkie.args.kafkaAddresses=yorkie-analytics-kafka.analytics.svc.cluster.local:9092 \
+  --set yorkie.args.kafkaWriteTimeout=5s \
+  --set yorkie.args.starrocksDSN="root:@tcp(kube-starrocks-fe-search.analytics.svc.cluster.local:9030)/yorkie"
 ```
 
 If clients are connected to Yorkie cluster with `userID`([Measuring MAU](/docs/js-sdk#measuring-mau)), you can see the user events are collected in StarRocks database.
