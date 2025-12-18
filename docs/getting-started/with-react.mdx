@@ -40,7 +40,7 @@ import { YorkieProvider, DocumentProvider } from '@yorkie-js/react';
 
 function App() {
   return (
-    <YorkieProvider apiKey="PROJECT_API_KEY">
+    <YorkieProvider rpcAddr="{{API_ADDR}}" apiKey="PROJECT_API_KEY">
       <DocumentProvider docKey="my-todo" initialRoot={{ todos: [] }}>
         <TodoList />
       </DocumentProvider>
