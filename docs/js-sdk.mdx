@@ -534,6 +534,234 @@ await client.changeSyncMode(doc, SyncMode.Manual);
 await client.sync(doc); // Trigger synchronization manually using the sync function.
 ```
 
+#### Managing Document Revisions
+
+Yorkie provides revision management capabilities that allow you to save snapshots of your document at specific points in time, browse through document history, and restore previous versions. This is useful for implementing features like version control, undo/redo functionality, or audit trails in your collaborative applications.
+
+##### Creating a Revision
+
+You can create a revision (snapshot) of the current document state using `client.createRevision()`. A revision captures the entire document state at the moment of creation.
+
+```javascript
+// Create a revision with a label
+const revision = await client.createRevision(doc, 'v1.0');
+
+// Create a revision with a label and description
+const revision = await client.createRevision(
+  doc,
+  'Feature complete',
+  'Added user authentication and profile management'
+);
+```
+
+Parameters:
+- `doc`: The document to create a revision for
+- `label`: A short, descriptive label for the revision (required)
+- `description` (Optional): A detailed description of what changed in this revision
+
+<Alert status="info">
+Revisions are stored on the server and can be accessed by any client with access to the document. They persist independently of the document's current state.
+</Alert>
+
+##### Listing Revisions
+
+Retrieve a list of all revisions for a document using `client.listRevisions()`. This returns an array of revision summaries containing metadata about each revision.
+
+```javascript
+// Get the first 50 revisions (newest first)
+const revisions = await client.listRevisions(doc);
+
+// Get revisions with pagination
+const revisions = await client.listRevisions(doc, {
+  pageSize: 20,
+  offset: 0,
+  isForward: false, // false = newest first, true = oldest first
+});
+
+// Display revision information
+revisions.forEach(revision => {
+  console.log(`ID: ${revision.id}`);
+  console.log(`Label: ${revision.label}`);
+  console.log(`Description: ${revision.description}`);
+  console.log(`Created at: ${revision.createdAt}`);
+  console.log(`Server Sequence: ${revision.serverSeq}`);
+});
+```
+
+Available options:
+- `pageSize` (Optional, default: 50): Number of revisions to retrieve per request
+- `offset` (Optional, default: 0): Number of revisions to skip for pagination
+- `isForward` (Optional, default: false): Sort order - `false` for newest first, `true` for oldest first
+
+Each revision summary includes:
+- `id`: Unique identifier for the revision
+- `label`: The label provided when creating the revision
+- `description`: Optional description of the revision
+- `createdAt`: Timestamp when the revision was created
+- `serverSeq`: Server sequence number at the time of revision creation
+
+##### Getting Revision Details
+
+Get detailed information about a specific revision, including its full snapshot data, using `client.getRevision()`:
+
+```javascript
+// Get a specific revision by ID
+const revision = await client.getRevision(doc, revisionId);
+
+// Access the revision's snapshot, YSON representation
+const snapshot = revision.snapshot;
+console.log('Revision data:', snapshot);
+```
+
+The returned revision object contains:
+- All metadata from the revision summary
+- `snapshot`: document state at the time of the revision, [YSON](/docs/web-api#yson) representation
+
+<Alert status="info">
+The snapshot contains the full document data as it existed when the revision was created. This data can be used for comparison, preview, or restoration purposes.
+</Alert>
+
+##### Parsing YSON Snapshots
+
+Revision snapshots are stored in YSON (Yorkie JSON) format, which is Yorkie's internal representation of document data. The JS SDK provides a `YSON` parser that allows you to parse these snapshots and convert them to usable data structures in your application.
+
+This is particularly useful when you need to:
+- Display a preview of a revision's content
+- Compare different revisions
+- Extract specific data from historical snapshots
+- Convert Yorkie data types (like Text) to plain strings
+
+```javascript
+import { YSON } from '@yorkie-js/sdk';
+
+// Get a revision with its snapshot
+const revision = await client.getRevision(doc, revisionId);
+
+if (revision.snapshot) {
+  try {
+    // Parse the YSON snapshot into Yorkie's internal data structure
+    const root = YSON.parse(revision.snapshot);
+    
+    // Access the parsed data
+    console.log(root.title);     // Access primitive values
+    console.log(root.todos);     // Access arrays
+    console.log(root.obj.name);  // Access nested objects
+  } catch (error) {
+    console.error('Failed to parse YSON:', error);
+  }
+}
+```
+
+**Parsing with TypeScript types:**
+
+You can provide type information for better type safety when parsing YSON snapshots:
+
+```typescript
+import { YSON } from '@yorkie-js/sdk';
+
+type DocType = {
+  title: string;
+  content: YSON.Text;
+  todos: Array<string>;
+};
+
+const revision = await client.getRevision(doc, revisionId);
+
+if (revision.snapshot) {
+  const root = YSON.parse<DocType>(revision.snapshot);
+  // root is now typed as DocType
+  console.log(root.title);
+}
+```
+
+**Converting Text to String:**
+
+When working with Yorkie's `Text` type in snapshots, you can use `YSON.textToString()` to convert it to a plain string:
+
+```javascript
+import { YSON } from '@yorkie-js/sdk';
+
+const revision = await client.getRevision(doc, revisionId);
+
+if (revision.snapshot) {
+  const root = YSON.parse<{ content: YSON.Text }>(revision.snapshot);
+  
+  // Convert Yorkie Text to plain string
+  const plainText = YSON.textToString(root.content);
+  console.log(plainText);
+  
+  // You can now use this string in your application
+  // For example, display it in a text editor or compare with other versions
+}
+```
+
+<Alert status="info">
+The YSON parser is designed to handle Yorkie's internal data structures. If you're working with standard Document data, you may also consider using the `toJS()` method on the live document for a simpler conversion to plain JavaScript objects.
+</Alert>
+
+##### Restoring a Revision
+
+Restore the document to a previous revision using `client.restoreRevision()`. This replaces the current document state with the state from the specified revision.
+
+```javascript
+// Restore to a specific revision
+await client.restoreRevision(doc, revisionId);
+
+// Sync to ensure the restored state is propagated
+await client.sync();
+```
+
+<Alert status="warning">
+Restoring a revision replaces the entire current document state with the revision's snapshot. This operation cannot be undone automatically, so consider creating a new revision before restoring to preserve the current state if needed.
+
+All clients currently attached to the document will receive the restored state through their sync mechanisms.
+</Alert>
+
+Here's a complete example of using the revision API:
+
+```javascript
+// Create a client and attach a document
+const client = new yorkie.Client({
+  rpcAddr: '{{API_ADDR}}',
+  apiKey: 'xxxxxxxxxxxxxxxxxxxx',
+});
+await client.activate();
+
+const doc = new yorkie.Document('my-document');
+await client.attach(doc);
+
+// Make some changes
+doc.update((root) => {
+  root.title = 'My Document';
+  root.content = 'Initial content';
+});
+
+// Create a revision to save this state
+const v1 = await client.createRevision(doc, 'v1.0', 'Initial version');
+
+// Make more changes
+doc.update((root) => {
+  root.content = 'Updated content';
+});
+
+// Create another revision
+const v2 = await client.createRevision(doc, 'v2.0', 'Updated content');
+
+// List all revisions
+const revisions = await client.listRevisions(doc);
+console.log(`Found ${revisions.length} revisions`);
+
+// Get details of a specific revision
+const revisionDetails = await client.getRevision(doc, v1.id);
+console.log('V1.0 snapshot:', revisionDetails.snapshot);
+
+// Restore to v1.0
+await client.restoreRevision(doc, v1.id);
+await client.sync();
+
+console.log('Restored to v1.0');
+```
+
 #### Detaching the Document
 
 If the document is no longer used, it should be detached to increase the efficiency of GC removing [CRDT tombstones](https://crdt.tech/glossary). For more information about GC, please refer to [Garbage Collection](https://github.com/yorkie-team/yorkie/blob/main/design/garbage-collection.md).
