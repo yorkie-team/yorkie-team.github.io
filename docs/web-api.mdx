@@ -324,6 +324,75 @@ curl '{{API_ADDR}}/yorkie.v1.AdminService/SearchDocuments' \
 }
 ```
 
+### Channel Management
+
+#### POST /yorkie.v1.AdminService/GetChannels
+
+This endpoint retrieves channel information without requiring an SDK client to attach to the channels. It returns the session count (number of connected clients) for the specified channels.
+
+Channels support [hierarchical keys using periods (`.`) as separators](/docs/js-sdk#hierarchical-channel-keys). When `include_sub_path` is enabled, the session count includes all clients connected to sub-level channels.
+
+##### Request
+
+Parameters:
+
+- `channel_keys`: An array of channel keys to retrieve information for.
+- `include_sub_path`: Whether to include session counts from sub-level channels in the total count.
+
+```bash
+curl '{{API_ADDR}}/yorkie.v1.AdminService/GetChannels' \
+  -H 'content-type: application/json' \
+  -H 'authorization: API-Key PROJECT_SECRET_KEY' \
+  --data-raw '{
+    "channel_keys": ["room-1", "room-1.section-1"],
+    "include_sub_path": false
+  }'
+```
+
+##### Response
+
+If `room-1` has 10 direct connections and `room-1.section-1` has 20 connections, the response would be:
+
+**Case 1: Get exact channel session counts (`include_sub_path: false`)**
+
+When `include_sub_path` is `false`, the `sessionCount` for a channel includes only the direct connections to that channel.
+In this case, the session count for `room-1` would be 10 and the session count for `room-1.section-1` would be 20.
+
+```json
+{
+  "channels": [
+    {
+      "key": "room-1",
+      "sessionCount": 10
+    },
+    {
+      "key": "room-1.section-1",
+      "sessionCount": 20
+    }
+  ]
+}
+```
+
+**Case 2: Get channel session counts including sub-levels (`include_sub_path: true`)**
+
+When `include_sub_path` is `true`, the `sessionCount` for a channel includes all clients connected to that channel and any sub-level channels. 
+In this case, the total session count for `room-1` would include both 10 and 20, totaling 30.
+
+```json
+{
+  "channels": [
+    {
+      "key": "room-1",
+      "sessionCount": 30
+    },
+    {
+      "key": "room-1.section-1",
+      "sessionCount": 20
+    }
+  ]
+}
+```
+
 ### YSON
 
 YSON(Yorkie Structured Object Notation) is a structured data format used by Yorkie to represent documents. It is similar to JSON but extends it with additional data types optimized for collaborative editing.

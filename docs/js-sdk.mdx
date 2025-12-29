@@ -963,6 +963,72 @@ await client.attach(channel);
 
 > The channel key is used to identify the Channel in Yorkie. Clients with the same channel key can communicate with each other through pub/sub messaging.
 
+#### Hierarchical Channel Keys
+
+Channels support a hierarchical structure using periods (`.`) as separators, allowing you to organize channels into logical groups and subgroups. This is particularly useful for managing complex applications with multiple rooms, sections, or nested contexts.
+
+```javascript
+// Create channels with hierarchical keys
+const roomChannel = new yorkie.Channel('room-1');
+const sectionChannel = new yorkie.Channel('room-1.section-a');
+const userChannel = new yorkie.Channel('room-1.section-a.user-123');
+
+await client.attach(roomChannel);
+await client.attach(sectionChannel);
+await client.attach(userChannel);
+```
+
+Each level in the hierarchy maintains its own presence count and can be used independently. For example:
+- `room-1` might track all users in a game room
+- `room-1.section-a` might track users in a specific section of that room
+- `room-1.section-a.user-123` might track presence for a specific user's context
+
+**Channel Key Restrictions:**
+
+When using hierarchical channel keys, certain patterns are not allowed:
+
+1. Keys cannot start or end with a period:
+   - ❌ `.room-1`
+   - ❌ `room-1.`
+   - ❌ `.room-1.section-1.`
+
+2. Keys cannot contain consecutive periods:
+   - ❌ `room-1..section-1`
+
+3. Valid examples:
+   - ✅ `room-1`
+   - ✅ `room-1.section-1`
+   - ✅ `room-1.section-1.user-123`
+
+<Alert status="warning">
+**Important: Distribute First-Level Channel Keys**
+
+Yorkie servers determine which server handles a channel based on a combination of your project and the first-level key of the channel. Using the same first-level key for all channels means all your channels will be managed by the same server, which can lead to performance bottlenecks and uneven load distribution.
+
+**Good practice - Distributed first-level keys:**
+```javascript
+new yorkie.Channel('game-1.room-a');
+new yorkie.Channel('game-2.room-b');
+new yorkie.Channel('chat-1.thread-1');
+new yorkie.Channel('notification-1.user-123');
+```
+
+**Bad practice - Same first-level key:**
+```javascript
+// All channels share 'app' as first level - avoid this!
+new yorkie.Channel('app.game-1');
+new yorkie.Channel('app.game-2');
+new yorkie.Channel('app.chat-1');
+new yorkie.Channel('app.notification-1');
+```
+
+Design your channel key structure to naturally distribute traffic across different first-level prefixes for optimal performance.
+</Alert>
+
+<Alert status="info">
+You can query hierarchical channel information using the [GetChannels API](/docs/web-api#post-yorkiev1adminservicegetchannels), which allows you to retrieve presence counts for specific channels and optionally include counts from all sub-levels.
+</Alert>
+
 #### Publishing and Subscribing to Messages
 
 Channels support a pub/sub pattern for broadcasting ephemeral messages to all connected clients:
