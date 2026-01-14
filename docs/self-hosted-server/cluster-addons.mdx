@@ -403,7 +403,7 @@ Now you have Yorkie analytics installed, you can connect Yorkie cluster to Yorki
 You need to set up the following arguments in your Yorkie cluster:
 
 ```bash
-helm upgrade yorkie yorkie-team/yorkie --namespace yorkie \
+helm upgrade yorkie-cluster yorkie-team/yorkie-cluster --namespace yorkie \
   --set yorkie.args.kafkaAddresses=yorkie-analytics-kafka.analytics.svc.cluster.local:9092 \
   --set yorkie.args.kafkaWriteTimeout=5s \
   --set yorkie.args.starrocksDSN="root:@tcp(kube-starrocks-fe-search.analytics.svc.cluster.local:9030)/yorkie"
