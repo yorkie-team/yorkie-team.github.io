@@ -72,6 +72,15 @@
 
     .edgeLabel {
       background-color: var(--gray-800);
+
+      .labelBkg {
+        color: var(--gray-100);
+      }
+
+      p {
+        color: var(--gray-100);
+        margin: 0;
+      }
     }
 
     text {

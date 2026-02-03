@@ -5,47 +5,111 @@ order: 10
 
 ## About Yorkie
 
-Yorkie is an open-source document store that provides a suite of tools for building real-time collaborative applications like Google Docs and Figma. It includes a JSON-like Document based on Conflict-free Replicated Data Types(CRDTs), Presence, and auth webhook features to enable synchronous co-editing.
+Yorkie is an open-source document store for building real-time collaborative applications. Think Google Docs, Figma, or any application where multiple users work together simultaneously - Yorkie provides the infrastructure to make that happen.
 
-Unlike other libraries like AutoMerge and Yjs, Yorkie includes a full-stack solution with SDKs, Cloud or Self-Hosted Server, making it easier to implement co-editing capabilities in your application.
+### What is Yorkie?
 
-In the following sections, we will explore the structure and workings of Yorkie in more detail.
+Yorkie is a comprehensive collaboration platform that handles the complex challenges of building real-time collaborative applications. It provides:
 
-### Components
+- [JSON-like Document](/docs/js-sdk#document) based on [Conflict-free Replicated Data Types (CRDTs)](/docs/glossary) for automatic conflict resolution
+- [Presence](/docs/js-sdk#presence) tracking to show who's online and what they're doing
+- [Channel](/docs/js-sdk#channel) for lightweight, real-time communication without data persistence
+- Offline support with automatic synchronization when network is restored
 
-Yorkie consists of four main components: Clients, Documents, Channels, and Server.
+### Why Yorkie?
 
-- [Client](/docs/js-sdk#client)s are the entities that communicate with the server. Changes made by documents can be synchronized with the server, allowing for real-time collaboration.
-- [Document](/docs/js-sdk#document)s are the core data structures of Yorkie, based on Conflict-free Replicated Data Types(CRDTs). Documents are persisted in the database and support offline editing, making them ideal for collaborative applications that require data persistence.
-- [Channel](/docs/js-sdk#channel)s provide lightweight, real-time communication for ephemeral data like presence tracking and message broadcasting. Unlike Documents, Channels are memory-only and do not persist data to the database.
-- [Server](/docs/self-hosted-server) is the central hub of Yorkie, receiving changes from clients, storing them in the database, and propagating them to other clients who are subscribed to the same documents or channels.
+Unlike other CRDT libraries like AutoMerge and Yjs that only provide data structures, Yorkie delivers a complete full-stack solution:
 
-In addition, [Project](/docs/cli#project)s in Yorkie represent separate services or applications within the system. This allows for multiple independent projects to coexist within a single Yorkie installation.
+- Client SDKs for [JavaScript](/docs/js-sdk), [React](/docs/getting-started/with-react), [Android](/docs/android-sdk), and [iOS](/docs/ios-sdk)
+- Managed Cloud Service or [Self-Hosted Server](/docs/self-hosted-server) options
+- Built-in Infrastructure for data persistence, synchronization, and scaling
+- [Admin APIs](/docs/web-api) for server-side document management
+- [Dashboard](https://yorkie.dev/dashboard) and [CLI](/docs/cli) for project management and monitoring
 
-> Server can be used either in Cloud or Self-Hosted Server. <br/><br/> When using Yorkie in the cloud, you can access the API directly through the SDK without the need for server installation. For security reason, you can also build and operate a self-hosted Yorkie server.
+This means you can focus on building your application's features instead of managing collaboration infrastructure.
+
+### Core Components
+
+Yorkie consists of four main components that work together to enable real-time collaboration:
+
+- [Client](/docs/js-sdk#client) : The entry point for your application. Clients connect to the server, manage documents and channels, and handle synchronization automatically.
+- [Document](/docs/js-sdk#document) : Persistent, collaborative data structures based on CRDTs. Documents are stored in the database, support offline editing, and automatically resolve conflicts when users edit simultaneously.
+- [Channel](/docs/js-sdk#channel) : Lightweight, memory-only communication layer for ephemeral data. Perfect for presence tracking (who's online, cursor positions) and real-time message broadcasting.
+- [Server](/docs/self-hosted-server) : The central hub that receives changes from clients, persists them to the database, and broadcasts updates to subscribed clients. Available as a managed cloud service or self-hosted.
+
+Additionally, **[Projects](/docs/cli#project)** allow you to organize multiple independent applications within a single Yorkie installation, each with its own documents, channels, and clients. Learn more about key concepts in the [Glossary](/docs/glossary).
+
+Yorkie offers flexibility in how you deploy:
+- **Cloud**: Get started instantly with our managed service - no infrastructure setup required
+- **Self-Hosted**: Full control over your data and infrastructure for security and compliance needs
 
 ### How it works
 
-A high-level overview of Yorkie is as follows:
+Here's a high-level overview of Yorkie's architecture:
 
+```mermaid
+graph LR
+    subgraph ClientA["Client A (Go)"]
+        DocA["Document D-1<br/>{ a: 1, b: {} }"]
+    end
+    
+    subgraph ClientB["Client B (JS)"]
+        DocB["Document D-1<br/>{ a: 2, b: {} }"]
+    end
+    
+    subgraph Dashboard["Dashboard or CLI"]
+        Query["Query Q-1<br/>P-1.find({a:2})"]
+    end
+    
+    subgraph Server["Cloud or Self-Hosted Server"]
+        subgraph Project["Project p-1"]
+            DocServer["Document D-1<br/>{ a: 2, b: {} }"]
+            Channel["Channel C-1<br/>{ A, B }"]
+        end
+    end
+    
+    subgraph DB["Database"]
+        DBChanges["Changes"]
+        DBSnapshots["Snapshots"]
+    end
+    
+    DocA <-->|Changes| DocServer
+    DocB <-->|Changes| DocServer
+    Query <--->|Query| Project
+    Project <--> DBChanges
+    Project <--> DBSnapshots
 ```
- Client "A" (Go)                 Cloud or Self-Hosted Server     Database
-┌───────────────────┐           ┌────────────────────────┐      ┌───────────┐
-│  Document "D-1"   │◄─Changes─►│  Project "p-1"         │      │ Changes   │
-│  { a: 1, b: {} }  │           │ ┌───────────────────┐  │◄────►│ Snapshots │
-└───────────────────┘           │ │  Document "D-1"   │  │      └───────────┘
- Client "B" (JS)                │ │  { a: 2, b: {} }  │  │
-┌───────────────────┐           │ │                   │  │
-│  Document "D-1"   │◄─Changes─►│ │  Channel "C-1"    │  │
-│  { a: 2, b: {} }  │           │ │     { A, B }      │  │
-└───────────────────┘           │ └───────────────────┘  │
- Dashboard or CLI               │                        │
-┌───────────────────┐           └────────────────────────┘
-│  Query "Q-1"      │                 ▲
-│  P-1.find({a:2})  ├─────── Query────┘
-└───────────────────┘
-```
 
-The Yorkie system allows clients to have replicas of a document, representing an application model, on multiple devices. Each client can edit the document independently on their local devices, even when offline. When a network connection is available, Yorkie determines which changes need to be synced between clients and brings their replicas into the same state. In the event that the document is being edited concurrently on different devices, Yorkie automatically syncs the changes and resolves any conflicts, ensuring that all replicas end up in the same state.
+**The Collaboration Flow:**
 
-To get started with Yorkie, please refer to the [Getting Started](/docs/getting-started).
+1. Multiple Replicas: Each client maintains its own replica of a document, representing your application's data model
+2. Offline Editing: Clients can edit documents independently, even without network connectivity
+3. Automatic Sync: When connected, Yorkie determines which changes need synchronization and updates all clients
+4. Conflict Resolution: If multiple users edit simultaneously, Yorkie's CRDTs automatically resolve conflicts, ensuring all replicas converge to the same state
+
+This architecture enables seamless real-time collaboration while supporting offline work, making it ideal for modern collaborative applications.
+
+### Use Cases
+
+Yorkie is perfect for building various types of collaborative applications:
+
+- Collaborative Editors Build the next Google Docs or Notion with [rich text editing examples](/examples/quill)
+- Real-time Whiteboards Create Figma-like experiences with [drawing applications](/examples/tldraw)
+- Project Management Tools Develop Trello-style boards with [kanban examples](/examples/kanban)
+- Code Collaboration Enable pair programming with [CodeMirror integration](/examples/codemirror)
+- Presence & Cursors Show who's online with [simultaneous cursors](/examples/simultaneous-cursors)
+
+Explore more [examples](/examples) to see what you can build with Yorkie.
+
+### Next Steps
+
+**Get Started Quickly:**
+- Follow the [Getting Started guide](/docs/getting-started) for step-by-step integration
+- Choose your platform: [JavaScript](/docs/js-sdk), [React](/docs/getting-started/with-react), [Android](/docs/android-sdk), or [iOS](/docs/ios-sdk)
+- Try our [live examples](/examples) to see Yorkie in action
+
+**Dive Deeper:**
+- Understand [Architecture Patterns](/docs/architecture-patterns) to design your collaboration system
+- Learn about [security best practices](/docs/security) for production deployments
+- Explore [CLI commands](/docs/cli) for managing your projects
+- Check the [Glossary](/docs/glossary) for terminology reference

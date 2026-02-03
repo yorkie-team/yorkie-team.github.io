@@ -93,24 +93,35 @@ Yorkie provides a sharded cluster in Kubernetes environments to support producti
 
 This page describes how to set up sharded cluster. An example of the sharded cluster is as follows:
 
-```
-Sharded Cluster
-                               ┌────────────┐
-                               │            │
-                               │  ┌──────┐  │
-                           ┌───┼─►│Server│  │
-                           │   │  └──────┘  │
-                           │   │            │
-┌──────┐      ┌────────┐   │   │  ┌──────┐  │    ┌───────┐
-│Client├──────┤L7 Load ├───┼───┼─►│Server│  ├───►│MongoDB│
-└──────┘      │Balancer│   │   │  └──────┘  │    └───────┘
-              └────────┘   │   │            │
-                   ▲       │   │  ┌──────┐  │
-                   │       └───┼─►│Server│  │
-              ┌────┴───┐       │  └──────┘  │
-              │Service │◄──────┤            │
-              │Registry│       └────────────┘
-              └────────┘
+```mermaid
+graph LR
+    Client[Client]
+    LB[L7 Load<br/>Balancer]
+    Registry[Service<br/>Registry]
+    Server1[Server]
+    Server2[Server]
+    Server3[Server]
+    MongoDB[(MongoDB)]
+    
+    Client --> LB
+    LB --> Server1
+    LB --> Server2
+    LB --> Server3
+    Server1 --> MongoDB
+    Server2 --> MongoDB
+    Server3 --> MongoDB
+    Registry --> LB
+    Registry -.-> Server1
+    Registry -.-> Server2
+    Registry -.-> Server3
+    
+    style Client fill:#e1f5ff
+    style LB fill:#fff4e1
+    style Registry fill:#ffe1f5
+    style Server1 fill:#e1ffe1
+    style Server2 fill:#e1ffe1
+    style Server3 fill:#e1ffe1
+    style MongoDB fill:#f5e1ff
 ```
 
 - L7 Load Balancer: It is responsible for routing requests to servers based on the computed request’s hash key and consistent hashing algorithm.
