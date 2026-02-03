@@ -19,7 +19,7 @@ import rehypeToc, { HtmlElementNode, ListItemNode } from '@jsdevtools/rehype-toc
 import rehypeImageMeta from '@/utils/rehypeImageMeta';
 import rehypeWrapContents from '@/utils/rehypeWrapContents';
 import rehypeVariables from '@/utils/rehypeVariables';
-import { Layout, Navigator, Button, Icon, CodeBlock, CodeBlockHeader, Image } from '@/components';
+import { Layout, Navigator, Button, Icon, CodeBlock, CodeBlockHeader, Image, Mermaid } from '@/components';
 import { CustomLink, CustomCodeBlock, Breadcrumb, Caption, ImageWrap, Alert, Blockquote } from '@/components/docs';
 
 // Custom components/renderers to pass to MDX.
@@ -43,6 +43,7 @@ const components: MDXComponents = {
   Alert,
   CodeBlock,
   CodeBlockHeader,
+  Mermaid,
 };
 
 export default function DocsPage({

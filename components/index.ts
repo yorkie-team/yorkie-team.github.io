@@ -8,3 +8,4 @@ export * from './Accordion/Accordion';
 export * from './CodeBlock';
 export * from './CopyButton';
 export * from './Image';
+export * from './Mermaid';
