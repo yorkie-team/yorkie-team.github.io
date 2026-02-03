@@ -11,8 +11,6 @@ By default, Yorkie allows requests from any origin. To enhance security, you can
 
 Each project in Yorkie can have its own allowed origins settings, which can be managed through the [Dashboard]({{DASHBOARD_PATH}}).
 
-<Alert status="warning"> Allowed origins settings are project-specific and may take up to **10 minutes** to be applied due to caching. </Alert>
-
 #### Configuring Allowed Origins
 
 1. Open the Project Settings page in the Dashboard.
@@ -25,21 +23,19 @@ Each project in Yorkie can have its own allowed origins settings, which can be m
 
 The Auth Webhook provides fine-grained access control by validating client requests through an external authentication server. This allows you to enforce custom authorization logic, ensuring that only authorized users can access and modify Yorkie documents.
 
-```
-(5) Response            (4) Handle request
-     ┌─────────────────┐  ┌──┐
-     │                 │  │  │   (3) Response
-     ▼                 │  ▼  │    - allowed
- ┌──────┐             ┌┴─────┤    - reason   ┌───────────────┐
- │Client├────────────►│Server│◄──────────────┤External Server│
- └──────┘ (1)Request  └────┬─┘               └───────────────┘
-           - token         │                      ▲
-           - dockey        └──────────────────────┘
-                               (2) Call webhook
-                                - token
-                                - dockey
-                                - verb: r or rw
-```
+<Mermaid
+  chart={`sequenceDiagram
+    participant Client
+    participant Server
+    participant External Server
+    
+    Client->>Server: (1) Request<br/>- token<br/>- dockey
+    Server->>External Server: (2) Call webhook<br/>- token<br/>- dockey<br/>- verb: r or rw
+    External Server->>Server: (3) Response<br/>- allowed<br/>- reason
+    Server->>Server: (4) Handle request
+    Server->>Client: (5) Response
+`}
+/>
 
 The authentication process follows these steps:
 
@@ -60,8 +56,6 @@ You can easily set up the Auth Webhook via the the [Dashboard]({{DASHBOARD_PATH}
 <Image alt="setting auth-webhook" src="/assets/images/docs/auth-webhook-dashboard.png" width={1300} height={840} style={{ maxWidth: '1000px' }} />
 
 Alternatively, you can configure the webhook using the Yorkie CLI. See updating the project for details. Refer to the [updating the project](/docs/cli#updating-the-project).
-
-<Alert status="warning"> Changes to the configuration may take up to 10 minutes to take effect. </Alert>
 
 ##### 2. Client Configuration
 
