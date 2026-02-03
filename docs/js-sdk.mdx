@@ -770,26 +770,9 @@ If the document is no longer used, it should be detached to increase the efficie
 await client.detach(doc);
 ```
 
-When detaching a document, you can provide additional options to control the detachment behavior:
-
-```javascript
-await client.detach(doc, {
-  removeIfNotAttached: true
-});
-```
-
-Available options:
-- `removeIfNotAttached` (Optional, boolean): When set to true, the document will be completely removed from the server if no other clients are attached to it. This is useful for cleaning up temporary documents or sessions. Default is false.
-
-<Alert status="warning"> Use `removeIfNotAttached: true` carefully, as it will permanently delete the document from the server if no other clients are currently attached. This action cannot be undone. </Alert>
-
 ##### Project-level Remove on Detach Setting
 
-The `Remove on Detach` setting is a project-level configuration that enforces server-side removal when a detach leaves the document with zero attached clients. It automatically applies to all documents in the project; you don't need to pass `removeIfNotAttached: true` on individual detach calls.
-
-<Alert status="warning">
-When the `Remove on Detach` setting is enabled, it overrides any `removeIfNotAttached` value passed to `client.detach()`. Even if you set `removeIfNotAttached: false`, the server will remove the document once no other clients are attached at detach time.
-</Alert>
+The `Remove on Detach` setting is a project-level configuration that enforces server-side removal when a detach leaves the document with zero attached clients. It automatically applies to all documents in the project
 
 #### Document Limits
 

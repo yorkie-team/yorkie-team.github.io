@@ -1,0 +1,352 @@
+---
+title: 'Architecture Patterns'
+order: 110
+---
+
+## Architecture Patterns
+
+When integrating Yorkie into your application, you may need to decide how to manage document lifecycle and data persistence, especially when you already have an existing database. This guide presents three recommended architectural patterns based on different Source of Truth (SoT) strategies.
+
+Understanding these patterns will help you design the optimal architecture for your use case, whether you want to maintain real-time collaborative state separately from persistent storage or use Yorkie as the primary data store.
+
+### Before You Begin
+
+If you're new to Yorkie, we recommend:
+1. Complete the [Getting Started guide](/docs/getting-started) first
+2. Understand basic [Client](/docs/js-sdk#client) and [Document](/docs/js-sdk#document) concepts
+3. Familiarize yourself with key terms in the [Glossary](/docs/glossary)
+4. Then return here to choose your architecture pattern
+
+### Pattern A: External DB as SoT with Server-Managed Lifecycle
+
+In this pattern, your existing database serves as the Source of Truth, while your server manages the document lifecycle through Yorkie's Admin API. This approach provides centralized control over document creation and deletion, making it suitable for applications that require strict server-side governance.
+
+**Key Characteristics:**
+- Server creates and deletes documents via [Admin API](/docs/web-api#documents-management)
+- Clients edit documents directly through Yorkie SDK during collaboration
+- Explicit "Save" action persists content to your database
+- Server maintains full control over document lifecycle
+
+> **Security Note:** When using Admin API for server-managed lifecycle, secure your API endpoints properly. See [Auth Webhook](/docs/security#auth-webhook) for authentication setup.
+
+**Document Creation Flow:**
+
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant S as Your Server
+    participant Y as Yorkie Server
+    participant DB as Your Database
+    
+    C->>S: Request document creation
+    S->>Y: Create document (Admin API)
+    Y-->>S: Document created (key)
+    S->>DB: Store document metadata
+    DB-->>S: Metadata saved
+    S-->>C: Return document key
+    C->>Y: Attach to document
+    Y-->>C: Document attached
+```
+
+1. Client requests document creation from your server
+2. Server creates a new document through [Yorkie Admin API](/docs/web-api#post-yorkiev1adminservicecreatedocument)
+3. Server stores document metadata in your database
+4. Server returns document key to client
+5. Client [attaches](/docs/js-sdk#attaching-the-document) to the document using the provided key
+
+**Document Editing Flow:**
+
+```mermaid
+sequenceDiagram
+    participant C1 as Client 1
+    participant C2 as Client 2
+    participant Y as Yorkie Server
+    
+    C1->>Y: Attach to document
+    Y-->>C1: Document synced
+    C2->>Y: Attach to document
+    Y-->>C2: Document synced
+    
+    loop Real-time Collaboration
+        C1->>Y: Edit document
+        Y->>C2: Sync changes
+        C2->>Y: Edit document
+        Y->>C1: Sync changes
+    end
+```
+
+1. Clients attach to the document via Yorkie SDK
+2. Real-time collaborative editing happens through Yorkie
+3. Server is not involved during active collaboration
+4. All changes are automatically synchronized between clients
+
+**Document Saving Flow:**
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant C as Client
+    participant S as Your Server
+    participant DB as Your Database
+    
+    U->>C: Click "Save" button
+    C->>S: Send document content
+    S->>DB: Persist content
+    DB-->>S: Content saved
+    S-->>C: Save confirmation
+    C-->>U: Display success
+```
+
+1. User clicks "Save" button
+2. Client sends document content to your server
+3. Server persists the content to your database
+4. Server returns save confirmation
+
+**Document Deletion Flow:**
+
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant S as Your Server
+    participant Y as Yorkie Server
+    participant DB as Your Database
+    
+    C->>S: Request document deletion
+    S->>Y: Remove document (Admin API)
+    Y-->>S: Document removed
+    S->>DB: Delete document
+    DB-->>S: Document deleted
+    S-->>C: Deletion confirmation
+```
+
+1. Client requests document deletion from your server
+2. Server removes document via Yorkie Admin API
+3. Server deletes document from your database
+4. Server returns deletion confirmation
+
+**When to Use This Pattern:**
+- You need strict server-side control over document lifecycle
+- Your application requires explicit save/persist actions
+- You want to maintain clear separation between real-time and persistent state
+- You have existing database infrastructure you want to preserve
+
+---
+
+### Pattern B: External DB as SoT with Client-Only Lifecycle Management
+
+This pattern also uses your external database as the Source of Truth, but delegates document lifecycle management to the client side. This serverless approach simplifies your backend architecture and leverages Yorkie's auto-cleanup features.
+
+**Key Characteristics:**
+- Server only provides document keys and initial content
+- Clients create and manage documents independently
+- Automatic document cleanup via `RemoveOnDetach` project setting (configure via [CLI](/docs/cli#updating-the-project) or Dashboard)
+- Explicit "Save" action persists content to your database
+
+**Document Creation Flow:**
+
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant S as Your Server
+    participant Y as Yorkie Server
+    
+    C->>S: Request document key & content
+    S-->>C: Return key & initial content
+    C->>C: Create document locally
+    C->>Y: Attach with initial content
+    Y-->>C: Document attached
+```
+
+1. Client requests document key and initial content from your server
+2. Client creates document locally with received key
+3. Client attaches document with initial content using the [`initialRoot`](/docs/js-sdk#initializing-root) option:
+
+```typescript
+const doc = new yorkie.Document(key); // Key received from server
+await client.attach(doc, {
+  initialRoot: contents // Initial content from server
+});
+```
+
+**Document Editing Flow:**
+
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant S as Your Server
+    participant Y as Yorkie Server
+    
+    C->>S: Request document key
+    S-->>C: Return document key
+    C->>C: Create document locally
+    C->>Y: Attach to document
+    Y-->>C: Document synced
+    
+    loop Real-time Collaboration
+        C->>Y: Edit document
+        Y->>C: Sync changes
+    end
+```
+
+1. Client requests document key from your server
+2. Client creates and attaches to document:
+
+```typescript
+const doc = new yorkie.Document(key); // Key received from server
+await client.attach(doc);
+```
+
+3. Real-time collaborative editing happens through Yorkie
+4. Server is not involved during active collaboration
+
+**Editing Completion Flow:**
+
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant Y as Yorkie Server
+    
+    C->>Y: Detach from document
+    Y->>Y: Check remaining clients
+    alt No clients attached
+        Y->>Y: Auto-remove document (RemoveOnDetach)
+    end
+    Y-->>C: Detach confirmed
+```
+
+1. Client finishes editing and [detaches](/docs/js-sdk#detaching-the-document) from document
+2. With project-level `RemoveOnDetach` option enabled, document is automatically removed when no clients are attached
+3. This automatic cleanup reduces server management overhead
+
+**Document Saving Flow:**
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant C as Client
+    participant S as Your Server
+    participant DB as Your Database
+    
+    U->>C: Click "Save" button
+    C->>S: Send document content
+    S->>DB: Persist content
+    DB-->>S: Content saved
+    S-->>C: Save confirmation
+    C-->>U: Display success
+```
+
+1. User clicks "Save" button
+2. Client sends document content to your server
+3. Server persists the content to your database
+4. Server returns save confirmation
+
+**When to Use This Pattern:**
+- You want to minimize server-side complexity
+- Your application benefits from client-driven architecture
+- You need automatic document cleanup
+- You still require explicit save actions but want simpler lifecycle management
+
+---
+
+### Pattern C: Yorkie as Source of Truth
+
+In this pattern, Yorkie serves as the primary Source of Truth for your document content. Your database only stores document metadata (e.g., title, owner, created date) while all content lives in Yorkie. This approach provides the most seamless real-time experience.
+
+**Key Characteristics:**
+- Yorkie stores and manages all document content
+- Your database stores only document metadata
+- No explicit "Save" button needed
+- All changes are automatically persisted in real-time
+- Simplified architecture with single source of truth
+
+> **How It Works:** Yorkie uses [CRDT (Conflict-free Replicated Data Types)](/docs/internals) to ensure automatic conflict resolution, enabling seamless real-time collaboration without manual conflict handling.
+
+**Document Editing Flow:**
+
+```mermaid
+sequenceDiagram
+    participant C1 as Client 1
+    participant C2 as Client 2
+    participant Y as Yorkie Server
+    
+    C1->>Y: Attach to document
+    Y-->>C1: Document synced
+    C2->>Y: Attach to document
+    Y-->>C2: Document synced
+    
+    loop Real-time Collaboration
+        C1->>Y: Edit document
+        Y->>Y: Auto-persist changes
+        Y->>C2: Sync changes
+        C2->>Y: Edit document
+        Y->>Y: Auto-persist changes
+        Y->>C1: Sync changes
+    end
+```
+
+1. Client attaches to document via Yorkie SDK
+2. All edits are automatically synchronized and persisted
+3. No manual save action required
+4. Changes are immediately available to all connected clients
+
+**Document Deletion Flow:**
+
+```mermaid
+sequenceDiagram
+    participant C as Client/Server
+    participant Y as Yorkie Server
+    participant S as Your Server
+    participant DB as Your Database
+    
+    C->>Y: Remove document (Yorkie API)
+    Y-->>C: Document removed
+    C->>S: Request metadata deletion
+    S->>DB: Delete metadata
+    DB-->>S: Metadata deleted
+    S-->>C: Deletion confirmed
+```
+
+1. Client or server removes document via [Yorkie Admin API](/docs/web-api#post-yorkiev1adminserviceremovedocument)
+2. Server removes document metadata from your database
+3. Document content is automatically removed from Yorkie
+
+**When to Use This Pattern:**
+- You're building a new application without legacy database constraints
+- You want true real-time collaboration without manual saves
+- Document content naturally lives in Yorkie (e.g., collaborative editors, whiteboards)
+- You prefer simplified architecture with automatic persistence
+- Your metadata storage needs are minimal
+
+---
+
+### Choosing the Right Pattern
+
+Consider these factors when selecting an architecture pattern:
+
+| Factor | Pattern A | Pattern B | Pattern C |
+|--------|-----------|-----------|-----------|
+| Server Control | High | Low | Medium |
+| Implementation Complexity | Medium | Low | Low |
+| Save Action Required | Yes | Yes | No |
+| Best For | Enterprise apps with strict governance | Serverless architectures | Real-time-first applications |
+| Database Load | Controlled by saves | Controlled by saves | Minimal (metadata only) |
+
+**Start with Pattern C** if you're building a new collaborative application from scratch. **Choose Pattern A** if you need tight server-side control and have existing database infrastructure. **Choose Pattern B** if you want a simpler client-driven approach while maintaining external persistence.
+
+### See It In Action
+
+Explore real-world examples implementing these patterns:
+- [Simultaneous Cursors Example](/examples/simultaneous-cursors) - Pattern C with real-time presence
+- [ToDo MVC Example](/examples/react-todomvc) - Real-time collaboration
+- [Quill Editor Example](/examples/nextjs-quill) - Collaborative text editing
+- [View All Examples](/examples)
+
+### Related Documentation
+
+For more information about Yorkie's API and features:
+- [JS SDK Documentation](/docs/js-sdk) - Client and Document API reference
+- [Web API](/docs/web-api) - Admin API for server-side management
+- [Security Configuration](/docs/security) - Auth Webhook and access control
+- [CLI](/docs/cli) - Command-line tools for project management
+- [Glossary](/docs/glossary) - Key terminology and concepts
+- [Internals](/docs/internals) - CRDT algorithms and design documents

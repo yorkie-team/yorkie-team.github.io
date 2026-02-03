@@ -1,0 +1,96 @@
+.mermaid {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background-color: var(--gray-400);
+  border-radius: 8px;
+  overflow-x: auto;
+  display: flex;
+  justify-content: center;
+
+  svg {
+    max-width: 100%;
+    height: auto;
+  }
+
+  // Mermaid diagram styling
+  .node rect,
+  .node circle,
+  .node ellipse,
+  .node polygon {
+    fill: var(--white);
+    stroke: var(--gray-400);
+    stroke-width: 2px;
+  }
+
+  .edgePath .path {
+    stroke: var(--gray-600);
+    stroke-width: 2px;
+  }
+
+  .edgeLabel {
+    background-color: var(--white);
+    padding: 4px 8px;
+    border-radius: 4px;
+  }
+
+  text {
+    fill: var(--gray-900);
+    font-family: inherit;
+  }
+
+  .actor {
+    fill: var(--white);
+    stroke: var(--gray-400);
+  }
+
+  .messageLine0,
+  .messageLine1 {
+    stroke: var(--gray-600);
+  }
+
+  .labelBox {
+    fill: var(--white);
+    stroke: var(--gray-400);
+  }
+}
+
+[data-theme='dark'] {
+  .mermaid {
+    background-color: var(--gray-900);
+
+    .node rect,
+    .node circle,
+    .node ellipse,
+    .node polygon {
+      fill: var(--gray-800);
+      stroke: var(--gray-600);
+    }
+
+    .edgePath .path {
+      stroke: var(--gray-400);
+    }
+
+    .edgeLabel {
+      background-color: var(--gray-800);
+    }
+
+    text {
+      fill: var(--gray-100);
+    }
+
+    .actor {
+      fill: var(--gray-800);
+      stroke: var(--gray-600);
+    }
+
+    .messageLine0,
+    .messageLine1 {
+      stroke: var(--gray-400);
+    }
+
+    .labelBox {
+      fill: var(--gray-800);
+      stroke: var(--gray-600);
+    }
+  }
+}
