@@ -27,7 +27,7 @@ await client.activate();
 
 > The API key is used to identify the project in Yorkie. You can get the API key of the project you created in the [Dashboard]({{DASHBOARD_PATH}}).
 
-##### Creating a Client with Auth Token
+#### Auth Token
 
 You can configure authentication for the client by setting up an `authTokenInjector` to provide tokens for Auth Webhook verification.
 If a `codes.Unauthenticated` error occurs, the `authTokenInjector` will be called again with the webhook's response reason, enabling automatic token refresh.
@@ -47,7 +47,7 @@ const client = new yorkie.Client({
 });
 ```
 
-##### Measuring MAU
+#### Measuring MAU
 
 You can measure MAU(Monthly Active Users) by setting the `userID` metadata when creating a client. The `userID` should be a unique identifier for each user.
 
@@ -61,7 +61,7 @@ const client = new yorkie.Client({
 
 You can check the MAU in the [Dashboard]({{DASHBOARD_PATH}}) by selecting the project and clicking the `overview` tab.
 
-##### Deactivate the Client
+#### Deactivate the Client
 
 When the client is no longer needed, you can deactivate it to release resources and disconnect from the server.
 
@@ -73,31 +73,23 @@ This will detach all documents attached to the client for efficient [garbage col
 
 ### Document
 
-`Document` is a primary data type in Yorkie, which provides a JSON-like updating experience that makes it easy to represent your application's model.
-A `Document` can be updated without being attached to the client, and its changes are automatically propagated to other clients when the `Document` is attached to the `Client` or when the network is restored.
+`Document` is a primary data type in Yorkie that provides a JSON-like updating experience for representing your application's model. Documents can be updated without being attached to the client, and changes are automatically propagated to other clients when attached or when the network is restored.
 
 #### Creating a Document
 
-You can create a Document using `yorkie.Document()`. Let's create a Document with a key and attach it to the Client.
+Create a Document with a unique key:
 
 ```javascript
 const doc = new yorkie.Document('doc-1');
 ```
 
-> The document key is used to identify the Document in Yorkie. It is a string that can be freely defined by the user.
-> However, it is allowed to use only `a-z`, `A-Z`, `0-9`, `-`, `.`, `_`, `~` and must be less than 120 characters.
-
+> Document keys can contain `a-z`, `A-Z`, `0-9`, `-`, `.`, `_`, `~` and must be less than 120 characters.
 
 #### Attaching the Document
 
-When you attach, the client notifies the server that it is subscribing to this document.
-If the document does not exist on the server, it will be created, and any local changes that occurred will be updated to the server's document.
-If the server already has a document associated with the provided key, it sends the existing changes to the client, which are then applied to synchronize the document.
+Attaching subscribes the client to a document. If the document doesn't exist on the server, it will be created. Once attached, all modifications are automatically synchronized with other clients.
 
-Once attached, the document becomes synchronized with other clients.
-This ensures that any modifications made by one client are instantly propagated to other clients collaborating on the same document.
-
-The second argument is options.
+Attach options:
 - `initialPresence`: Sets the initial presence of the client that attaches the document. The presence is shared with other users participating in the document. It must be serializable to JSON.
 - `syncMode`(Optional): Specifies synchronization modes. The default value is `SyncMode.Realtime`, which automatically pushes and pulls changes. If you set it to `SyncMode.Manual`, you'll need to manually handle synchronization.
 
@@ -110,7 +102,7 @@ await client.attach(doc, {
 
 #### Initializing root
 
-The root is used to manage the application's data, such as primitives, arrays, Counters, and Text in a form within the `Document`. You can set the initial values when calling `Document.attach()` using the `initialRoot` option.
+Set initial values for the document root when attaching:
 
 ```javascript
 await client.attach(doc, {
@@ -150,14 +142,76 @@ await client.attach(doc, {
 We support element types for Primitives, and [Custom CRDT types](/docs/js-sdk/#custom-crdt-types).
 
 <Alert status="warning">
-Elements added by `initialRoot` are not sent to the server during the `attach` process. They are applied locally to the Document after push-pull during `attach`.
+Elements added by `initialRoot` are applied locally after push-pull during `attach`, not sent to the server immediately.
 </Alert>
 
-#### Updating presence
+#### Editing the Document
 
-The `Document.update()` method allows you to make changes to the state of the current user's presence.
+Use `Document.update(changeFn, message)` to modify a Document. The optional `message` parameter adds a description to the change.
 
-Specific properties provided will be changed. The existing presence object will be updated by merging the new changes. In other words, properties not specified in the update function will remain unchanged. 
+```javascript
+const message = 'update document for test';
+doc.update((root) => {
+  root.todos = [];
+  root.todos.push('todo-1');
+  root.obj = {
+    name: 'yorkie',
+    age: 14,
+  };
+  root.counter = new yorkie.Counter(yorkie.IntType, 0);
+  root.counter.increase(1);
+}, message);
+```
+
+Under the hood, `root` in the `update` function creates a `change`, a set of operations, using a JavaScript proxy. Every element has its unique ID, created by the logical clock. This ID is used by Yorkie to track which object is which.
+
+You can get the contents of the Document using `document.getRoot()`.
+
+```javascript
+const root = doc.getRoot();
+console.log(root.todos);    // ["todo-1"]
+console.log(root.obj);      // {"name":"yorkie","age":14}
+console.log(root.obj.name); // "yorkie"
+console.log(root.counter.getValue()); // 1
+```
+
+#### Plain JavaScript Objects
+
+Convert Yorkie's JSONObject types to plain JavaScript objects using `toJS()`:
+
+```javascript
+const root = doc.getRoot();
+
+// Converting the entire root to a plain object
+const plainObject = root.toJS();
+console.log(plainObject); // Plain JavaScript object
+
+// Converting specific nested objects
+const plainTodos = root.todos.toJS();
+const plainObj = root.obj.toJS();
+```
+
+<Alert status="info">
+The `toJS()` method creates a deep copy as a plain JavaScript object, removing all Yorkie-specific metadata and proxies.
+</Alert>
+
+#### Detaching the Document
+
+Detach documents when no longer needed to improve garbage collection efficiency:
+
+```javascript
+await client.detach(doc);
+```
+
+The `Remove on Detach` project setting enforces server-side removal when the last client detaches from a document.
+
+#### Presence
+
+Presence tracks and shares user state (e.g., cursor positions, selections) in real-time.
+
+**Updating presence**
+
+Update the current user's presence using `Document.update()`. Properties are merged, and unspecified properties remain unchanged: 
 
 ```javascript
 doc.update((root, presence) => {
@@ -191,30 +245,21 @@ doc.update((root, presence) => {
 ```
 </Alert>
 
-#### Getting presence 
+**Getting presence**
 
-You can get the presences of the current client and other clients participating in the document.
-
-##### Document.getPresence(clientID) 
-
-It returns the presence of a specific client.
+**Document.getPresence(clientID)** returns the presence of a specific client:
 
 ```javascript
 doc.getPresence(client.getID()); // { color: 'blue', cursor: { x: 1, y: 1 } }
 ```
 
-##### Document.getMyPresence() 
-
- It returns the presence of the current client that has attached to the document.
+**Document.getMyPresence()** returns the presence of the current client:
 
 ```javascript
 doc.getMyPresence(); // { color: 'blue', cursor: { x: 1, y: 1 } }
 ```
 
-##### Document.getPresences() 
-
-It returns an array about all clients currently participating in the document.
-Each entry in the array includes the client's id and presence.
+**Document.getPresences()** returns all participating clients with their presence:
 
 ```javascript
 const users = doc.getPresences();
@@ -223,15 +268,13 @@ for (const { clientID, presence } of users ) {
 }
 ```
 
-Here is an example of showing a list of users participating in the collaborative application.
-- [Profile Stack](/examples/profile-stack)
+Example: [Profile Stack](/examples/profile-stack)
 
-##### Document.subscribe('presence')
+**Subscribing to presence changes**
 
-This method allows you to subscribe to presence-related changes. You'll be notified whenever clients watch, unwatch, or modify their presence.
+**Document.subscribe('presence')** notifies when clients watch, unwatch, or modify their presence.
 
-The `initialized` event occurs when the client list needs to be initialized.
-For example, this happens when you first connect a watch stream to a document, when the connection is lost, or when it is reconnected.
+The `initialized` event occurs when connecting, losing connection, or reconnecting to a watch stream.
 
 <Alert status="warning">
 Subscribe before attaching the document to ensure you receive the initial `initialized` event.
@@ -259,11 +302,9 @@ const unsubscribe = doc.subscribe('presence', (event) => {
 
 Use `my-presence` and `others` topics to distinguish between your own events and those of others.
 
-##### Document.subscribe('my-presence')
+**Document.subscribe('my-presence')** subscribes to the current client's presence changes.
 
-This method is specifically for subscribing to changes in the presence of the current client that has attached to the document.
-
-The possible event.type are: `initialized`, `presence-changed`.
+Possible event types: `initialized`, `presence-changed`.
 
 ```javascript
 const unsubscribe = doc.subscribe('my-presence', (event) => {
@@ -271,11 +312,9 @@ const unsubscribe = doc.subscribe('my-presence', (event) => {
 });
 ```
 
-##### Document.subscribe('others')
+**Document.subscribe('others')** subscribes to other clients' presence changes.
 
-This method enables you to subscribe to changes in the presence of other clients participating in the document.
-
-The possible event.type are: `watched`, `unwatched`, `presence-changed`.
+Possible event types: `watched`, `unwatched`, `presence-changed`.
 
 ```javascript
 const unsubscribe = doc.subscribe('others', (event) => {
@@ -293,65 +332,42 @@ const unsubscribe = doc.subscribe('others', (event) => {
 });
 ```
 
-#### Editing the Document
+#### Synchronization Modes
 
-`Document.update(changeFn, message)` enables you to modify a Document. The optional `message` allows you to add a description to the change. If the Document is attached to the Client, all changes are automatically synchronized with other Clients.
+Change the synchronization mode using `client.changeSyncMode(doc, syncMode)`.
 
-```javascript
-const message = 'update document for test';
-doc.update((root) => {
-  root.todos = [];
-  root.todos.push('todo-1');
-  root.obj = {
-    name: 'yorkie',
-    age: 14,
-  };
-  root.counter = new yorkie.Counter(yorkie.IntType, 0);
-  root.counter.increase(1);
-}, message);
-```
+Available modes:
 
-Under the hood, `root` in the `update` function creates a `change`, a set of operations, using a JavaScript proxy. Every element has its unique ID, created by the logical clock. This ID is used by Yorkie to track which object is which.
+- `SyncMode.Realtime`: Local changes are automatically pushed to the server, and remote changes are pulled from the server.
 
-You can get the contents of the Document using `document.getRoot()`.
+- `SyncMode.RealtimePushOnly`: Only local changes are pushed, and remote changes are not pulled.
+
+- `SyncMode.RealtimeSyncOff`: Changes are not synchronized, but the watch stream remains active.
+
+- `SyncMode.Manual`: Synchronization no longer occurs in real-time, and the watch stream is disconnected. Manual handling is required for synchronization.
 
 ```javascript
-const root = doc.getRoot();
-console.log(root.todos);    // ["todo-1"]
-console.log(root.obj);      // {"name":"yorkie","age":14}
-console.log(root.obj.name); // "yorkie"
-console.log(root.counter.getValue()); // 1
+// Enable automatic synchronization of both local and remote changes.
+await client.changeSyncMode(doc, SyncMode.Realtime);
+
+// Only push local changes automatically.
+await client.changeSyncMode(doc, SyncMode.RealtimePushOnly);
+
+// Synchronization turned off, but the watch stream remains active.
+await client.changeSyncMode(doc, SyncMode.RealtimeSyncOff);
+
+// Synchronization turned off, and the watch stream is disconnected.
+await client.changeSyncMode(doc, SyncMode.Manual);
+await client.sync(doc); // Trigger synchronization manually using the sync function.
 ```
 
-#### Converting Document Data to Plain JavaScript Objects
+#### Subscribing to Changes
 
-You can convert Yorkie's JSONObject types to plain JavaScript objects using the `toJS()` method. This is useful when you need to serialize document data or integrate with other libraries that expect plain objects.
+Subscribe to document events including changes, connection status, and synchronization status.
 
-```javascript
-const root = doc.getRoot();
+**Document.subscribe()**
 
-// Converting the entire root to a plain object
-const plainObject = root.toJS();
-console.log(plainObject); // Plain JavaScript object
-
-// Converting specific nested objects
-const plainTodos = root.todos.toJS();
-const plainObj = root.obj.toJS();
-```
-
-<Alert status="info"> The `toJS()` method creates a deep copy of the data as a plain JavaScript object, removing all Yorkie-specific metadata and proxies. </Alert>
-
-#### Subscribing to Document
-
-You can subscribe to various events occurring in the Document, such as changes, connection status, synchronization status, and all events by using the `document.subscribe()` method.
-By subscribing to these events, you can update the UI in real-time and handle exceptions that may occur during synchronization.
-
-##### Document.subscribe()
-
-A Document can be modified by changes generated remotely or locally in Yorkie. Whenever the Document is modified, change events are triggered and you can subscribe to these events using the `document.subscribe(callback)` method.
-By subscribing to changes in the Document, you can receive updates in real-time, which is useful for updating the UI when the Document changes.
-
-The callback is called with an event object, and the `event.type` property indicates the source of the change, which can be one of the following values: `local-change`, `remote-change`, or `snapshot`.
+Subscribe to document modification events. The `event.type` can be `local-change`, `remote-change`, or `snapshot`:
 
 ```javascript
 const unsubscribe = doc.subscribe((event) => {
@@ -383,23 +399,15 @@ For more information about changeInfo for document events, please refer to the [
 The `event.rawChange` value for `local-change` and `remote-change` events, and the `event.value.snapshot` for `snapshot` event, are set only when [`enableDevtools`](/docs/devtools/#install-the-extension) option is configured as `true`.
 </Alert>
 
-The `snapshot` event is triggered when a snapshot is received from the server.
-This occurs when the changes that a document needs to fetch from the server exceed a certain `SnapshotThreshold`.
-Instead of sending numerous changes, the server sends a snapshot of the document.
-In such cases, it is essential to update with data from the Yorkie Document.
-Refer to the [example code](https://github.com/yorkie-team/yorkie-js-sdk/blob/9c7accdfe337b9c9e7c7d0d3b3acc335951866ce/public/index.html#L346-L350) for handling snapshots in CodeMirror.
+The `snapshot` event occurs when fetching changes from the server exceeds `SnapshotThreshold`. The server sends a complete snapshot instead of individual changes. [Example code](https://github.com/yorkie-team/yorkie-js-sdk/blob/9c7accdfe337b9c9e7c7d0d3b3acc335951866ce/public/index.html#L346-L350) for handling snapshots in CodeMirror.
 
 <Alert status="warning">
-If a client has not synchronized for a prolonged period and then makes a sync request, it might receive a `snapshot` event.
-Ensure your application processes these snapshot events correctly to maintain document synchronization.
+Clients that haven't synchronized for a long time may receive a `snapshot` event. Ensure your application handles these events to maintain synchronization.
 </Alert>
 
-##### Document.subscribe('$.path')
+**Document.subscribe('$.path')**
 
-Additionally, you can subscribe to changes for a specific path in the Document using `doc.subscribe(path, callback)` with a path argument, such as `$.todos`, where the `$` sign indicates the root of the document.
-The callback function is called when the target path and its nested values are changed.
-
-With this feature, you can easily subscribe to changes for a specific part of the document and perform different actions based on the updated values.
+Subscribe to changes for a specific path (e.g., `$.todos`):
 
 ```javascript
 // The event is triggered when the value of the path("$.todos") is changed.
@@ -409,13 +417,9 @@ const unsubscribe = doc.subscribe('$.todos', (event) => {
 });
 ```
 
-##### Document.subscribe('connection')
+**Document.subscribe('connection')**
 
-After attaching the document to the client, the document is continuously synchronized with the server in real-time. This is achieved by maintaining a watch stream connection between the client and the server, which allows the client to receive events and updates from other users.
-
-To monitor the connection status of the stream, you can use a callback function that is triggered whenever the connection status changes. The possible values for `event.value` are `StreamConnectionStatus.Connected` and `StreamConnectionStatus.Disconnected`.
-
-When the watch stream is disconnected, it indicates that the user is offline and will not receive real-time updates from other users.
+Monitor the watch stream connection status. Possible values: `StreamConnectionStatus.Connected` and `StreamConnectionStatus.Disconnected`.
 
 ```javascript
 const unsubscribe = doc.subscribe('connection', (event) => {
@@ -429,10 +433,9 @@ const unsubscribe = doc.subscribe('connection', (event) => {
 
 For more information about `StreamConnectionStatus`, please refer to the [StreamConnectionStatus](https://yorkie.dev/yorkie-js-sdk/api-reference/enums/StreamConnectionStatus.html).
 
-##### Document.subscribe('sync')
+**Document.subscribe('sync')**
 
-If the document is attached to the client in `SyncMode.Realtime`, the document is automatically synchronized with the server in real-time.
-Under this mode, the document executes synchronization in the background, and you can track the synchronization status using the `sync` event. The possible `event.value` values are: `DocSyncStatus.Synced` and `DocSyncStatus.SyncFailed`.
+Track synchronization status in `SyncMode.Realtime`. Possible values: `DocSyncStatus.Synced` and `DocSyncStatus.SyncFailed`.
 
 ```javascript
 const unsubscribe = doc.subscribe('sync', (event) => {
@@ -446,9 +449,9 @@ const unsubscribe = doc.subscribe('sync', (event) => {
 
 For more information about `DocSyncStatus`, please refer to the [DocSyncStatus](https://yorkie.dev/yorkie-js-sdk/api-reference/enums/DocSyncStatus.html).
 
-##### Document.subscribe('status')
+**Document.subscribe('status')**
 
-You can subscribe to the status of the document using `doc.subscribe('status', callback)`. The possible values for `event.value.status` are `DocStatus.Attached`, `DocStatus.Detached`, and `DocStatus.Removed`.
+Subscribe to document status changes. Possible values: `DocStatus.Attached`, `DocStatus.Detached`, and `DocStatus.Removed`.
 
 ```javascript
 const unsubscribe = doc.subscribe('status', (event) => {
@@ -465,19 +468,12 @@ const unsubscribe = doc.subscribe('status', (event) => {
 For more information about `DocStatus`, please refer to the [DocStatus](https://yorkie.dev/yorkie-js-sdk/api-reference/enums/DocStatus.html).
 
 <Alert status="warning">
-In Web-based applications, it is hard to detect when the user closes the browser or navigates to another page. In such cases, the document may remain attached to the client, which can lead to inefficient storage and memory usage.
-To handle this, Yorkie provides one of housekeeping feature, `client-deactivate-threshold`, which is a time interval to automatically deactivate the clients that have not been used for a certain period.
-<br/>
-If the client is deactivated due to inactivity, the document will be detached from the client, and you will receive a `DocumentStatus.Detached` event through the `doc.subscribe('status', callback)` method.
-<br/>
-For more information about `client-deactivate-threshold`, please refer to the [Client Deactivate Threshold](/docs/cli#client-deactivate-threshold).
+In web applications, detecting browser closure or navigation is difficult. Yorkie's `client-deactivate-threshold` automatically deactivates inactive clients, which will trigger a `DocumentStatus.Detached` event. See [Client Deactivate Threshold](/docs/cli#client-deactivate-threshold).
 </Alert>
 
-##### Document.subscribe('auth-error')
+**Document.subscribe('auth-error')**
 
-You can subscribe to authentication error events using `doc.subscribe('auth-error', callback)`.
-This event is triggered when an unauthenticated error occurs during `PushPull` or `WatchDocuments` operations,
-specifically when the system automatically refreshes the token and retries the operation.
+Subscribe to authentication errors during `PushPull` or `WatchDocuments` operations:
 
 ```javascript
 const unsubscribe = doc.subscribe('auth-error', (event) => {
@@ -491,11 +487,9 @@ const unsubscribe = doc.subscribe('auth-error', (event) => {
 This subscription allows you to monitor when token refreshes occur due to authentication errors.  
 For more information about `Auth Webhook`, please refer to the [Auth Webhook](/docs/security#auth-webhook).
 
-##### Document.subscribe('all')
+**Document.subscribe('all')**
 
-You can subscribe to all events occurring in the document by using `document.subscribe('all', callback)`. This is used for displaying events in [Devtools extension](/docs/devtools).
-
-Events received from the callback function are of type `TransactionEvent`, which is an `Array<DocEvent>`. TransactionEvent represents a collection of events occurring within a single transaction (e.g., `doc.update()`).
+Subscribe to all document events. Used for [Devtools extension](/docs/devtools).
 
 ```javascript
 const unsubscribe = doc.subscribe('all', (transactionEvent) => {
@@ -505,42 +499,134 @@ const unsubscribe = doc.subscribe('all', (transactionEvent) => {
 });
 ```
 
-#### Changing Synchronization Mode
+#### Custom CRDT Types
 
-To change the synchronization mode for a document, you can use `client.changeSyncMode(doc, syncMode)`.
+Specialized data types for collaborative applications. Created in `document.update()` callbacks.
 
-Yorkie offers four SyncModes:
+**Text**
 
-- `SyncMode.Realtime`: Local changes are automatically pushed to the server, and remote changes are pulled from the server.
-
-- `SyncMode.RealtimePushOnly`: Only local changes are pushed, and remote changes are not pulled.
-
-- `SyncMode.RealtimeSyncOff`: Changes are not synchronized, but the watch stream remains active.
-
-- `SyncMode.Manual`: Synchronization no longer occurs in real-time, and the watch stream is disconnected. Manual handling is required for synchronization.
+Supports collaborative text editing with styling attributes:
 
 ```javascript
-// Enable automatic synchronization of both local and remote changes.
-await client.changeSyncMode(doc, SyncMode.Realtime);
-
-// Only push local changes automatically.
-await client.changeSyncMode(doc, SyncMode.RealtimePushOnly);
-
-// Synchronization turned off, but the watch stream remains active.
-await client.changeSyncMode(doc, SyncMode.RealtimeSyncOff);
-
-// Synchronization turned off, and the watch stream is disconnected.
-await client.changeSyncMode(doc, SyncMode.Manual);
-await client.sync(doc); // Trigger synchronization manually using the sync function.
+doc.update((root) => {
+  root.text = new yorkie.Text();            // {"text":""}
+  root.text.edit(0, 0, 'hello');            // {"text":"hello"}
+  root.text.edit(0, 1, 'H');                // {"text":"Hello"}
+  root.text.setStyle(0, 1, { bold: true }); // {"text":"<b>H</b>ello"}
+});
 ```
 
-#### Managing Document Revisions
+**Selection using presence**
 
-Yorkie provides revision management capabilities that allow you to save snapshots of your document at specific points in time, browse through document history, and restore previous versions. This is useful for implementing features like version control, or audit trails in your collaborative applications.
+Share text selection using presence instead of storing it permanently. Convert `index` to `position` for `Yorkie.Text`:
 
-##### Creating a Revision
+```javascript
+// Update selection through text editing
+codemirror.on('beforeChange', (cm, change) => {
+  doc.update((root, presence) => {
+    const range = root.content.edit(from, to, content); // return updated index range
+    presence.set({
+      selection: root.content.indexRangeToPosRange(range), // update presence
+    });
+  });
+});
 
-You can create a revision (snapshot) of the current document state using `client.createRevision()`. A revision captures the entire document state at the moment of creation.
+// Update selection using mouse or keyboard
+codemirror.on('beforeSelectionChange', (cm, change) => {
+  const fromIdx = cm.indexFromPos(change.ranges[0].anchor);
+  const toIdx = cm.indexFromPos(change.ranges[0].head);
+  doc.update((root, presence) => {
+    presence.set({
+      selection: root.content.indexRangeToPosRange([fromIdx, toIdx]), // update presence
+    });
+  });
+});
+```
+
+- When applying other user's selection changes:
+
+```javascript
+doc.subscribe('others', (event) => {
+  if (event.type === 'presence-changed') {
+    const { clientID, presence } = event.value;
+    const range = doc.getRoot().content.posRangeToIndexRange(presence.selection);
+    // Handle the updated selection in the editor
+  }
+});
+```
+
+Examples:
+- [CodeMirror example](https://github.com/yorkie-team/yorkie-js-sdk/blob/main/examples/vanilla-codemirror6)
+- [Quill example](https://github.com/yorkie-team/yorkie-js-sdk/blob/main/examples/vanilla-quill)
+
+**Counter**
+
+Supports integer operations with concurrent modifications:
+
+```javascript
+doc.update((root) => {
+  root.counter = new yorkie.Counter(yorkie.IntType, 1); // {"counter":1}
+  root.counter.increase(2);                             // {"counter":3}
+  root.counter.increase(3);                             // {"counter":6}
+  root.counter.increase(-4);                            // {"counter":2}
+});
+```
+
+#### TypeScript Support
+
+To use the Document more strictly, you can use [type variable](https://www.typescriptlang.org/docs/handbook/2/generics.html) in TypeScript when creating a Document.
+
+```typescript
+import yorkie, { JSONArray } from '@yorkie-js/sdk';
+type DocType = {
+  list: JSONArray<number>;
+  text: yorkie.Text;
+};
+type PresenceType = {
+  username: string;
+  color: string;
+};
+
+const doc = new yorkie.Document<DocType, PresenceType>('key');
+await client.attach(doc, {
+  initialPresence: {
+    username: 'alice',
+    color: 'blue',
+  },
+});
+doc.update((root, presence) => {
+  root.list = [1, 2, 3];
+  root.text = new yorkie.Text();
+  presence.set({ color: 'red' });
+});
+```
+
+#### Document Limits
+
+Yorkie enforces the following limits for system stability and performance. Configure these in the Dashboard's Project Settings.
+
+| Limit | Description | Default Behavior |
+|-------|-------------|------------------|
+| **Max Attachments** | Maximum clients that can attach to a document simultaneously | Failed attachments require manual retry |
+| **Max Subscribers** | Maximum clients that can maintain subscription streams | SDK auto-retries (1/sec) when limit reached |
+| **Max Document Size** | Maximum allowed document size on attachment | Local updates exceeding limit are rejected |
+
+**Understanding Document Size**
+
+A document's size includes both visible content and CRDT metadata for synchronization. The actual size may exceed what you see in the editor.
+
+- **Local updates** that exceed the size limit are rejected and not pushed to the server
+- **Remote updates** are always applied to ensure state convergence across clients
+
+Tip: Monitor connection status using `Document.subscribe('connection')` to detect when limits are reached.
+
+#### Document Revisions
+
+Save snapshots of your document at specific points in time, browse history, and restore previous versions.
+
+**Creating a Revision**
+
+Create a revision using `client.createRevision()`:
 
 ```javascript
 // Create a revision with a label
@@ -563,9 +649,9 @@ Parameters:
 Revisions are stored on the server and can be accessed by any client with access to the document. They persist independently of the document's current state.
 </Alert>
 
-##### Listing Revisions
+**Listing Revisions**
 
-Retrieve a list of all revisions for a document using `client.listRevisions()`. This returns an array of revision summaries containing metadata about each revision.
+List all revisions using `client.listRevisions()`:
 
 ```javascript
 // Get the first 50 revisions (newest first)
@@ -600,9 +686,9 @@ Each revision summary includes:
 - `createdAt`: Timestamp when the revision was created
 - `serverSeq`: Server sequence number at the time of revision creation
 
-##### Getting Revision Details
+**Getting Revision Details**
 
-Get detailed information about a specific revision, including its full snapshot data, using `client.getRevision()`:
+Get detailed information using `client.getRevision()`:
 
 ```javascript
 // Get a specific revision by ID
@@ -621,15 +707,9 @@ The returned revision object contains:
 The snapshot contains the full document data as it existed when the revision was created. This data can be used for comparison, preview, or restoration purposes.
 </Alert>
 
-##### Parsing YSON Snapshots
+**Parsing YSON Snapshots**
 
-Revision snapshots are stored in YSON (Yorkie JSON) format, which is Yorkie's internal representation of document data. The JS SDK provides a `YSON` parser that allows you to parse these snapshots and convert them to usable data structures in your application.
-
-This is particularly useful when you need to:
-- Display a preview of a revision's content
-- Compare different revisions
-- Extract specific data from historical snapshots
-- Convert Yorkie data types (like Text) to plain strings
+Revision snapshots are in YSON (Yorkie JSON) format. Use the `YSON` parser to convert them to usable data structures:
 
 ```javascript
 import { YSON } from '@yorkie-js/sdk';
@@ -699,9 +779,9 @@ if (revision.snapshot) {
 The YSON parser is designed to handle Yorkie's internal data structures. If you're working with standard Document data, you may also consider using the `toJS()` method on the live document for a simpler conversion to plain JavaScript objects.
 </Alert>
 
-##### Restoring a Revision
+**Restoring a Revision**
 
-Restore the document to a previous revision using `client.restoreRevision()`. This replaces the current document state with the state from the specified revision.
+Restore a document to a previous revision using `client.restoreRevision()`:
 
 ```javascript
 // Restore to a specific revision
@@ -712,9 +792,7 @@ await client.sync();
 ```
 
 <Alert status="warning">
-Restoring a revision replaces the entire current document state with the revision's snapshot. This operation cannot be undone automatically, so consider creating a new revision before restoring to preserve the current state if needed.
-
-All clients currently attached to the document will receive the restored state through their sync mechanisms.
+Restoring replaces the entire document state and cannot be undone automatically. Consider creating a new revision before restoring to preserve the current state.
 </Alert>
 
 **Example workflow:**
@@ -734,153 +812,12 @@ await client.restoreRevision(doc, v1.id);
 await client.sync();
 ```
 
-#### Detaching the Document
-
-If the document is no longer used, it should be detached to increase the efficiency of GC removing [CRDT tombstones](https://crdt.tech/glossary). For more information about GC, please refer to [Garbage Collection](https://github.com/yorkie-team/yorkie/blob/main/design/garbage-collection.md).
-
-```javascript
-await client.detach(doc);
-```
-
-##### Project-level Remove on Detach Setting
-
-The `Remove on Detach` setting is a project-level configuration that enforces server-side removal when a detach leaves the document with zero attached clients. It automatically applies to all documents in the project
-
-#### Document Limits
-
-Yorkie enforces certain limits on document operations to ensure system stability and optimal performance. These limits can be configured through the Yorkie Dashboard's Project Settings.
-
-<Alert status="info">
-When you modify limit settings in the dashboard, the changes may take up to 10 minutes to be applied across all servers due to caching. During this period, different servers might temporarily have different limit values.
-</Alert>
-
-
-##### Max Attachments per Document
-When you attach a document, the server keeps track of the number of clients subscribed to it. The `Max Attachments per Document` setting determines how many clients can be attached to a single document simultaneously. If a client attempts to attach when this limit is reached, the server will reject the attachment with an error.
-
-If the attachment fails due to the limit, the client will need to retry the attachment by either reloading the SDK or calling `attach` again, as there is no automatic retry mechanism. 
-
-##### Max Subscribers per Document
-When a client attaches to a document, it creates a subscription stream to receive real-time updates. The `Max Subscribers per Document` setting determines how many clients can maintain subscription streams simultaneously for a single document. If a client attempts to create a subscription stream when this limit is reached, the server will reject the request.
-
-Unlike attachment limits, the SDK automatically handles subscription limit errors by retrying the connection (1 retry per second).
-
-<Alert status="info">
-When the subscription limit is exceeded, you can monitor the connection status through the `Document.subscribe('connection')` callback. The SDK will receive a `StreamConnectionStatus.Disconnected` event, indicating that the watch stream is disconnected.
-
-```javascript
-doc.subscribe('connection', (event) => {
-  if (event.value === StreamConnectionStatus.Disconnected) {
-    // The connection is disconnected due to subscription limit or other issues
-    console.log('Watch stream disconnected, retrying automatically...');
-  }
-});
-```
-</Alert>
-
-##### Max Document Size Limit
-When a client attaches to a document, the maximum allowed size is determined by the `maxSizePerDocument` setting of the associated project. This limit is evaluated at each attachment, so the same document may be subject to different size constraints depending on the client's project configuration.
-
-A document’s size consists of two main components: **live data** and **garbage-collected (GC) data**. Each of these includes both **content data** (e.g., visible text or structured objects) and **meta data** (e.g., CRDT metadata for synchronization and conflict resolution). As a result, the actual document size may exceed what is visibly rendered in the editor.  
-For a breakdown of how data size is measured, see [resource.ts](https://github.com/yorkie-team/yorkie-js-sdk/blob/main/packages/sdk/src/util/resource.ts).
-
-The size limit is strictly enforced during local updates. If an update causes the document to exceed the limit, it is rejected locally and **not pushed to the server**.
-
-However, **remote updates are not subject to this limit** and are always applied, regardless of size. This ensures **state convergence** across clients—a critical requirement for distributed collaborative systems.
-
-Garbage-collected data is automatically reduced over time through system-managed garbage collection. While manual GC is not exposed, the system triggers GC under certain conditions. For instance, clients that remain inactive beyond the configured *Client Deactivate Threshold* are automatically deactivated, improving GC efficiency and reducing document GC size over time.  
-For details on GC and housekeeping, refer to the [housekeeping design document](https://github.com/yorkie-team/yorkie/blob/main/design/housekeeping.md).
-
-#### Custom CRDT types
-
-Custom CRDT types are data types that can be used for special applications such as text editors and counters, unlike general JSON data types such as `Object` and `Array`. Custom CRDT types can be created in the callback function of `document.update`.
-
-##### Text
-
-`Text` provides supports for collaborative text editing. In addition, contents in `Text` can have attributes; for example, characters can be bold, italic, or underlined.
-
-```javascript
-doc.update((root) => {
-  root.text = new yorkie.Text();            // {"text":""}
-  root.text.edit(0, 0, 'hello');            // {"text":"hello"}
-  root.text.edit(0, 1, 'H');                // {"text":"Hello"}
-  root.text.setStyle(0, 1, { bold: true }); // {"text":"<b>H</b>ello"}
-});
-```
-
-##### Selection using presence
-
-The temporary client information, such as text selection, does not need to be stored in the document permanently.
-Instead, it can be effectively shared using `presence`.
-
-When transmitting text selection information, it is essential to convert the `index`, which can vary based on the text state, into the `position` used by `Yorkie.Text`.
-This converted position selection can then be sent and applied through presence.
-
-Here is an example where presence is used to share text selection between users in CodeMirror editor.
-
-- When the text selection is changed:
-
-```javascript
-// Update selection through text editing
-codemirror.on('beforeChange', (cm, change) => {
-  doc.update((root, presence) => {
-    const range = root.content.edit(from, to, content); // return updated index range
-    presence.set({
-      selection: root.content.indexRangeToPosRange(range), // update presence
-    });
-  });
-});
-
-// Update selection using mouse or keyboard
-codemirror.on('beforeSelectionChange', (cm, change) => {
-  const fromIdx = cm.indexFromPos(change.ranges[0].anchor);
-  const toIdx = cm.indexFromPos(change.ranges[0].head);
-  doc.update((root, presence) => {
-    presence.set({
-      selection: root.content.indexRangeToPosRange([fromIdx, toIdx]), // update presence
-    });
-  });
-});
-```
-
-- When applying other user's selection changes:
-
-```javascript
-doc.subscribe('others', (event) => {
-  if (event.type === 'presence-changed') {
-    const { clientID, presence } = event.value;
-    const range = doc.getRoot().content.posRangeToIndexRange(presence.selection);
-    // Handle the updated selection in the editor
-  }
-});
-```
-
-Text selection can be efficiently shared using presence.
-Please refer to the following example for a complete code:
-
-- An example of Text co-editing with CodeMirror: [CodeMirror example](https://github.com/yorkie-team/yorkie-js-sdk/blob/main/examples/vanilla-codemirror6)
-- An example of Text co-editing with Quill: [Quill example](https://github.com/yorkie-team/yorkie-js-sdk/blob/main/examples/vanilla-quill)
-
-##### Counter
-
-`Counter` supports integer types changing with addition and subtraction. If an integer data needs to be modified simultaneously, `Counter` should be used instead of primitives.
-
-```javascript
-doc.update((root) => {
-  root.counter = new yorkie.Counter(yorkie.IntType, 1); // {"counter":1}
-  root.counter.increase(2);                             // {"counter":3}
-  root.counter.increase(3);                             // {"counter":6}
-  root.counter.increase(-4);                            // {"counter":2}
-});
-```
 
 #### History (Undo/Redo)
 
-Yorkie provides built-in undo/redo functionality for all document changes. This allows users to revert or reapply changes made to the document, making it ideal for collaborative editors and applications requiring change history.
+Built-in undo/redo for all document changes.
 
-##### Basic Usage
-
-You can undo and redo changes using the `document.history` API:
+**Basic Usage**
 
 ```javascript
 doc.update((root) => {
@@ -897,9 +834,7 @@ doc.history.redo();
 console.log(doc.getRoot().text.toString()); // "Hello"
 ```
 
-##### Checking Undo/Redo Availability
-
-Before calling `undo()` or `redo()`, you can check if these operations are available:
+**Checking Availability**
 
 ```javascript
 doc.update((root) => {
@@ -915,9 +850,9 @@ console.log(doc.history.canUndo()); // false
 console.log(doc.history.canRedo()); // true
 ```
 
-##### Redo Stack Behavior
+**Redo Stack Behavior**
 
-When you make a new change after undoing, the redo stack is automatically cleared:
+New changes after undo clear the redo stack:
 
 ```javascript
 doc.update((root) => {
@@ -938,7 +873,7 @@ doc.update((root) => {
 console.log(doc.history.canRedo()); // false
 ```
 
-##### Supported Operations
+**Supported Operations**
 
 History supports all CRDT types and operations including:
 - **Text**: edit operations (setStyle support is under development)
@@ -961,11 +896,9 @@ doc.history.redo(); // Redoes 'Task 2' push
 console.log(doc.getRoot().todos.toJS()); // ['Task 1', 'Task 2']
 ```
 
+**Limitations**
 
-
-##### Limitations
-
-- **Maximum Stack Depth**: The undo/redo stacks maintain a maximum of 50 changes each. Older changes are automatically removed when the limit is reached.
+- **Maximum Stack Depth**: 50 changes per stack.
 - **Not Available During Update**: You cannot call `undo()` or `redo()` inside a `doc.update()` callback.
 
 ```javascript
@@ -974,46 +907,17 @@ doc.update((root) => {
 });
 ```
 
-- **Local Only**: History tracks only local changes. Remote changes from other clients are applied but are not added to the undo/redo stacks. This means undo/redo operations only affect your own editing history and seamlessly integrate with changes from other users without conflicts.
+- **Local Only**: History tracks only local changes. Remote changes are applied but not added to undo/redo stacks.
 
 <Alert status="info">
-When you undo or redo, Yorkie intelligently applies only your changes while preserving modifications made by other collaborators. This ensures conflict-free collaboration where each user can independently manage their own editing history.
+Undo/redo operations only affect your own editing history and seamlessly integrate with changes from other users.
 </Alert>
 
-##### Examples
+**Examples**
 
 For complete working examples of history implementation, see:
 - [Vanilla CodeMirror6 Example](https://github.com/yorkie-team/yorkie-js-sdk/tree/main/examples/vanilla-codemirror6) - Text editor with undo/redo
 - [Whiteboard Example](https://github.com/yorkie-team/yorkie-js-sdk/blob/main/packages/sdk/public/whiteboard.html) - Visual example with history UI
-
-#### TypeScript Support
-
-To use the Document more strictly, you can use [type variable](https://www.typescriptlang.org/docs/handbook/2/generics.html) in TypeScript when creating a Document.
-
-```typescript
-import yorkie, { JSONArray } from '@yorkie-js/sdk';
-type DocType = {
-  list: JSONArray<number>;
-  text: yorkie.Text;
-};
-type PresenceType = {
-  username: string;
-  color: string;
-};
-
-const doc = new yorkie.Document<DocType, PresenceType>('key');
-await client.attach(doc, {
-  initialPresence: {
-    username: 'alice',
-    color: 'blue',
-  },
-});
-doc.update((root, presence) => {
-  root.list = [1, 2, 3];
-  root.text = new yorkie.Text();
-  presence.set({ color: 'red' });
-});
-```
 
 ### Channel
 
@@ -1052,51 +956,28 @@ Each level in the hierarchy maintains its own presence count and can be used ind
 
 **Channel Key Restrictions:**
 
-When using hierarchical channel keys, certain patterns are not allowed:
+When using hierarchical channel keys, follow these rules:
 
-1. Keys cannot start or end with a period:
-   - ❌ `.room-1`
-   - ❌ `room-1.`
-   - ❌ `.room-1.section-1.`
+| Rule | Invalid Examples | Valid Examples |
+|------|-----------------|----------------|
+| Cannot start with a period | ❌ `.room-1`<br/>❌ `.room-1.section-1` | ✅ `room-1`<br/>✅ `room-1.section-1` |
+| Cannot end with a period | ❌ `room-1.`<br/>❌ `room-1.section-1.` | ✅ `room-1`<br/>✅ `room-1.section-1` |
+| Cannot contain consecutive periods | ❌ `room-1..section-1`<br/>❌ `room..section..subsection` | ✅ `room-1.section-1`<br/>✅ `room.section.subsection` |
 
-2. Keys cannot contain consecutive periods:
-   - ❌ `room-1..section-1`
+**Distribute first-level channel keys:** Yorkie servers route channels based on the first-level key. Using the same first-level key (e.g., `app.*`) for all channels concentrates load on a single server, causing performance bottlenecks. Distribute traffic by using varied first-level keys:
+  ```javascript
+  // ✅ Good: Distributed first-level keys
+  new yorkie.Channel('game-1.room-a');
+  new yorkie.Channel('chat-1.thread-1');
+  
+  // ❌ Bad: Same first-level key
+  new yorkie.Channel('app.game-1');
+  new yorkie.Channel('app.chat-1');
+  ```
 
-3. Valid examples:
-   - ✅ `room-1`
-   - ✅ `room-1.section-1`
-   - ✅ `room-1.section-1.user-123`
+**Query channel information:** Use the [GetChannels API](/docs/web-api#post-yorkiev1adminservicegetchannels) to retrieve presence counts for specific channels and their sub-levels.
 
-<Alert status="warning">
-**Important: Distribute First-Level Channel Keys**
-
-Yorkie servers determine which server handles a channel based on a combination of your project and the first-level key of the channel. Using the same first-level key for all channels means all your channels will be managed by the same server, which can lead to performance bottlenecks and uneven load distribution.
-
-**Good practice - Distributed first-level keys:**
-```javascript
-new yorkie.Channel('game-1.room-a');
-new yorkie.Channel('game-2.room-b');
-new yorkie.Channel('chat-1.thread-1');
-new yorkie.Channel('notification-1.user-123');
-```
-
-**Bad practice - Same first-level key:**
-```javascript
-// All channels share 'app' as first level - avoid this!
-new yorkie.Channel('app.game-1');
-new yorkie.Channel('app.game-2');
-new yorkie.Channel('app.chat-1');
-new yorkie.Channel('app.notification-1');
-```
-
-Design your channel key structure to naturally distribute traffic across different first-level prefixes for optimal performance.
-</Alert>
-
-<Alert status="info">
-You can query hierarchical channel information using the [GetChannels API](/docs/web-api#post-yorkiev1adminservicegetchannels), which allows you to retrieve presence counts for specific channels and optionally include counts from all sub-levels.
-</Alert>
-
-#### Publishing and Subscribing to Messages
+#### Broadcast
 
 Channels support a pub/sub pattern for broadcasting ephemeral messages to all connected clients:
 
