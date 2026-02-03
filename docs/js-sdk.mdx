@@ -536,7 +536,7 @@ await client.sync(doc); // Trigger synchronization manually using the sync funct
 
 #### Managing Document Revisions
 
-Yorkie provides revision management capabilities that allow you to save snapshots of your document at specific points in time, browse through document history, and restore previous versions. This is useful for implementing features like version control, undo/redo functionality, or audit trails in your collaborative applications.
+Yorkie provides revision management capabilities that allow you to save snapshots of your document at specific points in time, browse through document history, and restore previous versions. This is useful for implementing features like version control, or audit trails in your collaborative applications.
 
 ##### Creating a Revision
 
@@ -717,49 +717,21 @@ Restoring a revision replaces the entire current document state with the revisio
 All clients currently attached to the document will receive the restored state through their sync mechanisms.
 </Alert>
 
-Here's a complete example of using the revision API:
+**Example workflow:**
 
 ```javascript
-// Create a client and attach a document
-const client = new yorkie.Client({
-  rpcAddr: '{{API_ADDR}}',
-  apiKey: 'xxxxxxxxxxxxxxxxxxxx',
-});
-await client.activate();
-
-const doc = new yorkie.Document('my-document');
-await client.attach(doc);
-
-// Make some changes
-doc.update((root) => {
-  root.title = 'My Document';
-  root.content = 'Initial content';
-});
-
-// Create a revision to save this state
+// Create a revision
 const v1 = await client.createRevision(doc, 'v1.0', 'Initial version');
-
-// Make more changes
-doc.update((root) => {
-  root.content = 'Updated content';
-});
-
-// Create another revision
-const v2 = await client.createRevision(doc, 'v2.0', 'Updated content');
 
 // List all revisions
 const revisions = await client.listRevisions(doc);
-console.log(`Found ${revisions.length} revisions`);
 
-// Get details of a specific revision
-const revisionDetails = await client.getRevision(doc, v1.id);
-console.log('V1.0 snapshot:', revisionDetails.snapshot);
+// Get revision details with snapshot
+const revision = await client.getRevision(doc, v1.id);
 
-// Restore to v1.0
+// Restore to a previous revision
 await client.restoreRevision(doc, v1.id);
 await client.sync();
-
-console.log('Restored to v1.0');
 ```
 
 #### Detaching the Document
@@ -901,6 +873,118 @@ doc.update((root) => {
   root.counter.increase(-4);                            // {"counter":2}
 });
 ```
+
+#### History (Undo/Redo)
+
+Yorkie provides built-in undo/redo functionality for all document changes. This allows users to revert or reapply changes made to the document, making it ideal for collaborative editors and applications requiring change history.
+
+##### Basic Usage
+
+You can undo and redo changes using the `document.history` API:
+
+```javascript
+doc.update((root) => {
+  root.text = new yorkie.Text();
+  root.text.edit(0, 0, 'Hello');
+});
+
+// Undo the last change
+doc.history.undo();
+console.log(doc.getRoot().text.toString()); // ""
+
+// Redo the undone change
+doc.history.redo();
+console.log(doc.getRoot().text.toString()); // "Hello"
+```
+
+##### Checking Undo/Redo Availability
+
+Before calling `undo()` or `redo()`, you can check if these operations are available:
+
+```javascript
+doc.update((root) => {
+  root.counter = new yorkie.Counter(yorkie.IntType, 0);
+  root.counter.increase(5);
+});
+
+console.log(doc.history.canUndo()); // true
+console.log(doc.history.canRedo()); // false
+
+doc.history.undo();
+console.log(doc.history.canUndo()); // false
+console.log(doc.history.canRedo()); // true
+```
+
+##### Redo Stack Behavior
+
+When you make a new change after undoing, the redo stack is automatically cleared:
+
+```javascript
+doc.update((root) => {
+  root.value = 1;
+});
+
+doc.update((root) => {
+  root.value = 2;
+});
+
+doc.history.undo();
+console.log(doc.history.canRedo()); // true
+
+// Making a new change clears the redo stack
+doc.update((root) => {
+  root.value = 3;
+});
+console.log(doc.history.canRedo()); // false
+```
+
+##### Supported Operations
+
+History supports all CRDT types and operations including:
+- **Text**: edit operations (setStyle support is under development)
+- **Object**: property set, delete operations
+- **Array**: push, insert, delete, move operations
+- **Counter**: increase operations
+- **Tree**: Undo/Redo support is under development
+
+```javascript
+doc.update((root) => {
+  root.todos = [];
+  root.todos.push('Task 1');
+  root.todos.push('Task 2');
+});
+
+doc.history.undo(); // Undoes 'Task 2' push
+console.log(doc.getRoot().todos.toJS()); // ['Task 1']
+
+doc.history.redo(); // Redoes 'Task 2' push
+console.log(doc.getRoot().todos.toJS()); // ['Task 1', 'Task 2']
+```
+
+
+
+##### Limitations
+
+- **Maximum Stack Depth**: The undo/redo stacks maintain a maximum of 50 changes each. Older changes are automatically removed when the limit is reached.
+- **Not Available During Update**: You cannot call `undo()` or `redo()` inside a `doc.update()` callback.
+
+```javascript
+doc.update((root) => {
+  doc.history.undo(); // ❌ Throws Error: "Undo is not allowed during an update"
+});
+```
+
+- **Local Only**: History tracks only local changes. Remote changes from other clients are applied but are not added to the undo/redo stacks. This means undo/redo operations only affect your own editing history and seamlessly integrate with changes from other users without conflicts.
+
+<Alert status="info">
+When you undo or redo, Yorkie intelligently applies only your changes while preserving modifications made by other collaborators. This ensures conflict-free collaboration where each user can independently manage their own editing history.
+</Alert>
+
+##### Examples
+
+For complete working examples of history implementation, see:
+- [Vanilla CodeMirror6 Example](https://github.com/yorkie-team/yorkie-js-sdk/tree/main/examples/vanilla-codemirror6) - Text editor with undo/redo
+- [Whiteboard Example](https://github.com/yorkie-team/yorkie-js-sdk/blob/main/packages/sdk/public/whiteboard.html) - Visual example with history UI
 
 #### TypeScript Support
 
