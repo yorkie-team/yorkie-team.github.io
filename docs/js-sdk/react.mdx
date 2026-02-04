@@ -1,0 +1,835 @@
+---
+title: 'React'
+order: 31
+---
+
+## React
+
+`@yorkie-js/react` is a React binding for the [Yorkie JS SDK](/docs/js-sdk) that provides a set of Providers and Hooks for integrating real-time collaboration into your React applications. It abstracts away the complexity of managing Yorkie Client and Document lifecycles, letting you focus on building your UI.
+
+If you're new to Yorkie with React, start with the [Getting Started with React](/docs/getting-started/with-react) guide. For low-level JS SDK details (CRDT types, subscriptions, events), refer to the [JS SDK](/docs/js-sdk) guide.
+
+`@yorkie-js/react` offers two approaches:
+1. **Providers + Hooks**: Wrap your component tree with `YorkieProvider` and `DocumentProvider` (or `ChannelProvider`) to share Yorkie instances via React context.
+2. **`useYorkieDoc`**: A standalone hook that creates and manages a Yorkie Client and Document internally, without requiring any Provider.
+
+### Installation
+
+```sh
+npm install @yorkie-js/react
+```
+
+> `@yorkie-js/react` requires **React 18 or later** as a peer dependency. Make sure to install React if you haven't already.
+> ```sh
+> npm install react react-dom
+> ```
+
+### Providers
+
+#### YorkieProvider
+
+`YorkieProvider` creates and manages a Yorkie `Client` instance. Wrap your application (or a subtree) with this provider to make the client available to all descendant components.
+
+**Props:**
+
+| Prop | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| apiKey | string | Yes | - | Project API key from the [Dashboard]({{DASHBOARD_PATH}}) |
+| rpcAddr | string | No | `https://api.yorkie.dev` | Yorkie API server address |
+| authTokenInjector | `(reason?: string) => Promise<string>` | No | undefined | Async function that returns an auth token for [Auth Webhook](/docs/security#auth-webhook) verification |
+| metadata | `Record<string, string>` | No | {} | Client metadata (e.g., `{ userID: '...' }` for MAU measurement) |
+
+**Basic usage:**
+
+```tsx
+import { YorkieProvider } from '@yorkie-js/react';
+
+function App() {
+  return (
+    <YorkieProvider
+      apiKey="your-api-key"
+      rpcAddr="{{API_ADDR}}"
+    >
+      {/* children */}
+    </YorkieProvider>
+  );
+}
+```
+
+**Auth Token integration:**
+
+Use `authTokenInjector` to provide tokens for [Auth Webhook](/docs/security#auth-webhook) verification. If a `codes.Unauthenticated` error occurs, the injector is called again with the webhook's response reason, enabling automatic token refresh.
+
+```tsx
+<YorkieProvider
+  apiKey="your-api-key"
+  rpcAddr="{{API_ADDR}}"
+  authTokenInjector={async (reason) => {
+    if (reason === 'token expired') {
+      return await refreshAccessToken();
+    }
+    return accessToken;
+  }}
+>
+  {/* children */}
+</YorkieProvider>
+```
+
+**Measuring MAU:**
+
+Set `userID` in the `metadata` prop to measure Monthly Active Users. The `userID` should be a unique identifier for each user. You can check MAU in the [Dashboard]({{DASHBOARD_PATH}}).
+
+```tsx
+<YorkieProvider
+  apiKey="your-api-key"
+  rpcAddr="{{API_ADDR}}"
+  metadata={{ userID: 'user-1234' }}
+>
+  {/* children */}
+</YorkieProvider>
+```
+
+#### DocumentProvider
+
+`DocumentProvider` attaches a Document to the client provided by `YorkieProvider` and manages its lifecycle (attach on mount, detach on unmount). It must be placed inside a `YorkieProvider`.
+
+> `DocumentProvider` handles React 18 StrictMode correctly. In development mode, StrictMode mounts effects twice, but the provider uses an internal flag to prevent duplicate `attach` calls.
+
+**Props:**
+
+| Prop | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| docKey | string | Yes | - | Unique document key |
+| initialRoot | `Record<string, any>` | No | {} | Initial values for the document root |
+| initialPresence | `Record<string, any>` | No | {} | Initial presence data for the current client |
+| enableDevtools | boolean | No | false | Enable [Devtools](/docs/devtools) integration |
+
+**Basic usage:**
+
+```tsx
+import { YorkieProvider, DocumentProvider } from '@yorkie-js/react';
+
+function App() {
+  return (
+    <YorkieProvider apiKey="your-api-key" rpcAddr="{{API_ADDR}}">
+      <DocumentProvider docKey="my-doc" initialRoot={{ todos: [] }}>
+        <TodoList />
+      </DocumentProvider>
+    </YorkieProvider>
+  );
+}
+```
+
+**initialRoot behavior:**
+
+Initial values are partially applied at the **top-level key** only (not deep merged). For each key in `initialRoot`:
+- If the key doesn't exist in the document, the value is applied.
+- If the key already exists, the entire value for that key is discarded — even if sub-properties differ.
+
+```tsx
+<DocumentProvider
+  docKey="my-doc"
+  initialRoot={{
+    title: 'Untitled',           // applied only if 'title' key doesn't exist
+    settings: { theme: 'dark' }, // applied only if 'settings' key doesn't exist
+  }}
+>
+  {/* If another client already set settings: { theme: 'light', lang: 'en' },
+      this client's settings value is discarded entirely — no deep merge occurs. */}
+</DocumentProvider>
+```
+
+This means multiple clients can safely specify `initialRoot` without overwriting each other's data. For more details, see [JS SDK: Initializing root](/docs/js-sdk#initializing-root).
+
+**initialPresence:**
+
+Set initial presence data that will be shared with other participants:
+
+```tsx
+<DocumentProvider
+  docKey="my-doc"
+  initialRoot={{ content: '' }}
+  initialPresence={{ cursor: { x: 0, y: 0 }, color: 'blue' }}
+>
+  <Editor />
+</DocumentProvider>
+```
+
+**enableDevtools:**
+
+Enable the [Devtools](/docs/devtools) extension for debugging document state:
+
+```tsx
+<DocumentProvider docKey="my-doc" enableDevtools={true}>
+  <MyApp />
+</DocumentProvider>
+```
+
+#### ChannelProvider
+
+`ChannelProvider` attaches a [Channel](/docs/js-sdk#channel) to the client provided by `YorkieProvider`. The React hooks (`useChannel`, `useChannelSessionCount`) currently expose **session count tracking** only. For channel broadcast/subscribe functionality, use the [JS SDK Channel API](/docs/js-sdk#channel) directly.
+
+> `ChannelProvider` handles React 18 StrictMode correctly. In development mode, StrictMode mounts effects twice, but the provider uses an internal flag to prevent duplicate `attach` calls.
+
+**Props:**
+
+| Prop | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| channelKey | string | Yes | - | Unique channel key (supports [hierarchical keys](/docs/js-sdk#hierarchical-channel-keys)) |
+| isRealtime | boolean | No | true | Session tracking mode |
+
+- `isRealtime={true}` (default): The session count updates automatically via a watch stream. Use this for live "users online" indicators.
+- `isRealtime={false}`: Manual mode — the watch stream is not established, so session count will not update automatically. If you need messaging (broadcast/subscribe) or manual sync, use the JS SDK channel directly and manage the lifecycle yourself. Receiving broadcast events requires a watch stream.
+
+> Channel broadcast/subscribe hooks are planned for a future release. In the meantime, use the [JS SDK Channel API](/docs/js-sdk#channel) directly for messaging (and remember to unsubscribe/detach on unmount to avoid leaks).
+
+**Basic usage:**
+
+```tsx
+import { YorkieProvider, ChannelProvider } from '@yorkie-js/react';
+
+function App() {
+  return (
+    <YorkieProvider apiKey="your-api-key" rpcAddr="{{API_ADDR}}">
+      <ChannelProvider channelKey="room-1">
+        <ChatRoom />
+      </ChannelProvider>
+    </YorkieProvider>
+  );
+}
+```
+
+### Hooks
+
+#### Document Hooks
+
+The following hooks must be used inside a `DocumentProvider`.
+
+##### useDocument
+
+`useDocument` provides full access to the document context, including root data, presences, connection status, and an update function.
+
+**TypeScript signature:**
+
+```tsx
+const {
+  root,
+  presences,
+  connection,
+  update,
+  loading,
+  error,
+} = useDocument<DocType, PresenceType>();
+```
+
+**Return values:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| root | DocType | The document's root object |
+| presences | `Array<{ clientID: string; presence: PresenceType }>` | All participating clients and their presence data |
+| connection | `StreamConnectionStatus` | Watch stream connection status (`StreamConnectionStatus.Connected` or `StreamConnectionStatus.Disconnected`). Import from `@yorkie-js/sdk`. |
+| update | (callback: (root, presence) => void) => void | Function to modify the document and/or presence |
+| loading | boolean | true while the document is being attached |
+| error | Error \| undefined | Error object if attachment failed |
+
+**Updating the document:**
+
+All mutations happen inside the `update` callback. Yorkie's proxy intercepts property assignments and array operations, converting them into CRDT operations automatically.
+
+```tsx
+import { useDocument } from '@yorkie-js/react';
+
+function Counter() {
+  const { root, update, loading, error } = useDocument<{ counter: number }>();
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error.message}</p>;
+
+  return (
+    <div>
+      <p>{root.counter}</p>
+      <button onClick={() => update((root) => (root.counter += 1))}>
+        Increment
+      </button>
+    </div>
+  );
+}
+```
+
+**Working with arrays:**
+
+Use `JSONArray` and `JSONObject` from `@yorkie-js/react` for typed collaborative arrays and objects. Inside the `update` callback, arrays support `push()`, `delete()`, `deleteByID()`, `getElementByIndex()`, and other standard operations.
+
+```tsx
+import { useDocument, JSONArray, JSONObject } from '@yorkie-js/react';
+
+interface Todo {
+  id: string;
+  text: string;
+  completed: boolean;
+}
+
+interface DocType {
+  todos: JSONArray<JSONObject<Todo>>;
+}
+
+function TodoApp() {
+  const { root, update } = useDocument<DocType>();
+
+  const addTodo = (text: string) => {
+    update((root) => {
+      root.todos.push({ id: Date.now().toString(), text, completed: false });
+    });
+  };
+
+  const toggleTodo = (index: number) => {
+    update((root) => {
+      root.todos[index].completed = !root.todos[index].completed;
+    });
+  };
+
+  const removeTodo = (index: number) => {
+    update((root) => {
+      root.todos.delete?.(index);
+    });
+  };
+
+  // ...
+}
+```
+
+For more on custom CRDT types (Text, Counter, Tree), see [JS SDK: Custom CRDT Types](/docs/js-sdk#custom-crdt-types).
+
+**Updating presence:**
+
+```tsx
+function CursorUpdater() {
+  const { update } = useDocument<MyDoc, { cursor: { x: number; y: number } }>();
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    update((root, presence) => {
+      presence.set({ cursor: { x: e.clientX, y: e.clientY } });
+    });
+  };
+
+  return <div onMouseMove={handleMouseMove}>Move your cursor</div>;
+}
+```
+
+For more on presence semantics (merging behavior, property replacement), see [JS SDK: Presence](/docs/js-sdk#presence).
+
+**Reducer pattern:**
+
+For complex state logic, you can combine `update` with a reducer-style dispatch function. This pattern works well for actions like add, toggle, and delete.
+
+```tsx
+import { useCallback } from 'react';
+import { useDocument, JSONArray, JSONObject } from '@yorkie-js/react';
+
+type Action =
+  | { type: 'ADD'; text: string }
+  | { type: 'TOGGLE'; index: number }
+  | { type: 'REMOVE'; index: number };
+
+function todoReducer(root: DocType, action: Action) {
+  switch (action.type) {
+    case 'ADD':
+      root.todos.push({ id: Date.now().toString(), text: action.text, completed: false });
+      break;
+    case 'TOGGLE':
+      root.todos[action.index].completed = !root.todos[action.index].completed;
+      break;
+    case 'REMOVE':
+      root.todos.delete?.(action.index);
+      break;
+  }
+}
+
+function TodoApp() {
+  const { root, update, loading, error } = useDocument<DocType>();
+
+  const dispatch = useCallback(
+    (action: Action) => update((root) => todoReducer(root, action)),
+    [update],
+  );
+
+  // ...
+}
+```
+
+##### useRoot
+
+`useRoot` returns only the root object from the document context. Use this instead of `useDocument` when you don't need presence or connection data, as it avoids unnecessary re-renders from presence changes.
+
+```tsx
+import { useRoot } from '@yorkie-js/react';
+
+function TodoList() {
+  const { root } = useRoot<{ todos: string[] }>();
+  return (
+    <ul>
+      {root.todos.map((todo, i) => (
+        <li key={i}>{todo}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+##### usePresences
+
+`usePresences` returns an array of all participating clients with their presence data. Each entry contains `clientID` and `presence`.
+
+> `usePresences` returns one entry per connected client (tab/device), not per unique user. A single user with multiple tabs open will appear as multiple entries.
+
+```tsx
+import React from 'react';
+import { usePresences } from '@yorkie-js/react';
+
+function PeerList() {
+  const presences = usePresences();
+  return (
+    <div>
+      <p>
+        {presences.length} {presences.length === 1 ? 'person' : 'people'} in this space
+      </p>
+      {presences.map((user, index) => (
+        <React.Fragment key={user.clientID}>
+          <span>{user.clientID.slice(-2)}</span>
+          {index < presences.length - 1 && <span>, </span>}
+        </React.Fragment>
+      ))}
+    </div>
+  );
+}
+```
+
+With typed presence data, you can build richer UI such as avatar lists:
+
+```tsx
+function AvatarList() {
+  const users = usePresences<{ name: string; color: string }>();
+  return (
+    <div>
+      {users.map((user) => (
+        <span
+          key={user.clientID}
+          style={{ backgroundColor: user.presence.color }}
+        >
+          {user.presence.name}
+        </span>
+      ))}
+    </div>
+  );
+}
+```
+
+##### useConnection
+
+`useConnection` returns the current watch stream connection status. You can use `StreamConnectionStatus` from `@yorkie-js/sdk` for type-safe comparisons.
+
+```tsx
+import { useConnection } from '@yorkie-js/react';
+import { StreamConnectionStatus } from '@yorkie-js/sdk';
+
+function ConnectionBadge() {
+  const connection = useConnection();
+  return (
+    <span>
+      {connection === StreamConnectionStatus.Connected ? 'Online' : 'Offline'}
+    </span>
+  );
+}
+```
+
+This is useful for conditionally disabling UI elements when the connection is lost:
+
+```tsx
+function SaveButton() {
+  const connection = useConnection();
+  return (
+    <button disabled={connection === StreamConnectionStatus.Disconnected}>
+      Save
+    </button>
+  );
+}
+```
+
+#### Channel Hooks
+
+The following hooks must be used inside a `ChannelProvider`.
+
+##### useChannel
+
+`useChannel` provides access to the channel's session count, loading state, and error.
+
+```tsx
+import { useChannel } from '@yorkie-js/react';
+
+function RoomStatus() {
+  const { sessionCount, loading, error } = useChannel();
+
+  if (loading) return <p>Connecting to room...</p>;
+  if (error) return <p>Error: {error.message}</p>;
+
+  return <p>{sessionCount} sessions online</p>;
+}
+```
+
+| Property | Type | Description |
+|----------|------|-------------|
+| sessionCount | number | Number of clients currently connected to the channel |
+| loading | boolean | `true` while the channel is being attached |
+| error | Error \| undefined | Error object if attachment failed |
+
+> `sessionCount` is session-based, not unique-user-based. A single user with multiple tabs open will be counted as multiple sessions.
+
+##### useChannelSessionCount
+
+`useChannelSessionCount` returns only the session count as a `number`. Use this when you don't need loading/error states.
+
+```tsx
+import { useChannelSessionCount } from '@yorkie-js/react';
+
+function OnlineBadge() {
+  const sessionCount = useChannelSessionCount();
+  return (
+    <span className="badge">
+      {sessionCount} online
+    </span>
+  );
+}
+```
+
+#### Standalone Hook
+
+##### useYorkieDoc
+
+`useYorkieDoc` is a self-contained hook that creates its own Yorkie Client and Document without requiring `YorkieProvider` or `DocumentProvider`. It handles the full lifecycle (activate, attach, detach, deactivate) internally.
+
+**Signature:**
+
+```tsx
+const { root, update, loading, error } = useYorkieDoc<DocType>(
+  apiKey: string,
+  docKey: string,
+  options?: {
+    rpcAddr?: string;
+    initialRoot?: Record<string, any>;
+    enableDevtools?: boolean;
+  }
+);
+```
+
+**When to use:**
+- Isolated features that don't share a client with the rest of the app
+- Micro frontends or embeddable widgets
+- Quick prototyping without setting up providers
+
+**Example:**
+
+```tsx
+import { useYorkieDoc } from '@yorkie-js/react';
+
+function StandaloneCounter() {
+  const { root, update, loading, error } = useYorkieDoc<{ counter: number }>(
+    'your-api-key',
+    'standalone-counter',
+    { initialRoot: { counter: 0 } },
+  );
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error.message}</p>;
+
+  return (
+    <div>
+      <p>{root.counter}</p>
+      <button onClick={() => update((root) => (root.counter += 1))}>
+        Increment
+      </button>
+    </div>
+  );
+}
+```
+
+**Provider approach vs `useYorkieDoc`:**
+
+| | Provider + Hooks | `useYorkieDoc` |
+|---|---|---|
+| Client sharing | Single client shared across the tree | Each hook creates its own client |
+| Multiple documents | Multiple `DocumentProvider`s under one `YorkieProvider` | One document per hook call |
+| Lifecycle management | Provider handles attach/detach | Hook handles everything internally |
+| Best for | App-wide collaboration, multiple documents | Isolated features, widgets, prototypes |
+
+### Performance Optimization
+
+#### createDocumentSelector
+
+By default, hooks like `useDocument` re-render on every document change. When your component only needs a small slice of the document, use `createDocumentSelector` to subscribe to specific parts and avoid unnecessary re-renders.
+
+`createDocumentSelector` is a factory function that creates a selector hook scoped to your document's types:
+
+```tsx
+import { createDocumentSelector } from '@yorkie-js/react';
+
+// Create a typed selector hook
+const useDocumentSelector = createDocumentSelector<{ counter: number }>();
+```
+
+Then use it in your components to select only the data you need:
+
+```tsx
+function CounterDisplay() {
+  // Only re-renders when root.counter changes
+  const { counter } = useDocumentSelector(({ root }) => ({
+    counter: root.counter,
+  }));
+
+  return <div>{counter}</div>;
+}
+
+function IncrementButton() {
+  // Only re-renders when update or connection changes
+  const { update, connection } = useDocumentSelector(
+    ({ update, connection }) => ({ update, connection }),
+  );
+
+  return (
+    <button
+      disabled={connection === 'disconnected'}
+      onClick={() => update((root) => (root.counter += 1))}
+    >
+      Increment
+    </button>
+  );
+}
+```
+
+The selector receives the full document state (`{ root, presences, connection, update, loading, error }`) and returns the slice you need. The component only re-renders when the selected value changes.
+
+**Selector cost:**
+
+Selectors run on every document update, even if the selected value doesn't change. Keep selectors lightweight and prefer returning small derived values (e.g., counts, IDs, or primitive fields) to minimize work.
+
+#### shallowEqual
+
+When your selector returns a new object on every call, React's default reference equality (`===`) will always detect a change and trigger a re-render. Use `shallowEqual` as the equality function to compare object properties shallowly:
+
+```tsx
+import { createDocumentSelector, shallowEqual } from '@yorkie-js/react';
+
+const useDocumentSelector = createDocumentSelector<MyDocType>();
+
+function MyComponent() {
+  const { title, count } = useDocumentSelector(
+    ({ root }) => ({ title: root.title, count: root.count }),
+    shallowEqual,
+  );
+
+  return <p>{title}: {count}</p>;
+}
+```
+
+#### Re-render minimization tips
+
+- **`useRoot` vs `useDocument`**: If you only need the root data, use `useRoot` to avoid re-renders triggered by presence or connection changes.
+- **Selector for fine-grained subscriptions**: Use `createDocumentSelector` to subscribe to specific fields instead of the entire document.
+- **Avoid returning mutable objects**: If a selector returns a mutable object/array that keeps the same reference, changes inside it may not trigger a re-render. Prefer primitives or derived values, or provide a custom equality function if needed.
+- **Separate components by concern**: Split presence display and document content into separate components so that presence updates don't re-render your content view.
+
+```tsx
+// Presence changes won't re-render ContentView
+function ContentView() {
+  const { root } = useRoot<MyDoc>();
+  return <div>{root.content}</div>;
+}
+
+// Document changes won't re-render PresenceView
+function PresenceView() {
+  const users = usePresences<MyPresence>();
+  return <AvatarStack users={users} />;
+}
+```
+
+### TypeScript Usage
+
+Define interfaces for your document root and presence, then pass them as generics to providers and hooks for end-to-end type safety:
+
+```tsx
+import {
+  YorkieProvider,
+  DocumentProvider,
+  useDocument,
+  useRoot,
+  usePresences,
+  createDocumentSelector,
+  shallowEqual,
+} from '@yorkie-js/react';
+
+// Define your types
+interface MyDoc {
+  title: string;
+  items: Array<{ id: string; text: string; done: boolean }>;
+}
+
+interface MyPresence {
+  name: string;
+  color: string;
+  cursor: { x: number; y: number };
+}
+
+// Use generics with hooks
+function ItemList() {
+  const { root, update } = useDocument<MyDoc, MyPresence>();
+  // root.title is typed as string
+  // root.items is typed as Array<{ id, text, done }>
+  return (
+    <ul>
+      {root.items.map((item) => (
+        <li key={item.id}>
+          <input
+            type="checkbox"
+            checked={item.done}
+            onChange={() =>
+              update((root) => {
+                const target = root.items.find((i) => i.id === item.id);
+                if (target) target.done = !target.done;
+              })
+            }
+          />
+          {item.text}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+// Use generics with createDocumentSelector
+const useSelector = createDocumentSelector<MyDoc, MyPresence>();
+
+function Header() {
+  const { title } = useSelector(
+    ({ root }) => ({ title: root.title }),
+    shallowEqual,
+  );
+  return <h1>{title}</h1>;
+}
+
+// Use generics with usePresences
+function CursorOverlay() {
+  const users = usePresences<MyPresence>();
+  return (
+    <>
+      {users.map((user) => (
+        <div
+          key={user.clientID}
+          style={{
+            position: 'absolute',
+            left: user.presence.cursor.x,
+            top: user.presence.cursor.y,
+            backgroundColor: user.presence.color,
+          }}
+        >
+          {user.presence.name}
+        </div>
+      ))}
+    </>
+  );
+}
+
+// Wire it all together
+function App() {
+  return (
+    <YorkieProvider apiKey="your-api-key" rpcAddr="{{API_ADDR}}">
+      <DocumentProvider
+        docKey="my-doc"
+        initialRoot={{ title: 'Untitled', items: [] }}
+        initialPresence={{ name: 'Anonymous', color: '#000', cursor: { x: 0, y: 0 } }}
+      >
+        <Header />
+        <ItemList />
+        <CursorOverlay />
+      </DocumentProvider>
+    </YorkieProvider>
+  );
+}
+```
+
+### Advanced Patterns
+
+#### Multiple Documents
+
+A single `YorkieProvider` can host multiple `DocumentProvider` instances. Each document is independently attached and managed:
+
+```tsx
+function Dashboard() {
+  return (
+    <YorkieProvider apiKey="your-api-key" rpcAddr="{{API_ADDR}}">
+      <DocumentProvider docKey="dashboard-settings" initialRoot={{ theme: 'light' }}>
+        <SettingsPanel />
+      </DocumentProvider>
+      <DocumentProvider docKey="dashboard-data" initialRoot={{ widgets: [] }}>
+        <WidgetGrid />
+      </DocumentProvider>
+    </YorkieProvider>
+  );
+}
+```
+
+#### Document + Channel Together
+
+Combine `DocumentProvider` for persistent collaborative data with `ChannelProvider` for ephemeral real-time features.
+
+> Both `DocumentProvider` and `ChannelProvider` automatically detach their resources when unmounted. You can safely use conditional rendering or route-based mounting to control when documents and channels are active.
+
+```tsx
+function CollaborativeEditor() {
+  return (
+    <YorkieProvider apiKey="your-api-key" rpcAddr="{{API_ADDR}}">
+      {/* Persistent document for collaborative editing */}
+      <DocumentProvider docKey="editor-doc" initialRoot={{ content: '' }}>
+        <Editor />
+      </DocumentProvider>
+
+      {/* Ephemeral channel for chat and online count */}
+      <ChannelProvider channelKey="editor-room" isRealtime={true}>
+        <ChatPanel />
+        <OnlineCounter />
+      </ChannelProvider>
+    </YorkieProvider>
+  );
+}
+
+function OnlineCounter() {
+  const { sessionCount } = useChannel();
+  return <span>{sessionCount} online</span>;
+}
+```
+
+### Examples
+
+The [yorkie-js-sdk repository](https://github.com/yorkie-team/yorkie-js-sdk/tree/main/examples) contains React and Next.js examples that demonstrate various use cases:
+
+**React examples:**
+
+| Example | Description | Key APIs |
+|---------|-------------|----------|
+| [react-todomvc](https://github.com/yorkie-team/yorkie-js-sdk/tree/main/examples/react-todomvc) | TodoMVC with collaborative editing | `useYorkieDoc`, `JSONArray`, reducer pattern |
+| [react-document-limit](https://github.com/yorkie-team/yorkie-js-sdk/tree/main/examples/react-document-limit) | Counter with document selector pattern | `createDocumentSelector`, `useConnection`, `usePresences` |
+| [react-flow](https://github.com/yorkie-team/yorkie-js-sdk/tree/main/examples/react-flow) | Collaborative node/edge graph editor | `useDocument`, `JSONArray`, complex CRDT mutations |
+| [react-tldraw](https://github.com/yorkie-team/yorkie-js-sdk/tree/main/examples/react-tldraw) | Collaborative whiteboard with undo/redo | Direct SDK usage, presence for cursors, history API |
+
+**Next.js examples:**
+
+| Example | Description | Key APIs |
+|---------|-------------|----------|
+| [nextjs-todolist](https://github.com/yorkie-team/yorkie-js-sdk/tree/main/examples/nextjs-todolist) | Collaborative todo list with presence avatars | `YorkieProvider`, `DocumentProvider`, `useDocument` |
+| [nextjs-presence](https://github.com/yorkie-team/yorkie-js-sdk/tree/main/examples/nextjs-presence) | Multi-room presence tracking with session counts | `ChannelProvider`, `useChannel`, `useChannelSessionCount` |
+| [nextjs-scheduler](https://github.com/yorkie-team/yorkie-js-sdk/tree/main/examples/nextjs-scheduler) | Collaborative calendar with event scheduling | Direct SDK usage, `JSONArray`, presence events |
+
+### Reference
+
+- [JS SDK API Reference](https://yorkie.dev/yorkie-js-sdk/api-reference/)
+- [Getting Started with React](/docs/getting-started/with-react)
+- [JS SDK Guide](/docs/js-sdk)
