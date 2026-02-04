@@ -964,18 +964,30 @@ When using hierarchical channel keys, follow these rules:
 | Cannot end with a period | ❌ `room-1.`<br/>❌ `room-1.section-1.` | ✅ `room-1`<br/>✅ `room-1.section-1` |
 | Cannot contain consecutive periods | ❌ `room-1..section-1`<br/>❌ `room..section..subsection` | ✅ `room-1.section-1`<br/>✅ `room.section.subsection` |
 
-**Distribute first-level channel keys:** Yorkie servers route channels based on the first-level key. Using the same first-level key (e.g., `app.*`) for all channels concentrates load on a single server, causing performance bottlenecks. Distribute traffic by using varied first-level keys:
+**Query channel information:** Use the [GetChannels API](/docs/web-api#post-yorkiev1adminservicegetchannels) to retrieve presence counts for specific channels and their sub-levels.
+
+<Alert status="warning">
+**Important: Distribute First-Level Channel Keys**
+
+Yorkie servers determine which server handles a channel based on a combination of your project and the first-level key of the channel. Using the same first-level key for all channels means all your channels will be managed by the same server, which can lead to performance bottlenecks and uneven load distribution.
+
+Design your channel key structure to naturally distribute traffic across different first-level prefixes for optimal performance.
+
   ```javascript
   // ✅ Good: Distributed first-level keys
   new yorkie.Channel('game-1.room-a');
   new yorkie.Channel('chat-1.thread-1');
+  new yorkie.Channel('chat-1.thread-1');
+  new yorkie.Channel('notification-1.user-123');
   
   // ❌ Bad: Same first-level key
+  // All channels share 'app' as first level - avoid this!
   new yorkie.Channel('app.game-1');
+  new yorkie.Channel('app.game-2');
   new yorkie.Channel('app.chat-1');
+  new yorkie.Channel('app.notification-1');
   ```
-
-**Query channel information:** Use the [GetChannels API](/docs/web-api#post-yorkiev1adminservicegetchannels) to retrieve presence counts for specific channels and their sub-levels.
+</Alert>
 
 #### Broadcast
 
@@ -1018,22 +1030,26 @@ await channel.broadcast('notification', { type: 'user-joined', user: 'Alice' });
 Broadcast messages are ephemeral and only delivered to clients currently connected to the channel. Messages are not persisted or stored, so clients that join later will not receive previous messages.
 </Alert>
 
-#### Tracking Online Presence
+#### Tracking Online Sessions
 
-Channels automatically track the number of connected clients, making it easy to display "users online" counters:
+Channels automatically track the number of connected clients, making it easy to display "sessions" counters:
 
 ```javascript
 // Subscribe to presence changes
 const unsubscribe = channel.subscribe('presence', (event) => {
-  console.log(`Users online: ${event.count}`);
+  console.log(`Sessions: ${event.count}`);
 });
 
-// Get the current presence count
-const count = channel.getPresenceCount();
-console.log(`Currently ${count} users online`);
+// Get the current session count
+const count = channel.getSessionCount();
+console.log(`Currently ${count} sessions`);
 ```
 
-The presence count is automatically updated when clients connect or disconnect from the channel.
+The session count is automatically updated when clients connect or disconnect from the channel.
+
+<Alert status="warning">
+Sessions are connection-based and managed for scalability. In abnormal cases (app crash, network partition), a client might not detach cleanly, so the server may keep the session counted until it is considered stale and cleaned up. This means the displayed count can be approximate and may lag briefly; avoid using it as a source of truth for critical business logic (billing, authorization, settlements).
+</Alert>
 
 #### Detaching a Channel
 
