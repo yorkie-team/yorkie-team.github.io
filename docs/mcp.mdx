@@ -1,0 +1,497 @@
+---
+title: 'MCP'
+order: 95
+phase: development
+---
+
+## MCP (Model Context Protocol)
+
+MCP integration allows AI assistants like Claude to interact with your Yorkie documents for tasks such as document migration, schema management, and structure inspection. This enables AI-powered workflows for maintaining and evolving your collaborative applications.
+
+### What is MCP?
+
+The [Model Context Protocol](https://modelcontextprotocol.io/specification) is a standard for AI assistants to interact with external tools and data sources. Yorkie's MCP integration exposes document operations as tools that AI assistants can use to help you manage your documents.
+
+### Use Cases
+
+- **Document Migration**: When you change your editor model (e.g., adding new fields to blocks), AI assistants can help discover affected documents, check migration safety, preview transformations, and generate migration scripts
+- **Schema Inference**: Analyze existing documents to suggest schema structures for validation
+- **Document Inspection**: Explore document structures and change history to understand your data
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         Yorkie Cloud Server                             │
+├─────────────────────────────────────────────────────────────────────────┤
+│  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────────┐  │
+│  │  YorkieService   │  │  AdminService    │  │  MCPService          │  │
+│  │  /yorkie.v1.     │  │  /yorkie.v1.     │  │  /mcp/               │  │
+│  │  YorkieService/  │  │  AdminService/   │  │                      │  │
+│  └──────────────────┘  └──────────────────┘  └──────────────────────┘  │
+│           ↑                    ↑                       ↑               │
+│           │                    │                       │               │
+│      API Key auth         API Key auth            API Key auth         │
+└─────────────────────────────────────────────────────────────────────────┘
+                                                         ↑
+                                                         │
+                                              Claude Desktop / AI Agents
+```
+
+The MCP service runs alongside the existing Yorkie and Admin services, sharing the same API key authentication.
+
+### Getting Started
+
+#### Prerequisites
+
+Before using MCP, ensure you have:
+1. A Yorkie project with a secret key (from [Dashboard]({{DASHBOARD_PATH}}) or via the [Admin API](/docs/admin-api))
+2. An MCP-compatible AI assistant (e.g., Claude Desktop)
+
+#### Claude Desktop Configuration
+
+Add Yorkie to your Claude Desktop configuration file:
+
+- **macOS/Linux**: `~/.config/claude/claude_desktop_config.json`
+- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+
+```json
+{
+  "mcpServers": {
+    "yorkie": {
+      "url": "{{API_ADDR}}/mcp/",
+      "headers": {
+        "Authorization": "API-Key YOUR_PROJECT_SECRET_KEY"
+      }
+    }
+  }
+}
+```
+
+Replace `YOUR_PROJECT_SECRET_KEY` with your project's secret key from the Dashboard.
+
+#### Verification
+
+After configuration, restart Claude Desktop and ask:
+
+> "What Yorkie tools do you have available?"
+
+Claude should list the available MCP tools for document inspection, schema management, and migration.
+
+### Authentication
+
+MCP uses the same API key authentication as the [Admin API](/docs/admin-api):
+
+```
+Authorization: API-Key <project-secret-key>
+```
+
+The secret key is available in the Yorkie Dashboard or can be retrieved via the Admin API.
+
+### Protocol
+
+MCP uses JSON-RPC 2.0 over HTTP. All requests are sent as POST to the `/mcp/` endpoint:
+
+```bash
+curl '{{API_ADDR}}/mcp/' \
+  -H 'Content-Type: application/json' \
+  -H 'Authorization: API-Key YOUR_PROJECT_SECRET_KEY' \
+  -d '{
+    "jsonrpc": "2.0",
+    "id": 1,
+    "method": "tools/call",
+    "params": {
+      "name": "list_documents",
+      "arguments": {"page_size": 10}
+    }
+  }'
+```
+
+### Available Tools
+
+MCP provides 10 tools organized into three categories: document inspection, schema management, and migration helpers.
+
+#### Document Inspection Tools
+
+##### list_documents
+
+List all documents in the project. Use this to discover documents that may need migration.
+
+**Parameters:**
+- `page_size` (integer, optional): Number of documents to return. Default: 20, Max: 100
+- `include_root` (boolean, optional): Include document content in response. Default: false
+
+**Response:**
+```json
+{
+  "documents": [
+    {
+      "key": "doc-001",
+      "id": "abc123",
+      "attached_clients": 0,
+      "safe_to_migrate": true,
+      "schema_key": "editor-v1",
+      "created_at": "2025-01-15T10:00:00Z",
+      "updated_at": "2025-01-15T12:30:00Z"
+    }
+  ],
+  "count": 1,
+  "project_name": "my-project"
+}
+```
+
+##### get_document
+
+Get a document's full content and metadata for migration inspection.
+
+**Parameters:**
+- `document_key` (string, required): The document key to fetch
+
+**Response:**
+```json
+{
+  "key": "doc-001",
+  "id": "abc123",
+  "root": "{\"type\":\"doc\",\"content\":[...]}",
+  "attached_clients": 0,
+  "safe_to_migrate": true,
+  "schema_key": "editor-v1",
+  "doc_size": {
+    "live": 1024,
+    "gc": 256
+  },
+  "created_at": "2025-01-15T10:00:00Z",
+  "accessed_at": "2025-01-15T14:00:00Z",
+  "updated_at": "2025-01-15T12:30:00Z"
+}
+```
+
+##### search_documents
+
+Search for documents by key pattern. Useful for finding documents that match certain criteria.
+
+**Parameters:**
+- `query` (string, required): Search query to match document keys
+- `page_size` (integer, optional): Number of results to return. Default: 20
+
+**Response:**
+```json
+{
+  "documents": [
+    {
+      "key": "blog-post-001",
+      "id": "abc123",
+      "schema_key": "blog-v1",
+      "created_at": "2025-01-15T10:00:00Z",
+      "updated_at": "2025-01-15T12:30:00Z"
+    }
+  ],
+  "total_count": 15
+}
+```
+
+##### get_document_history
+
+Get the change history of a document. Useful for understanding how the document evolved.
+
+**Parameters:**
+- `document_key` (string, required): The document key
+- `limit` (integer, optional): Maximum number of changes to return. Default: 50
+
+**Response:**
+```json
+{
+  "document_key": "doc-001",
+  "changes": [
+    {
+      "server_seq": 42,
+      "client_seq": 10,
+      "lamport": 100,
+      "message": "update content",
+      "operations_count": 3
+    }
+  ],
+  "count": 1,
+  "current_seq": 42,
+  "total_changes": 42
+}
+```
+
+#### Schema Management Tools
+
+##### list_schemas
+
+List all schemas defined in the project. Schemas define document structure validation rules.
+
+**Parameters:** None
+
+**Response:**
+```json
+{
+  "schemas": [
+    {
+      "name": "editor-v1",
+      "version": 2,
+      "created_at": "2025-01-10T08:00:00Z"
+    }
+  ],
+  "count": 1
+}
+```
+
+##### get_schema
+
+Get a schema's definition and validation rules.
+
+**Parameters:**
+- `schema_name` (string, required): Name of the schema
+- `version` (integer, optional): Schema version. Defaults to latest
+
+**Response:**
+```json
+{
+  "name": "editor-v1",
+  "version": 2,
+  "body": "{\"type\":\"object\",\"properties\":{...}}",
+  "rules": [...],
+  "created_at": "2025-01-10T08:00:00Z"
+}
+```
+
+##### infer_schema
+
+Analyze documents and suggest a schema based on their structure.
+
+**Parameters:**
+- `document_keys` (array of strings, optional): Document keys to analyze. If not provided, samples are selected automatically
+- `max_samples` (integer, optional): Max documents to analyze. Default: 5
+
+**Response:**
+```json
+{
+  "analyzed_documents": 5,
+  "field_statistics": {
+    "$.type": {
+      "path": "$.type",
+      "types": {"string": 5},
+      "occurrences": 5,
+      "required": true
+    }
+  },
+  "suggested_rules": [
+    {"path": "$.type", "type": "string"},
+    {"path": "$.content", "type": "array"}
+  ],
+  "suggested_schema": {
+    "name": "inferred-schema",
+    "version": 1,
+    "rules": [...]
+  }
+}
+```
+
+#### Migration Tools
+
+##### check_migration_safety
+
+Check if documents are safe to migrate (no active editors).
+
+**Parameters:**
+- `document_keys` (array of strings, required): List of document keys to check
+
+**Response:**
+```json
+{
+  "safe": ["doc-001", "doc-002"],
+  "safe_count": 2,
+  "unsafe": [
+    {
+      "key": "doc-003",
+      "reason": "has active editors",
+      "attached_clients": 2
+    }
+  ],
+  "unsafe_count": 1,
+  "total": 3
+}
+```
+
+##### preview_transform
+
+Preview a transformation on a document without applying (dry-run).
+
+**Parameters:**
+- `document_key` (string, required): The document key to transform
+- `operations` (array, required): List of transform operations to apply
+
+**Operations format:**
+```json
+[
+  {"op": "set", "path": "$.field", "value": "new value"},
+  {"op": "delete", "path": "$.oldField"},
+  {"op": "rename", "path": "$.oldName", "to": "newName"}
+]
+```
+
+Supported operations:
+- `set`: Set a field to a new value
+- `delete`: Remove a field
+- `rename`: Rename a field
+
+**Response:**
+```json
+{
+  "document_key": "doc-001",
+  "original": "{\n  \"type\": \"doc\",\n  ...\n}",
+  "transformed": "{\n  \"type\": \"doc\",\n  \"indent\": 0,\n  ...\n}",
+  "operations": [
+    {"op": "set", "path": "$.indent", "success": true, "error": ""}
+  ],
+  "safe_to_migrate": true,
+  "warning": ""
+}
+```
+
+##### generate_migration_code
+
+Generate migration code for transforming documents.
+
+**Parameters:**
+- `document_key` (string, optional): Sample document to base migration on
+- `operations` (array, required): Transform operations to generate code for
+- `language` (string, optional): Target language. Options: `typescript`, `go`, `curl`. Default: `typescript`
+
+**Response:**
+```json
+{
+  "language": "typescript",
+  "code": "// Yorkie Migration Script (TypeScript)\n...",
+  "operations": [...],
+  "usage": "Save this code and run with your YORKIE_SECRET_KEY environment variable set."
+}
+```
+
+### Migration Workflow
+
+Here's a typical workflow for AI-assisted document migration:
+
+#### Step 1: Discovery
+
+Ask your AI assistant to find documents that need migration:
+
+> "List all documents in my Yorkie project and show me their structure."
+
+The AI will use `list_documents` with `include_root: true` to discover your documents.
+
+#### Step 2: Analysis
+
+Inspect specific documents to understand the current structure:
+
+> "Show me the structure of document 'blog-post-001' and its change history."
+
+The AI will use `get_document` and `get_document_history` to analyze the document.
+
+#### Step 3: Schema Inference (Optional)
+
+If you need to create or update schemas:
+
+> "Analyze my documents and suggest a schema structure."
+
+The AI will use `infer_schema` to analyze document patterns and suggest validation rules.
+
+#### Step 4: Safety Check
+
+Before migration, verify no users are actively editing:
+
+> "Check if these documents are safe to migrate: blog-post-001, blog-post-002, blog-post-003"
+
+The AI will use `check_migration_safety` to identify documents with active editors.
+
+#### Step 5: Preview Transformation
+
+Test your transformation before applying:
+
+> "I want to add an 'indent' field with default value 0 to all paragraph blocks. Preview this transformation on 'blog-post-001'."
+
+The AI will use `preview_transform` to show a before/after diff without modifying the document.
+
+#### Step 6: Generate Migration Code
+
+Once satisfied with the preview, generate runnable migration scripts:
+
+> "Generate a TypeScript migration script for this transformation."
+
+The AI will use `generate_migration_code` to create a script you can run locally.
+
+#### Step 7: Execute Migration
+
+Run the generated migration script with your secret key:
+
+```bash
+YORKIE_API_URL={{API_ADDR}} \
+YORKIE_SECRET_KEY=<your-secret-key> \
+npx ts-node migration.ts
+```
+
+### Example Conversation
+
+Here's a complete example of migrating documents with AI assistance:
+
+```
+User: "I need to migrate my editor documents. I'm adding an 'indent' attribute
+       to paragraph blocks. Can you help?"
+
+AI: Let me help you with that migration. First, I'll discover your documents
+    and check their structure.
+
+    [Calls list_documents]
+
+    Found 47 documents in your project. Let me inspect one to understand the
+    current structure.
+
+    [Calls get_document("doc-001")]
+
+    I can see your documents have paragraph blocks without an indent field.
+    Let me check which documents are safe to migrate.
+
+    [Calls check_migration_safety(["doc-001", "doc-002", ...])]
+
+    45 documents are safe to migrate. 2 documents have active editors:
+    - doc-023: 1 active editor
+    - doc-041: 2 active editors
+
+    Let me preview the transformation on a safe document.
+
+    [Calls preview_transform("doc-001", [{"op": "set", "path": "$.content[*].indent", "value": 0}])]
+
+    Here's the before/after diff:
+
+    Before: {"type": "paragraph", "text": "Hello"}
+    After:  {"type": "paragraph", "text": "Hello", "indent": 0}
+
+    This looks correct. Shall I generate the migration script?
+
+User: "Yes, generate a TypeScript script."
+
+AI: [Calls generate_migration_code(operations, "typescript")]
+
+    Here's your migration script. Save it as migration.ts and run:
+
+    YORKIE_API_URL=https://api.yorkie.dev \
+    YORKIE_SECRET_KEY=<your-key> \
+    npx ts-node migration.ts
+```
+
+### Best Practices
+
+1. **Always check migration safety** before modifying documents to avoid conflicts with active editors
+2. **Preview transformations** on sample documents before generating migration code
+3. **Run migrations during low-traffic periods** when fewer users are actively editing
+4. **Keep migration scripts** for documentation and potential rollback scenarios
+5. **Test on a staging project first** before running migrations on production data
+
+### Limitations
+
+- **Read-only operations**: MCP tools inspect and analyze documents but don't directly modify them. Migrations are performed via generated scripts using the Admin API
+- **No real-time collaboration**: MCP is designed for administrative tasks, not real-time collaborative editing
+- **Path syntax**: Transform operations use simplified JSON paths (`$.field.nested`) without full JSONPath support for array wildcards
