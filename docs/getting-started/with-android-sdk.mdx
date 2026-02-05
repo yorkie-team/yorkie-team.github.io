@@ -5,7 +5,7 @@ order: 24
 
 ## Getting Started with Android SDK
 
-Welcome to Yorkie Android SDK! In this guide, we will walk you through the steps to get started with the Android SDK.
+This guide walks you through the steps to get started with the Yorkie Android SDK.
 
 ### Prerequisite
 
@@ -14,11 +14,11 @@ Welcome to Yorkie Android SDK! In this guide, we will walk you through the steps
 
 ### Using in your projects
 
-The library is published to [Maven Central](https://repo1.maven.org/maven2/dev/yorkie/yorkie-android/), so you can simply add the following line to your dependencies.
+The library is published to [Maven Central](https://repo1.maven.org/maven2/dev/yorkie/yorkie-android/), so you can add the following line to your dependencies.
 
 #### Gradle
 
-To use the Yorkie Android SDK in your project, you will need to add it as a dependency in your `build.gradle` file.
+To use the Yorkie Android SDK in your project, add it as a dependency in your `build.gradle` file.
 
 ```kotlin
 dependencies {
@@ -44,7 +44,7 @@ Add a dependency to the `<dependencies>` element.
 
 #### 1. Creating a Client with API key
 
-First, create a Client instance with API key and connect it to the yorkie server.
+First, create a Client instance with an API key and connect it to the Yorkie server.
 
 ```kotlin
 val client = Client(
@@ -83,11 +83,11 @@ scope.launch {
 }
 ```
 
-The document should be attached to the client in order to automatically synchronize it between the users participating the document.
+Attach the document to the client to automatically synchronize it between users participating in the document.
 
 #### 3. Updating the Document
 
-The created document is initially an empty object. You can create or update a key-value property you would like to share with peers using `Document.updateAsync()`.
+The document is initially an empty object. You can create or update key-value properties to share with peers using `Document.updateAsync()`.
 
 ```kotlin
 // Declare your own CoroutineScope
@@ -100,7 +100,7 @@ scope.launch {
 
 #### 4. Accessing Document
 
-If you want to access the document properties, you can use `Document.getRoot()`.
+To access document properties, use `Document.getRoot()`.
 
 ```kotlin
 // Declare your own CoroutineScope
@@ -114,7 +114,7 @@ scope.launch {
 
 #### 5. Subscribing to the changes that happen in the Document
 
-Clients sharing the same document can subscribe to the changes that happen in the Document.
+Clients sharing the same document can subscribe to changes.
 
 ```kotlin
 // Declare your own CoroutineScope
@@ -141,8 +141,7 @@ scope.launch {
 
 #### 6. Viewing the presence of other peers
 
-You can also subscribe to the presence of users participating in the document using `doc.events.filterIsInstance<PresenceChange>()`.
-You can use `doc.presences` to get the list of users who are currently involved in the document.
+You can also subscribe to user presence using `doc.events.filterIsInstance<PresenceChange>()`. Use `doc.presences` to get the list of users currently participating in the document.
 
 ```kotlin
 // Declare your own CoroutineScope

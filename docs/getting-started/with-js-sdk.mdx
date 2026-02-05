@@ -5,11 +5,11 @@ order: 21
 
 ## Getting Started with JS SDK
 
-Let's start using Yorkie with the JS SDK. You need an environment that can run JavaScript, such as a browser.
+This guide walks you through setting up Yorkie with the JS SDK. You need an environment that can run JavaScript, such as a browser.
 
 ### Setup
 
-To use the Yorkie JavaScript SDK in your project, you will need to install it using [npm](https://www.npmjs.com/package/@yorkie-js/sdk):
+To use the Yorkie JavaScript SDK in your project, install it using [npm](https://www.npmjs.com/package/@yorkie-js/sdk):
 
 ```bash
 $ npm install @yorkie-js/sdk
@@ -64,11 +64,11 @@ const doc = new yorkie.Document('my-doc');
 await client.attach(doc, { initialPresence: {} });
 ```
 
-The document should be attached to the client in order to automatically synchronize it between the users participating the document.
+Attach the document to the client to automatically synchronize it between users participating in the document.
 
 #### 3. Updating the Document
 
-The created document is initially an empty object. You can create or update a key-value property you would like to share with peers using `doc.update()`.
+The document is initially an empty object. You can create or update key-value properties to share with peers using `doc.update()`.
 
 ```js
 doc.update((root) => {
@@ -83,7 +83,7 @@ doc.update((root) => {
 
 #### 4. Accessing Document
 
-If you want to access the document properties, you can use `doc.getRoot()`. Using a dot notation, you can access a key-value property you or your peers have set.
+To access document properties, use `doc.getRoot()`. With dot notation, you can access any key-value property that you or your peers have set.
 
 ```js
 doc.update((root) => {
@@ -94,7 +94,7 @@ console.log(doc.getRoot().sharedMessage); // "Hello World!";
 
 #### 5. Subscribing to the changes that happen in the Document
 
-Clients sharing the same document can subscribe to the changes that happen in the Document using `doc.subscribe()`.
+Clients sharing the same document can subscribe to changes using `doc.subscribe()`.
 
 ```js
 doc.subscribe((event) => {
@@ -116,8 +116,7 @@ doc.subscribe((event) => {
 
 #### 6. Viewing the presence of users
 
-You can also subscribe to the presence of users participating in the document using `doc.subscribe('presence')`. 
-You can use `doc.getPresences()` to get the list of users who are currently involved in the document.
+You can also subscribe to user presence using `doc.subscribe('presence')`. Use `doc.getPresences()` to get the list of users currently participating in the document.
 
 ```js
 doc.subscribe('presence', (event) => {

@@ -5,13 +5,13 @@ order: 50
 
 ## Android SDK
 
-Through Yorkie Android SDK, you can efficiently build collaborative applications. On the client-side implementation, you can create Documents that are automatically synced with remote peers with minimal effort.
+The Yorkie Android SDK enables you to efficiently build collaborative applications. On the client side, you can create documents that automatically sync with remote peers with minimal effort.
 
 If you want to install the SDK, refer to the [Getting Started with Android SDK](/docs/getting-started/with-android-sdk).
 
 ### Client
 
-`Client` is a normal client that can communicate with the server. It has Documents and sends changes of the Document from local to the server to synchronize with other replicas in remote.
+`Client` is a normal client that communicates with the server. It holds documents and sends local changes to the server to synchronize with other replicas.
 
 #### Creating a Client
 
@@ -31,7 +31,7 @@ val client = Client(
 
 #### Activating a Client
 
-Activates the client by registering it with the server. The server assigns a unique client ID that is used to distinguish different clients. After activation, the client is ready to attach documents and communicate with the server.
+Activate the client by registering it with the server. The server assigns a unique client ID that distinguishes different clients. After activation, the client is ready to attach documents and communicate with the server.
 
 ```kotlin
 scope.launch {
@@ -72,7 +72,7 @@ scope.launch {
 
 #### Attaching Documents
 
-Attaches a document to the client. Once attached, the client will synchronize the document with the server and other clients. You can set initial presence data and choose the synchronization mode.
+Attach a document to the client. Once attached, the client synchronizes the document with the server and other clients. You can set initial presence data and choose the synchronization mode.
 
 **Parameters:**
 - `document`: The document to attach
@@ -93,7 +93,7 @@ scope.launch {
 
 #### Detaching Documents
 
-Detaches a document from the client. The client will no longer synchronize the document with the server. This is important for garbage collection to clean up CRDT tombstones.
+Detach a document from the client. The client no longer synchronizes the document with the server. This is important for garbage collection to clean up CRDT tombstones.
 
 **Parameters:**
 - `document`: The document to detach
@@ -107,7 +107,7 @@ scope.launch {
 
 #### Synchronizing Documents
 
-Manually pushes local changes to the server and pulls remote changes. Useful when using `Manual` sync mode or when you need to force synchronization.
+Manually push local changes to the server and pull remote changes. This is useful when using `Manual` sync mode or when you need to force synchronization.
 
 **Parameters:**
 - `document`: Specific document to sync. If `null`, syncs all attached documents (optional)
@@ -126,7 +126,7 @@ scope.launch {
 
 #### Changing Synchronization Mode
 
-Changes the synchronization mode of an attached document. This allows you to dynamically control how the document synchronizes with the server.
+Change the synchronization mode of an attached document. This allows you to dynamically control how the document synchronizes with the server.
 
 **Yorkie offers four SyncModes:**
 - `Client.SyncMode.Realtime`: Local changes are automatically pushed to the server, and remote changes are pulled from the server.
@@ -148,7 +148,7 @@ client.changeSyncMode(document, Client.SyncMode.Realtime)
 
 #### Broadcasting Messages
 
-Broadcasts a message to other clients subscribed to the document. This is useful for sending ephemeral messages that don't need to be stored in the document (e.g., notifications, alerts, or temporary states).
+Broadcast a message to other clients subscribed to the document. This is useful for sending ephemeral messages that don't need to be stored in the document, such as notifications, alerts, or temporary states.
 
 **Parameters:**
 - `document`: The document to broadcast to
@@ -168,7 +168,7 @@ scope.launch {
 
 #### Removing Documents
 
-Permanently removes a document from the server. This operation is irreversible and will delete the document for all clients.
+Permanently remove a document from the server. This operation is irreversible and deletes the document for all clients.
 
 **Parameters:**
 - `document`: The document to remove
@@ -181,7 +181,7 @@ scope.launch {
 
 #### Deactivating a Client
 
-Deactivates the client and disconnects from the server. All attached documents will be detached automatically.
+Deactivate the client and disconnect from the server. All attached documents are detached automatically.
 
 **Parameters:**
 - `keepalive`: If `true`, ensures the deactivation request completes even if the app terminates (optional, default: `false`)
@@ -219,12 +219,12 @@ val client = Client(
 
 ### Document
 
-`Document` is a primary data type in Yorkie, which provides a JSON-like updating experience that makes it easy to represent your application's model.
-A `Document` can be updated without being attached to the client, and its changes are automatically propagated to other clients when the `Document` is attached to the `Client` or when the network is restored.
+`Document` is the primary data type in Yorkie, providing a JSON-like updating experience that makes it easy to represent your application's model.
+A `Document` can be updated without being attached to the client, and its changes automatically propagate to other clients when the `Document` is attached to the `Client` or when the network is restored.
 
 #### Creating a Document
 
-Creates a new document instance with a unique key. The document can be modified locally before being attached to a client.
+Create a new document instance with a unique key. The document can be modified locally before being attached to a client.
 
 **Parameters:**
 - `key`: Unique identifier for the document
@@ -234,12 +234,11 @@ Creates a new document instance with a unique key. The document can be modified 
 val document = Document(Document.Key("my-document"))
 ```
 
-> The document key is used to identify the Document in Yorkie. It is a string that can be freely defined by the user.
-> However, it is allowed to use only `a-z`, `A-Z`, `0-9`, `-`, `.`, `_`, `~` and must be between 4-120 characters.
+> The document key identifies the Document in Yorkie. It is a string that you can freely define, but it can only contain `a-z`, `A-Z`, `0-9`, `-`, `.`, `_`, `~` and must be between 4 and 120 characters.
 
 #### Attaching a Document
 
-Attaches the document to a client. Once attached, the document will be synchronized with the server and other clients. You can set initial presence and choose the sync mode.
+Attach the document to a client. Once attached, the document synchronizes with the server and other clients. You can set initial presence and choose the sync mode.
 
 ```kotlin
 scope.launch {
@@ -268,7 +267,7 @@ when (document.status) {
 
 #### Updating a Document
 
-Updates the document structure and/or presence. The updater function provides access to the document root and presence. Changes are automatically synchronized with other clients when attached.
+Update the document structure and/or presence. The updater function provides access to the document root and presence. Changes automatically synchronize with other clients when attached.
 
 **Parameters:**
 - `message`: Optional description of the change
@@ -288,7 +287,7 @@ scope.launch {
 
 **getRoot()**
 
-Returns a proxy of the document's root object that you can use to read values.
+Return a proxy of the document's root object that you can use to read values.
 
 ```kotlin
 scope.launch {
@@ -300,7 +299,7 @@ scope.launch {
 
 **getValueByPath()**
 
-Gets a value at a specific JSON path. The path must start with `$` which represents the document root.
+Get a value at a specific JSON path. The path must start with `$`, which represents the document root.
 
 **Parameters:**
 - `path`: JSON path (e.g., `$.user.name`, `$.todos[0]`)
@@ -314,7 +313,7 @@ scope.launch {
 
 **toJson()**
 
-Converts the entire document to a JSON string representation.
+Convert the entire document to a JSON string representation.
 
 ```kotlin
 val json = document.toJson()
@@ -356,7 +355,7 @@ scope.launch {
 
 **events(targetPath)**
 
-Subscribe to changes for a specific path in the document. Only events affecting the target path or its nested values will be emitted.
+Subscribe to changes for a specific path in the document. Only events affecting the target path or its nested values are emitted.
 
 **Parameters:**
 - `targetPath`: JSON path to subscribe to (e.g., `$.todos`, `$.user.name`)
@@ -379,7 +378,7 @@ scope.launch {
 
 #### Changing Synchronization Mode
 
-Changes how the document synchronizes with the server. See the [Client Changing Synchronization Mode](#changing-synchronization-mode) section for available modes and their descriptions.
+Change how the document synchronizes with the server. See the [Client Changing Synchronization Mode](#changing-synchronization-mode) section for available modes and their descriptions.
 
 ```kotlin
 // Enable automatic synchronization of both local and remote changes
@@ -400,7 +399,7 @@ scope.launch {
 
 #### Detaching a Document
 
-Detaches the document from the client. The document will no longer be synchronized with the server. This is important for efficient garbage collection to remove [CRDT tombstones](https://crdt.tech/glossary).
+Detach the document from the client. The document no longer synchronizes with the server. This is important for efficient garbage collection to remove [CRDT tombstones](https://crdt.tech/glossary).
 
 ```kotlin
 scope.launch {
@@ -414,7 +413,7 @@ Yorkie provides several JSON-based data types that can be used to model your app
 
 #### JsonObject
 
-`JsonObject` is a key-value data structure, similar to a JSON object or Kotlin Map. It can contain any JSON-compatible values including other objects, arrays, primitives, and custom CRDT types.
+`JsonObject` is a key-value data structure similar to a JSON object or Kotlin Map. It can contain any JSON-compatible values, including other objects, arrays, primitives, and custom CRDT types.
 
 **Creating and Using JsonObject:**
 
@@ -464,7 +463,7 @@ scope.launch {
 
 #### JsonArray
 
-`JsonArray` is an ordered collection of values, similar to a JSON array or Kotlin List. It supports adding, removing, and accessing elements by index.
+`JsonArray` is an ordered collection of values similar to a JSON array or Kotlin List. It supports adding, removing, and accessing elements by index.
 
 **Creating and Using JsonArray:**
 
@@ -541,7 +540,7 @@ scope.launch {
 
 #### JsonText
 
-`JsonText` is a specialized CRDT type for collaborative text editing. It supports text operations like insert, delete, and styling, making it ideal for building rich text editors.
+`JsonText` is a specialized CRDT type for collaborative text editing. It supports text operations such as insert, delete, and styling, making it ideal for building rich text editors.
 
 **Creating and Editing Text:**
 
@@ -649,7 +648,7 @@ document.events.filterIsInstance<Document.Event.PresenceChanged.Others>().collec
 
 #### JsonCounter
 
-`JsonCounter` is a CRDT type that supports atomic increment and decrement operations. It automatically resolves conflicts when multiple clients modify the counter simultaneously.
+`JsonCounter` is a CRDT type that supports atomic increment and decrement operations, automatically resolving conflicts when multiple clients modify the counter simultaneously.
 
 **Creating and Using Counter:**
 
@@ -699,7 +698,7 @@ JsonCounter is ideal for:
 
 #### JsonTree
 
-`JsonTree` is a CRDT-based tree structure designed for representing hierarchical document structures like HTML or XML. It's ideal for building rich text editors with complex formatting (e.g., ProseMirror, Quill).
+`JsonTree` is a CRDT-based tree structure designed for representing hierarchical document structures such as HTML or XML. It is ideal for building rich text editors with complex formatting (such as ProseMirror or Quill).
 
 **Creating a Tree:**
 
@@ -837,7 +836,7 @@ scope.launch {
 
 ### Presence
 
-Presence is a feature that allows you to share the temporary state of online users in real-time. Unlike document data, presence information is not stored permanently and is only maintained while users are connected. This makes it ideal for showing user cursors, selections, online status, or any other ephemeral user state.
+Presence allows you to share the temporary state of online users in real-time. Unlike document data, presence information is not stored permanently and is only maintained while users are connected. This makes it ideal for showing user cursors, selections, online status, or any other ephemeral user state.
 
 #### Setting Initial Presence
 
@@ -875,7 +874,7 @@ scope.launch {
 
 #### Updating Presence
 
-You can update presence at any time using `document.updateAsync()`. The `presence` parameter in the updater function is a `Presence` instance.
+Update presence at any time using `document.updateAsync()`. The `presence` parameter in the updater function is a `Presence` instance.
 
 **Function Signature:**
 
@@ -905,7 +904,7 @@ scope.launch {
 
 **Merge Behavior:**
 
-Presence changes are merged, not replaced. Only the specified keys are updated:
+Presence changes are merged, not replaced. Only the specified keys are updated.
 
 ```kotlin
 // Initial presence: { "name": "Alice", "color": "blue" }
@@ -952,7 +951,7 @@ scope.launch {
 
 #### Presence Events
 
-Presence events notify you when users join, leave, or update their presence. These events are part of `Document.Event.PresenceChanged`.
+Presence events notify you when users join, leave, or update their presence. These events are part of `Document.Event.PresenceChanged`:
 
 ##### MyPresence Events
 

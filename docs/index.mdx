@@ -32,10 +32,10 @@ This means you can focus on building your application's features instead of mana
 
 Yorkie consists of four main components that work together to enable real-time collaboration:
 
-- [Client](/docs/js-sdk#client) : The entry point for your application. Clients connect to the server, manage documents and channels, and handle synchronization automatically.
-- [Document](/docs/js-sdk#document) : Persistent, collaborative data structures based on CRDTs. Documents are stored in the database, support offline editing, and automatically resolve conflicts when users edit simultaneously.
-- [Channel](/docs/js-sdk#channel) : Lightweight, memory-only communication layer for ephemeral data. Perfect for presence tracking (who's online, cursor positions) and real-time message broadcasting.
-- [Server](/docs/self-hosted-server) : The central hub that receives changes from clients, persists them to the database, and broadcasts updates to subscribed clients. Available as a managed cloud service or self-hosted.
+- [Client](/docs/js-sdk#client): The entry point for your application. Clients connect to the server, manage documents and channels, and handle synchronization automatically.
+- [Document](/docs/js-sdk#document): Persistent, collaborative data structures based on CRDTs. Documents are stored in the database, support offline editing, and automatically resolve conflicts when users edit simultaneously.
+- [Channel](/docs/js-sdk#channel): A lightweight, memory-only communication layer for ephemeral data. Ideal for presence tracking (who's online, cursor positions) and real-time message broadcasting.
+- [Server](/docs/self-hosted-server): The central hub that receives changes from clients, persists them to the database, and broadcasts updates to subscribed clients. Available as a managed cloud service or self-hosted.
 
 Additionally, **[Projects](/docs/cli#project)** allow you to organize multiple independent applications within a single Yorkie installation, each with its own documents, channels, and clients. Learn more about key concepts in the [Glossary](/docs/glossary).
 
@@ -93,11 +93,11 @@ This architecture enables seamless real-time collaboration while supporting offl
 
 Yorkie is perfect for building various types of collaborative applications:
 
-- Collaborative Editors Build the next Google Docs or Notion with [rich text editing examples](/examples/quill)
-- Real-time Whiteboards Create Figma-like experiences with [drawing applications](/examples/tldraw)
-- Project Management Tools Develop Trello-style boards with [kanban examples](/examples/kanban)
-- Code Collaboration Enable pair programming with [CodeMirror integration](/examples/codemirror)
-- Presence & Cursors Show who's online with [simultaneous cursors](/examples/simultaneous-cursors)
+- **Collaborative Editors**: Build the next Google Docs or Notion with [rich text editing examples](/examples/quill)
+- **Real-time Whiteboards**: Create Figma-like experiences with [drawing applications](/examples/tldraw)
+- **Project Management Tools**: Develop Trello-style boards with [kanban examples](/examples/kanban)
+- **Code Collaboration**: Enable pair programming with [CodeMirror integration](/examples/codemirror)
+- **Presence & Cursors**: Show who's online with [simultaneous cursors](/examples/simultaneous-cursors)
 
 Explore more [examples](/examples) to see what you can build with Yorkie.
 
