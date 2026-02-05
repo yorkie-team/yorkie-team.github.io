@@ -1,0 +1,155 @@
+---
+title: 'Event Webhook'
+order: 114
+---
+
+## Event Webhook
+
+The Event Webhook allows you to receive notifications when specific events occur in your Yorkie documents. Unlike the [Auth Webhook](/docs/advanced/security#auth-webhook) which handles authorization, the Event Webhook is designed for integrations and notifications when document state changes.
+
+### How It Works
+
+When a configured event occurs, Yorkie sends an HTTP POST request to your webhook endpoint with details about the event.
+
+<Mermaid
+  chart={`sequenceDiagram
+    participant Client
+    participant Server as Yorkie Server
+    participant Webhook as Your Webhook Server
+
+    Client->>Server: (1) Edit document
+    Server->>Server: (2) Process changes
+    Server->>Webhook: (3) POST event notification
+    Webhook->>Webhook: (4) Process event
+    Webhook->>Server: (5) Response (200 OK)
+`}
+/>
+
+1. A client makes changes to a document
+2. Yorkie server processes the changes
+3. If the event matches configured triggers, Yorkie sends a webhook request
+4. Your server processes the event (e.g., send notifications, update external systems)
+5. Your server responds to acknowledge receipt
+
+### Supported Events
+
+| Event | Description |
+|-------|-------------|
+| `DocumentRootChanged` | Triggered when the document's root content is modified |
+
+### Setup and Configuration
+
+#### 1. Configure the Event Webhook
+
+You can configure the Event Webhook using the Yorkie CLI:
+
+```bash
+# Set the webhook URL and enable the DocumentRootChanged event
+yorkie project update [project-name] \
+  --event-webhook-url "https://your-server.com/webhook" \
+  --event-webhook-events-add "DocumentRootChanged"
+```
+
+To disable specific events:
+
+```bash
+yorkie project update [project-name] \
+  --event-webhook-events-rm "DocumentRootChanged"
+```
+
+To enable all events:
+
+```bash
+yorkie project update [project-name] \
+  --event-webhook-events-add "ALL"
+```
+
+#### 2. Webhook Request Format
+
+When an event is triggered, Yorkie sends a POST request with the following JSON payload:
+
+```json
+{
+  "type": "DocumentRootChanged",
+  "attributes": {
+    "key": "your-document-key",
+    "issuedAt": "2025-01-02T15:04:05.000Z"
+  }
+}
+```
+
+| Field | Description |
+|-------|-------------|
+| `type` | The event type that triggered the webhook |
+| `attributes.key` | The key of the document that triggered the event |
+| `attributes.issuedAt` | ISO 8601 timestamp when the event occurred |
+
+#### 3. Webhook Response
+
+Your webhook server should respond with an HTTP status code:
+
+| Status Code | Meaning |
+|-------------|---------|
+| `200 OK` | Event received and processed successfully |
+| Other | Yorkie will retry the request based on retry configuration |
+
+### Retry Configuration
+
+The Event Webhook includes configurable retry behavior with exponential backoff for failed requests.
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `event-webhook-max-retries` | 10 | Maximum number of retry attempts |
+| `event-webhook-min-wait-interval` | 100ms | Minimum wait time between retries |
+| `event-webhook-max-wait-interval` | 3s | Maximum wait time between retries |
+| `event-webhook-request-timeout` | 3s | Timeout for each webhook request |
+
+#### Configure Retry Settings
+
+```bash
+yorkie project update [project-name] \
+  --event-webhook-max-retries 5 \
+  --event-webhook-min-wait-interval 200ms \
+  --event-webhook-max-wait-interval 5s \
+  --event-webhook-request-timeout 10s
+```
+
+### Example Webhook Server
+
+Here's a simple example of an Express.js webhook server:
+
+```javascript
+const express = require('express');
+const app = express();
+
+app.use(express.json());
+
+app.post('/webhook', (req, res) => {
+  const { type, attributes } = req.body;
+
+  console.log(`Event: ${type}`);
+  console.log(`Document: ${attributes.key}`);
+  console.log(`Time: ${attributes.issuedAt}`);
+
+  // Process the event (e.g., send notifications, update cache)
+
+  res.status(200).send('OK');
+});
+
+app.listen(3000, () => {
+  console.log('Webhook server listening on port 3000');
+});
+```
+
+### Use Cases
+
+- **Real-time notifications**: Notify users when a shared document is updated
+- **External system sync**: Keep external databases or services in sync with document changes
+- **Audit logging**: Record document change events for compliance
+- **Cache invalidation**: Invalidate caches when documents change
+
+### Related Documentation
+
+- [Auth Webhook](/docs/advanced/security#auth-webhook) - For authorization and access control
+- [CLI Reference](/docs/cli) - Complete CLI command reference
+- [Architecture Patterns](/docs/advanced/architecture-patterns) - Document lifecycle patterns

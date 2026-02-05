@@ -1,0 +1,170 @@
+---
+title: 'Resources'
+order: 115
+---
+
+## Resources
+
+Yorkie provides project-level resource settings to control document limits, lifecycle behavior, and performance characteristics. These settings help you manage resources and optimize Yorkie for your specific use case.
+
+### Configuration Methods
+
+Resource settings can be configured through:
+
+- **CLI**: Using `yorkie project update` command
+- **Dashboard**: Through the project settings page
+- **Admin API**: Using the [UpdateProject](/docs/admin-api#post-yorkiev1adminserviceupdateproject) endpoint
+
+### Document Limits
+
+Control the size and scale of documents in your project.
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `max-size-per-document` | 10 MiB | Maximum size of a document in bytes |
+| `max-subscribers-per-document` | 0 (unlimited) | Maximum number of clients that can subscribe to a document |
+| `max-attachments-per-document` | 0 (unlimited) | Maximum number of clients that can attach to a document |
+
+#### MaxSizePerDocument
+
+Limits the maximum size of a single document. When a document exceeds this limit, further modifications that would increase its size are rejected.
+
+```bash
+# Configure via Admin API (not available via CLI)
+# Use the Dashboard or Admin API to set this value
+```
+
+#### MaxSubscribersPerDocument
+
+Limits how many clients can subscribe (watch for changes) to a single document simultaneously. Set to `0` for unlimited subscribers.
+
+```bash
+yorkie project update [project-name] \
+  --max-subscribers-per-document 100
+```
+
+#### MaxAttachmentsPerDocument
+
+Limits how many clients can attach to a single document simultaneously. Set to `0` for unlimited attachments.
+
+```bash
+yorkie project update [project-name] \
+  --max-attachments-per-document 50
+```
+
+### Snapshot Configuration
+
+Snapshots improve performance by sending complete document state instead of individual changes when clients are significantly behind.
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `snapshot-threshold` | 500 | Number of changes that triggers snapshot delivery |
+| `snapshot-interval` | 500 | Interval of changes to create a snapshot |
+
+#### SnapshotThreshold
+
+When a client needs to fetch more changes than this threshold, the server sends a snapshot instead of individual changes. This is more efficient for clients that have been offline for extended periods.
+
+```bash
+yorkie project update [project-name] \
+  --snapshot-threshold 1000
+```
+
+<Alert status="info">
+When a client receives a snapshot instead of incremental changes, a `snapshot` event is triggered. Your application should handle this event to update its state. See [Document Events](/docs/js-sdk#documentsubscribesnapshot) for more details.
+</Alert>
+
+#### SnapshotInterval
+
+The interval at which snapshots are created and stored. Lower values create snapshots more frequently, which uses more storage but improves performance for clients that reconnect after being offline.
+
+```bash
+yorkie project update [project-name] \
+  --snapshot-interval 1000
+```
+
+### Lifecycle Settings
+
+Control how documents and clients are managed over time.
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `client-deactivate-threshold` | 24h | Time after which inactive clients are deactivated |
+| `remove-on-detach` | false | Automatically remove documents when all clients detach |
+| `auto-revision-enabled` | true | Automatically create revisions during snapshot creation |
+
+#### ClientDeactivateThreshold
+
+Clients that haven't communicated with the server for longer than this threshold are automatically deactivated during housekeeping. This helps clean up stale client connections.
+
+```bash
+yorkie project update [project-name] \
+  --client-deactivate-threshold 48h
+```
+
+#### RemoveOnDetach
+
+When enabled, documents are automatically removed from the server when the last client detaches. This is useful for temporary collaborative sessions where you don't need to persist the document after collaboration ends.
+
+```bash
+yorkie project update [project-name] \
+  --remove-on-detach true
+```
+
+<Alert status="warning">
+Use this setting carefully. Once enabled, documents will be permanently deleted when all clients detach. This cannot be undone.
+</Alert>
+
+See [Architecture Patterns - Pattern B](/docs/advanced/architecture-patterns#pattern-b-external-db-as-sot-with-client-only-lifecycle-management) for a use case of this setting.
+
+#### AutoRevisionEnabled
+
+When enabled, revisions are automatically created during snapshot creation. Revisions allow you to restore documents to previous states.
+
+```bash
+# Configure via Admin API (not available via CLI)
+# Use the Dashboard or Admin API to set this value
+```
+
+### Configuration Reference
+
+| Setting | CLI Flag | Default | Type |
+|---------|----------|---------|------|
+| MaxSizePerDocument | Admin API only | 10 MiB | int (bytes) |
+| MaxSubscribersPerDocument | `--max-subscribers-per-document` | 0 | int |
+| MaxAttachmentsPerDocument | `--max-attachments-per-document` | 0 | int |
+| SnapshotThreshold | `--snapshot-threshold` | 500 | int |
+| SnapshotInterval | `--snapshot-interval` | 500 | int |
+| ClientDeactivateThreshold | `--client-deactivate-threshold` | 24h | duration |
+| RemoveOnDetach | `--remove-on-detach` | false | bool |
+| AutoRevisionEnabled | Admin API only | true | bool |
+
+### Example: High-Traffic Configuration
+
+For projects with many concurrent users:
+
+```bash
+yorkie project update my-project \
+  --max-subscribers-per-document 500 \
+  --max-attachments-per-document 500 \
+  --snapshot-threshold 200 \
+  --snapshot-interval 200 \
+  --client-deactivate-threshold 12h
+```
+
+### Example: Temporary Sessions
+
+For temporary collaborative sessions that don't need persistence:
+
+```bash
+yorkie project update my-project \
+  --remove-on-detach true \
+  --client-deactivate-threshold 1h
+```
+
+### Related Documentation
+
+- [CLI Reference](/docs/cli) - Complete CLI command reference
+- [Admin API](/docs/admin-api) - API for project management
+- [Architecture Patterns](/docs/advanced/architecture-patterns) - Document lifecycle patterns
+- [JS SDK - Document Events](/docs/js-sdk#documentsubscribesnapshot) - Handling snapshot events
