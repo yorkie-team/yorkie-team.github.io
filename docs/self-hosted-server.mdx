@@ -5,13 +5,13 @@ order: 100
 
 ## Self-Hosted Server
 
-Sometimes you may want to run your own Yorkie Server. This page explains how to run a Yorkie Server.
+This page explains how to run your own Yorkie Server.
 
 To run a Yorkie Server, you need to install the CLI. If you haven't installed it yet, please refer to [CLI](/docs/cli).
 
 ### Running a Server via CLI
 
-Let's start a Server with the CLI. You can start a Server with the following command:
+Start a Server with the following command:
 
 ```bash
 $ yorkie server
@@ -20,8 +20,8 @@ backend created: id: cppoq5huevgut6tjo8qg, db: memory
 serving RPC on 8080
 serving profiling on 8081
 ```
-The Server handles administrative requests such as project maintenance, and it continues to run until it's told to quit with termination commands such as Ctrl+C.
-The Server stores its data using an in-memory DB, which does not provide durability by default.
+The Server handles administrative requests such as project maintenance and continues to run until it receives termination commands such as Ctrl+C.
+The Server stores its data using an in-memory database, which does not provide durability by default.
 
 ### Persistence
 
@@ -42,8 +42,7 @@ serving RPC on 8080
 
 ### Monitoring
 
-Server exports metrics under the `/metrics` path on its profiling port.
-The metrics can be fetched with curl:
+The Server exports metrics under the `/metrics` path on its profiling port. Fetch the metrics with curl:
 
 ```bash
 $ curl http://localhost:8081/metrics
@@ -55,11 +54,11 @@ yorkie_pushpull_received_changes_total 6
 ...
 ```
 
-This metrics can be collected from [Prometheus](https://prometheus.io/).
+These metrics can be collected by [Prometheus](https://prometheus.io/).
 
-Running [Prometheus](https://prometheus.io/) and [Grafana](https://grafana.com/oss/grafana/) is the easiest way to monitor Server's metrics.
+Running [Prometheus](https://prometheus.io/) and [Grafana](https://grafana.com/oss/grafana/) is the easiest way to monitor the Server's metrics.
 
-First, download all manifest files from [docker folder](https://github.com/yorkie-team/yorkie/tree/main/build/docker). Then, start the applications with `docker-compose`:
+First, download all manifest files from the [docker folder](https://github.com/yorkie-team/yorkie/tree/main/build/docker). Then start the applications with `docker-compose`:
 
 ```bash
 $ docker-compose -f docker-compose-full.yml up --build -d
@@ -70,7 +69,7 @@ Creating grafana    ... done
 
 Now, Prometheus will collect Server metrics every 10 seconds.
 
-Grafana has a built-in Prometheus support; just add a Prometheus data source:
+Grafana has built-in Prometheus support. Add a Prometheus data source:
 
 ```
 Name:   prometheus
@@ -91,7 +90,7 @@ In a production environment, a server cluster is necessary to handle large workl
 
 Yorkie provides a sharded cluster in Kubernetes environments to support production environments.
 
-This page describes how to set up sharded cluster. An example of the sharded cluster is as follows:
+This section describes how to set up a sharded cluster. An example of the sharded cluster architecture:
 
 ```mermaid
 graph LR
@@ -128,7 +127,7 @@ graph LR
 - Service Registry: It is responsible for storing metadata and configuration settings for Yorkie servers.
 - MongoDB: It stores the data of Yorkie. It can be configured to use sharding, just like Yorkie sharded cluster.
 
-Yorkie provides Helm Chart, which is a package manager for Kubernetes, to easily deploy Yorkie cluster on Kubernetes with above components configured.
+Yorkie provides a Helm Chart, a package manager for Kubernetes, to easily deploy a Yorkie cluster on Kubernetes with the above components configured.
 
 Below are guides for deploying Yorkie cluster on Kubernetes with Helm Charts on various platforms.
 

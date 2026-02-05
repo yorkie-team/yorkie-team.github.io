@@ -5,11 +5,11 @@ order: 70
 
 ## CLI
 
-CLI is a command-line interface for Yorkie. You can use CLI to manage your projects, documents or to start the server.
+CLI is a command-line interface for Yorkie. You can use the CLI to manage your projects, documents, or start the server.
 
 ### Getting started
 
-Let's get started with the CLI. There are two ways to install the CLI: pre-built binaries and Homebrew.
+There are two ways to install the CLI: pre-built binaries and Homebrew.
 
 #### Install pre-built binaries
 
@@ -56,9 +56,9 @@ Build date: ...
 
 #### Commands
 
-Yorkie is just a single command-line application `yorkie`, which takes a subcommand such as `server`.
+Yorkie is a single command-line application `yorkie` that takes a subcommand such as `server`.
 
-The Yorkie CLI is a well-behaved command-line application. In erroneous cases, a non-zero exit status will be returned. It also responds to `-h` and `---help` as you'd most likely expect.
+The Yorkie CLI is a well-behaved command-line application. In erroneous cases, a non-zero exit status is returned. It also responds to `-h` and `--help` as you would expect.
 
 To get help for any specific command, pass the `-h` flag to the relevant subcommand. For example, to see help about the `server` subcommand:
 
@@ -135,7 +135,7 @@ Global Flags:
 
 ### Signup
 
-You can sign up for a new account using the `signup` command.
+Sign up for a new account using the `signup` command.
 
 ```bash
 $ yorkie signup -u <username> --rpc-addr api.yorkie.dev:443
@@ -144,7 +144,7 @@ Enter Password:
 
 ### Login
 
-To use admin commands, you need to log in to the server. You can log in to the server using the `login` subcommand:
+To use admin commands, you must log in to the server. Log in using the `login` subcommand:
 
 ```bash
 $ yorkie login -u <username> --rpc-addr api.yorkie.dev:443
@@ -157,8 +157,7 @@ If you don't have an account, you can create one by signing up at [Dashboard](ht
 > If you are using the [self-hosted server](/docs/self-hosted-server), default username and password are `admin` and `admin`.
 > You can log in to the server using `$ yorkie login -u admin -p admin --insecure`. Or: `$ yorkie login -u admin --insecure`. 
 
-Once you log in to the server, the CLI stores the access token in the `~/.yorkie/config.json` file.
-You can check the context of the CLI using the `context` subcommand:
+Once you log in to the server, the CLI stores the access token in the `~/.yorkie/config.json` file. Check the context of the CLI using the `context` subcommand:
 
 ```bash
 $ yorkie context ls
@@ -170,7 +169,7 @@ $ yorkie context ls
 
 ### Logout
 
-If you want to log out from the server, you can use the `logout` subcommand:
+To log out from the server, use the `logout` subcommand:
 ```bash
 $ yorkie logout
 $ yorkie context ls
@@ -181,7 +180,7 @@ $ yorkie context ls
 ```
 ### Change Password
 
-If you want to change your password, you can use the command `passwd`.
+To change your password, use the `passwd` command.
 
 ```bash
 $ yorkie passwd -u <username> --rpc-addr api.yorkie.dev:443
@@ -191,7 +190,7 @@ Enter New Password:
 
 ### Delete Account
 
-If you want to delete your account, you can use the command `delete-account`.
+To delete your account, use the `delete-account` command.
 
 ```bash
 $ yorkie delete-account -u <username> --rpc-addr api.yorkie.dev:443
@@ -199,13 +198,13 @@ Enter Password:
 WARNING: ...
 ```
 
- This command will delete your account and all data associated with it. Please be careful when using this command.
+This command deletes your account and all data associated with it. Use this command with caution.
 
 ### Project
 
-Project represents your service or application in Yorkie. Separate Projects can exist within a single application. You can add more Projects as needed, for example, if you want to manage [auth webhook](/docs/advanced/security#auth-webhook) and documents for specific purposes.
+A Project represents your service or application in Yorkie. Multiple projects can exist within a single application. You can add more projects as needed, for example, to manage [auth webhooks](/docs/advanced/security#auth-webhook) and documents for specific purposes.
 
-To manage Projects, you can use the `project` subcommand:
+To manage projects, use the `project` subcommand:
 
 ```bash
 $ yorkie project
@@ -231,7 +230,7 @@ Use "yorkie project [command] --help" for more information about a command.
 
 #### Listing Projects
 
-You can list Projects on the server using `ls`.
+List projects on the server using `ls`.
 
 ```bash
 $ yorkie project ls
@@ -239,18 +238,18 @@ $ yorkie project ls
  default  cfurlpq6qdop9v48o0u0  cfurlpq6qdop9v48o0ug                    []                    24h                          15 minutes
 ```
 
-_Server creates a `default project` automatically. If you create a Client without apiKey, the Client is created in the default Project._
+_The server creates a `default project` automatically. If you create a Client without an apiKey, the Client is created in the default project._
 
 #### Creating a Project
 
-You can create a new Project with a name using `create`.
+Create a new project with a name using `create`.
 
 ```bash
 $ yorkie project create test-project
 {"id":"63fdbebab48d9fd33996b38a","name":"test-project","owner":"","auth_webhook_url":"","auth_webhook_methods":null,"ClientDeactivateThreshold":"24h","public_key":"cfurtei6qdop9v48o0v0","secret_key":"cfurtei6qdop9v48o0vg","created_at":"2023-02-28T08:43:38.192448Z","updated_at":"2023-02-28T08:43:38.192448Z"}
 ```
 
-If you create a Client with `public_key` of the Project as `apiKey`, you can manage the Client in the Project.
+If you create a Client with the project's `public_key` as the `apiKey`, you can manage the Client in the project.
 
 ```javascript
 const client = new yorkie.Client({
@@ -259,11 +258,11 @@ const client = new yorkie.Client({
 });
 ```
 
-Then Documents attached to the Client are isolated and stored in the Project.
+Documents attached to the Client are then isolated and stored in the project.
 
 #### Updating the Project
 
-You can update the Project on the server using `update`.
+Update the project on the server using `update`.
 
 ```
 Usage:
@@ -290,21 +289,21 @@ Global Flags:
       --rpc-addr string   Address of the rpc server (default "localhost:8080")
 ```
 
-You can update the name of the Project with `--name` flag.
+Update the name of the project with the `--name` flag.
 
 ```bash
 $ yorkie project update test-project --name new-test-project
 {"id":"63fdc721b48d9fd33996b38b","name":"new-test-project","owner":"","auth_webhook_url":"","auth_webhook_methods":null,"ClientDeactivateThreshold":"24h","public_key":"cfuse8a6qdop9v48o100","secret_key":"cfuse8a6qdop9v48o10g","created_at":"2023-02-28T09:19:29.269875Z","updated_at":"2023-02-28T09:27:06.0588974Z"}
 ```
 
-You can configure the project's Auth Webhook URL using the `--auth-webhook-url` flag.  
+Configure the project's Auth Webhook URL using the `--auth-webhook-url` flag.
 
 ```bash
 $ yorkie project update [name] --auth-webhook-url http://localhost:3000/auth-webhook
 ```
 
-You can add or remove webhook methods using the `--auth-webhook-method-add` and `--auth-webhook-method-rm` flags.
-When updating methods, remove operations are always processed before add operations.
+Add or remove webhook methods using the `--auth-webhook-method-add` and `--auth-webhook-method-rm` flags.
+When updating methods, remove operations are processed before add operations.
 The `ALL` keyword represents all available webhook methods.
 
 Here are some examples of managing webhook methods:
@@ -333,7 +332,7 @@ For more details on how Auth Webhook works, please refer to the [auth-webhook](/
 
 ### Document
 
-Document is a data structure that can be synchronized between multiple clients. With document commands, you can manage documents in the project.
+A Document is a data structure that can be synchronized between multiple clients. Use document commands to manage documents in the project.
 
 ```bash
 $ yorkie document
@@ -354,7 +353,7 @@ Use "yorkie document [command] --help" for more information about a command.
 
 #### Listing Documents
 
-You can list documents in the project using `ls`.
+List documents in the project using `ls`.
 
 ```
 Usage:
@@ -377,9 +376,9 @@ $ yorkie document ls test-project
  6482ce97c38d5a06529bba1b  test-document-1  ...         ...          ...         ...
 ```
 
-There are several flags to control the output of the command. With the flags you can paginate the output.
+Several flags control the output of the command, allowing you to paginate the output.
 
-You can use `--size` flag to limit the number of documents to output per page.
+Use the `--size` flag to limit the number of documents to output per page.
 
 ```bash
 $ yorkie document ls default --size 1
@@ -387,7 +386,7 @@ $ yorkie document ls default --size 1
  6482cea1c38d5a06529bbaa7  test-document-5  ...         ...          ...         ...
 ```
 
-You can use `--previous-id` flag to start after a specific document.
+Use the `--previous-id` flag to start after a specific document.
 
 ```bash
 $ yorkie document ls default --previous-id 6482ce9fc38d5a06529bba85
@@ -396,7 +395,7 @@ $ yorkie document ls default --previous-id 6482ce9fc38d5a06529bba85
  6482ce97c38d5a06529bba1b  test-document-1  ...         ...          ...         ...
 ```
 
-You can use `--forward` flag to search forward or backward.
+Use the `--forward` flag to search forward or backward.
 
 ```bash
 $ yorkie document ls default --forward
@@ -410,7 +409,7 @@ $ yorkie document ls default --forward
 
 #### Creating a Document
 
-You can create a new document using `create`.
+Create a new document using `create`.
 
 ```
 Usage:
@@ -428,7 +427,7 @@ $ yorkie document create test-project test-document
 
 #### Updating a Document
 
-You can update the root of an existing document using the `update` subcommand:
+Update the root of an existing document using the `update` subcommand.
 
 ```
 Usage:
@@ -446,7 +445,7 @@ $ yorkie document update test-project test-document --root '{"abs": true}'
 
 #### Removing a Document
 
-You can remove a document from the project using `remove`.
+Remove a document from the project using `remove`.
 
 ```
 Usage:
@@ -465,13 +464,13 @@ $ yorkie document remove test-project test-document-1
 
 #### Client Deactivate Threshold
 
-Client Deactivate Threshold is a time duration that determines the time for client deactivation of documents in projects. Deactivating the client and detaching it from documents is needed to increase the efficiency of GC removing [CRDT tombstones](https://crdt.tech/glossary). For more information about GC, please refer to [Garbage Collection](https://github.com/yorkie-team/yorkie/blob/main/design/garbage-collection.md).
+Client Deactivate Threshold is a time duration that determines when clients are deactivated for documents in projects. Deactivating the client and detaching it from documents improves the efficiency of garbage collection removing [CRDT tombstones](https://crdt.tech/glossary). For more information about GC, see [Garbage Collection](https://github.com/yorkie-team/yorkie/blob/main/design/garbage-collection.md).
 
-You can set client deactivate threshold of the project with `--client-deactivate-threshold` flag.
+Set the client deactivate threshold of the project with the `--client-deactivate-threshold` flag.
 
 ```bash
 $ yorkie project update test-project --client-deactivate-threshold 1h30m20s
 {"id":"63fdc721b48d9fd33996b38b","name":"test-project","owner":"","auth_webhook_url":"","auth_webhook_methods":null,"ClientDeactivateThreshold":"1h30m20s","public_key":"cfuse8a6qdop9v48o100","secret_key":"cfuse8a6qdop9v48o10g","created_at":"2023-02-28T09:19:29.269875Z","updated_at":"2023-02-28T09:19:41.7616869Z"}
 ```
 
-Setting the client deactivation threshold to `1h30m20s` will deactivate clients that have been inactive for 1 hour, 30 minutes, and 20 seconds but still remained activated. This will help document GC by not counting deactivated client's document sequence.
+Setting the client deactivation threshold to `1h30m20s` deactivates clients that have been inactive for 1 hour, 30 minutes, and 20 seconds but remained activated. This helps document GC by not counting the deactivated client's document sequence.

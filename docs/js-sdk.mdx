@@ -5,17 +5,17 @@ order: 30
 
 ## JS SDK
 
-Through Yorkie JS SDK, you can efficiently build collaborative applications. On the client-side implementation, you can create Documents that are automatically synced with remote peers with minimal effort.
+The Yorkie JS SDK enables you to efficiently build collaborative applications. On the client side, you can create documents that automatically sync with remote peers with minimal effort.
 
 If you want to install the SDK, refer to the [Getting Started with JS SDK](/docs/getting-started/with-js-sdk).
 
 ### Client
 
-`Client` is a regular client that communicates with the server. It has documents and sends local changes to the server to synchronize with other replicas remotely.
+`Client` is a normal client that communicates with the server. It holds documents and sends local changes to the server to synchronize with other replicas.
 
 #### Creating a Client
 
-You can create a Client using `new yorkie.Client()`. After the Client has been activated, it is connected to the server and ready to use.
+Create a Client using `new yorkie.Client()`. After activation, the Client connects to the server and is ready to use.
 
 ```javascript
 const client = new yorkie.Client({
@@ -29,8 +29,8 @@ await client.activate();
 
 #### Auth Token
 
-You can configure authentication for the client by setting up an `authTokenInjector` to provide tokens for Auth Webhook verification.
-If a `codes.Unauthenticated` error occurs, the `authTokenInjector` will be called again with the webhook's response reason, enabling automatic token refresh.
+Configure authentication for the client by setting up an `authTokenInjector` to provide tokens for Auth Webhook verification.
+If a `codes.Unauthenticated` error occurs, the `authTokenInjector` is called again with the webhook's response reason, enabling automatic token refresh.
 For more information about `Auth Webhook`, please refer to the [Auth Webhook](/docs/advanced/security#auth-webhook).
 
 ```javascript
@@ -49,7 +49,7 @@ const client = new yorkie.Client({
 
 #### Measuring MAU
 
-You can measure MAU(Monthly Active Users) by setting the `userID` metadata when creating a client. The `userID` should be a unique identifier for each user.
+Measure MAU (Monthly Active Users) by setting the `userID` metadata when creating a client. The `userID` should be a unique identifier for each user.
 
 ```javascript
 const client = new yorkie.Client({
@@ -73,7 +73,7 @@ This will detach all documents attached to the client for efficient [garbage col
 
 ### Document
 
-`Document` is a primary data type in Yorkie that provides a JSON-like updating experience for representing your application's model. Documents can be updated without being attached to the client, and changes are automatically propagated to other clients when attached or when the network is restored.
+`Document` is the primary data type in Yorkie, providing a JSON-like updating experience for representing your application's model. Documents can be updated without being attached to the client, and changes automatically propagate to other clients when attached or when the network is restored.
 
 #### Creating a Document
 
@@ -87,10 +87,10 @@ const doc = new yorkie.Document('doc-1');
 
 #### Attaching the Document
 
-Attaching subscribes the client to a document. If the document doesn't exist on the server, it will be created. Once attached, all modifications are automatically synchronized with other clients.
+Attaching subscribes the client to a document. If the document doesn't exist on the server, it is created. Once attached, all modifications automatically synchronize with other clients.
 
 Attach options:
-- `initialPresence`: Sets the initial presence of the client that attaches the document. The presence is shared with other users participating in the document. It must be serializable to JSON.
+- `initialPresence`: Sets the client's initial presence when attaching to the document. The presence is shared with other users participating in the document. It must be serializable to JSON.
 - `syncMode`(Optional): Specifies synchronization modes. The default value is `SyncMode.Realtime`, which automatically pushes and pulls changes. If you set it to `SyncMode.Manual`, you'll need to manually handle synchronization.
 
 ```javascript
@@ -114,8 +114,8 @@ await client.attach(doc, {
 ```
 
 The initial values are partially applied. For each element in `initialRoot`:
-- If the key doesn't exist, the element will be applied.
-- If the key already exists in the Document, that element will be discarded. Users don't need to worry about overwriting existing valid counters.
+- If the key doesn't exist, the element is applied.
+- If the key already exists in the document, that element is discarded. You don't need to worry about overwriting existing values.
 
 ```javascript
 await client.attach(doc, {
@@ -211,7 +211,7 @@ Presence tracks and shares user state (e.g., cursor positions, selections) in re
 
 **Updating presence**
 
-Update the current user's presence using `Document.update()`. Properties are merged, and unspecified properties remain unchanged: 
+Update the current user's presence using `Document.update()`. Properties are merged, and unspecified properties remain unchanged. 
 
 ```javascript
 doc.update((root, presence) => {
@@ -272,9 +272,9 @@ Example: [Profile Stack](/examples/profile-stack)
 
 **Subscribing to presence changes**
 
-**Document.subscribe('presence')** notifies when clients watch, unwatch, or modify their presence.
+**Document.subscribe('presence')** notifies you when clients watch, unwatch, or modify their presence.
 
-The `initialized` event occurs when connecting, losing connection, or reconnecting to a watch stream.
+The `initialized` event occurs when connecting, losing connection, or reconnecting to the watch stream.
 
 <Alert status="warning">
 Subscribe before attaching the document to ensure you receive the initial `initialized` event.
@@ -334,7 +334,7 @@ const unsubscribe = doc.subscribe('others', (event) => {
 
 #### Synchronization Modes
 
-Change the synchronization mode using `client.changeSyncMode(doc, syncMode)`.
+Change the synchronization mode using `client.changeSyncMode(doc, syncMode)`:
 
 Available modes:
 
@@ -399,10 +399,10 @@ For more information about changeInfo for document events, please refer to the [
 The `event.rawChange` value for `local-change` and `remote-change` events, and the `event.value.snapshot` for `snapshot` event, are set only when [`enableDevtools`](/docs/devtools/#install-the-extension) option is configured as `true`.
 </Alert>
 
-The `snapshot` event occurs when fetching changes from the server exceeds `SnapshotThreshold`. The server sends a complete snapshot instead of individual changes. [Example code](https://github.com/yorkie-team/yorkie-js-sdk/blob/9c7accdfe337b9c9e7c7d0d3b3acc335951866ce/public/index.html#L346-L350) for handling snapshots in CodeMirror.
+The `snapshot` event occurs when the number of changes to fetch from the server exceeds `SnapshotThreshold`. The server sends a complete snapshot instead of individual changes. See this [example code](https://github.com/yorkie-team/yorkie-js-sdk/blob/9c7accdfe337b9c9e7c7d0d3b3acc335951866ce/public/index.html#L346-L350) for handling snapshots in CodeMirror.
 
 <Alert status="warning">
-Clients that haven't synchronized for a long time may receive a `snapshot` event. Ensure your application handles these events to maintain synchronization.
+Clients that haven't synchronized for a long time may receive a `snapshot` event. Ensure that your application handles these events to maintain synchronization.
 </Alert>
 
 **Document.subscribe('$.path')**
@@ -419,7 +419,7 @@ const unsubscribe = doc.subscribe('$.todos', (event) => {
 
 **Document.subscribe('connection')**
 
-Monitor the watch stream connection status. Possible values: `StreamConnectionStatus.Connected` and `StreamConnectionStatus.Disconnected`.
+Monitor the watch stream connection status. Possible values are `StreamConnectionStatus.Connected` and `StreamConnectionStatus.Disconnected`.
 
 ```javascript
 const unsubscribe = doc.subscribe('connection', (event) => {
@@ -435,7 +435,7 @@ For more information about `StreamConnectionStatus`, please refer to the [Stream
 
 **Document.subscribe('sync')**
 
-Track synchronization status in `SyncMode.Realtime`. Possible values: `DocSyncStatus.Synced` and `DocSyncStatus.SyncFailed`.
+Track synchronization status in `SyncMode.Realtime`. Possible values are `DocSyncStatus.Synced` and `DocSyncStatus.SyncFailed`.
 
 ```javascript
 const unsubscribe = doc.subscribe('sync', (event) => {
@@ -451,7 +451,7 @@ For more information about `DocSyncStatus`, please refer to the [DocSyncStatus](
 
 **Document.subscribe('status')**
 
-Subscribe to document status changes. Possible values: `DocStatus.Attached`, `DocStatus.Detached`, and `DocStatus.Removed`.
+Subscribe to document status changes. Possible values are `DocStatus.Attached`, `DocStatus.Detached`, and `DocStatus.Removed`.
 
 ```javascript
 const unsubscribe = doc.subscribe('status', (event) => {
@@ -468,7 +468,7 @@ const unsubscribe = doc.subscribe('status', (event) => {
 For more information about `DocStatus`, please refer to the [DocStatus](https://yorkie.dev/yorkie-js-sdk/api-reference/enums/DocStatus.html).
 
 <Alert status="warning">
-In web applications, detecting browser closure or navigation is difficult. Yorkie's `client-deactivate-threshold` automatically deactivates inactive clients, which will trigger a `DocumentStatus.Detached` event. See [Client Deactivate Threshold](/docs/cli#client-deactivate-threshold).
+In web applications, detecting browser closure or navigation is difficult. Yorkie's `client-deactivate-threshold` automatically deactivates inactive clients, triggering a `DocumentStatus.Detached` event. See [Client Deactivate Threshold](/docs/cli#client-deactivate-threshold).
 </Alert>
 
 **Document.subscribe('auth-error')**
@@ -518,7 +518,7 @@ doc.update((root) => {
 
 **Selection using presence**
 
-Share text selection using presence instead of storing it permanently. Convert `index` to `position` for `Yorkie.Text`:
+Share text selection using presence instead of storing it permanently. Convert `index` to `position` for `Yorkie.Text`.
 
 ```javascript
 // Update selection through text editing
@@ -574,7 +574,7 @@ doc.update((root) => {
 
 #### TypeScript Support
 
-To use the Document more strictly, you can use [type variable](https://www.typescriptlang.org/docs/handbook/2/generics.html) in TypeScript when creating a Document.
+For stricter type checking, you can use [type variables](https://www.typescriptlang.org/docs/handbook/2/generics.html) in TypeScript when creating a Document.
 
 ```typescript
 import yorkie, { JSONArray } from '@yorkie-js/sdk';
@@ -613,12 +613,12 @@ Yorkie enforces the following limits for system stability and performance. Confi
 
 **Understanding Document Size**
 
-A document's size includes both visible content and CRDT metadata for synchronization. The actual size may exceed what you see in the editor.
+A document's size includes both visible content and CRDT metadata required for synchronization. The actual size may exceed what you see in the editor.
 
 - **Local updates** that exceed the size limit are rejected and not pushed to the server
 - **Remote updates** are always applied to ensure state convergence across clients
 
-Tip: Monitor connection status using `Document.subscribe('connection')` to detect when limits are reached.
+**Tip**: Monitor connection status using `Document.subscribe('connection')` to detect when limits are reached.
 
 #### Document Revisions
 
@@ -921,11 +921,11 @@ For complete working examples of history implementation, see:
 
 ### Channel
 
-`Channel` is a communication channel that enables real-time pub/sub messaging and presence tracking between clients. Unlike Documents which persist and synchronize data, Channels are designed for ephemeral, real-time communication such as chat messages, notifications, and presence indicators.
+`Channel` is a communication channel that enables real-time pub/sub messaging and presence tracking between clients. Unlike Documents, which persist and synchronize data, Channels are designed for ephemeral, real-time communication such as chat messages, notifications, and presence indicators.
 
 #### Creating a Channel
 
-You can create a Channel with a unique identifier and attach it to the Client:
+Create a Channel with a unique identifier and attach it to the Client:
 
 ```javascript
 const channel = new yorkie.Channel('room-123');
@@ -936,7 +936,7 @@ await client.attach(channel);
 
 #### Hierarchical Channel Keys
 
-Channels support a hierarchical structure using periods (`.`) as separators, allowing you to organize channels into logical groups and subgroups. This is particularly useful for managing complex applications with multiple rooms, sections, or nested contexts.
+Channels support a hierarchical structure using periods (`.`) as separators, allowing you to organize channels into logical groups and subgroups. This structure is particularly useful for managing complex applications with multiple rooms, sections, or nested contexts.
 
 ```javascript
 // Create channels with hierarchical keys
@@ -949,7 +949,7 @@ await client.attach(sectionChannel);
 await client.attach(userChannel);
 ```
 
-Each level in the hierarchy maintains its own presence count and can be used independently. For example:
+Each level in the hierarchy maintains its own presence count and can be used independently:
 - `room-1` might track all users in a game room
 - `room-1.section-a` might track users in a specific section of that room
 - `room-1.section-a.user-123` might track presence for a specific user's context
@@ -969,7 +969,7 @@ When using hierarchical channel keys, follow these rules:
 <Alert status="warning">
 **Important: Distribute First-Level Channel Keys**
 
-Yorkie servers determine which server handles a channel based on a combination of your project and the first-level key of the channel. Using the same first-level key for all channels means all your channels will be managed by the same server, which can lead to performance bottlenecks and uneven load distribution.
+Yorkie servers determine which server handles a channel based on a combination of your project and the first-level key of the channel. Using the same first-level key for all channels means that a single server manages all your channels, which can lead to performance bottlenecks and uneven load distribution.
 
 Design your channel key structure to naturally distribute traffic across different first-level prefixes for optimal performance.
 
@@ -991,7 +991,7 @@ Design your channel key structure to naturally distribute traffic across differe
 
 #### Broadcast
 
-Channels support a pub/sub pattern for broadcasting ephemeral messages to all connected clients:
+Channels support a pub/sub pattern for broadcasting ephemeral messages to all connected clients.
 
 ```javascript
 // Subscribe to messages on a specific topic
@@ -1009,7 +1009,7 @@ The event object contains:
 - `payload`: The message data (must be JSON serializable)
 - `publisher`: The client ID of the message sender
 
-You can subscribe to multiple topics on the same channel:
+You can subscribe to multiple topics on the same channel.
 
 ```javascript
 // Subscribe to different topics
@@ -1032,7 +1032,7 @@ Broadcast messages are ephemeral and only delivered to clients currently connect
 
 #### Tracking Online Sessions
 
-Channels automatically track the number of connected clients, making it easy to display "sessions" counters:
+Channels automatically track the number of connected clients, making it easy to display session counters.
 
 ```javascript
 // Subscribe to presence changes
@@ -1048,7 +1048,7 @@ console.log(`Currently ${count} sessions`);
 The session count is automatically updated when clients connect or disconnect from the channel.
 
 <Alert status="warning">
-Sessions are connection-based and managed for scalability. In abnormal cases (app crash, network partition), a client might not detach cleanly, so the server may keep the session counted until it is considered stale and cleaned up. This means the displayed count can be approximate and may lag briefly; avoid using it as a source of truth for critical business logic (billing, authorization, settlements).
+Sessions are connection-based and managed for scalability. In abnormal cases (such as app crashes or network partitions), a client might not detach cleanly, so the server may keep the session counted until it is considered stale and cleaned up. This means the displayed count can be approximate and may lag briefly. Avoid using session counts as a source of truth for critical business logic such as billing, authorization, or settlements.
 </Alert>
 
 #### Detaching a Channel
@@ -1072,7 +1072,7 @@ For persistent data that needs to be synchronized and stored, use [Document](#do
 
 ### Logger Options
 
-The Logger outputs events occurring within the SDK to the console for debugging purposes. To modify these options, you can use the `setLogLevel` function.
+The Logger outputs SDK events to the console for debugging purposes. To modify these options, use the `setLogLevel` function.
 
 ```typescript
 import { setLogLevel, LogLevel } from '@yorkie-js/sdk';

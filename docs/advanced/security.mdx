@@ -21,7 +21,7 @@ Each project in Yorkie can have its own allowed origins settings, which can be m
 
 ### Auth Webhook
 
-The Auth Webhook provides fine-grained access control by validating client requests through an external authentication server. This allows you to enforce custom authorization logic, ensuring that only authorized users can access and modify Yorkie documents.
+The Auth Webhook provides fine-grained access control by validating client requests through an external authentication server. This allows you to enforce custom authorization logic, ensuring only authorized users can access and modify Yorkie documents.
 
 <Mermaid
   chart={`sequenceDiagram
@@ -49,17 +49,17 @@ The authentication process follows these steps:
 
 ##### 1. Configure the Auth Webhook
 
-You can easily set up the Auth Webhook via the the [Dashboard]({{DASHBOARD_PATH}}):
+You can set up the Auth Webhook via the [Dashboard]({{DASHBOARD_PATH}}):
 - Go to the Project Settings page.
 - Set the webhook URL and define which methods require authentication.
 
 <Image alt="setting auth-webhook" src="/assets/images/docs/auth-webhook-dashboard.png" width={1300} height={840} style={{ maxWidth: '1000px' }} />
 
-Alternatively, you can configure the webhook using the Yorkie CLI. See updating the project for details. Refer to the [updating the project](/docs/cli#updating-the-project).
+Alternatively, configure the webhook using the Yorkie CLI. See [Updating the Project](/docs/cli#updating-the-project) for details.
 
 ##### 2. Client Configuration
 
-To provide authentication tokens dynamically, use the `authTokenInjector` option when creating a Yorkie client:
+Provide authentication tokens dynamically using the `authTokenInjector` option when creating a Yorkie client:
 
 ```javascript
 const client = new yorkie.Client({
@@ -109,7 +109,7 @@ HTTP Status Codes:
 
 ##### 5. Error Handling and Recovery
 
-Yorkie handles authentication failures based on the webhook response and HTTP status codes:
+Yorkie handles authentication failures based on the webhook response and HTTP status codes.
 
 | Status Code | Meaning | Action Taken |
 |------------|---------|--------------|
@@ -118,9 +118,9 @@ Yorkie handles authentication failures based on the webhook response and HTTP st
 | 403 Permission Denied | The token is valid but lacks the required permissions (allowed: false) | The request is rejected with `codes.PermissionDenied` |
 
 ##### Token Refresh & Retry Behavior
-For `PushPull`(realtime sync) and `WatchDocuments`: 
-- Yorkie automatically retries the request after refreshing the token.
+For `PushPull` (realtime sync) and `WatchDocuments`:
+- Yorkie automatically retries the request after refreshing the token
 - Notifies via [`document.subscribe('auth-error')`](/docs/js-sdk#documentsubscribeauth-error)
 
 For other API calls:
-- The system does not automatically retry; the client must manually handle the `codes.Unauthenticated` error and retry the request.
+- The system does not automatically retry; the client must manually handle the `codes.Unauthenticated` error and retry the request

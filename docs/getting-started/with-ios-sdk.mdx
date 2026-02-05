@@ -5,14 +5,14 @@ order: 23
 
 ## Getting Started with iOS SDK
 
-Welcome to Yorkie iOS SDK! In this guide, we will walk you through the steps to get started with the iOS SDK.
+This guide walks you through the steps to get started with the Yorkie iOS SDK.
 
 ### Using in your projects
 
 #### Swift Package Manager
-The Swift Package Manager is a tool for automating the distribution of Swift code and is integrated into the swift compiler.
+The Swift Package Manager is a tool for automating the distribution of Swift code and is integrated into the Swift compiler.
 
-Once you have your Swift package set up, adding Yorkie as a dependency is as easy as adding it to the dependencies value of your Package.swift.
+Once you have your Swift package set up, add Yorkie as a dependency in the dependencies section of your `Package.swift`.
 
 ```
 dependencies: [
@@ -24,7 +24,7 @@ dependencies: [
 
 #### 1. Creating a Client with API key
 
-First, create a Client with API key
+First, create a Client with an API key.
 
 ```swift
 let client = Client("{{API_ADDR}}", ClientOptions(apiKey: "xxxxxxxxxxxxxxxxxxxx"))
@@ -42,11 +42,11 @@ let doc = Document(key: docKey)
 try await client.attach(doc, [:])
 ```
 
-The document should be attached to the client in order to automatically synchronize it between the users participating the document.
+Attach the document to the client to automatically synchronize it between users participating in the document.
 
 #### 3. Updating the Document
 
-The created document is initially an empty object. You can create or update a key-value property you would like to share with peers using `Document.update()`.
+The document is initially an empty object. You can create or update key-value properties to share with peers using `Document.update()`.
 
 ```swift
 try await doc.update{ root, _ in
@@ -58,7 +58,7 @@ try await doc.update{ root, _ in
 
 #### 4. Accessing Document
 
-If you want to access the document properties, you can use `doc.getRoot()`. Using a dot notation, you can access a key-value property you or your peers have set.
+To access document properties, use `doc.getRoot()`. With dot notation, you can access any key-value property that you or your peers have set.
 
 ```swift
 try await doc.update{ root, _ in
@@ -69,7 +69,7 @@ await print(self.document.getRoot().sharedMessage!) // "Hello World!"
 
 #### 5. Subscribing to the changes that happen in the Document
 
-Clients sharing the same document can subscribe to the changes that happen in the Document using `doc.subscribe()`.
+Clients sharing the same document can subscribe to changes using `doc.subscribe()`.
 
 ```swift
 await doc.subscribe { event in
@@ -91,8 +91,7 @@ await doc.subscribe { event in
 
 #### 6. Viewing the presence of users
 
-You can also subscribe to the presence of users participating in the document using `doc.subscribePresence(.presence)`. 
-You can use `doc.getPresences()` to get the list of users who are currently involved in the document.
+You can also subscribe to user presence using `doc.subscribePresence(.presence)`. Use `doc.getPresences()` to get the list of users currently participating in the document.
 
 ```swift
 await doc.subscribePresnece { event in 

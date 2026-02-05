@@ -5,18 +5,17 @@ order: 60
 
 ## Devtools
 
-DevTools is a Chrome extension that can be used when developing with Yorkie.
-It visualizes Yorkie data, allows inspection, and enhances your development experience.
+DevTools is a Chrome extension for developing with Yorkie. It visualizes Yorkie data, allows inspection, and enhances your development experience.
 
 ### Install the extension
 
-To get started, simply download the extension from the [Chrome Web Store](https://chromewebstore.google.com/detail/yorkie-devtools/djhcelgbkggnbipeccnnbafbnljoikkc).
+To get started, download the extension from the [Chrome Web Store](https://chromewebstore.google.com/detail/yorkie-devtools/djhcelgbkggnbipeccnnbafbnljoikkc).
 
 Once installed, you'll find the `Yorkie🐾` panel within Chrome Developer Tools.
 
 <Image alt="devtools" src="/assets/images/docs/devtools.png" width={1400} height={900} style={{ maxWidth: '800px' }} />
 
-To use devtools, you need to set the `enableDevtools` option when creating the Document.
+To use DevTools, set the `enableDevtools` option when creating the Document.
 
 ```javascript
 const doc = new yorkie.Document('docKey', {
@@ -32,7 +31,7 @@ Within the `Yorkie 🐾` panel, you will find the `History` panel at the top, th
 
 #### Document pane
 
-- Visualize the rootObject structure that you have defined in document.
+- Visualize the rootObject structure that you have defined in the document.
 - CRDT insights:
     - Clearly display data types for each CRDTElement using intuitive icons and informative tooltips.
         - <Image alt="object icon" src="/assets/images/docs/devtools-icon-object.png" width={16} height={16} style={{ width: '16px' }}/><span>: object, </span>
@@ -54,8 +53,8 @@ Within the `Yorkie 🐾` panel, you will find the `History` panel at the top, th
 
 #### Presence pane
 
-- Represent clients participating in the document.
-- Access detailed data with a simple click.
+- View clients participating in the document.
+- Access detailed data with a click.
 <video autoPlay loop muted playsInline style={{ maxWidth: '800px' }}>
     <source src="/assets/images/docs/devtools-presence.mov"/>
 </video>
@@ -69,10 +68,10 @@ Within the `Yorkie 🐾` panel, you will find the `History` panel at the top, th
 
 - Observe events occurring within the document.
     - Local changes are highlighted in yellow, remote changes in blue, presence changes are represented by cursor icons and document changes are indicated by document-shaped icons.
-- Easily debug through time-travel and replay.
+- Debug through time-travel and replay.
     - Move the slider and click on an event to check event details and see how the document has changed.
-    - Convenient navigation is possible using the arrow buttons at the top right or using the directional keys.
-    - If you are only interested in document changes, click the `Y` button next to the navigation buttons to filter out presence changes, and toggle it again to undo.
+    - Navigate using the arrow buttons at the top right or the directional keys.
+    - To filter out presence changes, click the `Y` button next to the navigation buttons. Toggle it again to show all changes.
     
 <video autoPlay loop muted playsInline style={{ maxWidth: '900px' }}>
     <source src="/assets/images/docs/devtools-history.mov"/>

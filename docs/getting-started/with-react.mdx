@@ -5,15 +5,13 @@ order: 22
 
 ## Getting Started with React
 
-[@yorkie-js/react](https://www.npmjs.com/package/@yorkie-js/react) is a library that provides React hooks and components for integrating Yorkie into your [React](https://react.dev) applications.
- It simplifies the process of sharing and syncing state across multiple clients in real-time.
+[@yorkie-js/react](https://www.npmjs.com/package/@yorkie-js/react) is a library that provides React hooks and components for integrating Yorkie into your [React](https://react.dev) applications. It simplifies sharing and syncing state across multiple clients in real-time.
 
 `@yorkie-js/react` provides two ways to integrate Yorkie into your React applications:
-  1. `Providers + Hooks`: Provider-based approach for managing Yorkie instances and shared documents.
-  2. `useYorkieDoc`: Hook for directly managing Yorkie documents without a provider.
+1. **Providers + Hooks**: A provider-based approach for managing Yorkie instances and shared documents
+2. **useYorkieDoc**: A hook for directly managing Yorkie documents without a provider
 
-Both `Providers + Hooks` and `useYorkieDoc` provide flexible ways to integrate Yorkie into your React applications.
-Choose `Providers` when you need a global document context and `useYorkieDoc` for isolated, self-managed instances.
+Both approaches provide flexible ways to integrate Yorkie into your React applications. Choose Providers when you need a global document context, and `useYorkieDoc` for isolated, self-managed instances.
 
 ### Installation
 
@@ -32,8 +30,7 @@ npm install @yorkie-js/react
 
 #### Setting up YorkieProvider and DocumentProvider
 
-First, wrap your component tree with `YorkieProvider` and `DocumentProvider` to initialize the Yorkie Client and shared document.
-You can also provide an initial root object to the `DocumentProvider` to set the initial state of the shared document.
+First, wrap your component tree with `YorkieProvider` and `DocumentProvider` to initialize the Yorkie Client and shared document. You can also provide an initial root object to `DocumentProvider` to set the initial state of the shared document.
 
 ```tsx
 import { YorkieProvider, DocumentProvider } from '@yorkie-js/react';
@@ -150,7 +147,7 @@ function ConnectionStatus() {
 
 ### Alternative Hook: useYorkieDoc
 
-If you prefer not to use `DocumentProvider`, you can use `useYorkieDoc`, which directly initializes and manages the document without requiring a provider.
+If you prefer not to use `DocumentProvider`, use `useYorkieDoc`, which directly initializes and manages the document without requiring a provider.
 
 ```tsx
 import { useYorkieDoc } from '@yorkie-js/react';
