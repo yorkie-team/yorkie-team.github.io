@@ -1,6 +1,6 @@
 ---
 title: 'Resources'
-order: 115
+order: 116
 ---
 
 ## Resources
@@ -13,6 +13,7 @@ Resource settings can be configured through:
 
 - **CLI**: Using `yorkie project update` command
 - **Dashboard**: Through the project settings page
+- **Admin API**: Using the [UpdateProject](/docs/admin-api#post-yorkiev1adminserviceupdateproject) endpoint
 
 ### Document Limits
 
@@ -40,9 +41,9 @@ Limits the maximum size of a single document. When a document exceeds this limit
 - **Cost control**: Limit storage and bandwidth costs for document synchronization
 
 **Example scenarios:**
-- Text editor applications: Set to 5-50 MiB depending on expected content richness
+- Text editor applications: Set to 1-10 MiB depending on expected content richness
 - Code collaboration tools: Set to 1-5 MiB as code files are typically smaller
-- Drawing/whiteboard apps: Set to 50-100 MiB to accommodate image data
+- Drawing/whiteboard apps: Set to 1-20 MiB to accommodate shapes
 
 #### MaxAttachmentsPerDocument
 

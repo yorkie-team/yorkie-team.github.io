@@ -40,6 +40,7 @@ These words are used in the Yorkie project and the community. Understanding thes
 | ---- | ----------- |
 | Sync Mode | The synchronization mode that determines how a document syncs with the server. Options include: `Realtime` (automatic push and pull), `RealtimePushOnly` (push only), `RealtimeSyncOff` (no sync but watch stream active), and `Manual` (requires manual sync calls). |
 | Snapshot | A complete state of a document at a specific point in time. When the number of changes exceeds a threshold, the server sends a snapshot instead of individual changes to optimize synchronization performance. |
+| Revision | An immutable snapshot of a document at a specific point in time with metadata (label, description, timestamp). Revisions allow users to browse document history, preview previous states, and restore documents to earlier versions. See [Document Revisions](/docs/advanced/revisions). |
 | PushPullChanges | An API for bidirectional synchronization of changes between clients and the server. |
 | Checkpoint | A mechanism for tracking the synchronization state between clients and the server, consisting of ServerSeq and ClientSeq. |
 
