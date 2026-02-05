@@ -5,3 +5,4 @@ export * from './Breadcrumb';
 export * from './Caption';
 export * from './Alert';
 export * from './Blockquote';
+export * from './EditThisPage';

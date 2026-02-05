@@ -7,25 +7,54 @@ order: 130
 
 These words are used in the Yorkie project and the community. Understanding these terms will help you navigate the documentation and discussions more easily.
 
+### Core Architecture
+
 | Word | Description |
 | ---- | ----------- |
 | Yorkie | An open-source document store for building real-time collaborative applications. Sometimes it refers to the [main repository](https://github.com/yorkie-team/yorkie). |
 | Client | An regular client that communicates with the Yorkie server, synchronizing document changes for real-time collaboration. |
 | Server | The central component that manages documents and channels, stores changes, and facilitates communication between clients. |
 | Project | A logical grouping of documents, channels, and clients, allowing multiple independent services within a single Yorkie installation. |
+
+### Document & Data Structures
+
+| Word | Description |
+| ---- | ----------- |
 | Document | The primary data structure in Yorkie for persistent, collaborative data. It contains a presence and a root, and is stored in the database. Documents support offline editing and conflict-free synchronization using CRDTs. |
-| Channel | A lightweight, memory-only communication layer for real-time features like presence tracking and message broadcasting. Unlike Documents, Channels do not persist data to the database and are designed for ephemeral data. |
-| Presence | A data structure representing a user's current state within a document (e.g., cursor position, selection). |
 | Root | The main JSON-like data structure(CRDT) within a document that can be shared and edited by multiple users. |
 | Change | A representation of modifications made to a document, created by calling `Document.Update()`. |
+| Schema | An optional validation key that can be specified when attaching a document to ensure it conforms to a predefined structure or set of rules. |
+| YSON | Yorkie JSON (YSON) is a JSON-like format for representing Yorkie documents, including custom CRDT types such as `Text`, `Tree`, `Counter`, along with specialized types like `Int`, `Long`, `Date`, and `BinData`. Used for document snapshots and serialization. |
+
+### Real-time Collaboration
+
+| Word | Description |
+| ---- | ----------- |
+| Channel | A lightweight, memory-only communication layer for real-time features like presence tracking and message broadcasting. Unlike Documents, Channels do not persist data to the database and are designed for ephemeral data. |
+| Broadcast | A messaging mechanism within Channels that allows clients to publish and subscribe to real-time events without persisting the data. Useful for chat messages, notifications, and other ephemeral communications. |
+| Presence | A data structure representing a user's current state within a document (e.g., cursor position, selection). |
+
+### Synchronization & State Management
+
+| Word | Description |
+| ---- | ----------- |
+| Sync Mode | The synchronization mode that determines how a document syncs with the server. Options include: `Realtime` (automatic push and pull), `RealtimePushOnly` (push only), `RealtimeSyncOff` (no sync but watch stream active), and `Manual` (requires manual sync calls). |
+| Snapshot | A complete state of a document at a specific point in time. When the number of changes exceeds a threshold, the server sends a snapshot instead of individual changes to optimize synchronization performance. |
 | PushPullChanges | An API for bidirectional synchronization of changes between clients and the server. |
 | Checkpoint | A mechanism for tracking the synchronization state between clients and the server, consisting of ServerSeq and ClientSeq. |
-| Housekeeping | A maintenance process that cleans up unnecessary data on the server. |
+
+### CRDT Internals
+
+| Word | Description |
+| ---- | ----------- |
 | CRDT Element | A data structure representing a CRDT element, analogous to an Element in the DOM. For more information, see [Data Structures](https://github.com/yorkie-team/yorkie/blob/main/design/data-structure.md). |
 | CRDT Node | A single node within a CRDT element. |
 | Tombstone | A marker for a deleted node or element in CRDT. |
 | Garbage Collection | The process of removing nodes marked as tombstones to optimize storage and performance. |
 
-<br/>
+### Server Management
 
-> If you want to add a new word or modify the description, please submit a pull request to the [Homepage](https://github.com/yorkie-team/yorkie-team.github.io/blob/main/docs/glossary.mdx).
+| Word | Description |
+| ---- | ----------- |
+| Admin API | A REST API that allows server-side applications to programmatically manage Yorkie documents without using the Yorkie SDK. Useful for server-side document management, automation, and integration. |
+| Housekeeping | A maintenance process that cleans up unnecessary data on the server. |

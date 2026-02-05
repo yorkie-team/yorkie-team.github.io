@@ -1,11 +1,11 @@
 ---
-title: 'Web API'
+title: 'Admin API'
 order: 90
 ---
 
-## Web API
+## Admin API
 
-Yorkie Web API allows developers to interact programmatically with their Yorkie documents without using Yorkie SDK. It is convenient for managing documents in server-side applications.
+Yorkie Admin API allows developers to interact programmatically with their Yorkie documents without using Yorkie SDK. It is convenient for managing documents in server-side applications.
 
 The API is implemented using [Connect protocol](https://connectrpc.com/docs/protocol/), which means all requests are made using HTTP POST method to a specific service endpoint. The API accepts JSON-encoded request bodies, returns JSON-encoded responses, and uses standard HTTP response codes.
 
@@ -34,7 +34,7 @@ is provided, it will be used as the initial content of the document. Otherwise, 
 Parameters:
 
 - `document_key`: A unique key for the new document.
-- `initial_root`: The initial root([YSON string](/docs/web-api#yson)) of the document.
+- `initial_root`: The initial root([YSON string](/docs/advanced/yson)) of the document.
 
 ```bash
 curl '{{API_ADDR}}/yorkie.v1.AdminService/CreateDocument' \
@@ -70,7 +70,7 @@ This endpoint updates the content of an existing document.
 Parameters:
 
 - `document_key`: The key of the document to update.
-- `root`: The new root content ([YSON string](/docs/web-api#yson)) of the document.
+- `root`: The new root content ([YSON string](/docs/advanced/yson)) of the document.
 
 ```bash
 curl '{{API_ADDR}}/yorkie.v1.AdminService/UpdateDocument' \
@@ -390,104 +390,5 @@ In this case, the total session count for `room-1` would include both 10 and 20,
       "sessionCount": 20
     }
   ]
-}
-```
-
-### YSON
-
-YSON(Yorkie Structured Object Notation) is a structured data format used by Yorkie to represent documents. It is similar to JSON but extends it with additional data types optimized for collaborative editing.
-
-#### Data Types
-
-YSON supports standard JSON types and adds specialized types for collaborative applications. Each YSON type has specific use cases and representation formats:
-
-| Type | Description | Format Example | Use Case |
-|------|-------------|----------------|----------|
-| String | UTF-8 encoded text | `"value1"` | Text content |
-| Number | Standard numeric value | `42.5` | Generic numeric values |
-| Boolean | True or false | `true` | Flags and boolean states |
-| Null | Null value | `null` | Absent or undefined values |
-| Object | Collection of key-value pairs | `{"key": "value"}` | Structured data |
-| Array | Ordered list of values | `[1, 2, 3]` | Sequential collections |
-| Int | 32-bit integer | `Int(42)` | Precise integer values |
-| Long | 64-bit integer | `Long(64)` | Large integer values |
-| Date | ISO 8601 timestamp | `Date("2025-01-02T15:04:05.058Z")` | Time values |
-| BinData | Binary data with Base64 encoding | `BinData("AQID")` | Binary content |
-| Counter | Concurrent counter | `Counter(Int(10))` | Collaborative counting |
-| Text | List-based Rich Text | `Text({"type":"p",...})` | List-based Rich Text Editor, e.g) Quill |
-| Tree | Tree-based Rich Text | `Tree({"type":"p",...})` | Tree-based Rich Text Editor |
-
-#### Custom Types Details
-
-##### Int and Long
-
-YSON provides explicit integer types to ensure consistent handling across platforms:
-
-- `Int(number)`: A 32-bit integer type (-2,147,483,648 to 2,147,483,647)
-- `Long(number)`: A 64-bit integer type for larger numbers
-
-These types help ensure that numeric values are interpreted consistently when sharing documents across different programming languages.
-
-##### Date
-YSON Date represents a timestamp value in ISO 8601 format:
-
-```json
-Date("2025-01-02T15:04:05.058Z")
-```
-
-Dates in YSON are stored as strings in ISO format for consistent representation across systems.
-
-##### BinData
-Binary data in YSON is represented using Base64 encoding:
-
-```json
-BinData("AQID")  // Base64 encoded binary data
-```
-
-This allows binary content to be safely represented and transmitted as text.
-
-##### Counter
-
-`Counter` type is specifically designed for collaborative counting operations where multiple users might modify a numeric value concurrently:
-
-```json
-Counter(Int(10))  // A counter with initial value of 10
-```
-
-Using Counter instead of a regular number prevents conflicts when multiple users increment or decrement values simultaneously.
-
-##### Text
-The Text type is designed for rich text editing, allowing for complex formatting and attributes:
-
-```json
-Text([{"val":"Hello","attrs":{"color":"red"}},{"val":"World","attrs":{"color":"blue"}}])
-```
-
-This structure allows for a list of text segments, each with its own attributes, enabling rich text editing capabilities.
-
-##### Tree
-The Tree type provides a specialized structure for representing hierarchical data, particularly useful for rich text editing:
-
-```json
-Tree({"type":"p","children":[{"type":"text","value":"Tree in object"}]})
-```
-
-This structure allows for a tree-based representation of rich text, where each node can have its own type and attributes.
-
-#### Example Document
-
-```json
-{
-  "str": "value1",        // Standard string
-  "num": 42,             // Standard number(float64)
-  "int": Int(42),         // 32-bit integer
-  "long": Long(64),        // 64-bit integer
-  "null": null,            // Standard null
-  "bool": true,            // Standard boolean
-  "bytes": BinData("AQID"), // Binary data (Base64)
-  "date": Date("2025-01-02T15:04:05.058Z"), // Date and time
-  "counter": Counter(Int(10)), // Counter with integer value
-  "text": Text([{"val":"Hello","attrs":{"color":"red"}},{"val":"World","attrs":{"color":"blue"}}]), // List-based Rich Text
-  "tree": Tree({"type":"p","attrs":{"align":"center"},"children":[{"type":"text","value":"Hello World"}]}) // Tree-based Rich Text
 }
 ```
