@@ -39,7 +39,7 @@ For more information about `CLI`, please refer to the [CLI](https://github.com/y
 
 You can configure authentication for the client by setting up an `authTokenInjector` to provide tokens for Auth Webhook verification.
 If a `codes.Unauthenticated` error occurs, the `authTokenInjector` will be called again with the webhook's response reason, enabling automatic token refresh.
-For more information about `Auth Webhook`, please refer to the [Auth Webhook](/docs/security#auth-webhook).
+For more information about `Auth Webhook`, please refer to the [Auth Webhook](/docs/advanced/security#auth-webhook).
 
 ```swift
 struct MyAuthTokenInjector: AuthTokenInjector {
@@ -428,7 +428,7 @@ await doc.subscribeAuthError { event, _ in
 ```
 
 This subscription allows you to monitor when token refreshes occur due to authentication errors.  
-For more information about `Auth Webhook`, please refer to the [Auth Webhook](/docs/security#auth-webhook).
+For more information about `Auth Webhook`, please refer to the [Auth Webhook](/docs/advanced/security#auth-webhook).
 
 #### Broadcasting a Message
 

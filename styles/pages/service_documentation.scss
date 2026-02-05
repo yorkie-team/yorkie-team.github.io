@@ -111,6 +111,7 @@ html {
   .section {
     $sec: '.section';
     display: flex;
+    flex-wrap: wrap;
     // overflow-x: auto;
     min-width: 0;
     max-width: 100%;
@@ -184,9 +185,13 @@ html {
     box-sizing: border-box;
     color: var(--gray-800);
     word-break: break-all;
+    flex: 1 1 100%;
+    order: 1;
 
     @media screen and (min-width: 1600px) {
       padding-right: 48px;
+      flex: 1 1 0;
+      min-width: 0;
     }
 
     h2 {
@@ -559,6 +564,31 @@ html {
             margin: 0 4px;
             content: '-';
           }
+        }
+      }
+    }
+  }
+
+  .edit_this_page {
+    flex: 0 0 100%;
+    order: 3;
+    margin-top: variables.$spacing_48;
+    padding-top: variables.$spacing_24;
+
+    blockquote {
+      margin: 0;
+      padding: variables.$spacing_16 variables.$spacing_24;
+      background-color: var(--gray-050);
+      border-left: 4px solid var(--orange-dark);
+      @include mixins-lib.rfonts(14, 22);
+      color: var(--gray-800);
+
+      a {
+        color: var(--orange-dark);
+        text-decoration: underline;
+
+        &:hover {
+          color: var(--orange-darker);
         }
       }
     }

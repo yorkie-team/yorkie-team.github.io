@@ -36,7 +36,7 @@ npm install @yorkie-js/react
 |------|------|----------|---------|-------------|
 | apiKey | string | Yes | - | Project API key from the [Dashboard]({{DASHBOARD_PATH}}) |
 | rpcAddr | string | No | `https://api.yorkie.dev` | Yorkie API server address |
-| authTokenInjector | `(reason?: string) => Promise<string>` | No | undefined | Async function that returns an auth token for [Auth Webhook](/docs/security#auth-webhook) verification |
+| authTokenInjector | `(reason?: string) => Promise<string>` | No | undefined | Async function that returns an auth token for [Auth Webhook](/docs/advanced/security#auth-webhook) verification |
 | metadata | `Record<string, string>` | No | {} | Client metadata (e.g., `{ userID: '...' }` for MAU measurement) |
 
 **Basic usage:**
@@ -58,7 +58,7 @@ function App() {
 
 **Auth Token integration:**
 
-Use `authTokenInjector` to provide tokens for [Auth Webhook](/docs/security#auth-webhook) verification. If a `codes.Unauthenticated` error occurs, the injector is called again with the webhook's response reason, enabling automatic token refresh.
+Use `authTokenInjector` to provide tokens for [Auth Webhook](/docs/advanced/security#auth-webhook) verification. If a `codes.Unauthenticated` error occurs, the injector is called again with the webhook's response reason, enabling automatic token refresh.
 
 ```tsx
 <YorkieProvider

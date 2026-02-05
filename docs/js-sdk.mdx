@@ -31,7 +31,7 @@ await client.activate();
 
 You can configure authentication for the client by setting up an `authTokenInjector` to provide tokens for Auth Webhook verification.
 If a `codes.Unauthenticated` error occurs, the `authTokenInjector` will be called again with the webhook's response reason, enabling automatic token refresh.
-For more information about `Auth Webhook`, please refer to the [Auth Webhook](/docs/security#auth-webhook).
+For more information about `Auth Webhook`, please refer to the [Auth Webhook](/docs/advanced/security#auth-webhook).
 
 ```javascript
 const client = new yorkie.Client({
@@ -485,7 +485,7 @@ const unsubscribe = doc.subscribe('auth-error', (event) => {
 ```
 
 This subscription allows you to monitor when token refreshes occur due to authentication errors.  
-For more information about `Auth Webhook`, please refer to the [Auth Webhook](/docs/security#auth-webhook).
+For more information about `Auth Webhook`, please refer to the [Auth Webhook](/docs/advanced/security#auth-webhook).
 
 **Document.subscribe('all')**
 
@@ -701,7 +701,7 @@ console.log('Revision data:', snapshot);
 
 The returned revision object contains:
 - All metadata from the revision summary
-- `snapshot`: document state at the time of the revision, [YSON](/docs/web-api#yson) representation
+- `snapshot`: document state at the time of the revision, [YSON](/docs/advanced/yson) representation
 
 <Alert status="info">
 The snapshot contains the full document data as it existed when the revision was created. This data can be used for comparison, preview, or restoration purposes.
@@ -964,7 +964,7 @@ When using hierarchical channel keys, follow these rules:
 | Cannot end with a period | ❌ `room-1.`<br/>❌ `room-1.section-1.` | ✅ `room-1`<br/>✅ `room-1.section-1` |
 | Cannot contain consecutive periods | ❌ `room-1..section-1`<br/>❌ `room..section..subsection` | ✅ `room-1.section-1`<br/>✅ `room.section.subsection` |
 
-**Query channel information:** Use the [GetChannels API](/docs/web-api#post-yorkiev1adminservicegetchannels) to retrieve presence counts for specific channels and their sub-levels.
+**Query channel information:** Use the [GetChannels API](/docs/admin-api#post-yorkiev1adminservicegetchannels) to retrieve presence counts for specific channels and their sub-levels.
 
 <Alert status="warning">
 **Important: Distribute First-Level Channel Keys**
