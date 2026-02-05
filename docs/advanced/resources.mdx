@@ -13,11 +13,10 @@ Resource settings can be configured through:
 
 - **CLI**: Using `yorkie project update` command
 - **Dashboard**: Through the project settings page
-- **Admin API**: Using the [UpdateProject](/docs/admin-api#post-yorkiev1adminserviceupdateproject) endpoint
 
 ### Document Limits
 
-Control the size and scale of documents in your project.
+Control the size and scale of documents in your project. These limits help you prevent resource exhaustion, ensure predictable performance, and protect your infrastructure from unexpected load.
 
 | Setting | Default | Description |
 |---------|---------|-------------|
@@ -34,14 +33,16 @@ Limits the maximum size of a single document. When a document exceeds this limit
 # Use the Dashboard or Admin API to set this value
 ```
 
-#### MaxSubscribersPerDocument
+**When to use:**
+- **Rich content editors**: Limit document size to prevent performance degradation when editing large documents with images or complex formatting
+- **Memory management**: Ensure documents fit within your server's available memory
+- **Client performance**: Prevent clients from downloading excessively large documents that could freeze their applications
+- **Cost control**: Limit storage and bandwidth costs for document synchronization
 
-Limits how many clients can subscribe (watch for changes) to a single document simultaneously. Set to `0` for unlimited subscribers.
-
-```bash
-yorkie project update [project-name] \
-  --max-subscribers-per-document 100
-```
+**Example scenarios:**
+- Text editor applications: Set to 5-50 MiB depending on expected content richness
+- Code collaboration tools: Set to 1-5 MiB as code files are typically smaller
+- Drawing/whiteboard apps: Set to 50-100 MiB to accommodate image data
 
 #### MaxAttachmentsPerDocument
 
@@ -50,6 +51,28 @@ Limits how many clients can attach to a single document simultaneously. Set to `
 ```bash
 yorkie project update [project-name] \
   --max-attachments-per-document 50
+```
+
+**When to use:**
+- **Concurrent editing control**: Limit the number of clients actively editing a document
+- **Conflict prevention**: Reduce merge complexity by limiting concurrent editors
+- **Resource protection**: Prevent excessive server load from too many active connections
+- **License enforcement**: Enforce concurrent user limits based on your pricing model
+
+**Example scenarios:**
+- Real-time document editing: Set to 5-20 for optimal collaboration experience
+- Code pair programming: Set to 2-4 for focused collaboration
+- Whiteboard sessions: Set to 10-30 depending on session size
+- View-only scenarios: Use MaxSubscribersPerDocument instead, as viewing doesn't require attachment
+
+#### MaxSubscribersPerDocument
+
+Limits how many clients can subscribe (watch for changes) to a single document simultaneously. Set to `0` for unlimited subscribers.
+Unlike attachments limits, this setting controls event streaming clients that receive updates without actively editing the document.
+
+```bash
+yorkie project update [project-name] \
+  --max-subscribers-per-document 100
 ```
 
 ### Snapshot Configuration
