@@ -23,8 +23,8 @@ Unlike other CRDT libraries like AutoMerge and Yjs that only provide data struct
 - Client SDKs for [JavaScript](/docs/js-sdk), [React](/docs/getting-started/with-react), [Android](/docs/android-sdk), and [iOS](/docs/ios-sdk)
 - Managed Cloud Service or [Self-Hosted Server](/docs/self-hosted-server) options
 - Built-in Infrastructure for data persistence, synchronization, and scaling
-- [Admin APIs](/docs/admin-api) for server-side document management
-- [Dashboard](https://yorkie.dev/dashboard) and [CLI](/docs/cli) for project management and monitoring
+- [Admin APIs](/docs/tools/admin-api) for server-side document management
+- [Dashboard](https://yorkie.dev/dashboard) and [CLI](/docs/tools/cli) for project management and monitoring
 
 This means you can focus on building your application's features instead of managing collaboration infrastructure.
 
@@ -37,7 +37,7 @@ Yorkie consists of four main components that work together to enable real-time c
 - [Channel](/docs/js-sdk#channel): A lightweight, memory-only communication layer for ephemeral data. Ideal for presence tracking (who's online, cursor positions) and real-time message broadcasting.
 - [Server](/docs/self-hosted-server): The central hub that receives changes from clients, persists them to the database, and broadcasts updates to subscribed clients. Available as a managed cloud service or self-hosted.
 
-Additionally, **[Projects](/docs/cli#project)** allow you to organize multiple independent applications within a single Yorkie installation, each with its own documents, channels, and clients. Learn more about key concepts in the [Glossary](/docs/glossary).
+Additionally, **[Projects](/docs/tools/cli#project)** allow you to organize multiple independent applications within a single Yorkie installation, each with its own documents, channels, and clients. Learn more about key concepts in the [Glossary](/docs/glossary).
 
 Yorkie offers flexibility in how you deploy:
 - **Cloud**: Get started instantly with our managed service - no infrastructure setup required
@@ -111,5 +111,5 @@ Explore more [examples](/examples) to see what you can build with Yorkie.
 **Dive Deeper:**
 - Understand [Architecture Patterns](/docs/advanced/architecture-patterns) to design your collaboration system
 - Learn about [security best practices](/docs/advanced/security) for production deployments
-- Explore [CLI commands](/docs/cli) for managing your projects
+- Explore [CLI commands](/docs/tools/cli) for managing your projects
 - Check the [Glossary](/docs/glossary) for terminology reference

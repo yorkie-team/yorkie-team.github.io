@@ -13,7 +13,7 @@ Revisions are immutable snapshots of a document's state stored on the server. Ea
 
 - **Label**: A user-friendly identifier (e.g., "v1.0", "Draft", "Final")
 - **Description**: Optional detailed explanation of what changed
-- **Snapshot**: The complete document state in [YSON](/docs/advanced/yson) format
+- **Snapshot**: The complete document state in [YSON](/docs/internals/yson) format
 - **Timestamp**: When the revision was created
 - **Server Sequence**: The document's server sequence number at creation time
 
@@ -29,7 +29,7 @@ Revisions are immutable snapshots of a document's state stored on the server. Ea
 
 This guide assumes familiarity with:
 1. [Client](/docs/js-sdk#client) and [Document](/docs/js-sdk#document) basics
-2. [YSON format](/docs/advanced/yson) for understanding snapshots
+2. [YSON format](/docs/internals/yson) for understanding snapshots
 
 ### How Revisions Work
 
@@ -298,7 +298,7 @@ When enabled:
 - Labels follow the format: `snapshot-{serverSeq}`
 - Descriptions: `Auto created revision of snapshot #{serverSeq}`
 
-Configure via the Dashboard or [Admin API](/docs/admin-api#post-yorkiev1adminserviceupdateproject). See [Resources](/docs/advanced/resources#autorevisionenabled) for details.
+Configure via the Dashboard or [Admin API](/docs/tools/admin-api#post-yorkiev1adminserviceupdateproject). See [Resources](/docs/advanced/resources#autorevisionenabled) for details.
 
 ### Best Practices
 
@@ -341,6 +341,6 @@ Revision operations require appropriate document permissions:
 ### Related Documentation
 
 - [JS SDK - Document Revisions](/docs/js-sdk#document-revisions) - Complete API reference
-- [YSON](/docs/advanced/yson) - Understanding snapshot format
+- [YSON](/docs/internals/yson) - Understanding snapshot format
 - [Resources](/docs/advanced/resources) - Project configuration including auto-revisions
 - [CodePair](https://github.com/yorkie-team/codepair) - Reference implementation

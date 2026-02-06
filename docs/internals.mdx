@@ -1,0 +1,24 @@
+---
+title: 'Internals'
+order: 120
+---
+
+## Internals
+
+This section explains how Yorkie works under the hood and how to deploy it at scale. These topics are for those who want a deeper understanding of Yorkie's CRDT engine, synchronization mechanisms, and production infrastructure.
+
+### Topics
+
+- **[CRDT Concepts](/docs/internals/crdt-concepts)**: Understand how Yorkie uses CRDTs for conflict-free collaboration, including data structure hierarchy, logical clocks, elements, nodes, tombstones, and garbage collection
+- **[Synchronization](/docs/internals/synchronization)**: Learn how Yorkie keeps document replicas consistent through sync modes, PushPullChanges, checkpoints, snapshots, and the watch stream
+- **[Document Lifecycle](/docs/internals/document-lifecycle)**: Understand the state transitions of documents and clients, from attachment through detachment and removal
+- **[YSON](/docs/internals/yson)**: Learn about Yorkie Structured Object Notation, the data format used to represent documents with specialized types for collaborative editing
+- **[Cluster Mode](/docs/internals/cluster-mode)**: Deploy Yorkie in production with sharded cluster mode, consistent hashing, leader election, and MongoDB sharding
+
+### Prerequisites
+
+Before exploring these topics, ensure you have:
+1. Completed the [Getting Started guide](/docs/getting-started)
+2. Built at least one application using Yorkie SDKs
+3. Understood basic concepts like [Client](/docs/js-sdk#client), [Document](/docs/js-sdk#document), and [Channel](/docs/js-sdk#channel)
+4. Reviewed [Configuration](/docs/advanced) topics and the [Glossary](/docs/glossary)

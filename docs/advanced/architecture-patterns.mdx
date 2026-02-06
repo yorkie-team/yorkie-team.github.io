@@ -22,7 +22,7 @@ If you're new to Yorkie, we recommend:
 In this pattern, your existing database serves as the Source of Truth, while your server manages the document lifecycle through Yorkie's Admin API. This approach provides centralized control over document creation and deletion, making it suitable for applications that require strict server-side governance.
 
 **Key Characteristics:**
-- Server creates and deletes documents via [Admin API](/docs/admin-api#documents-management)
+- Server creates and deletes documents via [Admin API](/docs/tools/admin-api#documents-management)
 - Clients edit documents directly through Yorkie SDK during collaboration
 - Explicit "Save" action persists content to your database
 - Server maintains full control over document lifecycle
@@ -49,7 +49,7 @@ sequenceDiagram
 ```
 
 1. Client requests document creation from your server
-2. Server creates a new document through [Yorkie Admin API](/docs/admin-api#post-yorkiev1adminservicecreatedocument)
+2. Server creates a new document through [Yorkie Admin API](/docs/tools/admin-api#post-yorkiev1adminservicecreatedocument)
 3. Server stores document metadata in your database
 4. Server returns document key to client
 5. Client [attaches](/docs/js-sdk#attaching-the-document) to the document using the provided key
@@ -139,7 +139,7 @@ This pattern also uses your external database as the Source of Truth, but delega
 **Key Characteristics:**
 - Server only provides document keys and initial content
 - Clients create and manage documents independently
-- Automatic document cleanup via `RemoveOnDetach` project setting (configure via [CLI](/docs/cli#updating-the-project) or Dashboard)
+- Automatic document cleanup via `RemoveOnDetach` project setting (configure via [CLI](/docs/tools/cli#updating-the-project) or Dashboard)
 - Explicit "Save" action persists content to your database
 
 **Document Creation Flow:**
@@ -306,7 +306,7 @@ sequenceDiagram
     S-->>C: Deletion confirmed
 ```
 
-1. Client or server removes document via [Yorkie Admin API](/docs/admin-api#post-yorkiev1adminserviceremovedocument)
+1. Client or server removes document via [Yorkie Admin API](/docs/tools/admin-api#post-yorkiev1adminserviceremovedocument)
 2. Server removes document metadata from your database
 3. Document content is automatically removed from Yorkie
 
@@ -345,7 +345,7 @@ Explore real-world examples implementing these patterns:
 
 For more information about Yorkie's API and features:
 - [JS SDK Documentation](/docs/js-sdk) - Client and Document API reference
-- [Admin API](/docs/admin-api) - Admin API for server-side management
+- [Admin API](/docs/tools/admin-api) - Admin API for server-side management
 - [Security Configuration](/docs/advanced/security) - Auth Webhook and access control
-- [CLI](/docs/cli) - Command-line tools for project management
+- [CLI](/docs/tools/cli) - Command-line tools for project management
 - [Glossary](/docs/glossary) - Key terminology and concepts

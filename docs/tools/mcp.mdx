@@ -1,7 +1,6 @@
 ---
 title: 'MCP'
-order: 95
-phase: development
+order: 64
 ---
 
 ## MCP (Model Context Protocol)
@@ -45,7 +44,7 @@ The MCP service runs alongside the existing Yorkie and Admin services, sharing t
 #### Prerequisites
 
 Before using MCP, ensure you have:
-1. A Yorkie project with a secret key (from [Dashboard]({{DASHBOARD_PATH}}) or via the [Admin API](/docs/admin-api))
+1. A Yorkie project with a secret key (from [Dashboard]({{DASHBOARD_PATH}}) or via the [Admin API](/docs/tools/admin-api))
 2. An MCP-compatible AI assistant (e.g., Claude Desktop)
 
 #### Claude Desktop Configuration
@@ -80,7 +79,7 @@ Claude should list the available MCP tools for document inspection, schema manag
 
 ### Authentication
 
-MCP uses the same API key authentication as the [Admin API](/docs/admin-api):
+MCP uses the same API key authentication as the [Admin API](/docs/tools/admin-api):
 
 ```
 Authorization: API-Key <project-secret-key>

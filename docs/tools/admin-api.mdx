@@ -1,6 +1,6 @@
 ---
 title: 'Admin API'
-order: 90
+order: 63
 ---
 
 ## Admin API
@@ -33,7 +33,7 @@ This endpoint creates a new document in the specified project. If `initial_root`
 Parameters:
 
 - `document_key`: A unique key for the new document.
-- `initial_root`: The initial root([YSON string](/docs/advanced/yson)) of the document.
+- `initial_root`: The initial root([YSON string](/docs/internals/yson)) of the document.
 
 ```bash
 curl '{{API_ADDR}}/yorkie.v1.AdminService/CreateDocument' \
@@ -69,7 +69,7 @@ This endpoint updates the content of an existing document.
 Parameters:
 
 - `document_key`: The key of the document to update.
-- `root`: The new root content ([YSON string](/docs/advanced/yson)) of the document.
+- `root`: The new root content ([YSON string](/docs/internals/yson)) of the document.
 
 ```bash
 curl '{{API_ADDR}}/yorkie.v1.AdminService/UpdateDocument' \
