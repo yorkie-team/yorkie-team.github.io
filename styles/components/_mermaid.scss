@@ -31,7 +31,7 @@
     background-color: var(--gray-000);
     padding: 4px 8px;
     border-radius: 4px;
-    color: #332e2b;
+    color: var(--gray-900);
 
     foreignObject {
       overflow: visible;
@@ -103,13 +103,14 @@
 
     .edgeLabel {
       background-color: var(--gray-800);
+      color: var(--gray-100);
 
       .labelBkg {
-        color: var(--gray-100);
+        color: inherit;
       }
 
       p {
-        color: var(--gray-100);
+        color: inherit;
         margin: 0;
       }
     }
