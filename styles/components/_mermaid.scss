@@ -17,7 +17,7 @@
   .node circle,
   .node ellipse,
   .node polygon {
-    fill: var(--white);
+    fill: var(--gray-000);
     stroke: var(--gray-400);
     stroke-width: 2px;
   }
@@ -28,9 +28,40 @@
   }
 
   .edgeLabel {
-    background-color: var(--white);
+    background-color: var(--gray-000);
     padding: 4px 8px;
     border-radius: 4px;
+    color: var(--gray-900);
+
+    foreignObject {
+      overflow: visible;
+
+      & > div {
+        width: max-content;
+        height: max-content;
+        margin: 0 auto;
+        padding: 0;
+        line-height: 1.2;
+        
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+    }
+
+    p,
+    span {
+      margin: 0;
+      padding: 0;
+      line-height: 1.2;
+      color: inherit;
+    }
+
+    .labelBkg {
+      background-color: var(--gray-000);
+      color: inherit;
+    }
   }
 
   text {
@@ -39,7 +70,7 @@
   }
 
   .actor {
-    fill: var(--white);
+    fill: var(--gray-000);
     stroke: var(--gray-400);
   }
 
@@ -49,7 +80,7 @@
   }
 
   .labelBox {
-    fill: var(--white);
+    fill: var(--gray-000);
     stroke: var(--gray-400);
   }
 }
@@ -72,13 +103,15 @@
 
     .edgeLabel {
       background-color: var(--gray-800);
+      color: var(--gray-100);
 
       .labelBkg {
-        color: var(--gray-100);
+        background-color: var(--gray-800);
+        color: inherit;
       }
 
       p {
-        color: var(--gray-100);
+        color: inherit;
         margin: 0;
       }
     }
