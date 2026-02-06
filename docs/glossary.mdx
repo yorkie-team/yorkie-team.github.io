@@ -12,50 +12,64 @@ These terms are used in the Yorkie project and community. Understanding them wil
 | Word | Description |
 | ---- | ----------- |
 | Yorkie | An open-source document store for building real-time collaborative applications. Sometimes it refers to the [main repository](https://github.com/yorkie-team/yorkie). |
-| Client | A regular client that communicates with the Yorkie server, synchronizing document changes for real-time collaboration. |
-| Server | The central component that manages documents and channels, stores changes, and facilitates communication between clients. |
-| Project | A logical grouping of documents, channels, and clients, allowing multiple independent services within a single Yorkie installation. |
+| [Client](/docs/js-sdk#client) | A regular client that communicates with the Yorkie server, synchronizing document changes for real-time collaboration. |
+| [Server](/docs/self-hosted-server) | The central component that manages documents and channels, stores changes, and facilitates communication between clients. |
+| [Project](/docs/advanced/projects) | A logical grouping of documents, channels, and clients, allowing multiple independent services within a single Yorkie installation. |
+| [Dashboard]({{DASHBOARD_PATH}}) | A web-based UI for managing Yorkie projects, monitoring documents, and viewing analytics such as MAU (Monthly Active Users). |
+| API Key | A project-specific key used to authenticate [Client](/docs/js-sdk#client) connections to the Yorkie server. Each project has a public key (used by clients) and a secret key (used by the [Admin API](/docs/tools/admin-api)). |
 
 ### Document & Data Structures
 
 | Word | Description |
 | ---- | ----------- |
-| Document | The primary data structure in Yorkie for persistent, collaborative data. It contains a presence and a root, and is stored in the database. Documents support offline editing and conflict-free synchronization using CRDTs. |
-| Root | The main JSON-like data structure(CRDT) within a document that can be shared and edited by multiple users. |
-| Change | A representation of modifications made to a document, created by calling `Document.Update()`. |
+| [Document](/docs/js-sdk#document) | The primary data structure in Yorkie for persistent, collaborative data. It contains a presence and a root, and is stored in the database. Documents support offline editing and conflict-free synchronization using CRDTs. |
+| [Root](/docs/js-sdk#initializing-root) | The main JSON-like data structure(CRDT) within a document that can be shared and edited by multiple users. |
+| [Change](/docs/js-sdk#editing-the-document) | A representation of modifications made to a document, created by calling `Document.Update()`. |
 | Schema | An optional validation key that can be specified when attaching a document to ensure it conforms to a predefined structure or set of rules. |
-| YSON | Yorkie JSON (YSON) is a JSON-like format for representing Yorkie documents, including custom CRDT types such as `Text`, `Tree`, `Counter`, along with specialized types like `Int`, `Long`, `Date`, and `BinData`. Used for document snapshots and serialization. |
+| [YSON](/docs/internals/yson) | Yorkie JSON (YSON) is a JSON-like format for representing Yorkie documents, including custom CRDT types such as `Text`, `Tree`, `Counter`, along with specialized types like `Int`, `Long`, `Date`, and `BinData`. Used for document snapshots and serialization. |
+| [Text](/docs/js-sdk#custom-crdt-types) | A list-based CRDT type for collaborative rich text editing. Supports styling attributes and cursor sharing via presence. Used for integrations like [Quill](/examples/quill) and [CodeMirror](/examples/codemirror). |
+| [Tree](/docs/js-sdk#custom-crdt-types) | A tree-based CRDT type for structured rich text editing. Represents content as a hierarchical tree of nodes, similar to a DOM structure. |
+| [Counter](/docs/js-sdk#custom-crdt-types) | A CRDT type for concurrent counting operations. Supports integer and long types, allowing multiple users to increment or decrement a value simultaneously without conflicts. |
 
 ### Real-time Collaboration
 
 | Word | Description |
 | ---- | ----------- |
-| Channel | A lightweight, memory-only communication layer for real-time features like presence tracking and message broadcasting. Unlike Documents, Channels do not persist data to the database and are designed for ephemeral data. |
-| Broadcast | A messaging mechanism within Channels that allows clients to publish and subscribe to real-time events without persisting the data. Useful for chat messages, notifications, and other ephemeral communications. |
-| Presence | A data structure representing a user's current state within a document (e.g., cursor position, selection). |
+| [Channel](/docs/js-sdk#channel) | A lightweight, memory-only communication layer for real-time features like presence tracking and message broadcasting. Unlike Documents, Channels do not persist data to the database and are designed for ephemeral data. |
+| [Broadcast](/docs/js-sdk#broadcast) | A messaging mechanism within Channels that allows clients to publish and subscribe to real-time events without persisting the data. Useful for chat messages, notifications, and other ephemeral communications. |
+| [Presence](/docs/js-sdk#presence) | A data structure representing a user's current state within a document (e.g., cursor position, selection). |
+| Attach / Detach | The operations that subscribe or unsubscribe a [Client](/docs/js-sdk#client) to/from a [Document](/docs/js-sdk#attaching-the-document) or [Channel](/docs/js-sdk#channel). Attaching synchronizes state with the server; detaching releases the subscription and cleans up resources. |
 
 ### Synchronization & State Management
 
 | Word | Description |
 | ---- | ----------- |
-| Sync Mode | The synchronization mode that determines how a document syncs with the server. Options include: `Realtime` (automatic push and pull), `RealtimePushOnly` (push only), `RealtimeSyncOff` (no sync but watch stream active), and `Manual` (requires manual sync calls). |
-| Snapshot | A complete state of a document at a specific point in time. When the number of changes exceeds a threshold, the server sends a snapshot instead of individual changes to optimize synchronization performance. |
-| Revision | An immutable snapshot of a document at a specific point in time with metadata (label, description, timestamp). Revisions allow users to browse document history, preview previous states, and restore documents to earlier versions. See [Document Revisions](/docs/advanced/revisions). |
-| PushPullChanges | An API for bidirectional synchronization of changes between clients and the server. |
-| Checkpoint | A mechanism for tracking the synchronization state between clients and the server, consisting of ServerSeq and ClientSeq. |
+| [Sync Mode](/docs/js-sdk#synchronization-modes) | The synchronization mode that determines how a document syncs with the server. Options include: `Realtime` (automatic push and pull), `RealtimePushOnly` (push only), `RealtimeSyncOff` (no sync but watch stream active), and `Manual` (requires manual sync calls). For more details, see [Synchronization](/docs/internals/synchronization). |
+| [Snapshot](/docs/internals/synchronization#snapshots) | A complete state of a document at a specific point in time. When the number of changes exceeds a threshold, the server sends a snapshot instead of individual changes to optimize synchronization performance. |
+| [Revision](/docs/advanced/revisions) | An immutable snapshot of a document at a specific point in time with metadata (label, description, timestamp). Revisions allow users to browse document history, preview previous states, and restore documents to earlier versions. |
+| [PushPullChanges](/docs/internals/synchronization#pushpullchanges) | An API for bidirectional synchronization of changes between clients and the server. |
+| [Checkpoint](/docs/internals/synchronization#checkpoints) | A mechanism for tracking the synchronization state between clients and the server, consisting of ServerSeq and ClientSeq. |
+| [Watch Stream](/docs/internals/synchronization#the-watch-stream) | A persistent gRPC server-side streaming connection between a client and the server. Delivers real-time events (`DocChanged`, `DocWatched`, `DocUnwatched`) using a PubSub pattern, enabling [Presence](/docs/js-sdk#presence) and automatic change pulling. |
+| [Document Compaction](/docs/internals/synchronization#document-compaction) | A server-side process that consolidates old change history into a single snapshot to reduce storage overhead. Performed by [Housekeeping](/docs/glossary) on documents that are not currently attached. |
 
 ### CRDT Internals
 
 | Word | Description |
 | ---- | ----------- |
-| CRDT Element | A data structure representing a CRDT element, analogous to an Element in the DOM. For more information, see [Data Structures](https://github.com/yorkie-team/yorkie/blob/main/design/data-structure.md). |
-| CRDT Node | A single node within a CRDT element. |
-| Tombstone | A marker for a deleted node or element in CRDT. |
-| Garbage Collection | The process of removing nodes marked as tombstones to optimize storage and performance. |
+| [CRDT Element](/docs/internals/crdt-concepts#crdt-elements-and-nodes) | A data structure representing a CRDT element, analogous to an Element in the DOM. For more information, see [CRDT Concepts](/docs/internals/crdt-concepts) and the [Data Structures design doc](https://github.com/yorkie-team/yorkie/blob/main/design/data-structure.md). |
+| [CRDT Node](/docs/internals/crdt-concepts#crdt-elements-and-nodes) | A single node within a CRDT element. |
+| [TimeTicket](/docs/internals/crdt-concepts#timetickets) | A globally unique identifier for every CRDT node, composed of a Lamport timestamp, an ActorID (the creating client), and a delimiter. TimeTickets provide both uniqueness and a total ordering for conflict resolution. |
+| [Version Vector](/docs/internals/crdt-concepts#version-vectors) | A Lamport Synced Version Vector -- a hybrid logical clock that combines Lamport timestamps with version vectors. Used to track causal relationships between clients for [Garbage Collection](/docs/internals/crdt-concepts#garbage-collection). |
+| [RHT](/docs/internals/crdt-concepts#replicated-hash-table-rht) | Replicated Hash Table -- the CRDT backing Yorkie's `Object` type. Resolves concurrent key updates using Lamport timestamps (last-writer-wins per key). |
+| [RGA](/docs/internals/crdt-concepts#replicated-growable-array-rga) | Replicated Growable Array -- the CRDT backing Yorkie's `Array` and `Text` types. Supports concurrent insertions with deterministic ordering using `insertAfter` semantics. |
+| [Tombstone](/docs/internals/crdt-concepts#tombstones) | A marker for a deleted node or element in CRDT. Tombstoned nodes remain in memory until all clients have synced past the deletion. |
+| [Garbage Collection](/docs/internals/crdt-concepts#garbage-collection) | The process of removing nodes marked as tombstones to optimize storage and performance. Uses the `minVersionVector` to determine when it is safe to purge tombstones. |
 
 ### Server Management
 
 | Word | Description |
 | ---- | ----------- |
-| Admin API | A REST API that allows server-side applications to programmatically manage Yorkie documents without using the Yorkie SDK. Useful for server-side document management, automation, and integration. |
-| Housekeeping | A maintenance process that cleans up unnecessary data on the server. |
+| [Admin API](/docs/tools/admin-api) | A REST API that allows server-side applications to programmatically manage Yorkie documents without using the Yorkie SDK. Useful for server-side document management, automation, and integration. |
+| [Auth Webhook](/docs/advanced/security#auth-webhook) | A server-side webhook that validates client requests through an external authentication server, providing fine-grained access control for documents. See [Security](/docs/advanced/security). |
+| [Event Webhook](/docs/advanced/event-webhook) | A webhook that notifies external services when specific events occur in Yorkie documents (e.g., `DocumentRootChanged`). Useful for integrations, notifications, and external system synchronization. |
+| Housekeeping | A maintenance process that cleans up unnecessary data on the server, such as deactivating clients that exceed the `client-deactivate-threshold`. Configured via [CLI](/docs/tools/cli#updating-the-project). |

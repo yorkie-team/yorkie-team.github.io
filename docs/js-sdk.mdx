@@ -396,7 +396,7 @@ When the `event.type` is `local-change` or `remote-change`, the `event.value` is
 For more information about changeInfo for document events, please refer to the [ChangeInfo](https://yorkie.dev/yorkie-js-sdk/api-reference/interfaces/ChangeInfo.html).
 
 <Alert status="warning">
-The `event.rawChange` value for `local-change` and `remote-change` events, and the `event.value.snapshot` for `snapshot` event, are set only when [`enableDevtools`](/docs/devtools/#install-the-extension) option is configured as `true`.
+The `event.rawChange` value for `local-change` and `remote-change` events, and the `event.value.snapshot` for `snapshot` event, are set only when [`enableDevtools`](/docs/tools/devtools/#install-the-extension) option is configured as `true`.
 </Alert>
 
 The `snapshot` event occurs when the number of changes to fetch from the server exceeds `SnapshotThreshold`. The server sends a complete snapshot instead of individual changes. See this [example code](https://github.com/yorkie-team/yorkie-js-sdk/blob/9c7accdfe337b9c9e7c7d0d3b3acc335951866ce/public/index.html#L346-L350) for handling snapshots in CodeMirror.
@@ -468,7 +468,7 @@ const unsubscribe = doc.subscribe('status', (event) => {
 For more information about `DocStatus`, please refer to the [DocStatus](https://yorkie.dev/yorkie-js-sdk/api-reference/enums/DocStatus.html).
 
 <Alert status="warning">
-In web applications, detecting browser closure or navigation is difficult. Yorkie's `client-deactivate-threshold` automatically deactivates inactive clients, triggering a `DocumentStatus.Detached` event. See [Client Deactivate Threshold](/docs/cli#client-deactivate-threshold).
+In web applications, detecting browser closure or navigation is difficult. Yorkie's `client-deactivate-threshold` automatically deactivates inactive clients, triggering a `DocumentStatus.Detached` event. See [Client Deactivate Threshold](/docs/tools/cli#client-deactivate-threshold).
 </Alert>
 
 **Document.subscribe('auth-error')**
@@ -489,7 +489,7 @@ For more information about `Auth Webhook`, please refer to the [Auth Webhook](/d
 
 **Document.subscribe('all')**
 
-Subscribe to all document events. Used for [Devtools extension](/docs/devtools).
+Subscribe to all document events. Used for [Devtools extension](/docs/tools/devtools).
 
 ```javascript
 const unsubscribe = doc.subscribe('all', (transactionEvent) => {
@@ -701,7 +701,7 @@ console.log('Revision data:', snapshot);
 
 The returned revision object contains:
 - All metadata from the revision summary
-- `snapshot`: document state at the time of the revision, [YSON](/docs/advanced/yson) representation
+- `snapshot`: document state at the time of the revision, [YSON](/docs/internals/yson) representation
 
 <Alert status="info">
 The snapshot contains the full document data as it existed when the revision was created. This data can be used for comparison, preview, or restoration purposes.
@@ -964,7 +964,7 @@ When using hierarchical channel keys, follow these rules:
 | Cannot end with a period | ❌ `room-1.`<br/>❌ `room-1.section-1.` | ✅ `room-1`<br/>✅ `room-1.section-1` |
 | Cannot contain consecutive periods | ❌ `room-1..section-1`<br/>❌ `room..section..subsection` | ✅ `room-1.section-1`<br/>✅ `room.section.subsection` |
 
-**Query channel information:** Use the [GetChannels API](/docs/admin-api#post-yorkiev1adminservicegetchannels) to retrieve presence counts for specific channels and their sub-levels.
+**Query channel information:** Use the [GetChannels API](/docs/tools/admin-api#post-yorkiev1adminservicegetchannels) to retrieve presence counts for specific channels and their sub-levels.
 
 <Alert status="warning">
 **Important: Distribute First-Level Channel Keys**

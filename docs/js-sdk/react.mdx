@@ -102,7 +102,7 @@ Set `userID` in the `metadata` prop to measure Monthly Active Users. The `userID
 | docKey | string | Yes | - | Unique document key |
 | initialRoot | `Record<string, any>` | No | {} | Initial values for the document root |
 | initialPresence | `Record<string, any>` | No | {} | Initial presence data for the current client |
-| enableDevtools | boolean | No | false | Enable [Devtools](/docs/devtools) integration |
+| enableDevtools | boolean | No | false | Enable [Devtools](/docs/tools/devtools) integration |
 
 **Basic usage:**
 
@@ -157,7 +157,7 @@ Set initial presence data that will be shared with other participants:
 
 **enableDevtools:**
 
-Enable the [Devtools](/docs/devtools) extension for debugging document state:
+Enable the [Devtools](/docs/tools/devtools) extension for debugging document state:
 
 ```tsx
 <DocumentProvider docKey="my-doc" enableDevtools={true}>
