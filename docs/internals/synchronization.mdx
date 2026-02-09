@@ -236,7 +236,7 @@ Over time, a document accumulates a large history of individual changes. **Docum
 2. Creating a new initial change that represents the current document state.
 3. Maintaining document integrity while reducing metadata size.
 
-Compaction is performed by the [Housekeeping](/docs/glossary) background service and only runs on documents that:
+Compaction is performed by the [Housekeeping](/docs/internals/housekeeping) background service and only runs on documents that:
 - Have at least a configured minimum number of changes (default: 1000)
 - Are not currently attached to any client
 

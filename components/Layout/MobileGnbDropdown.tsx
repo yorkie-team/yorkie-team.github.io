@@ -89,42 +89,12 @@ export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
                   </li>
                   <li className="navigator_group">
                     <Link
-                      href="/docs/ios-sdk"
+                      href="/docs/tools"
                       className={classNames('navigator_item', 'add_icon', {
-                        is_active: asPath.startsWith(`/docs/ios-sdk`),
+                        is_active: asPath.startsWith(`/docs/tools`),
                       })}
                     >
-                      iOS SDK
-                    </Link>
-                  </li>
-                  <li className="navigator_group">
-                    <Link
-                      href="/docs/android-sdk"
-                      className={classNames('navigator_item', 'add_icon', {
-                        is_active: asPath.startsWith(`/docs/android-sdk`),
-                      })}
-                    >
-                      Android SDK
-                    </Link>
-                  </li>
-                  <li className="navigator_group">
-                    <Link
-                      href="/docs/devtools"
-                      className={classNames('navigator_item', 'add_icon', {
-                        is_active: asPath.startsWith(`/docs/devtools`),
-                      })}
-                    >
-                      Devtools
-                    </Link>
-                  </li>
-                  <li className="navigator_group">
-                    <Link
-                      href="/docs/cli"
-                      className={classNames('navigator_item', 'add_icon', {
-                        is_active: asPath.startsWith(`/docs/cli`),
-                      })}
-                    >
-                      CLI
+                      Tools & APIs
                     </Link>
                   </li>
                   <li className="navigator_group">
@@ -135,6 +105,36 @@ export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
                       })}
                     >
                       Self-Hosted Server
+                    </Link>
+                  </li>
+                  <li className="navigator_group">
+                    <Link
+                      href="/docs/advanced"
+                      className={classNames('navigator_item', 'add_icon', {
+                        is_active: asPath.startsWith(`/docs/advanced`),
+                      })}
+                    >
+                      Configuration
+                    </Link>
+                  </li>
+                  <li className="navigator_group">
+                    <Link
+                      href="/docs/internals"
+                      className={classNames('navigator_item', 'add_icon', {
+                        is_active: asPath.startsWith(`/docs/internals`),
+                      })}
+                    >
+                      Internals
+                    </Link>
+                  </li>
+                  <li className="navigator_group">
+                    <Link
+                      href="/docs/glossary"
+                      className={classNames('navigator_item', 'add_icon', {
+                        is_active: asPath.startsWith(`/docs/glossary`),
+                      })}
+                    >
+                      Glossary
                     </Link>
                   </li>
                 </ul>
