@@ -85,13 +85,28 @@ export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement
                 </Link>
               </li>
               <li className="site_item">
-                <Link href="/docs/ios-sdk" className="link">
-                  iOS SDK
+                <Link href="/docs/tools" className="link">
+                  Tools & APIs
                 </Link>
               </li>
               <li className="site_item">
-                <Link href="/docs/android-sdk" className="link">
-                  Android SDK
+                <Link href="/docs/self-hosted-server" className="link">
+                  Self-Hosted Server
+                </Link>
+              </li>
+              <li className="site_item">
+                <Link href="/docs/advanced" className="link">
+                  Configuration
+                </Link>
+              </li>
+              <li className="site_item">
+                <Link href="/docs/internals" className="link">
+                  Internals
+                </Link>
+              </li>
+              <li className="site_item">
+                <Link href="/docs/glossary" className="link">
+                  Glossary
                 </Link>
               </li>
             </ul>

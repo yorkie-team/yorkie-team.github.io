@@ -38,7 +38,7 @@ These terms are used in the Yorkie project and community. Understanding them wil
 | [Channel](/docs/js-sdk#channel) | A lightweight, memory-only communication layer for real-time features like presence tracking and message broadcasting. Unlike Documents, Channels do not persist data to the database and are designed for ephemeral data. |
 | [Broadcast](/docs/js-sdk#broadcast) | A messaging mechanism within Channels that allows clients to publish and subscribe to real-time events without persisting the data. Useful for chat messages, notifications, and other ephemeral communications. |
 | [Presence](/docs/js-sdk#presence) | A data structure representing a user's current state within a document (e.g., cursor position, selection). |
-| Attach / Detach | The operations that subscribe or unsubscribe a [Client](/docs/js-sdk#client) to/from a [Document](/docs/js-sdk#attaching-the-document) or [Channel](/docs/js-sdk#channel). Attaching synchronizes state with the server; detaching releases the subscription and cleans up resources. |
+| [Attach / Detach](/docs/internals/document-lifecycle#attach-and-detach) | The operations that transition a [Document](/docs/js-sdk#document) or [Channel](/docs/js-sdk#channel) between lifecycle states. Attaching subscribes the client to a document, starts synchronization and the [Watch Stream](/docs/internals/synchronization#the-watch-stream); detaching stops synchronization, closes the stream, and releases resources. See [Document Lifecycle](/docs/internals/document-lifecycle) for details on states and transitions. |
 
 ### Synchronization & State Management
 
@@ -72,4 +72,4 @@ These terms are used in the Yorkie project and community. Understanding them wil
 | [Admin API](/docs/tools/admin-api) | A REST API that allows server-side applications to programmatically manage Yorkie documents without using the Yorkie SDK. Useful for server-side document management, automation, and integration. |
 | [Auth Webhook](/docs/advanced/security#auth-webhook) | A server-side webhook that validates client requests through an external authentication server, providing fine-grained access control for documents. See [Security](/docs/advanced/security). |
 | [Event Webhook](/docs/advanced/event-webhook) | A webhook that notifies external services when specific events occur in Yorkie documents (e.g., `DocumentRootChanged`). Useful for integrations, notifications, and external system synchronization. |
-| Housekeeping | A maintenance process that cleans up unnecessary data on the server, such as deactivating clients that exceed the `client-deactivate-threshold`. Configured via [CLI](/docs/tools/cli#updating-the-project). |
+| [Housekeeping](/docs/internals/housekeeping) | A background service that periodically cleans up unnecessary data on the server, including deactivating inactive clients and compacting documents. Configured via [CLI](/docs/tools/cli#updating-the-project). |
