@@ -9,7 +9,7 @@ In Yorkie, documents and clients follow a well-defined lifecycle with distinct s
 
 ### Client Lifecycle
 
-A [Client](/docs/js-sdk#client) must be activated before it can work with documents or channels.
+A [Client](/docs/sdks/js-sdk#client) must be activated before it can work with documents or channels.
 
 ```mermaid
 stateDiagram-v2
@@ -170,5 +170,5 @@ The `PushPull` synchronization operation is **only available in the Attached sta
 - [Housekeeping design document](https://github.com/yorkie-team/yorkie/blob/main/design/housekeeping.md) -- Client deactivation and document compaction
 - [Synchronization](/docs/internals/synchronization) -- PushPullChanges, checkpoints, and sync modes
 - [CRDT Concepts: Garbage Collection](/docs/internals/crdt-concepts#garbage-collection) -- How GC relates to client lifecycle
-- [JS SDK: Document](/docs/js-sdk#document) -- SDK reference for document operations
+- [JS SDK: Document](/docs/sdks/js-sdk#document) -- SDK reference for document operations
 - [Glossary](/docs/glossary) -- Definitions of all key terms

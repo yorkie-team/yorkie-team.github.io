@@ -409,7 +409,7 @@ helm upgrade yorkie-cluster yorkie-team/yorkie-cluster --namespace yorkie \
   --set yorkie.args.starrocksDSN="root:@tcp(kube-starrocks-fe-search.analytics.svc.cluster.local:9030)/yorkie"
 ```
 
-If clients are connected to Yorkie cluster with `userID`([Measuring MAU](/docs/js-sdk#measuring-mau)), you can see the user events are collected in StarRocks database.
+If clients are connected to Yorkie cluster with `userID`([Measuring MAU](/docs/sdks/js-sdk#measuring-mau)), you can see the user events are collected in StarRocks database.
 
 ```bash
 StarRocks > use yorkie;

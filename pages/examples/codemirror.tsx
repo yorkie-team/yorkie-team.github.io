@@ -36,7 +36,7 @@ const CodemirrorExampleView: NextPage = () => {
                     CodeMirror 6
                   </a>{' '}
                   editor. It uses the{' '}
-                  <a href="https://yorkie.dev/docs/js-sdk#text" className="link" target="_blank" rel="noreferrer">
+                  <a href="https://yorkie.dev/docs/sdks/js-sdk#text" className="link" target="_blank" rel="noreferrer">
                     Text
                   </a>
                   , a custom CRDT type from Yorkie.

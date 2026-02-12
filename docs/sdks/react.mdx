@@ -1,13 +1,13 @@
 ---
 title: 'React'
-order: 31
+order: 32
 ---
 
 ## React
 
-`@yorkie-js/react` is a React binding for the [Yorkie JS SDK](/docs/js-sdk) that provides a set of Providers and Hooks for integrating real-time collaboration into your React applications. It abstracts away the complexity of managing Yorkie Client and Document lifecycles, letting you focus on building your UI.
+`@yorkie-js/react` is a React binding for the [Yorkie JS SDK](/docs/sdks/js-sdk) that provides a set of Providers and Hooks for integrating real-time collaboration into your React applications. It abstracts away the complexity of managing Yorkie Client and Document lifecycles, letting you focus on building your UI.
 
-If you're new to Yorkie with React, start with the [Getting Started with React](/docs/getting-started/with-react) guide. For low-level JS SDK details (CRDT types, subscriptions, events), refer to the [JS SDK](/docs/js-sdk) guide.
+If you're new to Yorkie with React, start with the [Getting Started with React](/docs/getting-started/with-react) guide. For low-level JS SDK details (CRDT types, subscriptions, events), refer to the [JS SDK](/docs/sdks/js-sdk) guide.
 
 `@yorkie-js/react` offers two approaches:
 1. **Providers + Hooks**: Wrap your component tree with `YorkieProvider` and `DocumentProvider` (or `ChannelProvider`) to share Yorkie instances via React context.
@@ -139,7 +139,7 @@ Initial values are partially applied at the **top-level key** only (not deep mer
 </DocumentProvider>
 ```
 
-This means multiple clients can safely specify `initialRoot` without overwriting each other's data. For more details, see [JS SDK: Initializing root](/docs/js-sdk#initializing-root).
+This means multiple clients can safely specify `initialRoot` without overwriting each other's data. For more details, see [JS SDK: Initializing root](/docs/sdks/js-sdk#initializing-root).
 
 **initialPresence:**
 
@@ -167,7 +167,7 @@ Enable the [Devtools](/docs/tools/devtools) extension for debugging document sta
 
 #### ChannelProvider
 
-`ChannelProvider` attaches a [Channel](/docs/js-sdk#channel) to the client provided by `YorkieProvider`. The React hooks (`useChannel`, `useChannelSessionCount`) currently expose **session count tracking** only. For channel broadcast/subscribe functionality, use the [JS SDK Channel API](/docs/js-sdk#channel) directly.
+`ChannelProvider` attaches a [Channel](/docs/sdks/js-sdk#channel) to the client provided by `YorkieProvider`. The React hooks (`useChannel`, `useChannelSessionCount`) currently expose **session count tracking** only. For channel broadcast/subscribe functionality, use the [JS SDK Channel API](/docs/sdks/js-sdk#channel) directly.
 
 > `ChannelProvider` handles React 18 StrictMode correctly. In development mode, StrictMode mounts effects twice, but the provider uses an internal flag to prevent duplicate `attach` calls.
 
@@ -175,13 +175,13 @@ Enable the [Devtools](/docs/tools/devtools) extension for debugging document sta
 
 | Prop | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
-| channelKey | string | Yes | - | Unique channel key (supports [hierarchical keys](/docs/js-sdk#hierarchical-channel-keys)) |
+| channelKey | string | Yes | - | Unique channel key (supports [hierarchical keys](/docs/sdks/js-sdk#hierarchical-channel-keys)) |
 | isRealtime | boolean | No | true | Session tracking mode |
 
 - `isRealtime={true}` (default): The session count updates automatically via a watch stream. Use this for live "users online" indicators.
 - `isRealtime={false}`: Manual mode — the watch stream is not established, so session count will not update automatically. If you need messaging (broadcast/subscribe) or manual sync, use the JS SDK channel directly and manage the lifecycle yourself. Receiving broadcast events requires a watch stream.
 
-> Channel broadcast/subscribe hooks are planned for a future release. In the meantime, use the [JS SDK Channel API](/docs/js-sdk#channel) directly for messaging (and remember to unsubscribe/detach on unmount to avoid leaks).
+> Channel broadcast/subscribe hooks are planned for a future release. In the meantime, use the [JS SDK Channel API](/docs/sdks/js-sdk#channel) directly for messaging (and remember to unsubscribe/detach on unmount to avoid leaks).
 
 **Basic usage:**
 
@@ -299,7 +299,7 @@ function TodoApp() {
 }
 ```
 
-For more on custom CRDT types (Text, Counter, Tree), see [JS SDK: Custom CRDT Types](/docs/js-sdk#custom-crdt-types).
+For more on custom CRDT types (Text, Counter, Tree), see [JS SDK: Custom CRDT Types](/docs/sdks/js-sdk#custom-crdt-types).
 
 **Updating presence:**
 
@@ -317,7 +317,7 @@ function CursorUpdater() {
 }
 ```
 
-For more on presence semantics (merging behavior, property replacement), see [JS SDK: Presence](/docs/js-sdk#presence).
+For more on presence semantics (merging behavior, property replacement), see [JS SDK: Presence](/docs/sdks/js-sdk#presence).
 
 **Reducer pattern:**
 
@@ -832,4 +832,4 @@ The [yorkie-js-sdk repository](https://github.com/yorkie-team/yorkie-js-sdk/tree
 
 - [JS SDK API Reference](https://yorkie.dev/yorkie-js-sdk/api-reference/)
 - [Getting Started with React](/docs/getting-started/with-react)
-- [JS SDK Guide](/docs/js-sdk)
+- [JS SDK Guide](/docs/sdks/js-sdk)

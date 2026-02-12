@@ -12,44 +12,44 @@ These terms are used in the Yorkie project and community. Understanding them wil
 | Word | Description |
 | ---- | ----------- |
 | Yorkie | An open-source document store for building real-time collaborative applications. Sometimes it refers to the [main repository](https://github.com/yorkie-team/yorkie). |
-| [Client](/docs/js-sdk#client) | A regular client that communicates with the Yorkie server, synchronizing document changes for real-time collaboration. |
+| [Client](/docs/sdks/js-sdk#client) | A regular client that communicates with the Yorkie server, synchronizing document changes for real-time collaboration. |
 | [Server](/docs/self-hosted-server) | The central component that manages documents and channels, stores changes, and facilitates communication between clients. |
 | [Project](/docs/advanced/projects) | A logical grouping of documents, channels, and clients, allowing multiple independent services within a single Yorkie installation. |
 | [Dashboard]({{DASHBOARD_PATH}}) | A web-based UI for managing Yorkie projects, monitoring documents, and viewing analytics such as MAU (Monthly Active Users). |
-| API Key | A project-specific key used to authenticate [Client](/docs/js-sdk#client) connections to the Yorkie server. Each project has a public key (used by clients) and a secret key (used by the [Admin API](/docs/tools/admin-api)). |
+| API Key | A project-specific key used to authenticate [Client](/docs/sdks/js-sdk#client) connections to the Yorkie server. Each project has a public key (used by clients) and a secret key (used by the [Admin API](/docs/tools/admin-api)). |
 
 ### Document & Data Structures
 
 | Word | Description |
 | ---- | ----------- |
-| [Document](/docs/js-sdk#document) | The primary data structure in Yorkie for persistent, collaborative data. It contains a presence and a root, and is stored in the database. Documents support offline editing and conflict-free synchronization using CRDTs. |
-| [Root](/docs/js-sdk#initializing-root) | The main JSON-like data structure(CRDT) within a document that can be shared and edited by multiple users. |
-| [Change](/docs/js-sdk#editing-the-document) | A representation of modifications made to a document, created by calling `Document.Update()`. |
+| [Document](/docs/sdks/js-sdk#document) | The primary data structure in Yorkie for persistent, collaborative data. It contains a presence and a root, and is stored in the database. Documents support offline editing and conflict-free synchronization using CRDTs. |
+| [Root](/docs/sdks/js-sdk#initializing-root) | The main JSON-like data structure(CRDT) within a document that can be shared and edited by multiple users. |
+| [Change](/docs/sdks/js-sdk#editing-the-document) | A representation of modifications made to a document, created by calling `Document.Update()`. |
 | Schema | An optional validation key that can be specified when attaching a document to ensure it conforms to a predefined structure or set of rules. |
 | [YSON](/docs/internals/yson) | Yorkie JSON (YSON) is a JSON-like format for representing Yorkie documents, including custom CRDT types such as `Text`, `Tree`, `Counter`, along with specialized types like `Int`, `Long`, `Date`, and `BinData`. Used for document snapshots and serialization. |
-| [Text](/docs/js-sdk#custom-crdt-types) | A list-based CRDT type for collaborative rich text editing. Supports styling attributes and cursor sharing via presence. Used for integrations like [Quill](/examples/quill) and [CodeMirror](/examples/codemirror). |
-| [Tree](/docs/js-sdk#custom-crdt-types) | A tree-based CRDT type for structured rich text editing. Represents content as a hierarchical tree of nodes, similar to a DOM structure. |
-| [Counter](/docs/js-sdk#custom-crdt-types) | A CRDT type for concurrent counting operations. Supports integer and long types, allowing multiple users to increment or decrement a value simultaneously without conflicts. |
+| [Text](/docs/sdks/js-sdk#custom-crdt-types) | A list-based CRDT type for collaborative rich text editing. Supports styling attributes and cursor sharing via presence. Used for integrations like [Quill](/examples/quill) and [CodeMirror](/examples/codemirror). |
+| [Tree](/docs/sdks/js-sdk#custom-crdt-types) | A tree-based CRDT type for structured rich text editing. Represents content as a hierarchical tree of nodes, similar to a DOM structure. |
+| [Counter](/docs/sdks/js-sdk#custom-crdt-types) | A CRDT type for concurrent counting operations. Supports integer and long types, allowing multiple users to increment or decrement a value simultaneously without conflicts. |
 
 ### Real-time Collaboration
 
 | Word | Description |
 | ---- | ----------- |
-| [Channel](/docs/js-sdk#channel) | A lightweight, memory-only communication layer for real-time features like presence tracking and message broadcasting. Unlike Documents, Channels do not persist data to the database and are designed for ephemeral data. |
-| [Broadcast](/docs/js-sdk#broadcast) | A messaging mechanism within Channels that allows clients to publish and subscribe to real-time events without persisting the data. Useful for chat messages, notifications, and other ephemeral communications. |
-| [Presence](/docs/js-sdk#presence) | A data structure representing a user's current state within a document (e.g., cursor position, selection). |
-| [Attach / Detach](/docs/internals/document-lifecycle#attach-and-detach) | The operations that transition a [Document](/docs/js-sdk#document) or [Channel](/docs/js-sdk#channel) between lifecycle states. Attaching subscribes the client to a document, starts synchronization and the [Watch Stream](/docs/internals/synchronization#the-watch-stream); detaching stops synchronization, closes the stream, and releases resources. See [Document Lifecycle](/docs/internals/document-lifecycle) for details on states and transitions. |
+| [Channel](/docs/sdks/js-sdk#channel) | A lightweight, memory-only communication layer for real-time features like presence tracking and message broadcasting. Unlike Documents, Channels do not persist data to the database and are designed for ephemeral data. |
+| [Broadcast](/docs/sdks/js-sdk#broadcast) | A messaging mechanism within Channels that allows clients to publish and subscribe to real-time events without persisting the data. Useful for chat messages, notifications, and other ephemeral communications. |
+| [Presence](/docs/sdks/js-sdk#presence) | A data structure representing a user's current state within a document (e.g., cursor position, selection). |
+| [Attach / Detach](/docs/internals/document-lifecycle#attach-and-detach) | The operations that transition a [Document](/docs/sdks/js-sdk#document) or [Channel](/docs/sdks/js-sdk#channel) between lifecycle states. Attaching subscribes the client to a document, starts synchronization and the [Watch Stream](/docs/internals/synchronization#the-watch-stream); detaching stops synchronization, closes the stream, and releases resources. See [Document Lifecycle](/docs/internals/document-lifecycle) for details on states and transitions. |
 
 ### Synchronization & State Management
 
 | Word | Description |
 | ---- | ----------- |
-| [Sync Mode](/docs/js-sdk#synchronization-modes) | The synchronization mode that determines how a document syncs with the server. Options include: `Realtime` (automatic push and pull), `RealtimePushOnly` (push only), `RealtimeSyncOff` (no sync but watch stream active), and `Manual` (requires manual sync calls). For more details, see [Synchronization](/docs/internals/synchronization). |
+| [Sync Mode](/docs/sdks/js-sdk#synchronization-modes) | The synchronization mode that determines how a document syncs with the server. Options include: `Realtime` (automatic push and pull), `RealtimePushOnly` (push only), `RealtimeSyncOff` (no sync but watch stream active), and `Manual` (requires manual sync calls). For more details, see [Synchronization](/docs/internals/synchronization). |
 | [Snapshot](/docs/internals/synchronization#snapshots) | A complete state of a document at a specific point in time. When the number of changes exceeds a threshold, the server sends a snapshot instead of individual changes to optimize synchronization performance. |
 | [Revision](/docs/advanced/revisions) | An immutable snapshot of a document at a specific point in time with metadata (label, description, timestamp). Revisions allow users to browse document history, preview previous states, and restore documents to earlier versions. |
 | [PushPullChanges](/docs/internals/synchronization#pushpullchanges) | An API for bidirectional synchronization of changes between clients and the server. |
 | [Checkpoint](/docs/internals/synchronization#checkpoints) | A mechanism for tracking the synchronization state between clients and the server, consisting of ServerSeq and ClientSeq. |
-| [Watch Stream](/docs/internals/synchronization#the-watch-stream) | A persistent gRPC server-side streaming connection between a client and the server. Delivers real-time events (`DocChanged`, `DocWatched`, `DocUnwatched`) using a PubSub pattern, enabling [Presence](/docs/js-sdk#presence) and automatic change pulling. |
+| [Watch Stream](/docs/internals/synchronization#the-watch-stream) | A persistent gRPC server-side streaming connection between a client and the server. Delivers real-time events (`DocChanged`, `DocWatched`, `DocUnwatched`) using a PubSub pattern, enabling [Presence](/docs/sdks/js-sdk#presence) and automatic change pulling. |
 | [Document Compaction](/docs/internals/synchronization#document-compaction) | A server-side process that consolidates old change history into a single snapshot to reduce storage overhead. Performed by [Housekeeping](/docs/glossary) on documents that are not currently attached. |
 
 ### CRDT Internals

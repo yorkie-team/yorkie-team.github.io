@@ -1,0 +1,293 @@
+---
+title: 'ProseMirror'
+order: 35
+---
+
+## ProseMirror
+
+`@yorkie-js/prosemirror` is a ProseMirror binding for the [Yorkie JS SDK](/docs/sdks/js-sdk) that provides two-way synchronization between a ProseMirror editor and Yorkie's [Tree](/docs/sdks/js-sdk#custom-crdt-types) CRDT. It handles content syncing, mark-to-element conversion, remote cursor display, and IME composition safely — so you can focus on building your editor.
+
+### Installation
+
+```bash
+npm install @yorkie-js/prosemirror
+```
+
+#### Peer Dependencies
+
+The following packages must be installed alongside:
+
+```bash
+npm install @yorkie-js/sdk prosemirror-model prosemirror-state prosemirror-view
+```
+
+### Quick Start
+
+Below is a minimal example that connects a ProseMirror editor to Yorkie for real-time collaboration.
+
+```typescript
+import yorkie from '@yorkie-js/sdk';
+import { EditorState } from 'prosemirror-state';
+import { EditorView } from 'prosemirror-view';
+import { schema } from 'prosemirror-schema-basic';
+import { exampleSetup } from 'prosemirror-example-setup';
+import {
+  YorkieProseMirrorBinding,
+  remoteSelectionPlugin,
+} from '@yorkie-js/prosemirror';
+
+async function main() {
+  // 1. Connect to Yorkie
+  const client = new yorkie.Client({
+    rpcAddr: '{{API_ADDR}}',
+    apiKey: 'xxxxxxxxxxxxxxxxxxxx',
+  });
+  await client.activate();
+
+  const doc = new yorkie.Document('my-prosemirror-doc');
+  await client.attach(doc, { initialPresence: {} });
+
+  // 2. Create the ProseMirror editor
+  const view = new EditorView(document.getElementById('editor')!, {
+    state: EditorState.create({
+      doc: schema.node('doc', null, [
+        schema.node('paragraph', null, [schema.text('Hello, world!')]),
+      ]),
+      plugins: [
+        ...exampleSetup({ schema }),
+        remoteSelectionPlugin(), // Renders remote selection highlights
+      ],
+    }),
+  });
+
+  // 3. Bind ProseMirror to Yorkie
+  const binding = new YorkieProseMirrorBinding(view, doc, 'tree', {
+    cursors: {
+      enabled: true,
+      overlayElement: document.getElementById('cursor-overlay')!,
+      wrapperElement: document.getElementById('editor-wrapper')!,
+    },
+  });
+  binding.initialize();
+}
+
+main();
+```
+
+The HTML structure should include an overlay container for remote cursors:
+
+```html
+<div id="editor-wrapper" style="position: relative;">
+  <div id="editor"></div>
+  <div id="cursor-overlay"></div>
+</div>
+```
+
+The `cursor-overlay` element must be positioned absolutely within the wrapper:
+
+```css
+#cursor-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+```
+
+When `initialize()` is called:
+- If the Yorkie document has no tree yet, the binding creates one from the current ProseMirror document.
+- If a tree already exists (another client created it), the binding loads it into the editor.
+
+When you're done, call `binding.destroy()` to clean up subscriptions and event listeners.
+
+### Configuration
+
+`YorkieProseMirrorBinding` accepts an options object as its fourth argument:
+
+```typescript
+const binding = new YorkieProseMirrorBinding(view, doc, 'tree', {
+  markMapping: { strong: 'strong', em: 'em', code: 'code', link: 'link' },
+  wrapperElementName: 'span',
+  cursors: { enabled: true, overlayElement: cursorOverlayEl },
+  onLog: (type, message) => console.log(`[${type}] ${message}`),
+});
+```
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `markMapping` | `MarkMapping` | Auto-generated from schema | Maps ProseMirror mark names to Yorkie element type names |
+| `wrapperElementName` | `string` | `'span'` | Element name used to wrap bare text alongside mark elements |
+| `cursors` | `CursorOptions` | `undefined` | Remote cursor display configuration |
+| `onLog` | `(type, message) => void` | `undefined` | Callback for sync event logging |
+
+### Mark Mapping
+
+ProseMirror represents formatting as **marks** on text nodes (e.g., bold text has a `strong` mark). Yorkie's Tree CRDT has no mark concept — formatting is represented as **wrapper elements** instead.
+
+The binding bridges this gap through mark mapping:
+
+```
+ProseMirror:  paragraph > text("hello", marks=[strong])
+Yorkie Tree:  <paragraph><strong><text>hello</text></strong></paragraph>
+```
+
+#### Default Mapping
+
+If you don't provide a `markMapping`, the binding auto-generates one from your ProseMirror schema using identity mapping (mark name = element name). The built-in `defaultMarkMapping` covers the common cases:
+
+```typescript
+import { defaultMarkMapping } from '@yorkie-js/prosemirror';
+// { strong: 'strong', em: 'em', code: 'code', link: 'link' }
+```
+
+#### Custom Mapping
+
+If your schema uses different mark names, provide a custom mapping:
+
+```typescript
+const binding = new YorkieProseMirrorBinding(view, doc, 'tree', {
+  markMapping: {
+    bold: 'strong',    // PM's 'bold' mark → Yorkie's 'strong' element
+    italic: 'em',      // PM's 'italic' mark → Yorkie's 'em' element
+  },
+});
+```
+
+#### Building from Schema
+
+Use `buildMarkMapping()` to auto-generate a mapping from your schema with optional overrides:
+
+```typescript
+import { buildMarkMapping } from '@yorkie-js/prosemirror';
+
+const mapping = buildMarkMapping(mySchema, {
+  bold: 'strong', // Override specific marks
+});
+```
+
+### Remote Cursors
+
+The binding provides two complementary systems for showing other users' cursors and selections.
+
+#### Cursor Overlays
+
+Cursor carets are rendered as DOM overlays positioned above the editor. Enable them via the `cursors` option:
+
+```typescript
+const binding = new YorkieProseMirrorBinding(view, doc, 'tree', {
+  cursors: {
+    enabled: true,
+    overlayElement: document.getElementById('cursor-overlay')!,
+    wrapperElement: document.getElementById('editor-wrapper')!, // Optional, for positioning reference
+    colors: ['#FECEEA', '#FEF1D2', '#A9FDD8', '#D7F8FF', '#CEC5FA'], // Optional custom colors
+  },
+});
+```
+
+Each remote cursor displays as a colored vertical caret with a label showing the last 2 characters of the client ID.
+
+#### Selection Highlights
+
+`remoteSelectionPlugin()` is a ProseMirror plugin that renders inline decorations for remote users' text selections:
+
+```typescript
+import { remoteSelectionPlugin } from '@yorkie-js/prosemirror';
+
+const state = EditorState.create({
+  plugins: [
+    ...otherPlugins,
+    remoteSelectionPlugin(),
+  ],
+});
+```
+
+The binding automatically dispatches selection updates to this plugin when remote users change their selections.
+
+### How It Works
+
+#### Two-Way Sync
+
+**Upstream (ProseMirror → Yorkie):** When the local user edits, the binding compares the old and new ProseMirror documents using a two-level diffing strategy:
+
+1. **Block-level diff** — identifies which top-level blocks changed
+2. **Character-level diff** — if only one block changed with identical structure, produces minimal `tree.edit()` calls for efficient concurrent editing
+3. **Full block replacement** — falls back to replacing entire blocks for structural changes (e.g., toggling bold, splitting paragraphs)
+
+**Downstream (Yorkie → ProseMirror):** When remote changes arrive, the binding builds a new ProseMirror document from the Yorkie tree and applies the minimal diff as a transaction, preserving local cursor position and undo history.
+
+#### IME Composition Handling
+
+During IME input (Chinese, Japanese, Korean), the binding defers remote changes that overlap the block being composed. Non-overlapping changes in other blocks are applied immediately. Deferred changes are flushed when composition ends, preventing the browser from breaking the active composition.
+
+### Lower-Level Utilities
+
+For custom integrations, the package exports individual functions:
+
+#### Format Conversion
+
+```typescript
+import { pmToYorkie, yorkieToJSON } from '@yorkie-js/prosemirror';
+
+// ProseMirror Node → Yorkie tree JSON
+const yorkieDoc = pmToYorkie(pmNode, markMapping, 'span');
+
+// Yorkie tree → ProseMirror-compatible JSON (for Node.fromJSON)
+const pmJSON = yorkieToJSON(tree, schema, elementToMarkMapping, 'span');
+```
+
+#### Manual Sync
+
+```typescript
+import {
+  syncToYorkie,
+  syncToPMIncremental,
+  syncToPM,
+  diffDocs,
+  buildDocFromYorkieTree,
+  applyDocDiff,
+} from '@yorkie-js/prosemirror';
+
+// Upstream: diff PM docs and apply to Yorkie tree
+syncToYorkie(tree, oldDoc, newDoc, markMapping, onLog, 'span');
+
+// Downstream: incremental sync (preferred, preserves undo history)
+syncToPMIncremental(view, tree, schema, elementToMarkMapping, onLog, 'span');
+
+// Downstream: full rebuild (used on initialization and as error recovery)
+syncToPM(view, tree, schema, elementToMarkMapping, onLog, 'span');
+
+// Block-level diff between two PM docs
+const diff = diffDocs(currentDoc, newDoc); // Returns { fromPos, toPos, slice }
+```
+
+#### Position Mapping
+
+Bidirectional mapping between ProseMirror positions and Yorkie flat indices, useful for cursor synchronization:
+
+```typescript
+import {
+  buildPositionMap,
+  pmPosToYorkieIdx,
+  yorkieIdxToPmPos,
+} from '@yorkie-js/prosemirror';
+
+const treeJSON = JSON.parse(tree.toJSON());
+const map = buildPositionMap(pmDoc, treeJSON);
+
+// Convert positions between coordinate systems
+const yorkieIdx = pmPosToYorkieIdx(map, pmPos);
+const pmPos = yorkieIdxToPmPos(map, yorkieIdx);
+```
+
+### Examples
+
+- [ProseMirror example](/examples/prosemirror) — Live collaborative rich-text editor
+- [vanilla-prosemirror](https://github.com/yorkie-team/yorkie-js-sdk/tree/main/examples/vanilla-prosemirror) — Minimal setup with toolbar, remote cursors, and devtools
+
+### Reference
+
+- [JS SDK API Reference](https://yorkie.dev/yorkie-js-sdk/api-reference/)
+- [JS SDK Guide](/docs/sdks/js-sdk)

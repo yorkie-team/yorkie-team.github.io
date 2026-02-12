@@ -9,7 +9,7 @@ A **Project** in Yorkie is a logical grouping that isolates documents, channels,
 
 ### Overview
 
-Every Yorkie installation starts with a `default` project that is created automatically. When a [Client](/docs/js-sdk#client) connects without specifying an API key, it is placed in the default project. For production applications, you should create dedicated projects to isolate data and configure settings independently.
+Every Yorkie installation starts with a `default` project that is created automatically. When a [Client](/docs/sdks/js-sdk#client) connects without specifying an API key, it is placed in the default project. For production applications, you should create dedicated projects to isolate data and configure settings independently.
 
 ```mermaid
 graph TB
@@ -47,7 +47,7 @@ Each project has two keys:
 
 | Key | Purpose | Usage |
 |-----|---------|-------|
-| **Public Key** | Identifies the project for client connections | Used as `apiKey` when creating a [Client](/docs/js-sdk#client) |
+| **Public Key** | Identifies the project for client connections | Used as `apiKey` when creating a [Client](/docs/sdks/js-sdk#client) |
 | **Secret Key** | Authenticates server-side applications | Used in the `authorization` header for [Admin API](/docs/tools/admin-api) requests |
 
 ```javascript
@@ -121,8 +121,8 @@ Each project can be independently configured with the following settings:
 | **Auth Webhook** | External authentication endpoint for validating client requests | [Security: Auth Webhook](/docs/advanced/security#auth-webhook) |
 | **Event Webhook** | Notification endpoint for document events | [Event Webhook](/docs/advanced/event-webhook) |
 | **Allowed Origins** | CORS restrictions for client connections | [Security: Allowed Origins](/docs/advanced/security#allowed-origins) |
-| **Max Attachments** | Maximum clients that can attach to a single document | [Document Limits](/docs/js-sdk#document-limits) |
-| **Max Subscribers** | Maximum clients that can subscribe to a single document | [Document Limits](/docs/js-sdk#document-limits) |
+| **Max Attachments** | Maximum clients that can attach to a single document | [Document Limits](/docs/sdks/js-sdk#document-limits) |
+| **Max Subscribers** | Maximum clients that can subscribe to a single document | [Document Limits](/docs/sdks/js-sdk#document-limits) |
 | **Client Deactivate Threshold** | Time after which inactive clients are automatically deactivated by [Housekeeping](/docs/internals/housekeeping) | [CLI](/docs/tools/cli#updating-the-project) |
 
 ### Common Patterns

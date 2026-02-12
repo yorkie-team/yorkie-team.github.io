@@ -13,7 +13,7 @@ Understanding these patterns will help you design the optimal architecture for y
 
 If you're new to Yorkie, we recommend:
 1. Complete the [Getting Started guide](/docs/getting-started) first
-2. Understand basic [Client](/docs/js-sdk#client) and [Document](/docs/js-sdk#document) concepts
+2. Understand basic [Client](/docs/sdks/js-sdk#client) and [Document](/docs/sdks/js-sdk#document) concepts
 3. Familiarize yourself with key terms in the [Glossary](/docs/glossary)
 4. Then return here to choose your architecture pattern
 
@@ -52,7 +52,7 @@ sequenceDiagram
 2. Server creates a new document through [Yorkie Admin API](/docs/tools/admin-api#post-yorkiev1adminservicecreatedocument)
 3. Server stores document metadata in your database
 4. Server returns document key to client
-5. Client [attaches](/docs/js-sdk#attaching-the-document) to the document using the provided key
+5. Client [attaches](/docs/sdks/js-sdk#attaching-the-document) to the document using the provided key
 
 **Document Editing Flow:**
 
@@ -159,7 +159,7 @@ sequenceDiagram
 
 1. Client requests document key and initial content from your server
 2. Client creates document locally with received key
-3. Client attaches document with initial content using the [`initialRoot`](/docs/js-sdk#initializing-root) option:
+3. Client attaches document with initial content using the [`initialRoot`](/docs/sdks/js-sdk#initializing-root) option:
 
 ```typescript
 const doc = new yorkie.Document(key); // Key received from server
@@ -214,7 +214,7 @@ sequenceDiagram
     Y-->>C: Detach confirmed
 ```
 
-1. Client finishes editing and [detaches](/docs/js-sdk#detaching-the-document) from document
+1. Client finishes editing and [detaches](/docs/sdks/js-sdk#detaching-the-document) from document
 2. With project-level `RemoveOnDetach` option enabled, document is automatically removed when no clients are attached
 3. This automatic cleanup reduces server management overhead
 
@@ -344,7 +344,7 @@ Explore real-world examples implementing these patterns:
 ### Related Documentation
 
 For more information about Yorkie's API and features:
-- [JS SDK Documentation](/docs/js-sdk) - Client and Document API reference
+- [JS SDK Documentation](/docs/sdks/js-sdk) - Client and Document API reference
 - [Admin API](/docs/tools/admin-api) - Admin API for server-side management
 - [Security Configuration](/docs/advanced/security) - Auth Webhook and access control
 - [CLI](/docs/tools/cli) - Command-line tools for project management

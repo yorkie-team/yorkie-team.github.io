@@ -120,7 +120,7 @@ Yorkie handles authentication failures based on the webhook response and HTTP st
 ##### Token Refresh & Retry Behavior
 For `PushPull` (realtime sync) and `WatchDocuments`:
 - Yorkie automatically retries the request after refreshing the token
-- Notifies via [`document.subscribe('auth-error')`](/docs/js-sdk#documentsubscribeauth-error)
+- Notifies via [`document.subscribe('auth-error')`](/docs/sdks/js-sdk#documentsubscribeauth-error)
 
 For other API calls:
 - The system does not automatically retry; the client must manually handle the `codes.Unauthenticated` error and retry the request
