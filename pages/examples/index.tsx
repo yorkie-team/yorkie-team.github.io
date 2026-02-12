@@ -107,6 +107,13 @@ const EXAMPLES: Example[] = [
     category: [CATEGORIES.CANVAS_TOOL],
   },
   {
+    id: 'prosemirror',
+    title: 'ProseMirror',
+    desc: 'This is a real-time collaborative version of the ProseMirror editor. It uses the Tree, a custom CRDT type from Yorkie.',
+    thumbnail: 'vanilla-prosemirror.png',
+    category: [CATEGORIES.EDITOR],
+  },
+  {
     id: 'quill',
     title: 'Rich Text Editor',
     desc: 'This demo shows the real-time collaborative version of the Quill editor with Yorkie and Vite.',

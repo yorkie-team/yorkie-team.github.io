@@ -32,6 +32,7 @@ const STATIC_EXAMPLES = [
   'react-flow',
   'vanilla-codemirror6',
   'react-tldraw',
+  'vanilla-prosemirror',
 ];
 
 const createEnvFile = (sdkPath: string) => {

@@ -84,7 +84,7 @@ const getFileContent = (filePath: string): string => {
 
   if (filePath.includes('package.json')) {
     const content = readFile(filePath);
-    return content.replace(/"@yorkie-js\/(sdk|react)": "workspace:\*"/g, `"@yorkie-js/$1": "^${yorkieVersion}"`);
+    return content.replace(/"@yorkie-js\/(sdk|react|prosemirror)": "workspace:\*"/g, `"@yorkie-js/$1": "^${yorkieVersion}"`);
   }
 
   return readFile(filePath);
