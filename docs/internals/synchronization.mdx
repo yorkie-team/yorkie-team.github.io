@@ -5,11 +5,11 @@ order: 122
 
 ## Synchronization
 
-Yorkie keeps document replicas consistent across multiple [Clients](/docs/js-sdk#client) through a synchronization system built on top of [CRDTs](/docs/internals/crdt-concepts). This page explains the mechanisms that make synchronization work: sync modes, PushPullChanges, checkpoints, snapshots, and the watch stream.
+Yorkie keeps document replicas consistent across multiple [Clients](/docs/sdks/js-sdk#client) through a synchronization system built on top of [CRDTs](/docs/internals/crdt-concepts). This page explains the mechanisms that make synchronization work: sync modes, PushPullChanges, checkpoints, snapshots, and the watch stream.
 
 ### Overview
 
-When a [Client](/docs/js-sdk#client) is attached to a [Document](/docs/js-sdk#document), Yorkie maintains a bidirectional communication channel between the client and the [Server](/docs/self-hosted-server). Changes made locally are pushed to the server, and changes from other clients are pulled. The system tracks what each client has seen using [Checkpoints](#checkpoints) and uses [Snapshots](#snapshots) to optimize synchronization for clients that have fallen behind.
+When a [Client](/docs/sdks/js-sdk#client) is attached to a [Document](/docs/sdks/js-sdk#document), Yorkie maintains a bidirectional communication channel between the client and the [Server](/docs/self-hosted-server). Changes made locally are pushed to the server, and changes from other clients are pulled. The system tracks what each client has seen using [Checkpoints](#checkpoints) and uses [Snapshots](#snapshots) to optimize synchronization for clients that have fallen behind.
 
 ```mermaid
 sequenceDiagram
@@ -31,7 +31,7 @@ Understanding how Yorkie handles edits internally helps explain the synchronizat
 
 | Component | Role |
 |-----------|------|
-| **Root** | The source of truth -- the actual CRDT data of the document. It can only be updated by applying [Changes](/docs/js-sdk#editing-the-document). |
+| **Root** | The source of truth -- the actual CRDT data of the document. It can only be updated by applying [Changes](/docs/sdks/js-sdk#editing-the-document). |
 | **Clone** | A proxy copy of the Root. When you call `document.update()`, your edits are first applied to the Clone, which generates Changes. If the operation succeeds, the Changes are then applied to the Root. This provides transaction-like safety. |
 | **LocalChanges** | A buffer that stores Changes waiting to be pushed to the server. Changes are applied locally first, then synchronized asynchronously. |
 
@@ -83,11 +83,11 @@ await client.changeSyncMode(doc, SyncMode.Manual);
 await client.sync(doc); // Manually trigger sync
 ```
 
-For the full SDK reference, see [Synchronization Modes](/docs/js-sdk#synchronization-modes).
+For the full SDK reference, see [Synchronization Modes](/docs/sdks/js-sdk#synchronization-modes).
 
 ### PushPullChanges
 
-**PushPullChanges** is the core synchronization API that enables bidirectional exchange of [Changes](/docs/js-sdk#editing-the-document) between a client and the server. Each sync cycle involves:
+**PushPullChanges** is the core synchronization API that enables bidirectional exchange of [Changes](/docs/sdks/js-sdk#editing-the-document) between a client and the server. Each sync cycle involves:
 
 1. **Push**: The client sends its local changes (operations made since the last sync) to the server.
 2. **Server processing**: The server stores the changes, assigns them a server sequence number, and updates the client's [Checkpoint](#checkpoints).
@@ -208,7 +208,7 @@ The watch stream delivers three types of events:
 | **DocWatched** | A new client has started watching the document (came online). |
 | **DocUnwatched** | A client has stopped watching the document (went offline or detached). |
 
-These events power the [Presence](/docs/js-sdk#presence) system, enabling features like showing who's online and tracking cursor positions.
+These events power the [Presence](/docs/sdks/js-sdk#presence) system, enabling features like showing who's online and tracking cursor positions.
 
 #### Connection Monitoring
 
@@ -258,8 +258,8 @@ Here's the complete lifecycle of a document from attachment to detachment. For t
 - [Document Editing design document](https://github.com/yorkie-team/yorkie/blob/main/design/document-editing.md) -- Root/Clone/LocalChanges architecture
 - [PubSub design document](https://github.com/yorkie-team/yorkie/blob/main/design/pub-sub.md) -- Watch stream implementation
 - [Housekeeping design document](https://github.com/yorkie-team/yorkie/blob/main/design/housekeeping.md) -- Background compaction and cleanup
-- [JS SDK: Synchronization Modes](/docs/js-sdk#synchronization-modes) -- SDK reference for sync mode APIs
-- [JS SDK: Subscribing to Changes](/docs/js-sdk#subscribing-to-changes) -- How to react to local, remote, and snapshot events
+- [JS SDK: Synchronization Modes](/docs/sdks/js-sdk#synchronization-modes) -- SDK reference for sync mode APIs
+- [JS SDK: Subscribing to Changes](/docs/sdks/js-sdk#subscribing-to-changes) -- How to react to local, remote, and snapshot events
 - [CRDT Concepts](/docs/internals/crdt-concepts) -- How CRDTs ensure conflict-free merging
 - [Revisions](/docs/advanced/revisions) -- Saving and restoring document snapshots
 - [Glossary](/docs/glossary) -- Definitions of all key terms

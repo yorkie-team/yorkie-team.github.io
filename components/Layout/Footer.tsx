@@ -80,7 +80,7 @@ export function Footer({ shortFooter }: { shortFooter?: boolean }): ReactElement
                 </Link>
               </li>
               <li className="site_item">
-                <Link href="/docs/js-sdk" className="link">
+                <Link href="/docs/sdks/js-sdk" className="link">
                   JS SDK
                 </Link>
               </li>

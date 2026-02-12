@@ -79,9 +79,9 @@ export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
                   </li>
                   <li className="navigator_group">
                     <Link
-                      href="/docs/js-sdk"
+                      href="/docs/sdks/js-sdk"
                       className={classNames('navigator_item', 'add_icon', {
-                        is_active: asPath.startsWith(`/docs/js-sdk`),
+                        is_active: asPath.startsWith(`/docs/sdks/js-sdk`),
                       })}
                     >
                       JS SDK

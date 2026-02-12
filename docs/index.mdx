@@ -11,16 +11,16 @@ Yorkie is an open-source document store for building real-time collaborative app
 
 Yorkie is a comprehensive collaboration platform that handles the complex challenges of building real-time collaborative applications. It provides:
 
-- [JSON-like Document](/docs/js-sdk#document) based on [Conflict-free Replicated Data Types (CRDTs)](/docs/glossary) for automatic conflict resolution
-- [Presence](/docs/js-sdk#presence) tracking to show who's online and what they're doing
-- [Channel](/docs/js-sdk#channel) for lightweight, real-time communication without data persistence
+- [JSON-like Document](/docs/sdks/js-sdk#document) based on [Conflict-free Replicated Data Types (CRDTs)](/docs/glossary) for automatic conflict resolution
+- [Presence](/docs/sdks/js-sdk#presence) tracking to show who's online and what they're doing
+- [Channel](/docs/sdks/js-sdk#channel) for lightweight, real-time communication without data persistence
 - Offline support with automatic synchronization when network is restored
 
 ### Why Yorkie?
 
 Unlike other CRDT libraries like AutoMerge and Yjs that only provide data structures, Yorkie delivers a complete full-stack solution:
 
-- Client SDKs for [JavaScript](/docs/js-sdk), [React](/docs/getting-started/with-react), [Android](/docs/android-sdk), and [iOS](/docs/ios-sdk)
+- Client SDKs for [JavaScript](/docs/sdks/js-sdk), [React](/docs/getting-started/with-react), [Android](/docs/sdks/android-sdk), and [iOS](/docs/sdks/ios-sdk)
 - Managed Cloud Service or [Self-Hosted Server](/docs/self-hosted-server) options
 - Built-in Infrastructure for data persistence, synchronization, and scaling
 - [Admin APIs](/docs/tools/admin-api) for server-side document management
@@ -32,9 +32,9 @@ This means you can focus on building your application's features instead of mana
 
 Yorkie consists of four main components that work together to enable real-time collaboration:
 
-- [Client](/docs/js-sdk#client): The entry point for your application. Clients connect to the server, manage documents and channels, and handle synchronization automatically.
-- [Document](/docs/js-sdk#document): Persistent, collaborative data structures based on CRDTs. Documents are stored in the database, support offline editing, and automatically resolve conflicts when users edit simultaneously.
-- [Channel](/docs/js-sdk#channel): A lightweight, memory-only communication layer for ephemeral data. Ideal for presence tracking (who's online, cursor positions) and real-time message broadcasting.
+- [Client](/docs/sdks/js-sdk#client): The entry point for your application. Clients connect to the server, manage documents and channels, and handle synchronization automatically.
+- [Document](/docs/sdks/js-sdk#document): Persistent, collaborative data structures based on CRDTs. Documents are stored in the database, support offline editing, and automatically resolve conflicts when users edit simultaneously.
+- [Channel](/docs/sdks/js-sdk#channel): A lightweight, memory-only communication layer for ephemeral data. Ideal for presence tracking (who's online, cursor positions) and real-time message broadcasting.
 - [Server](/docs/self-hosted-server): The central hub that receives changes from clients, persists them to the database, and broadcasts updates to subscribed clients. Available as a managed cloud service or self-hosted.
 
 Additionally, **[Projects](/docs/tools/cli#project)** allow you to organize multiple independent applications within a single Yorkie installation, each with its own documents, channels, and clients. Learn more about key concepts in the [Glossary](/docs/glossary).
@@ -105,7 +105,7 @@ Explore more [examples](/examples) to see what you can build with Yorkie.
 
 **Get Started Quickly:**
 - Follow the [Getting Started guide](/docs/getting-started) for step-by-step integration
-- Choose your platform: [JavaScript](/docs/js-sdk), [React](/docs/getting-started/with-react), [Android](/docs/android-sdk), or [iOS](/docs/ios-sdk)
+- Choose your platform: [JavaScript](/docs/sdks/js-sdk), [React](/docs/getting-started/with-react), [Android](/docs/sdks/android-sdk), or [iOS](/docs/sdks/ios-sdk)
 - Try our [live examples](/examples) to see Yorkie in action
 
 **Dive Deeper:**

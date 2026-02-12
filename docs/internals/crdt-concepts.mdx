@@ -9,13 +9,13 @@ Yorkie uses Conflict-free Replicated Data Types (CRDTs) to enable real-time coll
 
 ### What Are CRDTs?
 
-CRDTs are data structures that can be replicated across multiple clients, where each client can update its replica independently, and all replicas are guaranteed to converge to the same state. This means multiple users can edit a [Document](/docs/js-sdk#document) simultaneously without conflicts, even while offline.
+CRDTs are data structures that can be replicated across multiple clients, where each client can update its replica independently, and all replicas are guaranteed to converge to the same state. This means multiple users can edit a [Document](/docs/sdks/js-sdk#document) simultaneously without conflicts, even while offline.
 
 Unlike traditional conflict resolution approaches (such as Operational Transformation used by Google Docs), CRDTs provide mathematically guaranteed convergence. Every operation that can be applied to a CRDT is designed so that, regardless of the order operations are received, the final state is always the same.
 
 ### How Yorkie Uses CRDTs
 
-Yorkie's [Document](/docs/js-sdk#document) is built on a CRDT-based data structure. When you call `document.update()`, the changes you make to the [Root](/docs/js-sdk#initializing-root) are internally represented as CRDT operations. These operations are then synchronized with the [Server](/docs/self-hosted-server) and delivered to other clients via the [PushPullChanges](/docs/internals/synchronization#pushpullchanges) mechanism.
+Yorkie's [Document](/docs/sdks/js-sdk#document) is built on a CRDT-based data structure. When you call `document.update()`, the changes you make to the [Root](/docs/sdks/js-sdk#initializing-root) are internally represented as CRDT operations. These operations are then synchronized with the [Server](/docs/self-hosted-server) and delivered to other clients via the [PushPullChanges](/docs/internals/synchronization#pushpullchanges) mechanism.
 
 ```mermaid
 graph LR
@@ -48,9 +48,9 @@ These are the data types you interact with directly when editing documents throu
 | **Primitive** | Basic values: `string`, `number`, `boolean`, `null` | N/A (immutable values) |
 | **Object** | Key-value pairs, like a JavaScript object or hash table | [RHT](#replicated-hash-table-rht) (Replicated Hash Table) |
 | **Array** | Ordered list of values | [RGATreeList](#replicated-growable-array-rga) |
-| **[Text](/docs/js-sdk#custom-crdt-types)** | Rich text with style attributes for editors like [Quill](/examples/quill) and [CodeMirror](/examples/codemirror) | RGATreeSplit |
-| **[Counter](/docs/js-sdk#custom-crdt-types)** | Concurrent counter for increment/decrement operations | CRDT Counter |
-| **[Tree](/docs/js-sdk#custom-crdt-types)** | Tree structure for block-based editors like ProseMirror | [CRDTTree](#the-tree-crdt) |
+| **[Text](/docs/sdks/js-sdk#custom-crdt-types)** | Rich text with style attributes for editors like [Quill](/examples/quill) and [CodeMirror](/examples/codemirror) | RGATreeSplit |
+| **[Counter](/docs/sdks/js-sdk#custom-crdt-types)** | Concurrent counter for increment/decrement operations | CRDT Counter |
+| **[Tree](/docs/sdks/js-sdk#custom-crdt-types)** | Tree structure for block-based editors like ProseMirror | [CRDTTree](#the-tree-crdt) |
 
 #### CRDT Layer
 
@@ -114,9 +114,9 @@ For the full technical design, see the [Version Vector design document](https://
 
 Yorkie organizes its data model into **CRDT Elements** and **CRDT Nodes**:
 
-- **CRDT Element**: A data structure analogous to an Element in the DOM. Each element has a unique identifier ([TimeTicket](#timetickets)) that ensures global uniqueness across all clients. Elements include JSON objects, arrays, primitive values, and the specialized types like [Text](/docs/js-sdk#custom-crdt-types), [Tree](/docs/js-sdk#custom-crdt-types), and [Counter](/docs/js-sdk#custom-crdt-types).
+- **CRDT Element**: A data structure analogous to an Element in the DOM. Each element has a unique identifier ([TimeTicket](#timetickets)) that ensures global uniqueness across all clients. Elements include JSON objects, arrays, primitive values, and the specialized types like [Text](/docs/sdks/js-sdk#custom-crdt-types), [Tree](/docs/sdks/js-sdk#custom-crdt-types), and [Counter](/docs/sdks/js-sdk#custom-crdt-types).
 
-- **CRDT Node**: A single node within a CRDT element. For example, in a [Text](/docs/js-sdk#custom-crdt-types) element, each character (or group of characters inserted at once) is a node. In a [Tree](/docs/js-sdk#custom-crdt-types) element, each tree node (element or text) is a CRDT node.
+- **CRDT Node**: A single node within a CRDT element. For example, in a [Text](/docs/sdks/js-sdk#custom-crdt-types) element, each character (or group of characters inserted at once) is a node. In a [Tree](/docs/sdks/js-sdk#custom-crdt-types) element, each tree node (element or text) is a CRDT node.
 
 The element-node hierarchy allows Yorkie to track fine-grained changes. Each node carries metadata (its creator, creation time, and position) that enables the system to merge concurrent edits correctly.
 
@@ -201,7 +201,7 @@ sequenceDiagram
 
 #### Text-Specific Garbage Collection
 
-For [Text](/docs/js-sdk#custom-crdt-types) types, GC works at the text node level within the RGATreeSplit structure. Tombstoned text nodes are cached during editing and removed from the linked list during garbage collection, making them eligible for runtime memory reclamation. For details, see the [GC for Text Type design document](https://github.com/yorkie-team/yorkie/blob/main/design/gc-for-text-type.md).
+For [Text](/docs/sdks/js-sdk#custom-crdt-types) types, GC works at the text node level within the RGATreeSplit structure. Tombstoned text nodes are cached during editing and removed from the linked list during garbage collection, making them eligible for runtime memory reclamation. For details, see the [GC for Text Type design document](https://github.com/yorkie-team/yorkie/blob/main/design/gc-for-text-type.md).
 
 For the full GC design, see the [Garbage Collection design document](https://github.com/yorkie-team/yorkie/blob/main/design/garbage-collection.md).
 
@@ -213,9 +213,9 @@ Yorkie handles concurrent edits differently depending on the data type:
 |-----------|-------------------|---------|
 | **Object** | Last-writer-wins per key (via [RHT](#replicated-hash-table-rht)) | Two users set `root.title` simultaneously; the later [TimeTicket](#timetickets) wins |
 | **Array** | Position-based insertion (via [RGA](#replicated-growable-array-rga)) | Two users insert at the same index; both items appear in a deterministic order |
-| **[Text](/docs/js-sdk#custom-crdt-types)** | Character-level merge (via RGATreeSplit) | Two users type at the same position; both characters appear based on their TimeTickets |
-| **[Tree](/docs/js-sdk#custom-crdt-types)** | Node-level merge (via [CRDTTree](#the-tree-crdt)) | Two users add child nodes to the same parent; both nodes appear in deterministic order |
-| **[Counter](/docs/js-sdk#custom-crdt-types)** | Additive merge | Two users increment by 1; the counter increases by 2 |
+| **[Text](/docs/sdks/js-sdk#custom-crdt-types)** | Character-level merge (via RGATreeSplit) | Two users type at the same position; both characters appear based on their TimeTickets |
+| **[Tree](/docs/sdks/js-sdk#custom-crdt-types)** | Node-level merge (via [CRDTTree](#the-tree-crdt)) | Two users add child nodes to the same parent; both nodes appear in deterministic order |
+| **[Counter](/docs/sdks/js-sdk#custom-crdt-types)** | Additive merge | Two users increment by 1; the counter increases by 2 |
 
 This means your application does not need to implement any conflict resolution logic. As long as you use Yorkie's data types through `document.update()`, all conflicts are resolved automatically.
 
@@ -226,6 +226,6 @@ This means your application does not need to implement any conflict resolution l
 - [Version Vector design document](https://github.com/yorkie-team/yorkie/blob/main/design/version-vector.md) -- Hybrid logical clock system
 - [Tree design document](https://github.com/yorkie-team/yorkie/blob/main/design/tree.md) -- Tree CRDT for block-based editors
 - [Document Lifecycle](/docs/internals/document-lifecycle) -- States and transitions of documents and clients
-- [JS SDK: Custom CRDT Types](/docs/js-sdk#custom-crdt-types) -- How to use Text, Tree, and Counter in your application
+- [JS SDK: Custom CRDT Types](/docs/sdks/js-sdk#custom-crdt-types) -- How to use Text, Tree, and Counter in your application
 - [YSON](/docs/internals/yson) -- The serialization format for Yorkie documents
 - [Glossary](/docs/glossary) -- Definitions of all key terms

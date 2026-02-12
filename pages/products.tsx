@@ -83,7 +83,7 @@ const Products: NextPage = () => {
             </strong>
             <p className="sub_desc">
               Yorkie provides a general-purpose JSON-like{' '}
-              <Link href="/docs/js-sdk#document" className="link">
+              <Link href="/docs/sdks/js-sdk#document" className="link">
                 Document
               </Link>{' '}
               to enable complex application models while some CRDT libraries that only offer basic data types.
@@ -137,7 +137,7 @@ const Products: NextPage = () => {
             </strong>
             <p className="sub_desc">
               You can build a sense of presence by tracking the status of users who are editing the same document with{' '}
-              <Link href="/docs/js-sdk#getting-presence" className="link">
+              <Link href="/docs/sdks/js-sdk#getting-presence" className="link">
                 Presence
               </Link>
               .
@@ -181,7 +181,7 @@ const Products: NextPage = () => {
               <a href="#channel">Channel</a>
             </strong>
             <p className="sub_desc">
-              <Link href="/docs/js-sdk#channel" className="link">
+              <Link href="/docs/sdks/js-sdk#channel" className="link">
                 Channel
               </Link>{' '}
               provides lightweight real-time communication without database persistence. Perfect for tracking online
@@ -226,15 +226,15 @@ const Products: NextPage = () => {
                 <strong className="product_card_title">SDKs for Mobile &amp; Web</strong>
                 <p className="product_card_desc">
                   Yorkie SDKs support development for{' '}
-                  <Link href="/docs/ios-sdk" className="link">
+                  <Link href="/docs/sdks/ios-sdk" className="link">
                     iOS
                   </Link>
                   ,{' '}
-                  <Link href="/docs/android-sdk" className="link">
+                  <Link href="/docs/sdks/android-sdk" className="link">
                     Android
                   </Link>{' '}
                   and{' '}
-                  <Link href="/docs/js-sdk" className="link">
+                  <Link href="/docs/sdks/js-sdk" className="link">
                     Web
                   </Link>{' '}
                   applications.

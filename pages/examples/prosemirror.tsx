@@ -36,7 +36,7 @@ const ProsemirrorExampleView: NextPage = () => {
                     ProseMirror
                   </a>{' '}
                   editor. It uses the{' '}
-                  <a href="https://yorkie.dev/docs/js-sdk#tree" className="link" target="_blank" rel="noreferrer">
+                  <a href="https://yorkie.dev/docs/sdks/js-sdk#tree" className="link" target="_blank" rel="noreferrer">
                     Tree
                   </a>
                   , a custom CRDT type from Yorkie with the{' '}
