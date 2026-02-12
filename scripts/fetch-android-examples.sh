@@ -9,7 +9,7 @@ if [ -d "temp" ]; then
     rm -rf temp
 fi
 
-# git clone https://github.com/yorkie-team/yorkie-android-sdk.git temp
+git clone https://github.com/yorkie-team/yorkie-android-sdk.git temp
 # cd temp
 # git fetch origin refs/tags/v$version
 # git checkout tags/v$version
