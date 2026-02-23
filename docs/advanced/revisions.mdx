@@ -70,136 +70,28 @@ For detailed API documentation, see [JS SDK - Document Revisions](/docs/sdks/js-
 
 This section shows how to build a revision management interface, using patterns from [CodePair](https://github.com/yorkie-team/codepair) as a reference.
 
-#### React Hook Pattern
+#### React Hook (Recommended)
 
-Create a custom hook to manage revision state and operations:
+`@yorkie-js/react` provides a built-in `useRevisions` hook that wraps the client's revision API and automatically binds the current client and document. Use it inside a `DocumentProvider`:
 
-```typescript
-import { useState, useCallback, useEffect } from 'react';
-import { Client, Document, RevisionSummary } from '@yorkie-js/sdk';
+```tsx
+import { useState, useEffect } from 'react';
+import { useRevisions } from '@yorkie-js/react';
+import type { RevisionSummary } from '@yorkie-js/react';
 
-interface UseRevisionsOptions {
-  client: Client | null;
-  doc: Document<any, any> | null;
-  enabled?: boolean;
-}
-
-export function useRevisions({ client, doc, enabled = true }: UseRevisionsOptions) {
-  const [revisions, setRevisions] = useState<RevisionSummary[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-
-  // Fetch revision list
-  const fetchRevisions = useCallback(async (options?: {
-    pageSize?: number;
-    offset?: number;
-    isForward?: boolean;
-  }) => {
-    if (!client || !doc) return;
-
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const revs = await client.listRevisions(doc, {
-        pageSize: options?.pageSize ?? 50,
-        offset: options?.offset ?? 0,
-        isForward: options?.isForward ?? false, // newest first
-      });
-      setRevisions(revs);
-      return revs;
-    } catch (err) {
-      const error = err instanceof Error ? err : new Error('Failed to fetch revisions');
-      setError(error);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [client, doc]);
-
-  // Create a new revision
-  const createRevision = useCallback(async (label: string, description?: string) => {
-    if (!client || !doc) {
-      throw new Error('Client or document not available');
-    }
-
-    setIsLoading(true);
-    try {
-      const revision = await client.createRevision(doc, label, description);
-      await fetchRevisions(); // Refresh list
-      return revision;
-    } catch (err) {
-      const error = err instanceof Error ? err : new Error('Failed to create revision');
-      setError(error);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [client, doc, fetchRevisions]);
-
-  // Get revision with full snapshot
-  const getRevision = useCallback(async (revisionId: string) => {
-    if (!client || !doc) {
-      throw new Error('Client or document not available');
-    }
-    return client.getRevision(doc, revisionId);
-  }, [client, doc]);
-
-  // Restore to a previous revision
-  const restoreRevision = useCallback(async (revisionId: string) => {
-    if (!client || !doc) {
-      throw new Error('Client or document not available');
-    }
-
-    setIsLoading(true);
-    try {
-      await client.restoreRevision(doc, revisionId);
-      await client.sync(); // Ensure changes propagate
-      await fetchRevisions(); // Refresh list
-    } catch (err) {
-      const error = err instanceof Error ? err : new Error('Failed to restore revision');
-      setError(error);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [client, doc, fetchRevisions]);
-
-  // Load revisions on mount
-  useEffect(() => {
-    if (enabled && client && doc) {
-      fetchRevisions();
-    }
-  }, [enabled, client, doc, fetchRevisions]);
-
-  return {
-    revisions,
-    isLoading,
-    error,
-    fetchRevisions,
-    createRevision,
-    getRevision,
-    restoreRevision,
-  };
-}
-```
-
-#### Using the Hook
-
-```typescript
 function RevisionPanel() {
-  const { client, doc } = useYorkie(); // Your Yorkie context
-  const {
-    revisions,
-    isLoading,
-    createRevision,
-    getRevision,
-    restoreRevision,
-  } = useRevisions({ client, doc });
+  const { createRevision, listRevisions, getRevision, restoreRevision } =
+    useRevisions();
+  const [revisions, setRevisions] = useState<RevisionSummary[]>([]);
+
+  useEffect(() => {
+    listRevisions({ pageSize: 20, isForward: false }).then(setRevisions);
+  }, [listRevisions]);
 
   const handleCreate = async () => {
     const label = `v${new Date().toISOString().split('T')[0]}`;
     await createRevision(label, 'Manual checkpoint');
+    setRevisions(await listRevisions({ pageSize: 20 }));
   };
 
   const handlePreview = async (revisionId: string) => {
@@ -210,14 +102,13 @@ function RevisionPanel() {
   const handleRestore = async (revisionId: string) => {
     if (confirm('Restore to this revision? Current state will be replaced.')) {
       await restoreRevision(revisionId);
+      setRevisions(await listRevisions({ pageSize: 20 }));
     }
   };
 
   return (
     <div>
-      <button onClick={handleCreate} disabled={isLoading}>
-        Save Revision
-      </button>
+      <button onClick={handleCreate}>Save Revision</button>
       <ul>
         {revisions.map((rev) => (
           <li key={rev.id}>
@@ -230,6 +121,62 @@ function RevisionPanel() {
       </ul>
     </div>
   );
+}
+```
+
+The hook returns four methods:
+
+| Method | Description |
+|--------|-------------|
+| `createRevision(label, description?)` | Create a named revision snapshot |
+| `listRevisions(options?)` | List revisions with pagination (`pageSize`, `offset`, `isForward`) |
+| `getRevision(revisionID)` | Get a revision with its full snapshot |
+| `restoreRevision(revisionID)` | Restore the document to a previous revision |
+
+For the full hook API reference, see [React SDK - useRevisions](/docs/sdks/react#userevisions).
+
+For a complete working example, see the [react-revision](https://github.com/yorkie-team/yorkie-js-sdk/tree/main/examples/react-revision) example.
+
+#### Manual Approach
+
+If you need custom loading/error state management or aren't using `DocumentProvider`, you can build a custom hook using the client API directly:
+
+```typescript
+import { useState, useCallback, useEffect } from 'react';
+import { Client, Document, RevisionSummary } from '@yorkie-js/sdk';
+
+export function useCustomRevisions(client: Client | null, doc: Document<any, any> | null) {
+  const [revisions, setRevisions] = useState<RevisionSummary[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const fetchRevisions = useCallback(async () => {
+    if (!client || !doc) return;
+    setIsLoading(true);
+    try {
+      const revs = await client.listRevisions(doc, { pageSize: 50, isForward: false });
+      setRevisions(revs);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [client, doc]);
+
+  const createRevision = useCallback(async (label: string, description?: string) => {
+    if (!client || !doc) throw new Error('Client or document not available');
+    setIsLoading(true);
+    try {
+      const revision = await client.createRevision(doc, label, description);
+      await fetchRevisions();
+      return revision;
+    } finally {
+      setIsLoading(false);
+    }
+  }, [client, doc, fetchRevisions]);
+
+  useEffect(() => {
+    if (client && doc) fetchRevisions();
+  }, [client, doc, fetchRevisions]);
+
+  return { revisions, isLoading, createRevision, fetchRevisions };
 }
 ```
 
@@ -341,6 +288,7 @@ Revision operations require appropriate document permissions:
 ### Related Documentation
 
 - [JS SDK - Document Revisions](/docs/sdks/js-sdk#document-revisions) - Complete API reference
+- [React SDK - useRevisions](/docs/sdks/react#userevisions) - React hook for revision management
 - [YSON](/docs/internals/yson) - Understanding snapshot format
 - [Resources](/docs/advanced/resources) - Project configuration including auto-revisions
 - [CodePair](https://github.com/yorkie-team/codepair) - Reference implementation

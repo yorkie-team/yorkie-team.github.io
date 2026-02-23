@@ -456,6 +456,71 @@ function SaveButton() {
 }
 ```
 
+##### useRevisions
+
+`useRevisions` provides revision management methods for the current document. It wraps the client's revision API and automatically binds the current client and document. This hook must be used within a `DocumentProvider`.
+
+**TypeScript signature:**
+
+```tsx
+const {
+  createRevision,
+  listRevisions,
+  getRevision,
+  restoreRevision,
+} = useRevisions<DocType, PresenceType>();
+```
+
+**Return values:**
+
+| Method | Signature | Description |
+|--------|-----------|-------------|
+| createRevision | `(label: string, description?: string) => Promise<RevisionSummary>` | Create a named revision snapshot |
+| listRevisions | `(options?: { pageSize?: number; offset?: number; isForward?: boolean }) => Promise<RevisionSummary[]>` | List revisions with pagination |
+| getRevision | `(revisionID: string) => Promise<RevisionSummary>` | Get a revision with its full snapshot |
+| restoreRevision | `(revisionID: string) => Promise<void>` | Restore the document to a previous revision |
+
+**Usage example:**
+
+```tsx
+import { useRevisions } from '@yorkie-js/react';
+import type { RevisionSummary } from '@yorkie-js/react';
+
+function RevisionPanel() {
+  const { createRevision, listRevisions, restoreRevision } = useRevisions();
+  const [revisions, setRevisions] = useState<RevisionSummary[]>([]);
+
+  useEffect(() => {
+    listRevisions({ pageSize: 20 }).then(setRevisions);
+  }, [listRevisions]);
+
+  const handleSave = async () => {
+    await createRevision('v1.0', 'Initial draft');
+    setRevisions(await listRevisions({ pageSize: 20 }));
+  };
+
+  const handleRestore = async (id: string) => {
+    await restoreRevision(id);
+  };
+
+  return (
+    <div>
+      <button onClick={handleSave}>Save Revision</button>
+      <ul>
+        {revisions.map((rev) => (
+          <li key={rev.id}>
+            {rev.label}
+            <button onClick={() => handleRestore(rev.id)}>Restore</button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+For more details on revision concepts, snapshots, and best practices, see the [Revisions](/docs/advanced/revisions) guide.
+
 #### Channel Hooks
 
 The following hooks must be used inside a `ChannelProvider`.
@@ -663,6 +728,7 @@ import {
   useDocument,
   useRoot,
   usePresences,
+  useRevisions,
   createDocumentSelector,
   shallowEqual,
 } from '@yorkie-js/react';
@@ -819,6 +885,7 @@ The [yorkie-js-sdk repository](https://github.com/yorkie-team/yorkie-js-sdk/tree
 | [react-document-limit](https://github.com/yorkie-team/yorkie-js-sdk/tree/main/examples/react-document-limit) | Counter with document selector pattern | `createDocumentSelector`, `useConnection`, `usePresences` |
 | [react-flow](https://github.com/yorkie-team/yorkie-js-sdk/tree/main/examples/react-flow) | Collaborative node/edge graph editor | `useDocument`, `JSONArray`, complex CRDT mutations |
 | [react-tldraw](https://github.com/yorkie-team/yorkie-js-sdk/tree/main/examples/react-tldraw) | Collaborative whiteboard with undo/redo | Direct SDK usage, presence for cursors, history API |
+| [react-revision](https://github.com/yorkie-team/yorkie-js-sdk/tree/main/examples/react-revision) | Note editor with revision history | `useRevisions`, `useDocument`, create/list/restore revisions |
 
 **Next.js examples:**
 
