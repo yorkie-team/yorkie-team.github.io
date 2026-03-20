@@ -1,0 +1,183 @@
+---
+title: 'Schema Validation'
+order: 113
+---
+
+## Schema Validation
+
+Schema Validation allows you to declaratively define document structures and enforce them during collaborative editing. When a schema is attached to a document, every local edit is validated against the schema rules, preventing invalid changes from being applied.
+
+### How It Works
+
+Schemas are defined using a TypeScript-like DSL, stored on the server, and delivered to clients when they attach a document. The SDK validates every `document.Update()` call against the schema rules before applying changes.
+
+<Mermaid
+  chart={`sequenceDiagram
+    participant Dashboard
+    participant Server as Yorkie Server
+    participant SDK as Client SDK
+    participant Doc as Document
+
+    Dashboard->>Server: (1) Create schema
+    SDK->>Server: (2) Attach document with schema
+    Server->>Server: (3) Validate existing document
+    Server-->>SDK: (4) Return document + schema rules
+    SDK->>Doc: (5) document.Update()
+    Doc->>Doc: (6) Validate changes against rules
+    alt Valid
+        Doc-->>SDK: (7a) Update successful
+    else Invalid
+        Doc-->>SDK: (7b) Throw validation error
+    end
+`}
+/>
+
+1. Define a schema in the Dashboard using the Schema DSL
+2. A client attaches a document with a schema reference
+3. The server validates that the existing document conforms to the schema
+4. Schema rules are sent to the client along with the document
+5. The client calls `document.Update()` to edit the document
+6. The SDK validates the updated document against the schema rules
+7. If valid, changes are applied; if invalid, the update is rejected with an error
+
+### Defining a Schema
+
+Schemas use a TypeScript Type Alias syntax to define document structures. You can create schemas in the Dashboard's schema editor.
+
+#### Basic Example
+
+```typescript
+type Document = {
+  title: string;
+  completed: boolean;
+  priority: integer;
+};
+```
+
+#### Rich Document Example
+
+```typescript
+type Document = {
+  title: string;
+  content: yorkie.Tree<{
+    doc: { content: "block+"; };
+    paragraph: { content: "text*"; marks: "bold italic link"; group: "block"; };
+    heading: { content: "text*"; marks: "bold"; group: "block"; };
+    blockquote: { content: "block+"; group: "block"; };
+    text: {};
+  }>;
+  tags: yorkie.Array<string>;
+  metadata: {
+    author: string;
+    updatedAt: date;
+  };
+};
+```
+
+#### Supported Types
+
+| Category | Types | Description |
+|----------|-------|-------------|
+| Primitive | `string`, `boolean`, `integer`, `double`, `long`, `date`, `bytes`, `null` | Basic value types |
+| Yorkie | `yorkie.Text` | Collaborative plain text |
+| Yorkie | `yorkie.Tree` | Collaborative rich text tree (supports Tree Schema) |
+| Yorkie | `yorkie.Counter` | Collaborative counter |
+| Yorkie | `yorkie.Object` | Collaborative JSON object |
+| Yorkie | `yorkie.Array` | Collaborative JSON array |
+| Structural | Optional (`?`), Union (`\|`), Nested objects | Type composition |
+
+#### Tree Schema
+
+For `yorkie.Tree`, you can define node types with ProseMirror-compatible content expressions:
+
+| Field | Description | Example |
+|-------|-------------|---------|
+| `content` | Allowed children as a content expression | `"text*"`, `"block+"`, `"(heading \| paragraph)+"` |
+| `marks` | Space-separated allowed mark types | `"bold italic link"` |
+| `group` | Group name referenced in other content expressions | `"block"` |
+
+Content expression syntax:
+
+| Syntax | Meaning |
+|--------|---------|
+| `name` | Exactly one node of this type or group |
+| `name*` | Zero or more |
+| `name+` | One or more |
+| `name?` | Zero or one |
+| `a b` | Sequence (a followed by b) |
+| `a \| b` | Alternative (a or b) |
+
+### Attaching a Schema to a Document
+
+Specify a schema when attaching a document using the `schema` option:
+
+```javascript
+import yorkie from 'yorkie-js-sdk';
+
+const client = new yorkie.Client('{{API_ADDR}}');
+await client.activate();
+
+const doc = new yorkie.Document('my-doc');
+await client.attach(doc, {
+  schema: 'my-schema@1', // Format: "schema-name@version"
+});
+```
+
+The schema reference uses the format `name@version`, where:
+
+| Part | Description |
+|------|-------------|
+| `name` | The schema name as created in the Dashboard |
+| `version` | The schema version number (1, 2, 3, ...) |
+
+### Handling Validation Errors
+
+When a `document.Update()` call violates the schema, the SDK throws an error. Use try-catch to handle validation failures:
+
+```javascript
+try {
+  doc.update((root) => {
+    root.title = 123; // Error: schema expects string
+  });
+} catch (err) {
+  if (err.code === 'ErrDocumentSchemaValidationFailed') {
+    console.error('Schema violation:', err.message);
+    // e.g., "schema validation failed: expected string at path $.title"
+  }
+}
+```
+
+### Validation Behavior in Concurrent Editing
+
+Schema validation uses a **best-effort** approach for collaborative environments:
+
+| Scenario | Behavior |
+|----------|----------|
+| **Local edits** | Validated against schema rules. Invalid changes are rejected with an error. |
+| **Remote changes** | Applied without validation. Temporary violations may occur. |
+| **Next local edit** | Validated against the current state, including remote changes. |
+
+This means that after receiving remote changes, the document may temporarily be in a state that doesn't conform to the schema. The next local edit will be validated against the current state, so any structural issues must be resolved before further local edits can succeed.
+
+### Schema Version Management
+
+Schemas are managed immutably. Each update creates a new version:
+
+- **v1**: Initial schema definition
+- **v2**: Updated schema with new fields or modified constraints
+- **v3**: Further revisions
+
+Documents remain bound to the schema version they were attached with. To use a new schema version, detach and reattach the document with the updated schema reference.
+
+### Use Cases
+
+- **Structured documents**: Enforce consistent structure for collaborative forms, surveys, or configuration editors
+- **Rich text editors**: Define allowed node types, content models, and marks for ProseMirror-compatible editors
+- **Data integrity**: Prevent invalid data types from being written to shared documents
+- **Multi-client consistency**: Ensure all clients editing a document follow the same structural rules
+
+### Related Documentation
+
+- [JS SDK](/docs/sdks/js-sdk) - Client and Document usage
+- [Dashboard](/docs/tools/dashboard) - Schema creation and management
+- [Security](/docs/advanced/security) - Auth Webhook for access control
