@@ -9,7 +9,7 @@ Schema Validation allows you to declaratively define document structures and enf
 
 ### How It Works
 
-Schemas are defined using a TypeScript-like DSL, stored on the server, and delivered to clients when they attach a document. The SDK validates every `document.Update()` call against the schema rules before applying changes.
+Schemas are defined using a TypeScript-like DSL, stored on the server, and delivered to clients when they attach a document. The SDK validates every `doc.update()` call against the schema rules before applying changes.
 
 <Mermaid
   chart={`sequenceDiagram
@@ -22,7 +22,7 @@ Schemas are defined using a TypeScript-like DSL, stored on the server, and deliv
     SDK->>Server: (2) Attach document with schema
     Server->>Server: (3) Validate existing document
     Server-->>SDK: (4) Return document + schema rules
-    SDK->>Doc: (5) document.Update()
+    SDK->>Doc: (5) doc.update()
     Doc->>Doc: (6) Validate changes against rules
     alt Valid
         Doc-->>SDK: (7a) Update successful
@@ -36,7 +36,7 @@ Schemas are defined using a TypeScript-like DSL, stored on the server, and deliv
 2. A client attaches a document with a schema reference
 3. The server validates that the existing document conforms to the schema
 4. Schema rules are sent to the client along with the document
-5. The client calls `document.Update()` to edit the document
+5. The client calls `doc.update()` to edit the document
 6. The SDK validates the updated document against the schema rules
 7. If valid, changes are applied; if invalid, the update is rejected with an error
 
@@ -132,7 +132,7 @@ The schema reference uses the format `name@version`, where:
 
 ### Handling Validation Errors
 
-When a `document.Update()` call violates the schema, the SDK throws an error. Use try-catch to handle validation failures:
+When a `doc.update()` call violates the schema, the SDK throws an error. Use try-catch to handle validation failures:
 
 ```javascript
 try {
