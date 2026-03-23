@@ -31,9 +31,7 @@ Start Minikube with the following command. The yorkie-cluster Helm chart deploys
 $ minikube start --cpus=4 --memory=8192 --driver=docker
 ```
 
-:::note
-The default minikube resource settings (2 CPUs, 2GB memory) are insufficient for running the full Yorkie cluster. If you encounter pod scheduling failures or OOMKilled errors, ensure your minikube instance has at least 4 CPUs and 8GB of memory.
-:::
+<Alert status="info">The default minikube resource settings (2 CPUs, 2GB memory) are insufficient for running the full Yorkie cluster. If you encounter pod scheduling failures or OOMKilled errors, ensure your minikube instance has at least 4 CPUs and 8GB of memory.</Alert>
 
 After Minikube is started, you will see the following output:
 
