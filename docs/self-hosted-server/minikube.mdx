@@ -25,11 +25,13 @@ For this tutorial, you will need:
 
 First, you need to setup minikube on your machine to use Kubernetes locally and deploy Yorkie cluster.
 
-Start Minikube with the following command:
+Start Minikube with the following command. The yorkie-cluster Helm chart deploys a Percona MongoDB sharded cluster (config server, 2 shards, mongos), 3 Yorkie replicas, and an Istio gateway, so you need to allocate sufficient CPU and memory resources:
 
 ```bash
-$ minikube start
+$ minikube start --cpus=4 --memory=8192 --driver=docker
 ```
+
+<Alert status="info">The default minikube resource settings (2 CPUs, 2GB memory) are insufficient for running the full Yorkie cluster. If you encounter pod scheduling failures or OOMKilled errors, ensure your minikube instance has at least 4 CPUs and 8GB of memory.</Alert>
 
 After Minikube is started, you will see the following output:
 
