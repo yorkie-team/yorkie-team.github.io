@@ -18,9 +18,8 @@ This tutorial assumes that you are familiar with Kubernetes and `kubectl`.
 
 For this tutorial, you will need:
 
-- [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) v1.2.40+.
+- [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) v1.28+.
 - [Helm](https://helm.sh/docs/intro/install/) v3.0+.
-- [istioctl](https://istio.io/latest/docs/setup/getting-started/#download) v1.17+, installed on your machine.
 
 ### Setup AWS EKS cluster
 
@@ -46,38 +45,47 @@ CoreDNS is running at https://12341234123412341234.gr7.ap-northeast-2.eks.amazon
 To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'. 
 ```
 
-### Install Istio with istioctl
+### Install Istio via Helm
 
-After AWS EKS is configured, you need to install Istio for Yorkie cluster.
+After AWS EKS is configured, you need to install [Istio](https://istio.io/latest/docs/setup/install/helm/) for Yorkie cluster.
 Yorkie cluster uses Istio for L7 load balancing and traffic management.
 
-Install Istio with the following command:
+First, add the Istio Helm repository and create the required namespaces:
 
 ```bash
-$ istioctl install -f <(curl -s https://raw.githubusercontent.com/yorkie-team/yorkie/main/build/charts/yorkie-cluster/istio-operator.yaml)
+$ helm repo add istio https://istio-release.storage.googleapis.com/charts
+$ helm repo update
+$ kubectl create namespace istio-system
+$ kubectl create namespace yorkie
 ```
 
-This will install Istio with [Istio Operator](https://istio.io/latest/docs/setup/install/operator/) configuration file.
-You can find the configuration file [here](https://raw.githubusercontent.com/yorkie-team/yorkie/main/build/charts/yorkie-cluster/istio-operator.yaml).
-
-When installing Istio, you will see the following output:
+Then, install Istio components in order. The value files are provided in the
+[yorkie-cluster chart repository](https://github.com/yorkie-team/yorkie/tree/main/build/charts/yorkie-cluster/istio-values).
 
 ```bash
-This will install the Istio 1.17.1 default profile with ["Istio core" "Istiod" "Ingress gateways"] components into the cluster. Proceed? (y/N)
+# 1. Install Istio base (CRDs)
+$ helm install istio-base istio/base -n istio-system \
+  -f <(curl -s https://raw.githubusercontent.com/yorkie-team/yorkie/main/build/charts/yorkie-cluster/istio-values/base.yaml)
+
+# 2. Install istiod (control plane)
+$ helm install istiod istio/istiod -n istio-system --wait \
+  -f <(curl -s https://raw.githubusercontent.com/yorkie-team/yorkie/main/build/charts/yorkie-cluster/istio-values/istiod.yaml)
+
+# 3. Install yorkie-gateway
+$ helm install yorkie-gateway istio/gateway -n yorkie --wait \
+  -f <(curl -s https://raw.githubusercontent.com/yorkie-team/yorkie/main/build/charts/yorkie-cluster/istio-values/gateway.yaml)
 ```
 
-Type `y` and press `Enter` to continue.
-
-After Istio is installed, you will see the following output:
+After Istio is installed, verify all components are running:
 
 ```bash
-✔ Istio core installed
-✔ Istiod installed
-✔ Ingress gateways installed
-✔ Installation complete                                                                                             
-Making this installation the default for injection and validation.
+$ kubectl get pods -n istio-system
+NAME                      READY   STATUS    RESTARTS   AGE
+istiod-6b7f5d7b5f-abc12   1/1     Running   0          30s
 
-Thank you for installing Istio 1.17.  Please take a few minutes to tell us about your install/upgrade experience!  https://forms.gle/hMHGiwZHPU7UQRWe9
+$ kubectl get pods -n yorkie
+NAME                               READY   STATUS    RESTARTS   AGE
+yorkie-gateway-7f8b9c6d4e-xyz34    1/1     Running   0          20s
 ```
 
 ### Add yorkie-team Helm chart in your local repository
@@ -246,17 +254,14 @@ $ helm uninstall yorkie-cluster --namespace yorkie
 release "yorkie-cluster" uninstalled
 ```
 
-Then Uninstall Istio with the following command:
+Then, uninstall Istio components in reverse order:
 
 ```bash
-$ istioctl uninstall --purge
-All Istio resources will be pruned from the cluster
-Proceed? (y/N) y
-...
-✔ Uninstall complete
-
-# (Optional) Remove istio-system namespace
+$ helm uninstall yorkie-gateway -n yorkie
+$ helm uninstall istiod -n istio-system
+$ helm uninstall istio-base -n istio-system
 $ kubectl delete namespace istio-system
+$ kubectl delete namespace yorkie
 ```
 
 (Optional) Then, delete EKS cluster via AWS Console or AWS CLI.
