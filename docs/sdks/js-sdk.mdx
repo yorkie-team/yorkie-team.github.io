@@ -559,6 +559,57 @@ Examples:
 - [CodeMirror example](https://github.com/yorkie-team/yorkie-js-sdk/blob/main/examples/vanilla-codemirror6)
 - [Quill example](https://github.com/yorkie-team/yorkie-js-sdk/blob/main/examples/vanilla-quill)
 
+**Tree**
+
+Supports collaborative editing of hierarchical tree structures, such as rich text editors:
+
+```javascript
+doc.update((root) => {
+  root.t = new yorkie.Tree({
+    type: 'doc',
+    children: [
+      {
+        type: 'p',
+        children: [{ type: 'text', value: 'hello' }],
+      },
+    ],
+  }); // <doc><p>hello</p></doc>
+  root.t.edit(6, 6, { type: 'text', value: ' world' }); // <doc><p>hello world</p></doc>
+  root.t.style(0, 6, { bold: 'true' });                 // <doc><p bold="true">hello world</p></doc>
+});
+```
+
+Tree nodes are either **element nodes** (`type`, `children`, optional `attributes`) or **text nodes** (`type: 'text'`, `value`). Editing and styling use a flat index that counts each node boundary in the flattened tree.
+
+**Selection using presence**
+
+Share tree selection using presence. Convert `index` to `position` for `yorkie.Tree`.
+
+```javascript
+// Update selection through tree editing
+doc.update((root, presence) => {
+  const range = root.t.edit(from, to, content);
+  presence.set({
+    selection: root.t.indexRangeToPosRange(range),
+  });
+});
+```
+
+- When applying other user's selection changes:
+
+```javascript
+doc.subscribe('others', (event) => {
+  if (event.type === 'presence-changed') {
+    const { clientID, presence } = event.value;
+    const range = doc.getRoot().t.posRangeToIndexRange(presence.selection);
+    // Handle the updated selection in the editor
+  }
+});
+```
+
+Examples:
+- [ProseMirror example](https://github.com/yorkie-team/yorkie-js-sdk/blob/main/examples/vanilla-prosemirror)
+
 **Counter**
 
 Supports integer operations with concurrent modifications:
@@ -581,6 +632,7 @@ import yorkie, { JSONArray } from '@yorkie-js/sdk';
 type DocType = {
   list: JSONArray<number>;
   text: yorkie.Text;
+  tree: yorkie.Tree;
 };
 type PresenceType = {
   username: string;
