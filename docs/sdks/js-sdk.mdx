@@ -623,6 +623,29 @@ doc.update((root) => {
 });
 ```
 
+**Dedup Counter**
+
+A Counter variant that uses a HyperLogLog sketch to deduplicate increments by actor ID.
+Useful for measuring unique visitors (UV) or other cardinality metrics where the same
+actor should only be counted once. Provides approximate counts with ~2% error rate.
+
+```javascript
+// Create a dedup counter (uses IntDedupType instead of IntType)
+doc.update((root) => {
+  root.uv = new yorkie.Counter(yorkie.IntDedupType, 0);
+});
+
+// Each unique actor is counted once; duplicates are ignored
+doc.update((root) => {
+  root.uv.increase(1, { actor: userId }); // UV: counted if new userId
+});
+```
+
+<Alert type="info">
+  Dedup counters do not support undo/redo because the internal HyperLogLog sketch is append-only.
+  The `increase` value must always be `1`.
+</Alert>
+
 #### TypeScript Support
 
 For stricter type checking, you can use [type variables](https://www.typescriptlang.org/docs/handbook/2/generics.html) in TypeScript when creating a Document.
