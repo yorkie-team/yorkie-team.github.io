@@ -159,71 +159,59 @@ Once you are logged in, you will see the following dashboard:
 
 You can add more dashboards like [Go Processes](https://grafana.com/grafana/dashboards/6671-go-processes/) in Grafana dashboard.
 
-### Install Yorkie ArgoCD with Helm chart
+### Install ArgoCD with Helm chart
 
-You can install Yorkie ArgoCD addon to perform continuous delivery of Yorkie cluster with GitOps.
-Yorkie ArgoCD addon includes ArgoCD to perform continuous delivery of Yorkie cluster.
+You can install ArgoCD to perform continuous delivery of Yorkie cluster with GitOps.
+We use the upstream [argo/argo-cd](https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd) Helm chart.
 
-Install Yorkie ArgoCD addon with the following command:
+First, add the Argo Helm repository:
 
 ```bash
-$ helm install yorkie-argocd yorkie-team/yorkie-argocd -n argocd --create-namespace
+$ helm repo add argo https://argoproj.github.io/argo-helm
+$ helm repo update
 ```
 
-If you are using AWS EKS, use the following command instead:
+Install ArgoCD with the following command:
 
 ```bash
-$ helm install yorkie-argocd yorkie-team/yorkie-argocd -n argocd --create-namespace \
-    --set ingress.hosts..ingressClassName=alb \
-	--set ingress.hosts.enabled=true \
-    --set ingres.hosts.apiHost={YOUR_API_DOMAIN_NAME} \
-    --set ingress.alb.enabled=true \
-    --set ingress.alb.certArn={YOUR_CERTIFICATE_ARN}
+$ helm install argo-cd argo/argo-cd -n argocd --create-namespace \
+    --set crds.install=false \
+    --set configs.params."server.insecure"=true \
+    --set configs.params."server.rootpath"=/argocd
+```
+
+If you are using AWS EKS with ALB, add the ingress configuration:
+
+```bash
+$ helm install argo-cd argo/argo-cd -n argocd --create-namespace \
+    --set crds.install=false \
+    --set configs.params."server.insecure"=true \
+    --set configs.params."server.rootpath"=/argocd \
+    --set server.ingress.enabled=true \
+    --set server.ingress.ingressClassName=alb \
+    --set server.ingress.hostname={YOUR_API_DOMAIN_NAME} \
+    --set server.ingress.path=/argocd/ \
+    --set server.ingress.annotations."alb\.ingress\.kubernetes\.io/scheme"=internet-facing \
+    --set server.ingress.annotations."alb\.ingress\.kubernetes\.io/certificate-arn"={YOUR_CERTIFICATE_ARN} \
+    --set 'server.ingress.annotations.alb\.ingress\.kubernetes\.io/listen-ports=[{"HTTP": 80}\, {"HTTPS": 443}]'
 ```
 
 Replace `{YOUR_API_DOMAIN_NAME}` with your domain name.
 Also, replace `{YOUR_CERTIFICATE_ARN}` with your certificate ARN.
 
-This will install `yorkie-argocd` release.
+<Alert status="info">For more information about Helm chart configuration, see [argo-cd chart documentation](https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd).</Alert>
 
-<Alert status="info">You can also set other Helm chart configuration options. For more information about Helm chart configuration, see [Yorkie ArgoCD Helm Chart Configuration](https://github.com/yorkie-team/yorkie/tree/main/build/charts/yorkie-argocd#configuration).</Alert>
-
-After Yorkie ArgoCD is installed, you will see the following output:
+Then, install the ArgoCD Applications chart. This will be configured in a later section after all addons are installed.
 
 ```bash
-NAME: yorkie-argocd
-LAST DEPLOYED: Tue May  2 16:06:03 2023
-NAMESPACE: argocd
-STATUS: deployed
-REVISION: 1
-TEST SUITE: None
-NOTES:
---- Install Complete ---
-yorkie-argocd successfully installed!
-
-For next steps, follow:
-  $ curl https://github.com/yorkie-team/yorkie/tree/main/charts/yorkie-argocd
-
-To learn more about the release, try:
-  $ helm status yorkie-argocd -n argocd
-  $ helm get all yorkie-argocd -n argocd
+$ helm install argocd-apps argo/argocd-apps -n argocd -f apps-values.yaml
 ```
 
-Then, you need to set up the admin password for ArgoCD.
+You can get the initial admin password with the following command:
 
 ```bash
-# Set the initial password for the admin user
-$ kubectl -n argocd patch secret argocd-secret \
-  -p '{"stringData": {
-    "admin.password": "$2a$12$fJoZj9CnNyD5Yfi02nZh7.XcH4Ds9M.oftQOQDP5oytyra9cP6Dny",
-    "admin.passwordMtime": "'$(date +%FT%T%Z)'"
-}}'
-
-# Restart the ArgoCD server to apply the new password
-$ kubectl -n argocd get pod --no-headers=true | awk '/argocd-server/{print $1}'| xargs kubectl delete -n argocd pod
+$ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
 ```
-
-Now you have Yorkie ArgoCD installed.
 
 It will take a few minutes for pods to be ready, so wait until all pods are ready.
 You can check the status of pods with the following command:
@@ -235,19 +223,19 @@ $ kubectl get pods -n argocd --watch
 After all pods are ready, you will see the following output:
 
 ```bash
-NAME                                                READY   STATUS    RESTARTS   AGE
-argocd-application-controller-0                     1/1     Running   0          2m53s
-argocd-applicationset-controller-75cb58f45c-vxzv8   1/1     Running   0          2m53s
-argocd-dex-server-67df64dd59-9shpk                  1/1     Running   0          2m53s
-argocd-notifications-controller-65fbf675f4-rjpvw    1/1     Running   0          2m53s
-argocd-redis-75b645466f-r2jgn                       1/1     Running   0          2m53s
-argocd-repo-server-57df48bf86-h4pwd                 1/1     Running   0          2m53s
-argocd-server-6bd555f4c6-7sh8l                      1/1     Running   0          57s
+NAME                                                       READY   STATUS    RESTARTS   AGE
+argo-cd-argocd-application-controller-0                    1/1     Running   0          2m
+argo-cd-argocd-applicationset-controller-bffd78864-bcsfg   1/1     Running   0          2m
+argo-cd-argocd-dex-server-55f8b67c89-d2j89                 1/1     Running   0          2m
+argo-cd-argocd-notifications-controller-59dd8dfbbb-5ps8w   1/1     Running   0          2m
+argo-cd-argocd-redis-55bccb7655-kldsg                      1/1     Running   0          2m
+argo-cd-argocd-repo-server-79898bcb67-5nbfv                1/1     Running   0          2m
+argo-cd-argocd-server-59696d4ccd-d2kjb                     1/1     Running   0          2m
 ```
 
 ### View Yorkie GitOps on ArgoCD web UI
 
-Now you have Yorkie ArgoCD installed, you can access ArgoCD web UI to view deployment status of Yorkie cluster.
+Now you have ArgoCD installed, you can access ArgoCD web UI to view deployment status of Yorkie cluster.
 
 Access ArgoCD web UI with following url:
 
@@ -429,17 +417,86 @@ Then you will see the following output:
 
 Yorkie analytics collects various information beyond MAU measurement, including client connections, document operations, and other usage metrics on the [Dashboard]({{DASHBOARD_PATH}}).
 
+### Connect Yorkie addons to ArgoCD
+
+Now that all addons are installed, you can connect them to ArgoCD for GitOps-based continuous delivery.
+
+Create an `apps-values.yaml` file that defines ArgoCD Applications for each Yorkie addon:
+
+```yaml
+# apps-values.yaml
+applications:
+  yorkie-cluster:
+    namespace: argocd
+    project: default
+    sources:
+      - repoURL: https://yorkie-team.github.io/yorkie/helm-charts
+        chart: yorkie-cluster
+        targetRevision: {{YORKIE_VERSION}}
+        helm:
+          valueFiles:
+            - $values/k8s/cluster/values.yaml
+      - repoURL: https://github.com/your-org/your-devops-repo.git
+        targetRevision: main
+        ref: values
+    destination:
+      server: https://kubernetes.default.svc
+      namespace: yorkie
+
+  yorkie-monitoring:
+    namespace: argocd
+    project: default
+    sources:
+      - repoURL: https://yorkie-team.github.io/yorkie/helm-charts
+        chart: yorkie-monitoring
+        targetRevision: {{YORKIE_VERSION}}
+        helm:
+          valueFiles:
+            - $values/k8s/monitoring/values.yaml
+      - repoURL: https://github.com/your-org/your-devops-repo.git
+        targetRevision: main
+        ref: values
+    destination:
+      server: https://kubernetes.default.svc
+      namespace: monitoring
+
+  yorkie-analytics:
+    namespace: argocd
+    project: default
+    source:
+      repoURL: https://yorkie-team.github.io/yorkie/helm-charts
+      chart: yorkie-analytics
+      targetRevision: {{YORKIE_VERSION}}
+    destination:
+      server: https://kubernetes.default.svc
+      namespace: analytics
+```
+
+Replace `your-org/your-devops-repo` with your GitOps repository that contains the Helm values files.
+
+Install the Applications chart:
+
+```bash
+$ helm install argocd-apps argo/argocd-apps -n argocd -f apps-values.yaml
+```
+
+<Alert status="info">For more information about the argocd-apps chart, see [argocd-apps chart documentation](https://github.com/argoproj/argo-helm/tree/main/charts/argocd-apps).</Alert>
+
+After the Applications are created, ArgoCD will detect and manage the Yorkie addons. You can view and sync them from the ArgoCD web UI.
+
 ### Clean up cluster addons
 
 You **have** now installed Yorkie monitoring and ArgoCD, and viewed Yorkie metrics on Grafana dashboard and Yorkie GitOps on ArgoCD web UI.
 
-To learn about how to configure Yorkie Monitoring and Yorkie ArgoCD in Helm Chart, see [Yorkie Chart Repository](https://github.com/yorkie-team/yorkie/tree/main/build/charts/).
+To learn about how to configure Yorkie Monitoring in Helm Chart, see [Yorkie Chart Repository](https://github.com/yorkie-team/yorkie/tree/main/build/charts/).
+For ArgoCD configuration, see [argo-cd chart documentation](https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd).
 
-First, uninstall Yorkie ArgoCD with the following command:
+First, uninstall ArgoCD with the following command:
 
 ```bash
-# Uninstall Yorkie ArgoCD helm chart release
-$ helm uninstall yorkie-argocd -n argocd
+# Uninstall ArgoCD helm chart releases
+$ helm uninstall argocd-apps -n argocd
+$ helm uninstall argo-cd -n argocd
 
 # Delete ArgoCD CRDs
 $ kubectl get crd -oname | grep --color=never 'argoproj.io' | xargs kubectl delete
