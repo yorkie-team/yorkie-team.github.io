@@ -216,6 +216,7 @@ Yorkie handles concurrent edits differently depending on the data type:
 | **[Text](/docs/sdks/js-sdk#custom-crdt-types)** | Character-level merge (via RGATreeSplit) | Two users type at the same position; both characters appear based on their TimeTickets |
 | **[Tree](/docs/sdks/js-sdk#custom-crdt-types)** | Node-level merge (via [CRDTTree](#the-tree-crdt)) | Two users add child nodes to the same parent; both nodes appear in deterministic order |
 | **[Counter](/docs/sdks/js-sdk#custom-crdt-types)** | Additive merge | Two users increment by 1; the counter increases by 2 |
+| **Dedup Counter** | HLL max-merge | Two users record the same visitor; the counter stays at 1 (unique count) |
 
 This means your application does not need to implement any conflict resolution logic. As long as you use Yorkie's data types through `document.update()`, all conflicts are resolved automatically.
 

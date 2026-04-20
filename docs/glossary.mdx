@@ -29,7 +29,7 @@ These terms are used in the Yorkie project and community. Understanding them wil
 | [YSON](/docs/internals/yson) | Yorkie JSON (YSON) is a JSON-like format for representing Yorkie documents, including custom CRDT types such as `Text`, `Tree`, `Counter`, along with specialized types like `Int`, `Long`, `Date`, and `BinData`. Used for document snapshots and serialization. |
 | [Text](/docs/sdks/js-sdk#custom-crdt-types) | A list-based CRDT type for collaborative rich text editing. Supports styling attributes and cursor sharing via presence. Used for integrations like [Quill](/examples/quill) and [CodeMirror](/examples/codemirror). |
 | [Tree](/docs/sdks/js-sdk#custom-crdt-types) | A tree-based CRDT type for structured rich text editing. Represents content as a hierarchical tree of nodes, similar to a DOM structure. |
-| [Counter](/docs/sdks/js-sdk#custom-crdt-types) | A CRDT type for concurrent counting operations. Supports integer and long types, allowing multiple users to increment or decrement a value simultaneously without conflicts. |
+| [Counter](/docs/sdks/js-sdk#custom-crdt-types) | A CRDT type for concurrent counting operations. Supports integer and long (bigint) types, allowing multiple users to increment or decrement a value simultaneously without conflicts. DedupCounter variant counts unique actors using HyperLogLog for UV measurement. |
 
 ### Real-time Collaboration
 

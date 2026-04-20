@@ -108,7 +108,7 @@ Set initial values for the document root when attaching:
 await client.attach(doc, {
   initialRoot: {
     list: [1, 2, 3],
-    counter: new yorkie.Counter(yorkie.IntType, 0),
+    counter: new yorkie.Counter(0),
   },
 });
 ```
@@ -128,7 +128,7 @@ await client.attach(doc, {
 await client.attach(doc, {
   initialRoot: {
     list: [1, 2, 3],    // this update will be discarded
-    counter: new yorkie.Counter(yorkie.IntType, 0), // this update will be applied
+    counter: new yorkie.Counter(0), // this update will be applied
   },
 });
 
@@ -158,7 +158,7 @@ doc.update((root) => {
     name: 'yorkie',
     age: 14,
   };
-  root.counter = new yorkie.Counter(yorkie.IntType, 0);
+  root.counter = new yorkie.Counter(0);
   root.counter.increase(1);
 }, message);
 ```
@@ -612,16 +612,40 @@ Examples:
 
 **Counter**
 
-Supports integer operations with concurrent modifications:
+Supports integer operations with concurrent modifications. The counter type is inferred from the value: `number` for 32-bit integer, `bigint` for 64-bit long.
 
 ```javascript
 doc.update((root) => {
-  root.counter = new yorkie.Counter(yorkie.IntType, 1); // {"counter":1}
-  root.counter.increase(2);                             // {"counter":3}
-  root.counter.increase(3);                             // {"counter":6}
-  root.counter.increase(-4);                            // {"counter":2}
+  root.counter = new yorkie.Counter(1); // {"counter":1}
+  root.counter.increase(2);             // {"counter":3}
+  root.counter.increase(3);             // {"counter":6}
+  root.counter.increase(-4);            // {"counter":2}
+
+  // For 64-bit long counters, use bigint:
+  root.bigCounter = new yorkie.Counter(0n);
+  root.bigCounter.increase(1n);
 });
 ```
+
+**DedupCounter**
+
+Counts unique actors using HyperLogLog, useful for UV (unique visitor) measurement. Use `add(actor)` to record a unique visitor. Provides approximate counts with ~2% error rate.
+
+```javascript
+doc.update((root) => {
+  root.visitors = new yorkie.DedupCounter();
+  root.visitors.add(userId);
+});
+
+// Duplicate actors are ignored
+doc.update((root) => {
+  root.visitors.add(userId); // same user, count stays the same
+});
+```
+
+<Alert status="info">
+DedupCounter is designed for daily UV tracking. Create a separate document per day (e.g., `analytics-pageId-20260414`) to reset counts naturally.
+</Alert>
 
 #### TypeScript Support
 
@@ -890,7 +914,7 @@ console.log(doc.getRoot().text.toString()); // "Hello"
 
 ```javascript
 doc.update((root) => {
-  root.counter = new yorkie.Counter(yorkie.IntType, 0);
+  root.counter = new yorkie.Counter(0);
   root.counter.increase(5);
 });
 
