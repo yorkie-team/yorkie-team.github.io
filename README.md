@@ -116,3 +116,8 @@ When PR is merged into main, it is automatically distributed by GitHub Actions.
 ## Contributing
 
 See [CONTRIBUTING](CONTRIBUTING.md) for details on submitting patches and the contribution workflow.
+
+## Documentation
+
+- [MAINTAINING.md](MAINTAINING.md) — Release and maintenance procedures
+- [CLAUDE.md](CLAUDE.md) — Agent instructions for AI-assisted development
