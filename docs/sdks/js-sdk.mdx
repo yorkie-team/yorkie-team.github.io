@@ -95,9 +95,16 @@ Attach options:
 - `documentPollInterval`(Optional): Polling interval in milliseconds. Used only when `syncMode` is `SyncMode.Polling`. Defaults to `3000`.
 
 ```javascript
+// Manual mode: the caller drives sync via client.sync(doc).
 await client.attach(doc, {
   initialPresence: { color: 'blue', cursor: { x: 0, y: 0 } },
   syncMode: SyncMode.Manual,
+});
+
+// Polling mode: stream-less periodic sync; pulls every 5 seconds.
+await client.attach(doc, {
+  syncMode: SyncMode.Polling,
+  documentPollInterval: 5000,
 });
 ```
 
