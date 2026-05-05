@@ -57,13 +57,14 @@ This local-first approach means your application remains responsive even with ne
 
 ### Sync Modes
 
-Yorkie provides four synchronization modes that control how a document syncs with the server. You can change the mode at any time using `client.changeSyncMode()`.
+Yorkie provides five synchronization modes that control how a document or channel syncs with the server. You can change the mode at any time using `client.changeSyncMode()`.
 
 | Mode | Push | Pull | Watch Stream | Use Case |
 |------|------|------|-------------|----------|
 | **`Realtime`** | Automatic | Automatic | Active | Default mode for real-time collaboration |
-| **`RealtimePushOnly`** | Automatic | Disabled | Active | When you want to send changes but not receive others (e.g., a presenter mode) |
-| **`RealtimeSyncOff`** | Disabled | Disabled | Active | Temporarily pause sync while staying aware of connection status |
+| **`RealtimePushOnly`** | Automatic | Disabled | Active | When you want to send changes but not receive others (e.g., a presenter mode). Document only. |
+| **`RealtimeSyncOff`** | Disabled | Disabled | Active | Temporarily pause sync while staying aware of connection status. Document only. |
+| **`Polling`** | Periodic | Periodic | Disconnected | Stream-less periodic sync. For Documents, pulls remote changes at the polling interval — not suitable for collaborative editing. For Channels, refreshes `sessionCount` without a watch stream — useful for large viewer counts where broadcast is not needed. |
 | **`Manual`** | Manual only | Manual only | Disconnected | Full control over when sync happens; useful for batch operations |
 
 ```javascript
@@ -77,6 +78,9 @@ await client.changeSyncMode(doc, SyncMode.RealtimePushOnly);
 
 // Pause all sync
 await client.changeSyncMode(doc, SyncMode.RealtimeSyncOff);
+
+// Switch to polling mode (no watch stream; pulls at the polling interval).
+await client.changeSyncMode(doc, SyncMode.Polling);
 
 // Switch to manual mode
 await client.changeSyncMode(doc, SyncMode.Manual);

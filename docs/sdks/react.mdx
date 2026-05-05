@@ -176,10 +176,21 @@ Enable the [Devtools](/docs/tools/devtools) extension for debugging document sta
 | Prop | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
 | channelKey | string | Yes | - | Unique channel key (supports [hierarchical keys](/docs/sdks/js-sdk#hierarchical-channel-keys)) |
-| isRealtime | boolean | No | true | Session tracking mode |
+| syncMode | `SyncMode` | No | `SyncMode.Realtime` | Sync mode for the channel. See [Synchronization Modes](/docs/sdks/js-sdk#synchronization-modes). Use `SyncMode.Polling` to track `sessionCount` without a watch stream. |
+| isRealtime | boolean | No | - | Boolean shortcut covering only Realtime/Manual. `true` → `SyncMode.Realtime`, `false` → `SyncMode.Manual`. Cannot express `SyncMode.Polling`; use `syncMode` for that. If both props are set, `syncMode` wins. |
 
-- `isRealtime={true}` (default): The session count updates automatically via a watch stream. Use this for live "users online" indicators.
-- `isRealtime={false}`: Manual mode — the watch stream is not established, so session count will not update automatically. If you need messaging (broadcast/subscribe) or manual sync, use the JS SDK channel directly and manage the lifecycle yourself. Receiving broadcast events requires a watch stream.
+- `syncMode={SyncMode.Realtime}` (default): The session count updates automatically via a watch stream. Required to receive broadcast events through the JS SDK Channel.
+- `syncMode={SyncMode.Polling}`: Stream-less mode. The session count refreshes at `channelHeartbeatInterval` (default 3 seconds). Recommended for large channels where broadcast is not needed (e.g., showing approximate viewer count on read-only pages).
+- `syncMode={SyncMode.Manual}`: No automatic activity. Equivalent to `isRealtime={false}` for backward compatibility. Use the JS SDK channel directly to drive sync.
+
+```tsx
+import { ChannelProvider, SyncMode } from '@yorkie-js/react';
+
+// Large viewer-count page using polling.
+<ChannelProvider channelKey="live-stream-42" syncMode={SyncMode.Polling}>
+  <ViewerCounter />
+</ChannelProvider>
+```
 
 > Channel broadcast/subscribe hooks are planned for a future release. In the meantime, use the [JS SDK Channel API](/docs/sdks/js-sdk#channel) directly for messaging (and remember to unsubscribe/detach on unmount to avoid leaks).
 

@@ -91,12 +91,20 @@ Attaching subscribes the client to a document. If the document doesn't exist on 
 
 Attach options:
 - `initialPresence`: Sets the client's initial presence when attaching to the document. The presence is shared with other users participating in the document. It must be serializable to JSON.
-- `syncMode`(Optional): Specifies synchronization modes. The default value is `SyncMode.Realtime`, which automatically pushes and pulls changes. If you set it to `SyncMode.Manual`, you'll need to manually handle synchronization.
+- `syncMode`(Optional): Specifies synchronization modes. The default value is `SyncMode.Realtime`, which automatically pushes and pulls changes. See [Synchronization Modes](#synchronization-modes) for the full list, including `SyncMode.Polling` for stream-less periodic sync.
+- `documentPollInterval`(Optional): Polling interval in milliseconds. Used only when `syncMode` is `SyncMode.Polling`. Defaults to `3000`.
 
 ```javascript
+// Manual mode: the caller drives sync via client.sync(doc).
 await client.attach(doc, {
   initialPresence: { color: 'blue', cursor: { x: 0, y: 0 } },
   syncMode: SyncMode.Manual,
+});
+
+// Polling mode: stream-less periodic sync; pulls every 5 seconds.
+await client.attach(doc, {
+  syncMode: SyncMode.Polling,
+  documentPollInterval: 5000,
 });
 ```
 
@@ -334,15 +342,17 @@ const unsubscribe = doc.subscribe('others', (event) => {
 
 #### Synchronization Modes
 
-Change the synchronization mode using `client.changeSyncMode(doc, syncMode)`:
+Change the synchronization mode at any time using `client.changeSyncMode(resource, syncMode)`. The resource can be a Document or a [Channel](#channel).
 
 Available modes:
 
-- `SyncMode.Realtime`: Local changes are automatically pushed to the server, and remote changes are pulled from the server.
+- `SyncMode.Realtime`: Local changes are automatically pushed to the server, and remote changes are pulled from the server. Watch stream is open.
 
-- `SyncMode.RealtimePushOnly`: Only local changes are pushed, and remote changes are not pulled.
+- `SyncMode.RealtimePushOnly` (Document only): Only local changes are pushed, and remote changes are not pulled.
 
-- `SyncMode.RealtimeSyncOff`: Changes are not synchronized, but the watch stream remains active.
+- `SyncMode.RealtimeSyncOff` (Document only): Changes are not synchronized, but the watch stream remains active.
+
+- `SyncMode.Polling`: No watch stream is opened. The existing sync loop drives `PushPullChanges` (Document) or the heartbeat (Channel) at a fixed interval. For Documents, remote changes arrive on the next polling tick — not suitable for collaborative editing. For Channels, recommended when broadcast events are not needed and `sessionCount` (an approximate count) is acceptable; useful for handling very large viewer counts where the watch stream cost dominates.
 
 - `SyncMode.Manual`: Synchronization no longer occurs in real-time, and the watch stream is disconnected. Manual handling is required for synchronization.
 
@@ -355,6 +365,9 @@ await client.changeSyncMode(doc, SyncMode.RealtimePushOnly);
 
 // Synchronization turned off, but the watch stream remains active.
 await client.changeSyncMode(doc, SyncMode.RealtimeSyncOff);
+
+// Stream-less periodic sync. Pull at documentPollInterval (default 3000 ms).
+await client.changeSyncMode(doc, SyncMode.Polling);
 
 // Synchronization turned off, and the watch stream is disconnected.
 await client.changeSyncMode(doc, SyncMode.Manual);
@@ -1009,6 +1022,22 @@ await client.attach(channel);
 ```
 
 > The channel key is used to identify the Channel in Yorkie. Clients with the same channel key can communicate with each other through pub/sub messaging.
+
+Attach options:
+- `syncMode`(Optional): Channel sync mode. Defaults to `SyncMode.Realtime`. Use `SyncMode.Polling` for stream-less periodic sync (recommended for large channels where broadcast events are not needed). `SyncMode.Manual` disables automatic activity. `RealtimePushOnly` and `RealtimeSyncOff` are document-only and rejected for channels.
+- `channelHeartbeatInterval`(Optional): Heartbeat interval in milliseconds. Mode-specific defaults: `Polling` → `3000`, `Realtime` → `30000`. Must be a positive number.
+
+```javascript
+// Default: Realtime — opens a watch stream for broadcast events.
+await client.attach(new yorkie.Channel('room-123'));
+
+// Polling: stream-less periodic sessionCount refresh, useful for large
+// viewer counts where broadcast is not needed.
+await client.attach(new yorkie.Channel('viewer-room'), {
+  syncMode: SyncMode.Polling,
+  channelHeartbeatInterval: 3000,
+});
+```
 
 #### Hierarchical Channel Keys
 
