@@ -114,6 +114,7 @@ Control how documents and clients are managed over time.
 | Setting | Default | Description |
 |---------|---------|-------------|
 | `client-deactivate-threshold` | 24h | Time after which inactive clients are deactivated |
+| `channel-session-ttl` | 15s | Time a presence channel session is retained after its last refresh (1s..5m) |
 | `remove-on-detach` | false | Automatically remove documents when all clients detach |
 | `auto-revision-enabled` | true | Automatically create revisions during snapshot creation |
 
@@ -125,6 +126,20 @@ Clients that haven't communicated with the server for longer than this threshold
 yorkie project update [project-name] \
   --client-deactivate-threshold 48h
 ```
+
+#### ChannelSessionTTL
+
+The duration a presence channel session is retained on the server after its last refresh. Raising the value keeps users counted in the live presence count longer after they leave, which is useful for small rooms where the count would otherwise feel volatile. The value must be between `1s` and `5m`; the default is `15s` (matching the server-wide default).
+
+```bash
+yorkie project update [project-name] \
+  --channel-session-ttl 1m
+```
+
+**When to use:**
+- **Small-room presence**: Raise to `30s`–`1m` so brief visits keep the live count from collapsing
+- **Tight real-time feedback**: Keep at the `15s` default when accurate "live now" counts matter more than smoothing
+- **High-churn rooms**: Combine with the SDK's heartbeat interval (Channel sessions are refreshed every `TTL/3`); lowering the TTL increases refresh traffic linearly
 
 #### RemoveOnDetach
 
@@ -160,6 +175,7 @@ When enabled, revisions are automatically created during snapshot creation. Revi
 | SnapshotThreshold | `--snapshot-threshold` | 500 | int |
 | SnapshotInterval | `--snapshot-interval` | 500 | int |
 | ClientDeactivateThreshold | `--client-deactivate-threshold` | 24h | duration |
+| ChannelSessionTTL | `--channel-session-ttl` | 15s | duration (1s..5m) |
 | RemoveOnDetach | `--remove-on-detach` | false | bool |
 | AutoRevisionEnabled | Admin API only | true | bool |
 
