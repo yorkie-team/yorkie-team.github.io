@@ -56,7 +56,7 @@ These terms are used in the Yorkie project and community. Understanding them wil
 
 | Word | Description |
 | ---- | ----------- |
-| [CRDT Element](/docs/internals/crdt-concepts#crdt-elements-and-nodes) | A data structure representing a CRDT element, analogous to an Element in the DOM. For more information, see [CRDT Concepts](/docs/internals/crdt-concepts) and the [Data Structures design doc](https://github.com/yorkie-team/yorkie/blob/main/design/data-structure.md). |
+| [CRDT Element](/docs/internals/crdt-concepts#crdt-elements-and-nodes) | A data structure representing a CRDT element, analogous to an Element in the DOM. For more information, see [CRDT Concepts](/docs/internals/crdt-concepts) and the [Data Structures design doc](https://github.com/yorkie-team/yorkie/blob/main/docs/design/data-structure.md). |
 | [CRDT Node](/docs/internals/crdt-concepts#crdt-elements-and-nodes) | A single node within a CRDT element. |
 | [TimeTicket](/docs/internals/crdt-concepts#timetickets) | A globally unique identifier for every CRDT node, composed of a Lamport timestamp, an ActorID (the creating client), and a delimiter. TimeTickets provide both uniqueness and a total ordering for conflict resolution. |
 | [Version Vector](/docs/internals/crdt-concepts#version-vectors) | A Lamport Synced Version Vector -- a hybrid logical clock that combines Lamport timestamps with version vectors. Used to track causal relationships between clients for [Garbage Collection](/docs/internals/crdt-concepts#garbage-collection). |

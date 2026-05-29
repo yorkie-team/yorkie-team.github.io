@@ -69,7 +69,7 @@ When the client is no longer needed, you can deactivate it to release resources 
 try await client.deactivate()
 ```
 
-This will detach all documents attached to the client for efficient [garbage collection](https://github.com/yorkie-team/yorkie/blob/main/design/garbage-collection.md).
+This will detach all documents attached to the client for efficient [garbage collection](https://github.com/yorkie-team/yorkie/blob/main/docs/design/garbage-collection.md).
 
 ### Document
 
@@ -485,7 +485,7 @@ try await client.sync(doc) // Trigger synchronization manually using the sync fu
 
 #### Detaching the Document
 
-If the document is no longer needed, detach it to improve the efficiency of garbage collection removing [CRDT tombstones](https://crdt.tech/glossary). For more information about GC, see [Garbage Collection](https://github.com/yorkie-team/yorkie/blob/main/design/garbage-collection.md).
+If the document is no longer needed, detach it to improve the efficiency of garbage collection removing [CRDT tombstones](https://crdt.tech/glossary). For more information about GC, see [Garbage Collection](https://github.com/yorkie-team/yorkie/blob/main/docs/design/garbage-collection.md).
 
 ```swift
 try await client.detach(doc)

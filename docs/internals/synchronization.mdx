@@ -53,7 +53,7 @@ When another client's changes arrive:
 2. The Changes are applied to the local **Root** using CRDT merge rules.
 3. Subscribed event handlers (via `document.subscribe()`) are called with the change events.
 
-This local-first approach means your application remains responsive even with network latency. For the full technical details, see the [Document Editing design document](https://github.com/yorkie-team/yorkie/blob/main/design/document-editing.md).
+This local-first approach means your application remains responsive even with network latency. For the full technical details, see the [Document Editing design document](https://github.com/yorkie-team/yorkie/blob/main/docs/design/document-editing.md).
 
 ### Sync Modes
 
@@ -230,7 +230,7 @@ doc.subscribe('connection', (event) => {
 
 When the watch stream disconnects, local changes are buffered and pushed once the connection is restored. This is how Yorkie supports offline editing.
 
-For the full PubSub design, see the [PubSub design document](https://github.com/yorkie-team/yorkie/blob/main/design/pub-sub.md).
+For the full PubSub design, see the [PubSub design document](https://github.com/yorkie-team/yorkie/blob/main/docs/design/pub-sub.md).
 
 ### Document Compaction
 
@@ -259,9 +259,9 @@ Here's the complete lifecycle of a document from attachment to detachment. For t
 ### Further Reading
 
 - [Document Lifecycle](/docs/internals/document-lifecycle) -- State transitions of documents and clients
-- [Document Editing design document](https://github.com/yorkie-team/yorkie/blob/main/design/document-editing.md) -- Root/Clone/LocalChanges architecture
-- [PubSub design document](https://github.com/yorkie-team/yorkie/blob/main/design/pub-sub.md) -- Watch stream implementation
-- [Housekeeping design document](https://github.com/yorkie-team/yorkie/blob/main/design/housekeeping.md) -- Background compaction and cleanup
+- [Document Editing design document](https://github.com/yorkie-team/yorkie/blob/main/docs/design/document-editing.md) -- Root/Clone/LocalChanges architecture
+- [PubSub design document](https://github.com/yorkie-team/yorkie/blob/main/docs/design/pub-sub.md) -- Watch stream implementation
+- [Housekeeping design document](https://github.com/yorkie-team/yorkie/blob/main/docs/design/housekeeping.md) -- Background compaction and cleanup
 - [JS SDK: Synchronization Modes](/docs/sdks/js-sdk#synchronization-modes) -- SDK reference for sync mode APIs
 - [JS SDK: Subscribing to Changes](/docs/sdks/js-sdk#subscribing-to-changes) -- How to react to local, remote, and snapshot events
 - [CRDT Concepts](/docs/internals/crdt-concepts) -- How CRDTs ensure conflict-free merging
