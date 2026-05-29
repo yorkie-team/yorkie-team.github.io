@@ -70,11 +70,12 @@ General-purpose data structures used by the CRDT layer:
 
 | Type | Description |
 |------|-------------|
-| **[SplayTree](https://en.wikipedia.org/wiki/Splay_tree)** | A self-adjusting binary search tree. Moves frequently accessed nodes to the root, which is effective for text editing where users access nearby positions. Used as an index tree to provide fast positional access. |
+| **[SplayTree](https://en.wikipedia.org/wiki/Splay_tree)** | A self-adjusting binary search tree. Moves frequently accessed nodes to the root, which is effective for text editing where users access nearby positions. Used as the index tree in **RGATreeSplit** for fast positional access in text. |
+| **TreeList** | An order-statistic tree on a [Left-leaning Red-Black Tree](https://en.wikipedia.org/wiki/Left-leaning_red%E2%80%93black_tree), with O(log N) worst-case index-based access. Used as the index tree of **RGATreeList**. |
 | **[LLRBTree](https://en.wikipedia.org/wiki/Left-leaning_red%E2%80%93black_tree)** | A left-leaning red-black tree. Simpler than a standard red-black tree, used for ordered key lookups. |
 | **IndexTree** | A tree structure representing the document model of text-based editors. |
 
-For the full dependency graph and technical details, see the [Data Structures design document](https://github.com/yorkie-team/yorkie/blob/main/design/data-structure.md).
+For the full dependency graph and technical details, see the [Data Structures design document](https://github.com/yorkie-team/yorkie/blob/main/docs/design/data-structure.md).
 
 ### Logical Clocks and TimeTickets
 
@@ -108,7 +109,7 @@ To solve this, Yorkie uses a **Lamport Synced Version Vector** -- a hybrid of La
 
 The server uses the **minimum Version Vector** (`minVersionVector`) across all active clients to determine when tombstoned nodes can be safely garbage collected.
 
-For the full technical design, see the [Version Vector design document](https://github.com/yorkie-team/yorkie/blob/main/design/version-vector.md).
+For the full technical design, see the [Version Vector design document](https://github.com/yorkie-team/yorkie/blob/main/docs/design/version-vector.md).
 
 ### CRDT Elements and Nodes
 
@@ -159,7 +160,7 @@ The Tree CRDT guarantees eventual consistency across 27 concurrent editing cases
 - **`insertAfter` only**: Like the RGA, all insertions reference a left sibling node, ensuring deterministic ordering.
 - **`maxCreatedAtMapByActor`**: A map that tracks the latest creation time per actor within an editing range, enabling the system to distinguish concurrent from causally related operations and prevent unintended deletions.
 
-For the full technical design, see the [Tree design document](https://github.com/yorkie-team/yorkie/blob/main/design/tree.md).
+For the full technical design, see the [Tree design document](https://github.com/yorkie-team/yorkie/blob/main/docs/design/tree.md).
 
 ### Tombstones
 
@@ -201,9 +202,9 @@ sequenceDiagram
 
 #### Text-Specific Garbage Collection
 
-For [Text](/docs/sdks/js-sdk#custom-crdt-types) types, GC works at the text node level within the RGATreeSplit structure. Tombstoned text nodes are cached during editing and removed from the linked list during garbage collection, making them eligible for runtime memory reclamation. For details, see the [GC for Text Type design document](https://github.com/yorkie-team/yorkie/blob/main/design/gc-for-text-type.md).
+For [Text](/docs/sdks/js-sdk#custom-crdt-types) types, GC works at the text node level within the RGATreeSplit structure. Tombstoned text nodes are cached during editing and removed from the linked list during garbage collection, making them eligible for runtime memory reclamation. For details, see the [GC for Text Type design document](https://github.com/yorkie-team/yorkie/blob/main/docs/design/gc-for-text-type.md).
 
-For the full GC design, see the [Garbage Collection design document](https://github.com/yorkie-team/yorkie/blob/main/design/garbage-collection.md).
+For the full GC design, see the [Garbage Collection design document](https://github.com/yorkie-team/yorkie/blob/main/docs/design/garbage-collection.md).
 
 ### Conflict Resolution in Practice
 
@@ -222,10 +223,10 @@ This means your application does not need to implement any conflict resolution l
 
 ### Further Reading
 
-- [Data Structures design document](https://github.com/yorkie-team/yorkie/blob/main/design/data-structure.md) -- Technical details on how Yorkie represents data internally
-- [Garbage Collection design document](https://github.com/yorkie-team/yorkie/blob/main/design/garbage-collection.md) -- Deep dive into the GC mechanism
-- [Version Vector design document](https://github.com/yorkie-team/yorkie/blob/main/design/version-vector.md) -- Hybrid logical clock system
-- [Tree design document](https://github.com/yorkie-team/yorkie/blob/main/design/tree.md) -- Tree CRDT for block-based editors
+- [Data Structures design document](https://github.com/yorkie-team/yorkie/blob/main/docs/design/data-structure.md) -- Technical details on how Yorkie represents data internally
+- [Garbage Collection design document](https://github.com/yorkie-team/yorkie/blob/main/docs/design/garbage-collection.md) -- Deep dive into the GC mechanism
+- [Version Vector design document](https://github.com/yorkie-team/yorkie/blob/main/docs/design/version-vector.md) -- Hybrid logical clock system
+- [Tree design document](https://github.com/yorkie-team/yorkie/blob/main/docs/design/tree.md) -- Tree CRDT for block-based editors
 - [Document Lifecycle](/docs/internals/document-lifecycle) -- States and transitions of documents and clients
 - [JS SDK: Custom CRDT Types](/docs/sdks/js-sdk#custom-crdt-types) -- How to use Text, Tree, and Counter in your application
 - [YSON](/docs/internals/yson) -- The serialization format for Yorkie documents

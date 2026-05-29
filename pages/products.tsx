@@ -245,7 +245,7 @@ const Products: NextPage = () => {
                 <p className="product_card_desc">
                   Yorkie uses{' '}
                   <a
-                    href="https://github.com/yorkie-team/yorkie/blob/main/design/garbage-collection.md"
+                    href="https://github.com/yorkie-team/yorkie/blob/main/docs/design/garbage-collection.md"
                     className="link"
                   >
                     Garbage Collection
