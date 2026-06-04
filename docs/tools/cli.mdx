@@ -275,6 +275,7 @@ Flags:
       --auth-webhook-method-add stringArray    authorization-webhook methods to add ('ALL' for all methods)
       --auth-webhook-method-rm stringArray     authorization-webhook methods to remove ('ALL' for all methods)
       --auth-webhook-url string                authorization-webhook update url
+      --channel-session-ttl string             channel session TTL (must be between 1s and 5m)
       --client-deactivate-threshold string     client deactivate threshold for housekeeping
       --event-webhook-events-add stringArray   event-webhook events to add ('ALL' for all events)
       --event-webhook-events-rm stringArray    event-webhook events to remove ('ALL' for all events)
@@ -474,3 +475,15 @@ $ yorkie project update test-project --client-deactivate-threshold 1h30m20s
 ```
 
 Setting the client deactivation threshold to `1h30m20s` deactivates clients that have been inactive for 1 hour, 30 minutes, and 20 seconds but remained activated. This helps document GC by not counting the deactivated client's document sequence.
+
+#### Channel Session TTL
+
+Channel Session TTL is a per-project duration that controls how long a presence channel session is retained on the server after its last refresh. Raising the value keeps users counted in the live presence count longer after they leave — useful for small rooms where the live count would otherwise feel volatile. The value must be between `1s` and `5m`; the default is `15s`.
+
+Set the channel session TTL of the project with the `--channel-session-ttl` flag.
+
+```bash
+$ yorkie project update test-project --channel-session-ttl 1m
+```
+
+Values outside the `[1s, 5m]` range are rejected by the admin API. Lowering the TTL increases refresh traffic from active clients linearly (the SDK heartbeat targets `TTL/3`).
