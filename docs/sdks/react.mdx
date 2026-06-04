@@ -103,6 +103,7 @@ Set `userID` in the `metadata` prop to measure Monthly Active Users. The `userID
 | initialRoot | `Record<string, any>` | No | {} | Initial values for the document root |
 | initialPresence | `Record<string, any>` | No | {} | Initial presence data for the current client |
 | enableDevtools | boolean | No | false | Enable [Devtools](/docs/tools/devtools) integration |
+| disableGC | boolean | No | undefined | Opts out of server-side `VersionVector` tracking for this attachment. Only safe for documents that never produce tombstones (e.g. Counter-only). See [JS SDK: Disabling GC](/docs/sdks/js-sdk#disabling-gc) for the caveat. |
 
 **Basic usage:**
 
@@ -162,6 +163,16 @@ Enable the [Devtools](/docs/tools/devtools) extension for debugging document sta
 ```tsx
 <DocumentProvider docKey="my-doc" enableDevtools={true}>
   <MyApp />
+</DocumentProvider>
+```
+
+**disableGC:**
+
+Opt out of server-side `VersionVector` tracking for this attachment to reduce per-`PushPull` cost on high-fan-out workloads. Only safe for documents that never produce tombstones — typically Counter-only or primitive-value replacement. See [JS SDK: Disabling GC](/docs/sdks/js-sdk#disabling-gc) for the full caveat.
+
+```tsx
+<DocumentProvider docKey="counter" disableGC>
+  <Counter />
 </DocumentProvider>
 ```
 
@@ -534,7 +545,7 @@ For more details on revision concepts, snapshots, and best practices, see the [R
 
 #### Channel Hooks
 
-The following hooks must be used inside a `ChannelProvider`.
+`useChannel` and `useChannelSessionCount` must be used inside a `ChannelProvider`. `usePeekChannel` is the exception — it only needs an enclosing `YorkieProvider`.
 
 ##### useChannel
 
@@ -578,6 +589,43 @@ function OnlineBadge() {
 }
 ```
 
+##### usePeekChannel
+
+`usePeekChannel` polls a channel's session count **without attaching** to it — no `Session` is created on the server and no broadcasts are received. It does **not** require a `ChannelProvider`; only an enclosing `YorkieProvider` is needed. See [JS SDK: Peeking Session Count](/docs/sdks/js-sdk#peeking-session-count) for when to choose this over `useChannel`.
+
+**Signature:**
+
+```tsx
+const { sessionCount, loading, error } = usePeekChannel(
+  channelKey: string,
+  options?: {
+    pollInterval?: number; // default 3000 (ms)
+    enabled?: boolean;     // default true; set false to pause polling
+  },
+);
+```
+
+**Example:**
+
+```tsx
+import { usePeekChannel } from '@yorkie-js/react';
+
+function WritersBadge() {
+  const { sessionCount } = usePeekChannel('post-writers', {
+    pollInterval: 2000,
+  });
+  return <span>{sessionCount} writing</span>;
+}
+```
+
+| Property | Type | Description |
+|----------|------|-------------|
+| sessionCount | number | Current session count for the channel |
+| loading | boolean | `true` while the initial peek is in flight |
+| error | Error \| undefined | Error from the most recent peek call, if any |
+
+> Use this for display-only counters shown across many pages (e.g. a "N people writing" badge on every feed item). For interactive channel membership — broadcasts or contributing to the count — use [`ChannelProvider`](#channelprovider) with `useChannel` instead.
+
 #### Standalone Hook
 
 ##### useYorkieDoc
@@ -594,6 +642,7 @@ const { root, update, loading, error } = useYorkieDoc<DocType>(
     rpcAddr?: string;
     initialRoot?: Record<string, any>;
     enableDevtools?: boolean;
+    disableGC?: boolean;
   }
 );
 ```
@@ -602,6 +651,15 @@ const { root, update, loading, error } = useYorkieDoc<DocType>(
 - Isolated features that don't share a client with the rest of the app
 - Micro frontends or embeddable widgets
 - Quick prototyping without setting up providers
+
+**Options:**
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| rpcAddr | string | - | Yorkie server address |
+| initialRoot | `Record<string, any>` | {} | Initial values for the document root |
+| enableDevtools | boolean | false | Enable [Devtools](/docs/tools/devtools) integration |
+| disableGC | boolean | undefined | Opts out of server-side `VersionVector` tracking. Only safe for documents that never produce tombstones. See [JS SDK: Disabling GC](/docs/sdks/js-sdk#disabling-gc). |
 
 **Example:**
 
