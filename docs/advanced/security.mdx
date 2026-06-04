@@ -19,6 +19,17 @@ Each project in Yorkie can have its own allowed origins settings, which can be m
 
 <Image alt="setting allowed-origins" src="/assets/images/docs/allowed-origins-dashboard.png" width={1300} height={640} style={{ maxWidth: '1000px' }} />
 
+#### Pattern Syntax
+
+Each entry must be either `*` (allow any origin) or a full origin URL. The host portion may contain `*` as a wildcard:
+
+- `https://example.com` — exact origin only.
+- `https://*.example.com` — any single subdomain, such as `https://api.example.com`.
+- `https://*-m.example.com` — any subdomain ending in `-m`, such as `https://mini-m.example.com`.
+- `https://api-*.example.com` — any subdomain starting with `api-`.
+
+`*` matches any sequence of characters within a single DNS label only. `.` is a hard boundary, so `https://*.example.com` does **not** match `https://a.b.example.com`. The scheme and port must match exactly.
+
 ### Auth Webhook
 
 The Auth Webhook provides fine-grained access control by validating client requests through an external authentication server. This allows you to enforce custom authorization logic, ensuring only authorized users can access and modify Yorkie documents.
