@@ -93,6 +93,7 @@ Attach options:
 - `initialPresence`: Sets the client's initial presence when attaching to the document. The presence is shared with other users participating in the document. It must be serializable to JSON.
 - `syncMode`(Optional): Specifies synchronization modes. The default value is `SyncMode.Realtime`, which automatically pushes and pulls changes. See [Synchronization Modes](#synchronization-modes) for the full list, including `SyncMode.Polling` for stream-less periodic sync.
 - `documentPollInterval`(Optional): Polling interval in milliseconds. Used only when `syncMode` is `SyncMode.Polling`. Defaults to `3000`.
+- `disableGC`(Optional): Opts the attachment out of server-side `VersionVector` tracking, reducing per-`PushPull` payload for high-fan-out workloads. Defaults to `false`. See [Disabling GC](#disabling-gc) before enabling.
 
 ```javascript
 // Manual mode: the caller drives sync via client.sync(doc).
@@ -151,6 +152,18 @@ We support element types for Primitives, and [Custom CRDT types](/docs/sdks/js-s
 
 <Alert status="warning">
 Elements added by `initialRoot` are applied locally after push-pull during `attach`, not sent to the server immediately.
+</Alert>
+
+#### Disabling GC
+
+For documents whose workload never produces tombstones — typically `Counter`-only or primitive-value replacement documents — you can attach with `disableGC: true`. The server then skips `minVersionVector` tracking for this attachment and omits the response `VersionVector`, which removes a per-`PushPull` cost that scales with the number of active clients.
+
+```javascript
+await client.attach(doc, { disableGC: true });
+```
+
+<Alert status="warning">
+`disableGC` only controls the wire contract with the server. Misuse on documents that use `Tree`, `Text`, or `Array` deletions leads to undefined garbage-collection behavior on this client — tombstones may accumulate without being purged. Only enable it for workloads you are certain never produce tombstones.
 </Alert>
 
 #### Editing the Document
@@ -1155,6 +1168,25 @@ The session count is automatically updated when clients connect or disconnect fr
 <Alert status="warning">
 Sessions are connection-based and managed for scalability. In abnormal cases (such as app crashes or network partitions), a client might not detach cleanly, so the server may keep the session counted until it is considered stale and cleaned up. This means the displayed count can be approximate and may lag briefly. Avoid using session counts as a source of truth for critical business logic such as billing, authorization, or settlements.
 </Alert>
+
+#### Peeking Session Count
+
+Use `client.peekChannel(channelKey)` to read a channel's current `sessionCount` **without joining** the channel. No `Session` is created on the server, no broadcast events are received, and there is no pub/sub fan-out cost for the caller.
+
+```javascript
+const count = await client.peekChannel('post-writers');
+```
+
+This is the recommended path for **display-only** counters shown across many surrounding pages — for example, a "N people writing" badge attached to every item in a feed. Each viewer would otherwise occupy a `Session` slot and contribute heartbeat/pubsub load to a channel they are not actually participating in.
+
+| | `attach()` | `peekChannel()` |
+|---|---|---|
+| Server state per caller | `Session` + indexes | none |
+| Network per caller | heartbeat | one request per call |
+| Receives broadcasts | yes | no |
+| Use case | participate in the channel | display the count only |
+
+Pair `peekChannel` with your own polling cadence to refresh the displayed count. The client must be activated before calling it.
 
 #### Detaching a Channel
 
