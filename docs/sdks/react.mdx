@@ -545,7 +545,7 @@ For more details on revision concepts, snapshots, and best practices, see the [R
 
 #### Channel Hooks
 
-The following hooks must be used inside a `ChannelProvider`.
+`useChannel` and `useChannelSessionCount` must be used inside a `ChannelProvider`. `usePeekChannel` is the exception — it only needs an enclosing `YorkieProvider`.
 
 ##### useChannel
 
