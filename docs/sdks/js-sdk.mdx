@@ -94,6 +94,7 @@ Attach options:
 - `syncMode`(Optional): Specifies synchronization modes. The default value is `SyncMode.Realtime`, which automatically pushes and pulls changes. See [Synchronization Modes](#synchronization-modes) for the full list, including `SyncMode.Polling` for stream-less periodic sync.
 - `documentPollInterval`(Optional): Polling interval in milliseconds. Used only when `syncMode` is `SyncMode.Polling`. Defaults to `3000`.
 - `disableGC`(Optional): Opts the attachment out of server-side `VersionVector` tracking, reducing per-`PushPull` payload for high-fan-out workloads. Defaults to `false`. See [Disabling GC](#disabling-gc) before enabling.
+- `disablePresence`(Optional): Opts the attachment out of presence map propagation for documents that don't need presence (e.g. `Counter`-only, form, or read-mostly documents). Defaults to `false`. See [Disabling Presence](#disabling-presence) before enabling.
 
 ```javascript
 // Manual mode: the caller drives sync via client.sync(doc).
@@ -164,6 +165,18 @@ await client.attach(doc, { disableGC: true });
 
 <Alert status="warning">
 `disableGC` only controls the wire contract with the server. Misuse on documents that use `Tree`, `Text`, or `Array` deletions leads to undefined garbage-collection behavior on this client — tombstones may accumulate without being purged. Only enable it for workloads you are certain never produce tombstones.
+</Alert>
+
+#### Disabling Presence
+
+For documents that don't need presence — typically `Counter`-only, form, or read-mostly documents — you can attach with `disablePresence: true`. The server then strips the presence map from snapshots and changes, and no presence updates are propagated for the attachment.
+
+```javascript
+await client.attach(doc, { disablePresence: true });
+```
+
+<Alert status="info">
+`disablePresence` is fixated on the first attach and is immutable afterwards. If a later attach specifies a different value, the server returns the persisted value rather than the requested one. To change it, create a new document key, or have an administrator update the value directly in storage.
 </Alert>
 
 #### Editing the Document

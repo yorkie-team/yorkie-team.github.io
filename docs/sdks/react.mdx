@@ -104,6 +104,7 @@ Set `userID` in the `metadata` prop to measure Monthly Active Users. The `userID
 | initialPresence | `Record<string, any>` | No | {} | Initial presence data for the current client |
 | enableDevtools | boolean | No | false | Enable [Devtools](/docs/tools/devtools) integration |
 | disableGC | boolean | No | undefined | Opts out of server-side `VersionVector` tracking for this attachment. Only safe for documents that never produce tombstones (e.g. Counter-only). See [JS SDK: Disabling GC](/docs/sdks/js-sdk#disabling-gc) for the caveat. |
+| disablePresence | boolean | No | undefined | Opts out of presence map propagation for this attachment. Useful for Counter-only, form, or read-mostly documents. See [JS SDK: Disabling Presence](/docs/sdks/js-sdk#disabling-presence). |
 
 **Basic usage:**
 
@@ -172,6 +173,16 @@ Opt out of server-side `VersionVector` tracking for this attachment to reduce pe
 
 ```tsx
 <DocumentProvider docKey="counter" disableGC>
+  <Counter />
+</DocumentProvider>
+```
+
+**disablePresence:**
+
+Opt out of presence map propagation for this attachment. Useful for `Counter`-only, form, or read-mostly documents that don't need presence. The value is fixated on the first attach — see [JS SDK: Disabling Presence](/docs/sdks/js-sdk#disabling-presence) for details.
+
+```tsx
+<DocumentProvider docKey="counter" disablePresence>
   <Counter />
 </DocumentProvider>
 ```
@@ -643,6 +654,7 @@ const { root, update, loading, error } = useYorkieDoc<DocType>(
     initialRoot?: Record<string, any>;
     enableDevtools?: boolean;
     disableGC?: boolean;
+    disablePresence?: boolean;
   }
 );
 ```
@@ -660,6 +672,7 @@ const { root, update, loading, error } = useYorkieDoc<DocType>(
 | initialRoot | `Record<string, any>` | {} | Initial values for the document root |
 | enableDevtools | boolean | false | Enable [Devtools](/docs/tools/devtools) integration |
 | disableGC | boolean | undefined | Opts out of server-side `VersionVector` tracking. Only safe for documents that never produce tombstones. See [JS SDK: Disabling GC](/docs/sdks/js-sdk#disabling-gc). |
+| disablePresence | boolean | undefined | Opts out of presence map propagation. Useful for Counter-only, form, or read-mostly documents. See [JS SDK: Disabling Presence](/docs/sdks/js-sdk#disabling-presence). |
 
 **Example:**
 
