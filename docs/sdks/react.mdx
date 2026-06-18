@@ -38,6 +38,10 @@ npm install @yorkie-js/react
 | rpcAddr | string | No | `https://api.yorkie.dev` | Yorkie API server address |
 | authTokenInjector | `(reason?: string) => Promise<string>` | No | undefined | Async function that returns an auth token for [Auth Webhook](/docs/advanced/security#auth-webhook) verification |
 | metadata | `Record<string, string>` | No | {} | Client metadata (e.g., `{ userID: '...' }` for MAU measurement) |
+| activate | boolean | No | true | Whether to call `client.activate()` on mount and `client.deactivate()` on unmount. Set to `false` for channel-only apps — the SDK lazy-attaches the client on the first heartbeat, so the explicit activate round trips become unnecessary. Document use cases (`useDocument`, `useYorkieDoc`) still require activation, so leave this `true` if any descendant attaches a document. |
+| deactivateOnUnload | boolean | No | true | Whether to deactivate the client on page unload. Set to `false` to skip the unmount-time `client.deactivate({ keepalive: true })` for apps that don't need GC or presence cleanup on unload (e.g. non-collaborative or `disableGC` documents). See [JS SDK: deactivateOnUnload](/docs/sdks/js-sdk#deactivate-the-client). |
+
+`YorkieProviderProps` extends [`ClientOptions`](/docs/sdks/js-sdk), so any client option (e.g. `deactivateOnUnload`) can be passed directly as a prop in addition to the provider-level `activate` flag.
 
 **Basic usage:**
 
@@ -103,6 +107,8 @@ Set `userID` in the `metadata` prop to measure Monthly Active Users. The `userID
 | initialRoot | `Record<string, any>` | No | {} | Initial values for the document root |
 | initialPresence | `Record<string, any>` | No | {} | Initial presence data for the current client |
 | enableDevtools | boolean | No | false | Enable [Devtools](/docs/tools/devtools) integration |
+| syncMode | `SyncMode` | No | `SyncMode.Realtime` | Synchronization mode for the document. See [Synchronization Modes](/docs/sdks/js-sdk#synchronization-modes). |
+| documentPollInterval | number | No | 3000 | Poll interval in ms. Only used when `syncMode` is `SyncMode.Polling`. Applied at attach time. |
 | disableGC | boolean | No | undefined | Opts out of server-side `VersionVector` tracking for this attachment. Only safe for documents that never produce tombstones (e.g. Counter-only). See [JS SDK: Disabling GC](/docs/sdks/js-sdk#disabling-gc) for the caveat. |
 | disablePresence | boolean | No | undefined | Opts out of presence map propagation for this attachment. Useful for Counter-only, form, or read-mostly documents. See [JS SDK: Disabling Presence](/docs/sdks/js-sdk#disabling-presence). |
 
@@ -200,9 +206,10 @@ Opt out of presence map propagation for this attachment. Useful for `Counter`-on
 | channelKey | string | Yes | - | Unique channel key (supports [hierarchical keys](/docs/sdks/js-sdk#hierarchical-channel-keys)) |
 | syncMode | `SyncMode` | No | `SyncMode.Realtime` | Sync mode for the channel. See [Synchronization Modes](/docs/sdks/js-sdk#synchronization-modes). Use `SyncMode.Polling` to track `sessionCount` without a watch stream. |
 | isRealtime | boolean | No | - | Boolean shortcut covering only Realtime/Manual. `true` → `SyncMode.Realtime`, `false` → `SyncMode.Manual`. Cannot express `SyncMode.Polling`; use `syncMode` for that. If both props are set, `syncMode` wins. |
+| channelHeartbeatInterval | number | No | 5000 | Overrides the heartbeat interval (ms), applied at attach time. The default is 5000 ms for both Realtime and Polling modes (co-tuned to the server's `ChannelSessionTTL`). |
 
 - `syncMode={SyncMode.Realtime}` (default): The session count updates automatically via a watch stream. Required to receive broadcast events through the JS SDK Channel.
-- `syncMode={SyncMode.Polling}`: Stream-less mode. The session count refreshes at `channelHeartbeatInterval` (default 3 seconds). Recommended for large channels where broadcast is not needed (e.g., showing approximate viewer count on read-only pages).
+- `syncMode={SyncMode.Polling}`: Stream-less mode. The session count refreshes at `channelHeartbeatInterval` (default 5000 ms). Recommended for large channels where broadcast is not needed (e.g., showing approximate viewer count on read-only pages).
 - `syncMode={SyncMode.Manual}`: No automatic activity. Equivalent to `isRealtime={false}` for backward compatibility. Use the JS SDK channel directly to drive sync.
 
 ```tsx
@@ -234,6 +241,35 @@ function App() {
 
 ### Hooks
 
+#### Client Hook
+
+##### useYorkie
+
+`useYorkie` returns the Yorkie `Client` provided by `YorkieProvider`, along with its loading and error state. It must be used under a `YorkieProvider`. Use this when you need direct access to the client for low-level [JS SDK](/docs/sdks/js-sdk) operations not covered by the higher-level hooks.
+
+```tsx
+const { client, loading, error } = useYorkie();
+```
+
+| Property | Type | Description |
+|----------|------|-------------|
+| client | `Client \| undefined` | The Yorkie client. `undefined` until activation completes. |
+| loading | boolean | `true` while the client is being activated |
+| error | Error \| undefined | Error object if activation failed |
+
+```tsx
+import { useYorkie } from '@yorkie-js/react';
+
+function ClientStatus() {
+  const { client, loading, error } = useYorkie();
+
+  if (loading) return <p>Connecting...</p>;
+  if (error) return <p>Error: {error.message}</p>;
+
+  return <p>Client ready: {client?.getID()}</p>;
+}
+```
+
 #### Document Hooks
 
 The following hooks must be used inside a `DocumentProvider`.
@@ -246,6 +282,7 @@ The following hooks must be used inside a `DocumentProvider`.
 
 ```tsx
 const {
+  doc,
   root,
   presences,
   connection,
@@ -259,6 +296,7 @@ const {
 
 | Property | Type | Description |
 |----------|------|-------------|
+| doc | `Document<DocType, PresenceType> \| undefined` | The underlying document instance. `undefined` until the document is attached. |
 | root | DocType | The document's root object |
 | presences | `Array<{ clientID: string; presence: PresenceType }>` | All participating clients and their presence data |
 | connection | `StreamConnectionStatus` | Watch stream connection status (`StreamConnectionStatus.Connected` or `StreamConnectionStatus.Disconnected`). Import from `@yorkie-js/sdk`. |
@@ -554,6 +592,36 @@ function RevisionPanel() {
 
 For more details on revision concepts, snapshots, and best practices, see the [Revisions](/docs/advanced/revisions) guide.
 
+##### useRemoveDocument
+
+`useRemoveDocument` returns a zero-argument function that removes the current document from the server via `client.remove()`. This is distinct from detach: it removes the document for **every** client, not just the current one, after which the key can be reattached as a fresh document. This hook must be used within a `DocumentProvider`.
+
+**TypeScript signature:**
+
+```tsx
+const removeDocument: () => Promise<void> = useRemoveDocument<DocType, PresenceType>();
+```
+
+The returned function rejects if the document is not yet attached, and propagates any removal error to the caller.
+
+```tsx
+import { useRemoveDocument } from '@yorkie-js/react';
+
+function DeleteButton() {
+  const removeDocument = useRemoveDocument();
+
+  const handleDelete = async () => {
+    try {
+      await removeDocument();
+    } catch (e) {
+      console.error('Failed to remove document:', e);
+    }
+  };
+
+  return <button onClick={handleDelete}>Delete document</button>;
+}
+```
+
 #### Channel Hooks
 
 `useChannel` and `useChannelSessionCount` must be used inside a `ChannelProvider`. `usePeekChannel` is the exception — it only needs an enclosing `YorkieProvider`.
@@ -580,6 +648,7 @@ function RoomStatus() {
 | sessionCount | number | Number of clients currently connected to the channel |
 | loading | boolean | `true` while the channel is being attached |
 | error | Error \| undefined | Error object if attachment failed |
+| detach | `() => Promise<void>` | Idempotent function that permanently stops the channel from inside the tree (e.g. on `error`) without unmounting the surrounding `ChannelProvider`. Safe to call more than once. |
 
 > `sessionCount` is session-based, not unique-user-based. A single user with multiple tabs open will be counted as multiple sessions.
 
@@ -602,16 +671,16 @@ function OnlineBadge() {
 
 ##### usePeekChannel
 
-`usePeekChannel` polls a channel's session count **without attaching** to it — no `Session` is created on the server and no broadcasts are received. It does **not** require a `ChannelProvider`; only an enclosing `YorkieProvider` is needed. See [JS SDK: Peeking Session Count](/docs/sdks/js-sdk#peeking-session-count) for when to choose this over `useChannel`.
+`usePeekChannel` reads a channel's session count **without attaching** to it — no `Session` is created on the server and no broadcasts are received. By default it fetches once on mount and does not poll; pass a positive `pollInterval` to opt into continuous polling. It does **not** require a `ChannelProvider`; only an enclosing `YorkieProvider` is needed. See [JS SDK: Peeking Session Count](/docs/sdks/js-sdk#peeking-session-count) for when to choose this over `useChannel`.
 
 **Signature:**
 
 ```tsx
-const { sessionCount, loading, error } = usePeekChannel(
+const { sessionCount, loading, error, refetch } = usePeekChannel(
   channelKey: string,
   options?: {
-    pollInterval?: number; // default 3000 (ms)
-    enabled?: boolean;     // default true; set false to pause polling
+    pollInterval?: number; // no default — unset fetches once on mount; set a positive ms value to poll
+    enabled?: boolean;     // default true; set false to pause fetching
   },
 );
 ```
@@ -632,8 +701,9 @@ function WritersBadge() {
 | Property | Type | Description |
 |----------|------|-------------|
 | sessionCount | number | Current session count for the channel |
-| loading | boolean | `true` while the initial peek is in flight |
+| loading | boolean | `true` before the first successful fetch (or while a `refetch()` is in flight) |
 | error | Error \| undefined | Error from the most recent peek call, if any |
+| refetch | `() => Promise<void>` | Issues a peek immediately, ignoring `pollInterval`. Useful on button clicks or after user actions that may have changed the count. |
 
 > Use this for display-only counters shown across many pages (e.g. a "N people writing" badge on every feed item). For interactive channel membership — broadcasts or contributing to the count — use [`ChannelProvider`](#channelprovider) with `useChannel` instead.
 
@@ -646,18 +716,22 @@ function WritersBadge() {
 **Signature:**
 
 ```tsx
-const { root, update, loading, error } = useYorkieDoc<DocType>(
+const { root, presences, connection, update, loading, error } = useYorkieDoc<DocType, PresenceType>(
   apiKey: string,
   docKey: string,
-  options?: {
-    rpcAddr?: string;
+  options?: Omit<ClientOptions, 'apiKey'> & {
     initialRoot?: Record<string, any>;
+    initialPresence?: Record<string, any>;
     enableDevtools?: boolean;
+    syncMode?: SyncMode;
+    documentPollInterval?: number;
     disableGC?: boolean;
     disablePresence?: boolean;
   }
 );
 ```
+
+In addition to the document-specific options below, `options` accepts any [`ClientOptions`](/docs/sdks/js-sdk) field except `apiKey` (which is passed as the first argument) — for example `rpcAddr`, `metadata`, or `authTokenInjector`.
 
 **When to use:**
 - Isolated features that don't share a client with the rest of the app
@@ -668,9 +742,12 @@ const { root, update, loading, error } = useYorkieDoc<DocType>(
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| rpcAddr | string | - | Yorkie server address |
+| rpcAddr | string | - | Yorkie server address (inherited from `ClientOptions`) |
 | initialRoot | `Record<string, any>` | {} | Initial values for the document root |
+| initialPresence | `Record<string, any>` | {} | Initial presence data for the current client |
 | enableDevtools | boolean | false | Enable [Devtools](/docs/tools/devtools) integration |
+| syncMode | `SyncMode` | `SyncMode.Realtime` | Synchronization mode for the document. See [Synchronization Modes](/docs/sdks/js-sdk#synchronization-modes). |
+| documentPollInterval | number | 3000 | Poll interval in ms. Only used when `syncMode` is `SyncMode.Polling`. |
 | disableGC | boolean | undefined | Opts out of server-side `VersionVector` tracking. Only safe for documents that never produce tombstones. See [JS SDK: Disabling GC](/docs/sdks/js-sdk#disabling-gc). |
 | disablePresence | boolean | undefined | Opts out of presence map propagation. Useful for Counter-only, form, or read-mostly documents. See [JS SDK: Disabling Presence](/docs/sdks/js-sdk#disabling-presence). |
 
