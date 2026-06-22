@@ -71,6 +71,30 @@ await client.deactivate();
 
 This will detach all documents attached to the client for efficient [garbage collection](https://github.com/yorkie-team/yorkie/blob/main/docs/design/garbage-collection.md).
 
+`deactivate()` accepts an optional `DeactivateOptions`:
+
+- `keepalive`(Optional): Defaults to `false`. When `true`, the deactivation request is sent immediately using `fetch` with the `keepalive` option, ensuring it completes even while the page is unloading. Use this inside `beforeunload`/`unload` handlers.
+- `synchronous`(Optional): Defaults to `false`. When `true`, the server waits for all pending operations to complete before deactivating.
+
+```javascript
+// Ensure deactivation completes during page unload.
+window.addEventListener('beforeunload', () => {
+  void client.deactivate({ keepalive: true });
+});
+```
+
+By default the client registers its own `beforeunload` listener during `activate()` that deactivates the client when the page is unloaded. This is controlled by the `deactivateOnUnload` client option (default `true`):
+
+```javascript
+const client = new yorkie.Client({
+  rpcAddr: '{{API_ADDR}}',
+  apiKey: 'xxxxxxxxxxxxxxxxxxxx',
+  deactivateOnUnload: false,
+});
+```
+
+Set `deactivateOnUnload: false` for apps that don't need GC or presence cleanup on unload — for example, non-collaborative apps or documents attached with `disableGC`. In those cases the unload-time deactivate is pure overhead, and its `fetch({ keepalive: true })` request can reject mid-flight during hard navigation. Opting out is safe: the server reaps the stale client after its [Client Deactivate Threshold](/docs/tools/cli#client-deactivate-threshold).
+
 ### Document
 
 `Document` is the primary data type in Yorkie, providing a JSON-like updating experience for representing your application's model. Documents can be updated without being attached to the client, and changes automatically propagate to other clients when attached or when the network is restored.
@@ -84,6 +108,18 @@ const doc = new yorkie.Document('doc-1');
 ```
 
 > Document keys can contain `a-z`, `A-Z`, `0-9`, `-`, `.`, `_`, `~` and must be less than 120 characters.
+
+The constructor also accepts an optional second argument, `DocumentOptions`:
+
+- `disableGC`(Optional): Disables garbage collection for this document. Defaults to `false`. See [Disabling GC](#disabling-gc).
+- `disablePresence`(Optional): Declares that this document does not use presence. Defaults to `false`. See [Disabling Presence](#disabling-presence).
+- `enableDevtools`(Optional): Enables the [Devtools extension](/docs/tools/devtools) for this document. Defaults to `false`.
+
+```javascript
+const doc = new yorkie.Document('doc-1', { disablePresence: true });
+```
+
+The `disableGC` and `disablePresence` values seed the corresponding attach-time options of the same name. When the matching attach option is omitted, the document's seeded value is used.
 
 #### Attaching the Document
 
@@ -1051,7 +1087,7 @@ await client.attach(channel);
 
 Attach options:
 - `syncMode`(Optional): Channel sync mode. Defaults to `SyncMode.Realtime`. Use `SyncMode.Polling` for stream-less periodic sync (recommended for large channels where broadcast events are not needed). `SyncMode.Manual` disables automatic activity. `RealtimePushOnly` and `RealtimeSyncOff` are document-only and rejected for channels.
-- `channelHeartbeatInterval`(Optional): Heartbeat interval in milliseconds. Mode-specific defaults: `Polling` → `3000`, `Realtime` → `30000`. Must be a positive number.
+- `channelHeartbeatInterval`(Optional): Heartbeat interval in milliseconds for this attachment. Must be a positive number. If unset, the client-level `channelHeartbeatInterval` (`ClientOptions.channelHeartbeatInterval`, default `5000`) applies to both `Realtime` and `Polling` modes — there is no mode-specific default.
 
 ```javascript
 // Default: Realtime — opens a watch stream for broadcast events.
@@ -1061,7 +1097,7 @@ await client.attach(new yorkie.Channel('room-123'));
 // viewer counts where broadcast is not needed.
 await client.attach(new yorkie.Channel('viewer-room'), {
   syncMode: SyncMode.Polling,
-  channelHeartbeatInterval: 3000,
+  channelHeartbeatInterval: 3000, // override the 5000 ms client-level default
 });
 ```
 
