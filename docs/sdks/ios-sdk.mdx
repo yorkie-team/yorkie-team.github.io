@@ -88,6 +88,18 @@ let doc = Document(key: "doc-1")
 
 > The document key identifies the Document in Yorkie. It is a string that you can freely define, but it can only contain `a-z`, `A-Z`, `0-9`, `-`, `.`, `_`, `~` and must be between 4 and 120 characters.
 
+The initializer also accepts a `DocumentOptions` value for document-scope settings:
+
+```swift
+let doc = Document(key: "doc-1", opts: DocumentOptions(disableGC: false, disablePresence: true))
+```
+
+- `disableGC`: Disables local garbage collection for this document. This argument is required (it has no default). See [Disabling GC](#disabling-gc).
+- `enableDevtools` (Optional): Enables the Devtools recorder for this document. Defaults to `false`.
+- `disablePresence` (Optional): Declares that this document does not use presence. Defaults to `false`. See [Disabling Presence](#disabling-presence).
+
+The `disablePresence` value seeds the attach-time option of the same name: when the `disablePresence` attach option is omitted, the document's value is used. `DocumentOptions.disableGC` gates local garbage collection and is set independently of the attach-time `disableGC` option, which controls the server wire contract.
+
 
 #### Attaching the Document
 
@@ -97,9 +109,12 @@ If the server already has a document associated with the provided key, it sends 
 
 Once attached, the document synchronizes with other clients, ensuring that any modifications made by one client instantly propagate to all other clients collaborating on the same document.
 
-The second argument accepts options:
+The `attach` method accepts several options:
 - `initialPresence`: Sets the client's initial presence when attaching to the document. The presence is shared with other users participating in the document. It must be serializable to JSON.
-- `syncMode` (Optional): Specifies the synchronization mode. The default value is `SyncMode.realtime`, which automatically pushes and pulls changes. If you set it to `SyncMode.manual`, you must handle synchronization manually.
+- `syncMode` (Optional): Specifies the synchronization mode. The default value is `SyncMode.realtime`, which automatically pushes and pulls changes. If you set it to `SyncMode.manual`, you must handle synchronization manually. See [Changing Synchronization Mode](#changing-synchronization-mode) for the full list, including `SyncMode.polling` for stream-less periodic sync.
+- `documentPollInterval` (Optional): Poll interval as a `TimeInterval` in **seconds**. Used only when `syncMode` is `SyncMode.polling`. Defaults to `3.0`. (Note: unlike the JS SDK's millisecond value, iOS uses seconds.)
+- `disableGC` (Optional): Opts the attachment out of server-side `VersionVector` tracking, reducing per-`PushPull` payload for high-fan-out workloads. Defaults to `false`. See [Disabling GC](#disabling-gc) before enabling.
+- `disablePresence` (Optional): Opts the attachment out of presence map propagation for documents that don't need presence (e.g. `JSONCounter`-only, form, or read-mostly documents). Defaults to the document's seeded value (`false` unless set via `DocumentOptions`). See [Disabling Presence](#disabling-presence) before enabling.
 
 ```swift
 try await clientA.attach(doc, ["color": "blue", "cursor": ["x": 0, "y": 0]], .manual)
@@ -137,6 +152,30 @@ We support element types for Primitives, and [Custom CRDT types](/docs/sdks/js-s
 
 <Alert status="warning">
 Elements added by `initialRoot` are not sent to the server during the `attach` process. They are applied locally to the Document after push-pull during `attach`.
+</Alert>
+
+#### Disabling GC
+
+For documents whose workload never produces tombstones — typically `JSONCounter`-only or primitive-value replacement documents — you can attach with `disableGC: true`. The server then skips `minVersionVector` tracking for this attachment and omits the response `VersionVector`, which removes a per-`PushPull` cost that scales with the number of active clients.
+
+```swift
+try await client.attach(doc, disableGC: true)
+```
+
+<Alert status="warning">
+`disableGC` only controls the wire contract with the server. Misuse on documents that use `JSONText`, `JSONTree`, or `JSONArray` deletions leads to undefined garbage-collection behavior on this client — tombstones may accumulate without being purged. Only enable it for workloads you are certain never produce tombstones.
+</Alert>
+
+#### Disabling Presence
+
+For documents that don't need presence — typically `JSONCounter`-only, form, or read-mostly documents — you can attach with `disablePresence: true`. The server then strips the presence map from snapshots and changes, and no presence updates are propagated for the attachment. Any `presence.set` calls inside `doc.update` are silently dropped.
+
+```swift
+try await client.attach(doc, disablePresence: true)
+```
+
+<Alert status="info">
+`disablePresence` is fixated on the first attach and is immutable afterwards. If a later attach specifies a different value, the server returns the persisted value rather than the requested one. To change it, create a new document key, or have an administrator update the value directly in storage.
 </Alert>
 
 #### Updating presence
@@ -458,7 +497,7 @@ Broadcast messages are not persisted and are only delivered to clients currently
 
 To change the synchronization mode for a document, use `client.changeSyncMode(doc, syncMode)`.
 
-Yorkie offers four SyncModes:
+Yorkie offers five SyncModes:
 
 - `SyncMode.realtime`: Local changes are automatically pushed to the server, and remote changes are pulled from the server.
 
@@ -467,6 +506,8 @@ Yorkie offers four SyncModes:
 - `SyncMode.realtimeSyncOff`: Changes are not synchronized, but the watch stream remains active.
 
 - `SyncMode.manual`: Synchronization no longer occurs in real-time, and the watch stream is disconnected. Manual handling is required for synchronization.
+
+- `SyncMode.polling`: The sync loop runs without opening a watch stream. `PushPullChanges` runs at the polling interval, so remote changes arrive on the next tick (latency ≈ the interval). Recommended for large, low-interactivity documents where broadcast events are not needed; not suitable for collaborative editing — use `SyncMode.realtime` for that. Set the interval with the `documentPollInterval` attach option (`TimeInterval` in seconds, default `3.0`).
 
 ```swift
 // Enable automatic synchronization of both local and remote changes.
@@ -478,9 +519,18 @@ try await client.changeSyncMode(doc, .realtimePushOnly)
 // Synchronization turned off, but the watch stream remains active.
 try await client.changeSyncMode(doc, .realtimeSyncOff)
 
-// Synchronization turned off, and the watch stream is disconneted.
+// Stream-less periodic sync at the document's poll interval.
+try await client.changeSyncMode(doc, .polling)
+
+// Synchronization turned off, and the watch stream is disconnected.
 try await client.changeSyncMode(doc, manual)
 try await client.sync(doc) // Trigger synchronization manually using the sync function.
+```
+
+To start a document in polling mode from the beginning, pass it at attach time along with an optional interval:
+
+```swift
+try await client.attach(doc, [:], .polling, documentPollInterval: 5.0)
 ```
 
 #### Detaching the Document
@@ -572,6 +622,206 @@ try await doc.update{ root in
     (root.counter as? JSONCounter<Int64>)?.increase(value: -4)  // {"counter":2}
 }
 ```
+
+### Channel
+
+`Channel` is a communication channel that enables real-time pub/sub messaging and presence tracking between clients. Unlike Documents, which persist and synchronize data, Channels are designed for ephemeral, real-time communication such as chat messages, notifications, and presence indicators.
+
+For more information about `Channel`, please refer to the [Channel](https://yorkie.dev/yorkie-ios-sdk/documentation/yorkie/channel).
+
+#### Creating a Channel
+
+Create a Channel with a unique key and attach it to the Client. The `Channel` initializer is throwing, because it validates the key:
+
+```swift
+let channel = try Channel(key: "room-123")
+try await client.attachChannel(channel)
+```
+
+> The channel key identifies the Channel in Yorkie. Clients with the same channel key can communicate with each other through pub/sub messaging.
+
+By default a channel syncs in realtime, opening a watch stream so broadcast events are delivered as they happen. For large channels where you only need an approximate session count and don't need broadcast events, create the channel with `isRealtime: false` — no watch stream is opened, and you refresh the count on your own cadence with `syncChannel`:
+
+```swift
+// Realtime (default): opens a watch stream for broadcast events.
+let roomChannel = try Channel(key: "room-123")
+try await client.attachChannel(roomChannel)
+
+// Non-realtime: stream-less, for large viewer counts where broadcast is not needed.
+let viewerChannel = try Channel(key: "viewer-room", isRealtime: false)
+try await client.attachChannel(viewerChannel)
+```
+
+<Alert status="info">
+Unlike the JS SDK, iOS sets a channel's sync behavior at construction time via the `isRealtime` flag rather than an `attach` option. There is no per-attach `channelHeartbeatInterval`; the client uses a fixed 5-second heartbeat interval internally.
+</Alert>
+
+#### Hierarchical Channel Keys
+
+Channels support a hierarchical structure using periods (`.`) as separators, allowing you to organize channels into logical groups and subgroups. This structure is particularly useful for managing complex applications with multiple rooms, sections, or nested contexts.
+
+```swift
+let roomChannel = try Channel(key: "room-1")
+let sectionChannel = try Channel(key: "room-1.section-a")
+let userChannel = try Channel(key: "room-1.section-a.user-123")
+
+try await client.attachChannel(roomChannel)
+try await client.attachChannel(sectionChannel)
+try await client.attachChannel(userChannel)
+```
+
+Each level in the hierarchy maintains its own presence count and can be used independently:
+- `room-1` might track all users in a game room
+- `room-1.section-a` might track users in a specific section of that room
+- `room-1.section-a.user-123` might track presence for a specific user's context
+
+**Channel Key Restrictions:**
+
+The key is validated when the `Channel` is created (a `YorkieError` is thrown otherwise):
+
+| Rule | Invalid Examples | Valid Examples |
+|------|-----------------|----------------|
+| Cannot be empty or contain whitespace | ❌ `""`<br/>❌ `room 1` | ✅ `room-1` |
+| Cannot start with a period | ❌ `.room-1`<br/>❌ `.room-1.section-1` | ✅ `room-1`<br/>✅ `room-1.section-1` |
+| Cannot end with a period | ❌ `room-1.`<br/>❌ `room-1.section-1.` | ✅ `room-1`<br/>✅ `room-1.section-1` |
+| Cannot contain consecutive periods | ❌ `room-1..section-1`<br/>❌ `room..section..subsection` | ✅ `room-1.section-1`<br/>✅ `room.section.subsection` |
+
+<Alert status="warning">
+**Important: Distribute First-Level Channel Keys**
+
+Yorkie servers determine which server handles a channel based on a combination of your project and the first-level key of the channel. Using the same first-level key for all channels means that a single server manages all your channels, which can lead to performance bottlenecks and uneven load distribution.
+
+Design your channel key structure to naturally distribute traffic across different first-level prefixes for optimal performance.
+
+  ```swift
+  // ✅ Good: Distributed first-level keys
+  try Channel(key: "game-1.room-a")
+  try Channel(key: "chat-1.thread-1")
+  try Channel(key: "chat-2.thread-1")
+  try Channel(key: "notification-1.user-123")
+
+  // ❌ Bad: Same first-level key
+  // All channels share 'app' as first level - avoid this!
+  try Channel(key: "app.game-1")
+  try Channel(key: "app.game-2")
+  try Channel(key: "app.chat-1")
+  try Channel(key: "app.notification-1")
+  ```
+</Alert>
+
+#### Broadcast
+
+Channels support a pub/sub pattern for broadcasting ephemeral messages to all connected clients. Subscribe to a topic with `subscribeTopic`, and send messages with `broadcast`.
+
+```swift
+// Subscribe to messages on a specific topic
+channel.subscribeTopic("chat") { event in
+    print("[\(event.topic)] \(event.payload["message"] ?? "")")
+    print("From: \(event.clientID)")
+}
+
+// Broadcast a message to all clients in the same channel
+try channel.broadcast(topic: "chat", payload: Payload(["message": "Hello, world!"]))
+```
+
+The `ChannelBroadcastEvent` object contains:
+- `topic`: The topic name you subscribed to
+- `payload`: The message data as a `Payload` (must be JSON serializable)
+- `clientID`: The ID of the client that sent the broadcast
+
+You can subscribe to multiple topics on the same channel, and `subscribeBroadcast` receives every remote broadcast regardless of topic:
+
+```swift
+channel.subscribeTopic("chat") { event in
+    print("Chat message: \(event.payload)")
+}
+
+channel.subscribeTopic("notification") { event in
+    print("Notification: \(event.payload)")
+}
+
+// Or handle all broadcast topics in one place
+channel.subscribeBroadcast { event in
+    print("[\(event.topic)] \(event.payload)")
+}
+
+try channel.broadcast(topic: "chat", payload: Payload(["message": "Hello!"]))
+try channel.broadcast(topic: "notification", payload: Payload(["type": "user-joined", "user": "Alice"]))
+```
+
+You can also broadcast without a `Channel` reference by using the channel key directly on the client:
+
+```swift
+try await client.broadcast("room-123", topic: "chat", payload: Payload(["message": "Hello!"]), options: nil)
+```
+
+<Alert status="warning">
+Broadcast messages are ephemeral and only delivered to clients currently connected to the channel. Messages are not persisted or stored, so clients that join later will not receive previous messages.
+</Alert>
+
+#### Tracking Online Sessions
+
+Channels automatically track the number of connected clients, making it easy to display session counters. Subscribe to presence changes with `subscribePresenceChange`, and read the current value with `getSessionCount()`.
+
+```swift
+// Subscribe to presence (session count) changes
+channel.subscribePresenceChange { event in
+    print("Sessions: \(event.count)")
+}
+
+// Get the current session count
+let count = channel.getSessionCount()
+print("Currently \(count) sessions")
+```
+
+For a non-realtime channel (`isRealtime: false`), no watch stream delivers updates automatically. Call `syncChannel` to refresh the count on demand; it returns the latest session count:
+
+```swift
+let count = try await client.syncChannel(viewerChannel)
+```
+
+The session count is automatically updated when clients connect or disconnect from a realtime channel.
+
+<Alert status="warning">
+Sessions are connection-based and managed for scalability. In abnormal cases (such as app crashes or network partitions), a client might not detach cleanly, so the server may keep the session counted until it is considered stale and cleaned up. This means the displayed count can be approximate and may lag briefly. Avoid using session counts as a source of truth for critical business logic such as billing, authorization, or settlements.
+</Alert>
+
+#### Handling Channel Errors
+
+Subscribe to authentication and sync errors to surface an error state in your UI. A subsequent successful event on the channel implies recovery — there is no separate "recovered" event.
+
+```swift
+channel.subscribeAuthError { event in
+    // event.reason, event.method
+}
+
+channel.subscribeSyncError { event in
+    // event.error, event.method
+}
+```
+
+You can also observe every channel event in one place with `subscribeAll { event in ... }`, switching on `event.type` (`ChannelEventType`).
+
+#### Detaching a Channel
+
+When you're done with a channel, detach it to clean up resources and stop receiving messages:
+
+```swift
+try await client.detachChannel(channel)
+```
+
+This is a local cleanup — the server reclaims the session automatically once heartbeats stop.
+
+#### Use Cases
+
+Channels are ideal for:
+- **Chat applications**: Real-time messaging without persistence
+- **Live notifications**: Temporary alerts and updates
+- **Presence indicators**: Showing who's online or in a room
+- **Cursor sharing**: Broadcasting cursor positions in collaborative tools
+- **Event broadcasting**: Sending signals or triggers between clients
+
+For persistent data that needs to be synchronized and stored, use [Document](#document) instead.
 
 ### Logger Options
 
