@@ -88,17 +88,17 @@ let doc = Document(key: "doc-1")
 
 > The document key identifies the Document in Yorkie. It is a string that you can freely define, but it can only contain `a-z`, `A-Z`, `0-9`, `-`, `.`, `_`, `~` and must be between 4 and 120 characters.
 
-The initializer also accepts a `DocumentOptions` value to seed document-scope settings:
+The initializer also accepts a `DocumentOptions` value for document-scope settings:
 
 ```swift
 let doc = Document(key: "doc-1", opts: DocumentOptions(disableGC: false, disablePresence: true))
 ```
 
-- `disableGC`: Disables garbage collection for this document. See [Disabling GC](#disabling-gc).
+- `disableGC`: Disables local garbage collection for this document. This argument is required (it has no default). See [Disabling GC](#disabling-gc).
 - `enableDevtools` (Optional): Enables the Devtools recorder for this document. Defaults to `false`.
 - `disablePresence` (Optional): Declares that this document does not use presence. Defaults to `false`. See [Disabling Presence](#disabling-presence).
 
-The `disableGC` and `disablePresence` values seed the corresponding attach-time options of the same name. When the matching attach option is omitted, the document's seeded value is used.
+The `disablePresence` value seeds the attach-time option of the same name: when the `disablePresence` attach option is omitted, the document's value is used. `DocumentOptions.disableGC` gates local garbage collection and is set independently of the attach-time `disableGC` option, which controls the server wire contract.
 
 
 #### Attaching the Document
@@ -522,7 +522,7 @@ try await client.changeSyncMode(doc, .realtimeSyncOff)
 // Stream-less periodic sync at the document's poll interval.
 try await client.changeSyncMode(doc, .polling)
 
-// Synchronization turned off, and the watch stream is disconneted.
+// Synchronization turned off, and the watch stream is disconnected.
 try await client.changeSyncMode(doc, manual)
 try await client.sync(doc) // Trigger synchronization manually using the sync function.
 ```
