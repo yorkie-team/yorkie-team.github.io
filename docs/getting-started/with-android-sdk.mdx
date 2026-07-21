@@ -74,12 +74,12 @@ val document = Document(Key("my-doc"))
 
 // Declare your own CoroutineScope
 scope.launch {
-  client.attachAsync(document).await()
+  client.attachDocument(document).await()
 }
 
 // Do not forget to detach it when you no longer need it
 scope.launch {
-  client.detachAsync(document).await()
+  client.detachDocument(document).await()
 }
 ```
 
