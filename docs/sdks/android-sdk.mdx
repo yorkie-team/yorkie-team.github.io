@@ -79,15 +79,31 @@ Attach a document to the client. Once attached, the client synchronizes the docu
 - `initialPresence`: Initial presence data (default: empty map)
 - `syncMode`: Synchronization mode (default: `Realtime`)
 - `schema`: Optional schema key for document validation
+- `disableGC`: `Boolean` (default: `false`) - declares that this attachment will not produce or consume tombstones. Use only with `Counter` or primitive workloads; misuse on a document that uses `Tree`, `Text`, or `Array` deletions leads to undefined GC behavior on this client.
+- `disablePresence`: `Boolean` (default: `false`) - declares that this document does not produce, consume, or store presence.
 
 ```kotlin
 val document = Document(Document.Key("my-doc"))
 scope.launch {
-    client.attachAsync(
+    client.attachDocument(
         document,
         initialPresence = mapOf("name" to "Alice", "color" to "blue"),
         syncMode = Client.SyncMode.Realtime
     ).await()
+}
+```
+
+**disableGC**
+
+Controls only the wire contract: the server skips minVV tracking and omits the response VersionVector for this client. It is distinct from any local-only `Document` GC pass. Honored on first attach only; the server persists the value and returns it on later attaches.
+
+**disablePresence**
+
+When `true`, the initial presence is not pushed and presence updates from `document.updateAsync()` are dropped. Honored on first attach only; the server persists the value and returns it on later attaches.
+
+```kotlin
+scope.launch {
+    client.attachDocument(document, disableGC = true, disablePresence = true).await()
 }
 ```
 
@@ -101,7 +117,7 @@ Detach a document from the client. The client no longer synchronizes the documen
 
 ```kotlin
 scope.launch {
-    client.detachAsync(document).await()
+    client.detachDocument(document).await()
 }
 ```
 
@@ -128,10 +144,11 @@ scope.launch {
 
 Change the synchronization mode of an attached document. This allows you to dynamically control how the document synchronizes with the server.
 
-**Yorkie offers four SyncModes:**
+**Yorkie offers five SyncModes:**
 - `Client.SyncMode.Realtime`: Local changes are automatically pushed to the server, and remote changes are pulled from the server.
 - `Client.SyncMode.RealtimePushOnly`: Only push local changes automatically.
 - `Client.SyncMode.RealtimeSyncOff`: Changes are not synchronized, but the watch stream remains active.
+- `Client.SyncMode.Polling`: The sync loop runs without opening a watch stream; local changes are pushed and remote changes pulled on a fixed interval (`Client.Options.documentPollInterval`). Stream-less and suited to low-frequency updates.
 - `Client.SyncMode.Manual`: Synchronization no longer occurs in real-time, and the watch stream is disconnected.
 
 **Parameters:**
@@ -151,7 +168,7 @@ client.changeSyncMode(document, Client.SyncMode.Realtime)
 Broadcast a message to other clients subscribed to the document. This is useful for sending ephemeral messages that don't need to be stored in the document, such as notifications, alerts, or temporary states.
 
 **Parameters:**
-- `document`: The document to broadcast to
+- `key`: The key of the attached document or channel to broadcast to
 - `topic`: The topic/channel of the message
 - `payload`: The message payload as a string (can be JSON)
 - `options`: Broadcast options including retry configuration (optional)
@@ -159,7 +176,7 @@ Broadcast a message to other clients subscribed to the document. This is useful 
 ```kotlin
 scope.launch {
     client.broadcast(
-        document,
+        key = document.getKey(),
         topic = "cursor-moved",
         payload = """{"x": 100, "y": 200}"""
     ).await()
@@ -175,7 +192,7 @@ Permanently remove a document from the server. This operation is irreversible an
 
 ```kotlin
 scope.launch {
-    client.removeAsync(document).await()
+    client.removeDocument(document).await()
 }
 ```
 
@@ -202,6 +219,7 @@ When creating a client, you can configure various options:
 - `fetchAuthToken`: Optional function to fetch authentication tokens when needed
 - `syncLoopDuration`: Duration between sync loops (default: 50ms)
 - `reconnectStreamDelay`: Delay before reconnecting after stream disconnect (default: 1000ms)
+- `documentPollInterval`: Push-pull interval for documents attached with `SyncMode.Polling`, as a kotlin `Duration` (default: `3_000.milliseconds`, i.e. milliseconds, not seconds). Unused in other sync modes.
 
 ```kotlin
 val client = Client(
@@ -211,7 +229,8 @@ val client = Client(
         apiKey = "your-api-key",
         metadata = mapOf("device" to "mobile"),
         syncLoopDuration = 100.milliseconds,
-        reconnectStreamDelay = 2.seconds
+        reconnectStreamDelay = 2.seconds,
+        documentPollInterval = 3_000.milliseconds
     )
 )
 ```
@@ -236,13 +255,26 @@ val document = Document(Document.Key("my-document"))
 
 > The document key identifies the Document in Yorkie. It is a string that you can freely define, but it can only contain `a-z`, `A-Z`, `0-9`, `-`, `.`, `_`, `~` and must be between 4 and 120 characters.
 
+#### Document Options
+
+`Document.Options` configures the document independently of the attach flags:
+
+- `disableGC`: `Boolean` (default: `false`) - disables garbage collection for the document.
+- `disablePresence`: `Boolean` (default: `false`) - seeds the presence-free state before attach; the server-fixated value from the attach response takes precedence once attached.
+
+There is no `enableDevtools` option on Android.
+
+```kotlin
+val document = Document(Document.Key("my-doc"), Document.Options(disableGC = true))
+```
+
 #### Attaching a Document
 
 Attach the document to a client. Once attached, the document synchronizes with the server and other clients. You can set initial presence and choose the sync mode.
 
 ```kotlin
 scope.launch {
-    client.attachAsync(
+    client.attachDocument(
         document,
         initialPresence = mapOf("name" to "Alice", "color" to "blue"),
         syncMode = Client.SyncMode.Realtime
@@ -390,6 +422,9 @@ client.changeSyncMode(document, Client.SyncMode.RealtimePushOnly)
 // Synchronization turned off, but the watch stream remains active
 client.changeSyncMode(document, Client.SyncMode.RealtimeSyncOff)
 
+// Sync loop runs without a watch stream, pushing/pulling on a fixed interval
+client.changeSyncMode(document, Client.SyncMode.Polling)
+
 // Synchronization turned off, and the watch stream is disconnected
 client.changeSyncMode(document, Client.SyncMode.Manual)
 scope.launch {
@@ -403,7 +438,7 @@ Detach the document from the client. The document no longer synchronizes with th
 
 ```kotlin
 scope.launch {
-    client.detachAsync(document).await()
+    client.detachDocument(document).await()
 }
 ```
 
@@ -845,11 +880,13 @@ When attaching a document, you can set the initial presence for the client using
 **Function Signature:**
 
 ```kotlin
-fun attachAsync(
+fun attachDocument(
     document: Document,
     initialPresence: P = emptyMap(),
     syncMode: Client.SyncMode = Client.SyncMode.Realtime,
-    schema: String? = null
+    schema: String? = null,
+    disableGC: Boolean = false,
+    disablePresence: Boolean = false
 ): Deferred<OperationResult>
 ```
 
@@ -860,7 +897,7 @@ fun attachAsync(
 
 ```kotlin
 scope.launch {
-    client.attachAsync(
+    client.attachDocument(
         document,
         initialPresence = mapOf(
             "name" to "Alice",
@@ -1012,6 +1049,105 @@ scope.launch {
                 }
             }
         }
+}
+```
+
+### Channel
+
+`Channel` is a lightweight presence counter for pub/sub use cases that don't need document-level CRDT sync, such as showing how many users are viewing a page or broadcasting ephemeral messages to a topic. A channel key is an opaque, freely-defined string; there is no hierarchical-key feature in the Android SDK.
+
+#### Creating a Channel
+
+```kotlin
+val channel = Channel("my-channel-key")
+```
+
+#### Attaching a Channel
+
+Attach the channel to the client. The `isRealtime` parameter controls whether the client watches for channel changes in realtime.
+
+**Parameters:**
+- `channel`: The channel to attach
+- `isRealtime`: If `true` (default), starts watching for channel changes in realtime. If `false`, uses manual sync mode where you must call `client.syncAsync(channel)` to refresh the channel count.
+
+```kotlin
+scope.launch {
+    client.attachChannel(channel, isRealtime = true).await()
+}
+
+// Manual sync mode: refresh the count yourself
+scope.launch {
+    client.attachChannel(channel, isRealtime = false).await()
+    client.syncAsync(channel).await()
+}
+```
+
+> Migration note: the deprecated `Presence` typealias and `attachPresence(...)` have been renamed to `Channel` and `attachChannel(channel, isRealtime)`.
+
+#### Tracking Session Count
+
+Read the current online session count with `getSessionCount()`, or subscribe to `channel.eventStream` for `ChannelEvent.Initialized` and `ChannelEvent.Changed` updates.
+
+```kotlin
+val count = channel.getSessionCount()
+
+scope.launch {
+    channel.eventStream.collect { event ->
+        when (event) {
+            is ChannelEvent.Initialized -> println("Initial session count: ${event.sessionCount}")
+            is ChannelEvent.Changed -> println("Session count changed: ${event.sessionCount}")
+            else -> {}
+        }
+    }
+}
+```
+
+> `getCount()` is deprecated - use `getSessionCount()` instead.
+
+#### Peeking a Channel
+
+Read a channel's current session count without creating a session on the server. Use this when you only need to display the count without contributing to it or receiving broadcasts.
+
+```kotlin
+scope.launch {
+    val result = client.peekChannel("my-channel-key").await()
+    result.onSuccess { sessionCount ->
+        println("Current session count: $sessionCount")
+    }
+}
+```
+
+#### Broadcasting on a Channel
+
+Publish a message to a channel's topic using `client.broadcast(key, topic, payload)`, and receive messages via `channel.eventStream`'s `ChannelEvent.Broadcast` event.
+
+```kotlin
+// Publish
+scope.launch {
+    client.broadcast(
+        key = channel.getKey(),
+        topic = "chat",
+        payload = """{"message": "hello"}"""
+    ).await()
+}
+
+// Subscribe
+scope.launch {
+    channel.eventStream.collect { event ->
+        if (event is ChannelEvent.Broadcast) {
+            println("${event.actorID} sent on ${event.topic}: ${event.payload}")
+        }
+    }
+}
+```
+
+#### Detaching a Channel
+
+Detach the channel from the client. This is local-only cleanup; the server reclaims the session via TTL.
+
+```kotlin
+scope.launch {
+    client.detachChannel(channel).await()
 }
 ```
 
