@@ -97,20 +97,16 @@ export const setFileOpen = (directoryInfo: DirectoryInfo, targetFilePath: string
 };
 
 const findOpenedFileInfo = (directoryInfo: DirectoryInfo, targetFilePath: string): FileInfo | null => {
-  let opendFileInfo: FileInfo | null = null;
+  let openedFileInfo: FileInfo | null = null;
   for (const child of directoryInfo.children) {
-    if (opendFileInfo != null) {
-      break;
-    }
     if (child.isFile) {
       child.isOpen = child.path === targetFilePath;
       if (child.isOpen) {
-        opendFileInfo = child;
-        break;
+        openedFileInfo = child;
       }
     } else {
-      opendFileInfo = opendFileInfo ?? findOpenedFileInfo(child, targetFilePath);
+      openedFileInfo = findOpenedFileInfo(child, targetFilePath) ?? openedFileInfo;
     }
   }
-  return opendFileInfo;
-}
+  return openedFileInfo;
+};
