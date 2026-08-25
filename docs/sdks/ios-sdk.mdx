@@ -594,7 +594,7 @@ await doc.clearHistory()
 **Limitations**
 
 - **Maximum stack depth**: 50 changes per stack. Pushing beyond that drops the oldest entry.
-- **Not available during update**: calling `undo()` or `redo()` inside a `doc.update` callback throws a `YorkieError` with code `.errRefused` ("Undo is not allowed during an update").
+- **Not available during update**: calling `undo()` or `redo()` inside a `doc.update` callback throws a `YorkieError` with code `.errRefused` ("Undo is not allowed during an update", or "Redo is not allowed during an update" from `redo()`).
 - **Local only**: only the local client's own changes enter the stacks. Remote changes are applied to the Document but are never reverted by your `undo()`.
 
 <Alert status="info">
