@@ -303,6 +303,7 @@ Update the document structure and/or presence. The updater function provides acc
 
 **Parameters:**
 - `message`: Optional description of the change
+- `skipHistory`: If `true`, the change is not recorded on the undo/redo history stacks — it still mutates the document, emits events, and syncs normally (optional, default: `false`)
 - `updater`: Lambda function to modify the document root and/or presence
 
 ```kotlin
@@ -441,6 +442,28 @@ scope.launch {
     client.detachDocument(document).await()
 }
 ```
+
+#### History (Undo/Redo)
+
+`document.history` provides local undo/redo over changes recorded from this client's `updateAsync()` calls. Use `canUndo()`/`canRedo()` to check stack state, and `undoAsync()`/`redoAsync()` to apply the reverse operations.
+
+```kotlin
+scope.launch {
+    document.updateAsync { root, _ ->
+        root["title"] = "Hello"
+    }.await()
+
+    if (document.history.canUndo()) {
+        document.history.undoAsync().await()
+    }
+
+    if (document.history.canRedo()) {
+        document.history.redoAsync().await()
+    }
+}
+```
+
+Changes applied with `updateAsync(skipHistory = true)` are excluded from the history stacks, mirroring how remote changes bypass local history.
 
 ### Json Types
 
@@ -804,6 +827,8 @@ scope.launch {
 }
 ```
 
+> Since v0.7.16, `edit()` and `editByPath()` throw `YorkieException` with code `ErrInvalidArgument` when the given range or path resolves to an invalid split position (previously a raw `StringIndexOutOfBoundsException` could surface).
+
 **Styling Tree Nodes:**
 
 ```kotlin
@@ -918,6 +943,7 @@ Update presence at any time using `document.updateAsync()`. The `presence` param
 ```kotlin
 fun updateAsync(
     message: String? = null,
+    skipHistory: Boolean = false,
     updater: suspend (root: JsonObject, presence: Presence) -> Unit
 ): Deferred<OperationResult>
 ```
