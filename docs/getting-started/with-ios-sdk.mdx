@@ -20,6 +20,8 @@ dependencies: [
 ]
 ```
 
+> iOS SDK v0.7.16 and later require a Yorkie server v0.7.16 or later. The tree node identity rules the SDK relies on are part of the wire contract shared with the server, so against an older server a `JSONTree` undo or redo can abort a sync with `ErrInvalidArgument: offset out of range`.
+
 ### How to use Yorkie
 
 #### 1. Creating a Client with API key
