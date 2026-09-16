@@ -49,7 +49,7 @@ First, create a Client instance with an API key and connect it to the Yorkie ser
 ```kotlin
 val client = Client(
   host = "{{API_ADDR}}",
-  options = Options(apiKey = "xxxxxxxxxxxxxxxxxxxx"),
+  options = Client.Options(apiKey = "xxxxxxxxxxxxxxxxxxxx"),
 )
 
 // Declare your own CoroutineScope
@@ -70,7 +70,7 @@ scope.launch {
 Then create a Document.
 
 ```kotlin
-val document = Document(Key("my-doc"))
+val document = Document(Document.Key("my-doc"))
 
 // Declare your own CoroutineScope
 scope.launch {
@@ -92,7 +92,7 @@ The document is initially an empty object. You can create or update key-value pr
 ```kotlin
 // Declare your own CoroutineScope
 scope.launch {
-  document.updateAsync { root ->
+  document.updateAsync { root, _ ->
     root["key"] = "value" // {"key":"value"}
   }.await()
 }
@@ -105,7 +105,7 @@ To access document properties, use `Document.getRoot()`.
 ```kotlin
 // Declare your own CoroutineScope
 scope.launch {
-  document.updateAsync { root ->
+  document.updateAsync { root, _ ->
     root["sharedMessage"] = "Hello World!" // {"sharedMessage":"Hello World!"}
   }.await()
   println(document.getRoot()["sharedMessage"]) // "Hello World!"
@@ -141,14 +141,14 @@ scope.launch {
 
 #### 6. Viewing the presence of other peers
 
-You can also subscribe to user presence using `doc.events.filterIsInstance<PresenceChange>()`. Use `doc.presences` to get the list of users currently participating in the document.
+You can also subscribe to user presence using `document.events.filterIsInstance<Document.Event.PresenceChanged>()`. Use `document.presences` to get the list of users currently participating in the document.
 
 ```kotlin
 // Declare your own CoroutineScope
 scope.launch {
-  document.events.filterIsInstance<PresenceChange>.collect {
+  document.events.filterIsInstance<Document.Event.PresenceChanged>().collect {
     val users = document.presences.value
-    println("There are currently ${users.length} users online.")
+    println("There are currently ${users.size} users online.")
   }
 }
 ```
