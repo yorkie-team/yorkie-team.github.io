@@ -533,6 +533,74 @@ To start a document in polling mode from the beginning, pass it at attach time a
 try await client.attach(doc, [:], .polling, documentPollInterval: 5.0)
 ```
 
+#### History (Undo/Redo)
+
+A Document keeps an undo stack and a redo stack of the local client's own changes. Unlike the JS SDK, which exposes them through `doc.history`, the iOS SDK puts them directly on `Document`.
+
+```swift
+try await doc.update { root, _ in
+    root.text = JSONText()
+    (root.text as? JSONText)?.edit(0, 0, "Hello")
+}
+
+try await doc.undo()    // {"text":[]}
+try await doc.redo()    // {"text":[{"val":"Hello"}]}
+```
+
+`canUndo` and `canRedo` report whether the matching stack still has something to replay. Both are `false` while a `doc.update` callback is running.
+
+```swift
+try await doc.update { root, _ in
+    root.todos = Array<String>()
+    (root.todos as? JSONArray)?.append("todo-1")
+}
+
+await doc.canUndo    // true
+await doc.canRedo    // false
+
+try await doc.undo()
+
+await doc.canUndo    // false
+await doc.canRedo    // true
+```
+
+Calling `undo()` or `redo()` on an empty stack is a no-op rather than an error, so checking `canUndo` / `canRedo` first is optional. Applying a new local change clears the redo stack.
+
+**Supported operations**
+
+Undo and redo replay reverse operations, which are produced for:
+
+- `JSONObject`: setting and removing properties
+- `JSONArray`: append, insert, remove, move, and whole-array replacement
+- `JSONText`: `edit`, `setStyle`, and `removeStyle`
+- `JSONTree`: `edit`, `style`, and `removeStyle`
+
+<Alert status="warning">
+`JSONCounter.increase` produces no reverse operation, so it contributes nothing to the undo stack: a change made up only of `increase` calls is skipped by `undo()`, and in a mixed change the other operations are reverted while the counter keeps its value. Presence changes are likewise not restored by undo.
+</Alert>
+
+<Alert status="warning">
+`JSONTree` undo/redo requires a Yorkie server v0.7.16 or later, because the node identity rules it relies on are part of the wire contract shared with the server. See [Getting Started with iOS SDK](/docs/getting-started/with-ios-sdk).
+</Alert>
+
+**Clearing the history**
+
+`clearHistory()` empties both stacks. The SDK calls it for you after `attach`, so elements created through `initialRoot` are never reachable via undo, and again whenever a server snapshot replaces the local state. Call it yourself to drop one-time setup changes you made after attaching.
+
+```swift
+await doc.clearHistory()
+```
+
+**Limitations**
+
+- **Maximum stack depth**: 50 changes per stack. Pushing beyond that drops the oldest entry.
+- **Not available during update**: calling `undo()` or `redo()` inside a `doc.update` callback throws a `YorkieError` with code `.errRefused` ("Undo is not allowed during an update", or "Redo is not allowed during an update" from `redo()`).
+- **Local only**: only the local client's own changes enter the stacks. Remote changes are applied to the Document but are never reverted by your `undo()`.
+
+<Alert status="info">
+Undo and redo affect only your own editing history, and the result still converges with concurrent edits from other clients.
+</Alert>
+
 #### Detaching the Document
 
 If the document is no longer needed, detach it to improve the efficiency of garbage collection removing [CRDT tombstones](https://crdt.tech/glossary). For more information about GC, see [Garbage Collection](https://github.com/yorkie-team/yorkie/blob/main/docs/design/garbage-collection.md).
