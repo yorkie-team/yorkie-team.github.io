@@ -53,6 +53,22 @@ struct MyAuthTokenInjector: AuthTokenInjector {
 
 let client = Client("{{API_ADDR}}", ClientOptions(apiKey: "xxxxxxxxxxxxxxxxxxxx", authTokenInjector: MyAuthTokenInjector()))
 ```
+##### Client Identity
+
+A Client carries two identifiers, and they are not interchangeable.
+
+- `client.id` is the **session id**, issued per activation. A new one is minted every time the client activates.
+- `client.getActorID()` is the **stable actor**, supplied by the server on activation and derived from the project and the client key. It survives across sessions, and it is what the SDK stamps into the document's changes.
+
+```swift
+try await client.activate()
+let actor = client.getActorID() // nil before activation
+```
+
+<Alert status="warning">
+Since v0.7.20 the actor — not the session id — is what keys presence and identifies peers in `watched` and `unwatched` events. An app that used `client.id` to find itself among peers must use `client.getActorID()`. Because the actor also breaks ties between concurrent edits and is derived from the client key rather than being time-ordered, the winner of a tie no longer follows client creation order.
+</Alert>
+
 #### Syncing Documents Manually
 In `SyncMode.manual`, the client does not automatically synchronize documents with the server. You must manually call the `sync(document:)` method to synchronize the document when necessary.
 
@@ -214,8 +230,12 @@ Retrieve presence information for clients participating in the document.
 **Getting specific client presence:**
 
 ```swift
-await doc.getPresence(client.id!) 
+await doc.getPresence(client.getActorID()!)
 ```
+
+<Alert status="info">
+Presences are keyed by the stable actor, not by `client.id`. See [Client Identity](#client-identity).
+</Alert>
 
 **Getting your own presence:**
 
@@ -334,7 +354,7 @@ By subscribing to these events, you can update the UI in real-time and handle ex
 
 A Document can be modified by changes generated remotely or locally. Whenever the Document is modified, change events are triggered. You can subscribe to these events using the `document.subscribe(callback)` method to receive updates in real-time, which is useful for updating the UI when the Document changes.
 
-The callback is called with an event object, and the `event.type` property indicates the source of the change, which can be one of the following values: `statusChanged`, `connectionChanged`, `syncStatusChanged`, `snapshot`, `localChange`, `remoteChange`, `initialized`, `watched`, `unwatched`, `presenceChanged`, `broadcast`, `localBroadcast` or `authError`.
+The callback is called with an event object, and the `event.type` property indicates the source of the change, which can be one of the following values: `statusChanged`, `connectionChanged`, `syncStatusChanged`, `snapshot`, `localChange`, `remoteChange`, `initialized`, `watched`, `unwatched`, `presenceChanged`, `broadcast`, `localBroadcast`, `authError`, `epochMismatch` or `localChangesDropped`.
 
 For more information about document events, please refer to the [DocEvent](https://yorkie.dev/yorkie-ios-sdk/documentation/yorkie/docevent).
 
@@ -532,6 +552,97 @@ To start a document in polling mode from the beginning, pass it at attach time a
 ```swift
 try await client.attach(doc, [:], .polling, documentPollInterval: 5.0)
 ```
+
+#### Offline Persistence
+
+By default a Document lives only in memory: if the app is killed with changes that have not reached the server, those changes are gone. Set `ClientOptions.store` and the client persists every document attached to it, so edits made offline survive a restart and are pushed on the next successful sync.
+
+```swift
+let client = Client("{{API_ADDR}}", ClientOptions(
+    apiKey: "xxxxxxxxxxxxxxxxxxxx",
+    store: MemoryDocStore()
+))
+```
+
+`MemoryDocStore` is the built-in implementation, and it is deliberately **not** durable — it keeps documents in a process-local dictionary so the resume path is usable without the SDK committing to a storage location. To survive process restarts, supply your own `DocStore`.
+
+##### Implementing a DocStore
+
+A store holds, per document key, a base snapshot plus an append-only log of the changes made since it. That shape is what keeps writes cheap: appending costs the size of one change, which does not grow with the document, whereas re-serializing the whole document costs time proportional to its size — and a document is at its largest exactly while it is being edited.
+
+```swift
+public protocol DocStore: Sendable {
+    func load(docKey: String) async throws -> StoredDoc?
+    func saveSnapshot(docKey: String, bytes: Data) async throws
+    func appendChange(docKey: String, change: StoredChange) async throws
+    func saveMeta(docKey: String, bytes: Data) async throws
+    func remove(docKey: String) async throws
+}
+```
+
+| Method | Contract |
+| --- | --- |
+| `load` | Returns the stored state, whose `changes` must be ordered by ascending `clientSeq`, or `nil` when the key is absent. |
+| `saveSnapshot` | Replaces the snapshot and atomically drops every appended change **and any stored meta**. This is compaction — the new snapshot already contains those changes, and it embeds a newer header than meta holds. |
+| `appendChange` | Appends one local change. This is the hot path, so it must not rewrite the whole entry. It is an **upsert keyed by `clientSeq`**: re-appending a stored change replaces it, so a retried write is safe. |
+| `saveMeta` | Records the post-sync header. Leaves the snapshot alone, and leaves the log alone — only compaction trims the log. |
+| `remove` | Removes everything persisted for the key. Removing an absent key succeeds. |
+
+The bytes are opaque to the SDK, so an implementation is free to compress or encrypt what it is handed.
+
+<Alert status="warning">
+`appendChange` and `saveMeta` must be a **no-op when nothing is stored for the key** — they must never create an entry. An entry holding a log with no snapshot under it cannot be restored, and the client discards an unrestorable entry, taking the un-pushed changes in that log with it. The client always writes a base snapshot before it appends.
+</Alert>
+
+<Alert status="warning">
+`DocStore` changed shape in v0.7.22. It was previously one opaque blob: `load` returned `Data?` and `save` replaced it. Apps using `MemoryDocStore` are unaffected, but an app with its own store must migrate to `StoredDoc`, `saveSnapshot`, `appendChange` and `saveMeta`.
+</Alert>
+
+##### Sharing a store across processes
+
+Two sessions resuming the same persisted document would both replay its log and both push, duplicating the work. `ClientOptions.sessionLock` guards against that, and it is consulted only when `store` is set. The default is `NoopSessionLock`, which grants every lease — correct for a single process. Supply your own when a durable store is shared across processes, such as an app and its extensions.
+
+```swift
+let client = Client("{{API_ADDR}}", ClientOptions(
+    apiKey: "xxxxxxxxxxxxxxxxxxxx",
+    store: MyDurableDocStore(),
+    sessionLock: MySessionLock()
+))
+```
+
+##### When local changes are dropped
+
+Some resumes cannot be reconciled with the server at all. When that happens the SDK keeps what it can and publishes a `LocalChangesDroppedEvent` describing what was lost, so the app can surface the data loss or re-apply the changes on top of the re-anchored state.
+
+```swift
+await doc.subscribe { event, _ in
+    guard let event = event as? LocalChangesDroppedEvent else { return }
+
+    for change in event.value.changes {
+        // change.actorID, change.clientSeq, change.lamport,
+        // change.message, change.operationCount, change.hasPresenceChange
+        print("dropped \(change.operationCount) ops from \(change.actorID ?? "unknown")")
+    }
+}
+```
+
+`event.value.reason` says why:
+
+| Reason | Meaning |
+| --- | --- |
+| `epochReanchor` | The document was compacted server-side, so the resume re-anchored from a snapshot. |
+| `documentPurged` | The server no longer has the document the changes were made against. |
+| `actorMismatch` | The stored document belongs to a different actor than the one resuming it. |
+| `restoreFailed` | The stored bytes could not be decoded at all, so nothing was restored. |
+| `logDiscontinuity` | The appended change log had a hole, so it could not be replayed. The snapshot restored normally; what was lost is the log written after it. |
+
+<Alert status="warning">
+`logDiscontinuity` was added to `LocalChangesDroppedValue.Reason` in v0.7.22. An exhaustive `switch` over `Reason` will not compile until it handles the new case.
+</Alert>
+
+<Alert status="info">
+Unlike the JS SDK, the iOS SDK does not yet cap how much work a persist may do — upstream's `maxPersistBytes` and `maxPersistMillis` budgets are not ported. A pulling sync on a very large document re-serializes it with no ceiling, which is a stall proportional to document size rather than a correctness problem.
+</Alert>
 
 #### History (Undo/Redo)
 
