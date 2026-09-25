@@ -20,7 +20,7 @@ dependencies: [
 ]
 ```
 
-> iOS SDK v0.7.16 and later require a Yorkie server v0.7.16 or later. The tree node identity rules the SDK relies on are part of the wire contract shared with the server, so against an older server a `JSONTree` undo or redo can abort a sync with `ErrInvalidArgument: offset out of range`.
+> iOS SDK v0.7.22 and later require a Yorkie server v0.7.22 or later. Several of the SDK's correctness rules — tree node identity, element identity in garbage collection, and the checkpoint an offline resume re-anchors against — are part of the wire contract shared with the server, so an older server can abort a sync rather than degrading. On a server older than v0.7.16, a `JSONTree` undo or redo aborts with `ErrInvalidArgument: offset out of range`.
 
 ### How to use Yorkie
 
