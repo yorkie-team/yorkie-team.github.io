@@ -58,12 +58,20 @@ let client = Client("{{API_ADDR}}", ClientOptions(apiKey: "xxxxxxxxxxxxxxxxxxxx"
 A Client carries two identifiers, and they are not interchangeable.
 
 - `client.id` is the **session id**, issued per activation. A new one is minted every time the client activates.
-- `client.getActorID()` is the **stable actor**, supplied by the server on activation and derived from the project and the client key. It survives across sessions, and it is what the SDK stamps into the document's changes.
+- `client.getActorID()` is the **stable actor**, supplied by the server on activation and derived from the project and the client key. It is what the SDK stamps into the document's changes.
 
 ```swift
+let client = Client("{{API_ADDR}}", ClientOptions(
+    key: myPersistedClientKey,
+    apiKey: "xxxxxxxxxxxxxxxxxxxx"
+))
 try await client.activate()
 let actor = client.getActorID() // nil before activation
 ```
+
+<Alert status="warning">
+**The actor is stable only if the client key is.** `ClientOptions.key` defaults to `nil`, and the SDK then generates a fresh UUID for every `Client`, so the actor changes on every launch. Keep your own key somewhere durable — the Keychain, or `UserDefaults` — and pass the same one each time. This matters most alongside [Offline Persistence](#offline-persistence), where a document stored under one actor and resumed under another has its un-pushed changes dropped with reason `actorMismatch`.
+</Alert>
 
 <Alert status="warning">
 Since v0.7.20 the actor — not the session id — is what keys presence and identifies peers in `watched` and `unwatched` events. An app that used `client.id` to find itself among peers must use `client.getActorID()`. Because the actor also breaks ties between concurrent edits and is derived from the client key rather than being time-ordered, the winner of a tie no longer follows client creation order.
@@ -555,16 +563,19 @@ try await client.attach(doc, [:], .polling, documentPollInterval: 5.0)
 
 #### Offline Persistence
 
-By default a Document lives only in memory: if the app is killed with changes that have not reached the server, those changes are gone. Set `ClientOptions.store` and the client persists every document attached to it, so edits made offline survive a restart and are pushed on the next successful sync.
+By default a Document lives only in memory: if the app is killed with changes that have not reached the server, those changes are gone. `ClientOptions.store` gives the client somewhere to persist every document attached to it, so un-pushed edits can be replayed and pushed on the next successful sync.
 
 ```swift
 let client = Client("{{API_ADDR}}", ClientOptions(
+    key: myPersistedClientKey,
     apiKey: "xxxxxxxxxxxxxxxxxxxx",
-    store: MemoryDocStore()
+    store: MyDurableDocStore()
 ))
 ```
 
-`MemoryDocStore` is the built-in implementation, and it is deliberately **not** durable — it keeps documents in a process-local dictionary so the resume path is usable without the SDK committing to a storage location. To survive process restarts, supply your own `DocStore`.
+<Alert status="warning">
+**Surviving an app restart takes a durable store and a stable client key.** The built-in `MemoryDocStore` keeps documents in a process-local dictionary, so it recovers nothing once the process is gone — it exists so the resume path is usable without the SDK committing to a storage location, which makes it useful for trying the API out or for resuming within a single run, and nothing more. Implement `DocStore` over your own storage to survive restarts, and pass a `ClientOptions.key` you persist, or the restored document is resumed under a new actor and dropped with reason `actorMismatch`. See [Client Identity](#client-identity).
+</Alert>
 
 ##### Implementing a DocStore
 
