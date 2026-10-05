@@ -744,9 +744,20 @@ try await doc.update{ root in
     root.text = JSONText() // {"text":[]}
     (root.text as? JSONText)?.edit(0, 0, "hello")               // {"text":[{"val":"hello"}]}
     (root.text as? JSONText)?.edit(0, 1, "H")                   // {"text":[{"val":"H"},{"val":"ello"}]}
-    (root.text as? JSONText)?.setStyle(fromIdx: 0, toIdx: 1, attributes: ["bold": true])    // {"text":[{"attrs":{"bold":"true"},"val":"H"},{"val":"ello"}]}
+    (root.text as? JSONText)?.setStyle(0, 1, ["bold": true])     // {"text":[{"attrs":{"bold":true},"val":"H"},{"val":"ello"}]}
+    (root.text as? JSONText)?.setStyle(1, 3, ["color": "red"])   // {"text":[{"attrs":{"bold":true},"val":"H"},{"attrs":{"color":"red"},"val":"el"},{"val":"lo"}]}
 }
 ```
+
+**Attribute values**
+
+An attribute value is stored as text. Booleans, numbers, arrays, and objects are stored as JSON (`true`, `12`). Since v0.7.23, a string is stored as itself (`red`), the same way the Yorkie server and other SDKs store it, unless the string would itself parse as JSON — `"1"`, `"true"`, or `"null"` keep their quotes so they read back as strings rather than as a number, a boolean, or null. This raw form is what the attributes in `StyleOpInfo` and `EditOpInfo` carry, so an app that matched a string attribute as `"\"red\""` before v0.7.23 now receives `red`.
+
+An attribute counts toward the document size limit by the UTF-8 length of its key and value, matching the server.
+
+<Alert status="warning">
+A style concurrent with a deletion is applied on every replica, including to text another client has already deleted. Undoing that style and then the deletion brings the text back without the attributes it carried. All clients and the server must be on v0.7.23 or later to agree on this.
+</Alert>
 
 ##### Selection using presence
 
