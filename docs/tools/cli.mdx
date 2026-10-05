@@ -80,10 +80,6 @@ Flags:
       --auth-github-user-url string                     GitHub User API URL (default "https://api.github.com/user")
       --auth-webhook-cache-auth-ttl duration            TTL value to set when caching authorization webhook response. (default 10s)
       --auth-webhook-cache-size int                     The cache size of the authorization webhook. (default 5000)
-      --auth-webhook-max-retries uint                   Maximum number of retries for authorization webhook. (default 10)
-      --auth-webhook-max-wait-interval duration         Maximum wait interval between retries(exponential backoff). (default 3s)
-      --auth-webhook-min-wait-interval duration         Minimum wait interval between retries(exponential backoff). (default 100ms)
-      --auth-webhook-request-timeout duration           Timeout for each authorization webhook request. (default 3s)
       --backend-admin-password string                   The password of the default admin. (default "admin")
       --backend-admin-token-duration duration           The duration of the admin authentication token. (default 168h0m0s)
       --backend-admin-user string                       The name of the default admin user, who has full permissions. (default "admin")
@@ -272,18 +268,22 @@ Examples:
 yorkie project update name [options]
 
 Flags:
-      --auth-webhook-method-add stringArray    authorization-webhook methods to add ('ALL' for all methods)
-      --auth-webhook-method-rm stringArray     authorization-webhook methods to remove ('ALL' for all methods)
-      --auth-webhook-url string                authorization-webhook update url
-      --channel-session-ttl string             channel session TTL (must be between 1s and 5m)
-      --client-deactivate-threshold string     client deactivate threshold for housekeeping
-      --event-webhook-events-add stringArray   event-webhook events to add ('ALL' for all events)
-      --event-webhook-events-rm stringArray    event-webhook events to remove ('ALL' for all events)
-      --event-webhook-url string               event-webhook update url
-  -h, --help                                   help for update
-      --max-attachments-per-document int       max attachments per document
-      --max-subscribers-per-document int       max subscribers per document
-      --name string                            new project name
+      --auth-webhook-max-retries uint              Maximum number of retries for authorization webhook. (default 10)
+      --auth-webhook-max-wait-interval duration    Maximum wait interval between retries(exponential backoff). (default 3s)
+      --auth-webhook-method-add stringArray        authorization-webhook methods to add ('ALL' for all methods)
+      --auth-webhook-method-rm stringArray         authorization-webhook methods to remove ('ALL' for all methods)
+      --auth-webhook-min-wait-interval duration    Minimum wait interval between retries(exponential backoff). (default 100ms)
+      --auth-webhook-request-timeout duration      Timeout for each authorization webhook request. (default 3s)
+      --auth-webhook-url string                    authorization-webhook update url
+      --channel-session-ttl string                 channel session TTL (must be between 1s and 5m)
+      --client-deactivate-threshold string         client deactivate threshold for housekeeping
+      --event-webhook-events-add stringArray       event-webhook events to add ('ALL' for all events)
+      --event-webhook-events-rm stringArray        event-webhook events to remove ('ALL' for all events)
+      --event-webhook-url string                   event-webhook update url
+  -h, --help                                       help for update
+      --max-attachments-per-document int           max attachments per document
+      --max-subscribers-per-document int           max subscribers per document
+      --name string                                new project name
 
 Global Flags:
   -o, --output string     One of 'yaml' or 'json'.
