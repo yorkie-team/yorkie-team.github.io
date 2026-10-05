@@ -22,10 +22,9 @@ The easiest way to install Yorkie is from pre-built binaries:
 
 ```bash
 $ yorkie version --client
-Yorkie: {{YORKIE_VERSION}}
-Commit: ...
+Yorkie Client: {{YORKIE_VERSION}}
 Go: ...
-Build date: ...
+Build Date: ...
 ```
 
 #### Install via Homebrew
@@ -47,11 +46,10 @@ $ brew install yorkie
 Verify that the installation worked by opening a new Terminal session and trying Yorkie's available subcommands.
 
 ```bash
-$ yorkie version
-Yorkie: {{YORKIE_VERSION}}
-Commit: ...
+$ yorkie version --client
+Yorkie Client: {{YORKIE_VERSION}}
 Go: ...
-Build date: ...
+Build Date: ...
 ```
 
 #### Commands
@@ -70,59 +68,74 @@ Usage:
   yorkie server [options] [flags]
 
 Flags:
-      --auth-github-auth-url string                     GitHub OAuth2 authorization URL (default "https://github.com/login/oauth/authorize")
-      --auth-github-callback-redirect-url string        GitHub OAuth callback redirect URL (default "http://localhost:5173/dashboard")
-      --auth-github-client-id string                    GitHub OAuth Client ID
-      --auth-github-client-secret string                GitHub OAuth Client Secret
-      --auth-github-device-auth-url string              GitHub OAuth2 device authorization URL (default "https://github.com/login/device/code")
-      --auth-github-redirect-url string                 GitHub OAuth callback URL (default "http://localhost:8080/auth/github/callback")
-      --auth-github-token-url string                    GitHub OAuth2 token URL (default "https://github.com/login/oauth/access_token")
-      --auth-github-user-url string                     GitHub User API URL (default "https://api.github.com/user")
-      --auth-webhook-cache-auth-ttl duration            TTL value to set when caching authorization webhook response. (default 10s)
-      --auth-webhook-cache-size int                     The cache size of the authorization webhook. (default 5000)
-      --backend-admin-password string                   The password of the default admin. (default "admin")
-      --backend-admin-token-duration duration           The duration of the admin authentication token. (default 168h0m0s)
-      --backend-admin-user string                       The name of the default admin user, who has full permissions. (default "admin")
-      --backend-gateway-addr string                     Gateway address (default "localhost:8080")
-      --backend-secret-key string                       The secret key for signing authentication tokens for admin users. (default "yorkie-secret")
-      --backend-snapshot-disable-gc                     Whether to disable garbage collection of snapshots.
-      --backend-snapshot-interval int                   Interval of changes to create a snapshot. (default 500)
-      --backend-snapshot-threshold int                  Threshold that determines if changes should be sent with snapshot when the number of changes is greater than this value. (default 500)
-      --backend-use-default-project                     Whether to use the default project. Even if public key is not provided from the client, the default project will be used for the request. (default true)
-      --client-deactivate-threshold string              Deactivate threshold of clients in specific project for housekeeping. (default "24h")
-  -c, --config string                                   Config path
-      --event-webhook-max-retries uint                  Maximum number of retries for event webhook. (default 10)
-      --event-webhook-max-wait-interval duration        Maximum wait interval between retries(exponential backoff). (default 3s)
-      --event-webhook-min-wait-interval duration        Minimum wait interval between retries(exponential backoff). (default 100ms)
-      --event-webhook-request-timeout duration          Timeout for each event webhook request. (default 3s)
-  -h, --help                                            help for server
-      --hostname string                                 Yorkie Server Hostname
-      --housekeeping-candidates-limit-per-project int   candidates limit per project for a single housekeeping run (default 500)
-      --housekeeping-compaction-min-changes int         minimum number of changes to compact a document for housekeeping run (default 1000)
-      --housekeeping-interval duration                  housekeeping interval between housekeeping runs (default 30s)
-      --housekeeping-project-fetch-size int             housekeeping project fetch size for a single housekeeping run (default 100)
-      --kafka-addresses string                          Comma-separated list of Kafka addresses (e.g., localhost:9092,localhost:9093)
-      --kafka-channel-events-topic string              Kafka topic name to publish channel events (default "channel-events")
-      --kafka-document-events-topic string              Kafka topic name to publish document events (default "document-events")
-      --kafka-session-events-topic string              Kafka topic name to publish session events (default "session-events")
-      --kafka-user-events-topic string                 Kafka topic name to publish user events (default "user-events")
-      --kafka-write-timeout duration                    Timeout for writing messages to Kafka (default 5s)
-  -l, --log-level string                                Log level: debug, info, warn, error, panic, fatal (default "info")
-      --mongo-connection-timeout duration               Mongo DB's connection timeout (default 5s)
-      --mongo-connection-uri string                     MongoDB's connection URI
-      --mongo-monitoring-enabled                        Enable MongoDB query monitoring
-      --mongo-monitoring-slow-query-threshold string    Threshold for logging slow MongoDB queries (e.g. '100ms', '1s') (default "100ms")
-      --mongo-ping-timeout duration                     Mongo DB's ping timeout (default 5s)
-      --mongo-yorkie-database string                    Yorkie's database name in MongoDB (default "yorkie-meta")
-      --pprof-enabled                                   Enable runtime profiling data via HTTP server.
-      --profiling-port int                              Profiling port (default 8081)
-      --project-info-cache-size int                     The cache size of the project info. (default 256)
-      --project-info-cache-ttl duration                 TTL value to set when caching project info. (default 10m0s)
-      --rpc-cert-file string                            RPC certification file's path
-      --rpc-key-file string                             RPC key file's path
-      --rpc-port int                                    RPC port (default 8080)
-      --snapshot-cache-size int                         The cache size of the snapshots. (default 1000)
-      --starrocks-dsn string                            StarRocks DSN for the analytics
+      --auth-github-auth-url string                            GitHub OAuth2 authorization URL (default "https://github.com/login/oauth/authorize")
+      --auth-github-callback-redirect-url string               GitHub OAuth callback redirect URL (default "http://localhost:5173/dashboard")
+      --auth-github-client-id string                           GitHub OAuth Client ID
+      --auth-github-client-secret string                       GitHub OAuth Client Secret
+      --auth-github-device-auth-url string                     GitHub OAuth2 device authorization URL (default "https://github.com/login/device/code")
+      --auth-github-redirect-url string                        GitHub OAuth callback URL (default "http://localhost:8080/auth/github/callback")
+      --auth-github-token-url string                           GitHub OAuth2 token URL (default "https://github.com/login/oauth/access_token")
+      --auth-github-user-url string                            GitHub User API URL (default "https://api.github.com/user")
+      --auth-webhook-cache-auth-ttl duration                   TTL value to set when caching authorization webhook response. (default 10s)
+      --auth-webhook-cache-size int                            The cache size of the authorization webhook. (default 5000)
+      --backend-admin-password string                          The password of the default admin. (default "admin")
+      --backend-admin-token-duration duration                  The duration of the admin authentication token. (default 168h0m0s)
+      --backend-admin-user string                              The name of the default admin user, who has full permissions. (default "admin")
+      --backend-enable-webhook-validation                      Whether to enable webhook URL validation to prevent SSRF attacks.
+      --backend-gateway-addr string                            Gateway address (default "localhost:8080")
+      --backend-rpc-addr string                                Backend RPC address (default "localhost:8080")
+      --backend-secret-key string                              The secret key for signing authentication tokens for admin users. (default "yorkie-secret")
+      --backend-snapshot-disable-gc                            Whether to disable garbage collection of snapshots.
+      --backend-use-default-project                            Whether to use the default project. Even if public key is not provided from the client, the default project will be used for the request. (default true)
+      --channel-session-cleanup-interval duration              The interval for running cleanup of expired channel sessions. (default 10s)
+      --channel-session-count-cache-size int                   The cache size of the channel session count. (default 10000)
+      --channel-session-count-cache-ttl duration               The TTL value for channel session count cache. (default 30s)
+      --channel-session-ttl duration                           The TTL value for channel sessions. (default 15s)
+      --cluster-client-pool-size int                           The number of connections per host in the cluster client pool. (default 1)
+      --cluster-client-timeout duration                        The hard limit for the entire HTTP request lifecycle of cluster communication. (default 30s)
+      --cluster-rpc-timeout duration                           The timeout for individual cluster RPC calls. (default 10s)
+      --cluster-secret string                                  The shared secret for authenticating cluster RPC calls. If empty, all requests are allowed.
+  -c, --config string                                          Config path
+  -h, --help                                                   help for server
+      --hostname string                                        Yorkie Server Hostname
+      --housekeeping-candidates-limit int                      candidates limit for a single housekeeping run (default 2000)
+      --housekeeping-compaction-min-changes int                minimum number of changes to compact a document for housekeeping run (default 1000)
+      --housekeeping-deactivate-concurrency int                max concurrent client deactivations within a single housekeeping cycle (0 or 1 = sequential) (default 8)
+      --housekeeping-interval duration                         housekeeping interval between housekeeping runs (default 30s)
+      --housekeeping-project-stats-refresh-interval duration   Project-stats refresh interval. Set to "0s" to disable the project-stats refresh task. (default 5m0s)
+      --kafka-addresses string                                 Comma-separated list of Kafka addresses (e.g., localhost:9092,localhost:9093)
+      --kafka-channel-events-topic string                      Kafka topic name to publish channel events (default "channel-events")
+      --kafka-client-events-topic string                       Kafka topic name to publish client events (default "client-events")
+      --kafka-document-events-topic string                     Kafka topic name to publish document events (default "document-events")
+      --kafka-session-events-topic string                      Kafka topic name to publish session events (default "session-events")
+      --kafka-user-events-topic string                         Kafka topic name to publish user events (default "user-events")
+      --kafka-write-timeout duration                           Timeout for writing messages to Kafka (default 5s)
+  -l, --log-level string                                       Log level: debug, info, warn, error, panic, fatal (default "info")
+      --max-concurrent-cluster-rpcs int                        The maximum number of concurrent cluster RPC calls across the server. (default 5000)
+      --mongo-cache-stats-enabled                              Enable MongoDB cache statistics logging
+      --mongo-cache-stats-interval duration                    Interval for logging MongoDB cache statistics (e.g. '30s', '1m') (default 30s)
+      --mongo-change-cache-size int                            MongoDB change cache size (default 10000)
+      --mongo-client-cache-size int                            MongoDB client cache size (default 10000)
+      --mongo-connection-timeout duration                      Mongo DB's connection timeout (default 5s)
+      --mongo-connection-uri string                            MongoDB's connection URI
+      --mongo-doc-cache-size int                               MongoDB document cache size (default 10000)
+      --mongo-monitoring-enabled                               Enable MongoDB query monitoring
+      --mongo-monitoring-slow-query-threshold string           Threshold for logging slow MongoDB queries (e.g. '100ms', '1s') (default "100ms")
+      --mongo-ping-timeout duration                            Mongo DB's ping timeout (default 5s)
+      --mongo-project-cache-size int                           MongoDB project cache size (default 256)
+      --mongo-project-cache-ttl duration                       TTL for MongoDB project cache (e.g. '5m', '60s') (default 5m0s)
+      --mongo-vector-cache-size int                            MongoDB version vector cache size (default 10000)
+      --mongo-yorkie-database string                           Yorkie's database name in MongoDB (default "yorkie-meta")
+      --pprof-enabled                                          Enable runtime profiling data via HTTP server.
+      --profiling-port int                                     Profiling port (default 8081)
+      --rpc-cert-file string                                   RPC certification file's path
+      --rpc-idle-timeout duration                              Maximum duration to wait for the next request on idle keep-alive connections. Should exceed the idle timeout of any fronting load balancer. (default 2m0s)
+      --rpc-key-file string                                    RPC key file's path
+      --rpc-port int                                           RPC port (default 8080)
+      --rpc-read-header-timeout duration                       Maximum duration for reading request headers (Slowloris protection) (default 5s)
+      --snapshot-cache-size int                                The cache size of the snapshots. (default 1000)
+      --starrocks-dsn string                                   StarRocks DSN for the analytics
+      --starrocks-summary-enabled                              Serve project-stats history from the decoupled daily HLL summary tables (dual read). Enable only after the summary tables are backfilled and validated.
 
 Global Flags:
   -o, --output string     One of 'yaml' or 'json'.
@@ -191,7 +204,7 @@ To delete your account, use the `delete-account` command.
 ```bash
 $ yorkie delete-account -u <username> --rpc-addr api.yorkie.dev:443
 Enter Password:
-WARNING: ...
+Warning: This action cannot be undone. Type 'DELETE' to confirm:
 ```
 
 This command deletes your account and all data associated with it. Use this command with caution.
@@ -230,9 +243,11 @@ List projects on the server using `ls`.
 
 ```bash
 $ yorkie project ls
- NAME     PUBLIC KEY            SECRET KEY            AUTH WEBHOOK URL  AUTH WEBHOOK METHODS  CLIENT DEACTIVATE THRESHOLD  CREATED AT 
- default  cfurlpq6qdop9v48o0u0  cfurlpq6qdop9v48o0ug                    []                    24h                          15 minutes
+ NAME     PUBLIC KEY              SECRET KEY              CREATED AT 
+ default  fUYWjA2SmLrpxvt9hvix62  Qxp5jZeuH45bDmjYLDfZJb  15 minutes 
 ```
+
+Use the `--verbose` (`-v`) flag to show every project setting, such as the auth webhook and event webhook settings.
 
 _The server creates a `default project` automatically. If you create a Client without an apiKey, the Client is created in the default project._
 
@@ -242,7 +257,7 @@ Create a new project with a name using `create`.
 
 ```bash
 $ yorkie project create test-project
-{"id":"63fdbebab48d9fd33996b38a","name":"test-project","owner":"","auth_webhook_url":"","auth_webhook_methods":null,"ClientDeactivateThreshold":"24h","public_key":"cfurtei6qdop9v48o0v0","secret_key":"cfurtei6qdop9v48o0vg","created_at":"2023-02-28T08:43:38.192448Z","updated_at":"2023-02-28T08:43:38.192448Z"}
+{"id":"6ac32edca4736914b08f6be3","name":"test-project","owner":"","auth_webhook_url":"","auth_webhook_methods":null,"AuthWebhookMaxRetries":10,"AuthWebhookMinWaitInterval":"100ms","AuthWebhookMaxWaitInterval":"3s","AuthWebhookRequestTimeout":"3s","event_webhook_url":"","event_webhook_events":null,"EventWebhookMaxRetries":10,"EventWebhookMinWaitInterval":"100ms","EventWebhookMaxWaitInterval":"3s","EventWebhookRequestTimeout":"3s","ClientDeactivateThreshold":"24h0m0s","ChannelSessionTTL":"15s","SnapshotThreshold":500,"SnapshotInterval":500,"MaxSubscribersPerDocument":0,"MaxAttachmentsPerDocument":0,"MaxSizePerDocument":10485760,"remove_on_detach":false,"auto_revision_enabled":true,"allowed_origins":null,"public_key":"KMtw3F2MhLRQyYzHfryUpA","secret_key":"MmQRTFYFKckaeJBUkcUkpS","created_at":"2026-10-05T05:00:12.110212Z","updated_at":"2026-10-05T05:00:12.110212Z"}
 ```
 
 If you create a Client with the project's `public_key` as the `apiKey`, you can manage the Client in the project.
@@ -250,7 +265,7 @@ If you create a Client with the project's `public_key` as the `apiKey`, you can 
 ```javascript
 const client = new yorkie.Client({
   rpcAddr: '{{API_ADDR}}',
-  apiKey: 'cfurtei6qdop9v48o0v0', // public_key of the project
+  apiKey: 'KMtw3F2MhLRQyYzHfryUpA', // public_key of the project
 });
 ```
 
@@ -275,15 +290,22 @@ Flags:
       --auth-webhook-min-wait-interval duration    Minimum wait interval between retries(exponential backoff). (default 100ms)
       --auth-webhook-request-timeout duration      Timeout for each authorization webhook request. (default 3s)
       --auth-webhook-url string                    authorization-webhook update url
-      --channel-session-ttl string                 channel session TTL (must be between 1s and 5m)
-      --client-deactivate-threshold string         client deactivate threshold for housekeeping
+      --channel-session-ttl duration               Channel session TTL (must be between 1s and 5m) (default 15s)
+      --client-deactivate-threshold duration       client deactivate threshold for housekeeping (default 24h0m0s)
       --event-webhook-events-add stringArray       event-webhook events to add ('ALL' for all events)
       --event-webhook-events-rm stringArray        event-webhook events to remove ('ALL' for all events)
+      --event-webhook-max-retries uint             Maximum number of retries for event webhook. (default 10)
+      --event-webhook-max-wait-interval duration   Maximum wait interval between retries(exponential backoff). (default 3s)
+      --event-webhook-min-wait-interval duration   Minimum wait interval between retries(exponential backoff). (default 100ms)
+      --event-webhook-request-timeout duration     Timeout for each event webhook request. (default 3s)
       --event-webhook-url string                   event-webhook update url
   -h, --help                                       help for update
       --max-attachments-per-document int           max attachments per document
       --max-subscribers-per-document int           max subscribers per document
       --name string                                new project name
+      --remove-on-detach                           remove on detach
+      --snapshot-interval int                      Interval of changes to create a snapshot. (default 500)
+      --snapshot-threshold int                     Threshold that determines if changes should be sent with snapshot when the number of changes is greater than this value. (default 500)
 
 Global Flags:
   -o, --output string     One of 'yaml' or 'json'.
@@ -294,7 +316,7 @@ Update the name of the project with the `--name` flag.
 
 ```bash
 $ yorkie project update test-project --name new-test-project
-{"id":"63fdc721b48d9fd33996b38b","name":"new-test-project","owner":"","auth_webhook_url":"","auth_webhook_methods":null,"ClientDeactivateThreshold":"24h","public_key":"cfuse8a6qdop9v48o100","secret_key":"cfuse8a6qdop9v48o10g","created_at":"2023-02-28T09:19:29.269875Z","updated_at":"2023-02-28T09:27:06.0588974Z"}
+{"id":"6ac32edca4736914b08f6be3","name":"new-test-project","owner":"","auth_webhook_url":"","auth_webhook_methods":null,"AuthWebhookMaxRetries":10,"AuthWebhookMinWaitInterval":"100ms","AuthWebhookMaxWaitInterval":"3s","AuthWebhookRequestTimeout":"3s","event_webhook_url":"","event_webhook_events":null,"EventWebhookMaxRetries":10,"EventWebhookMinWaitInterval":"100ms","EventWebhookMaxWaitInterval":"3s","EventWebhookRequestTimeout":"3s","ClientDeactivateThreshold":"24h0m0s","ChannelSessionTTL":"15s","SnapshotThreshold":500,"SnapshotInterval":500,"MaxSubscribersPerDocument":0,"MaxAttachmentsPerDocument":0,"MaxSizePerDocument":10485760,"remove_on_detach":false,"auto_revision_enabled":true,"allowed_origins":null,"public_key":"KMtw3F2MhLRQyYzHfryUpA","secret_key":"MmQRTFYFKckaeJBUkcUkpS","created_at":"2026-10-05T05:00:12.110212Z","updated_at":"2026-10-05T05:00:12.145846Z"}
 ```
 
 Configure the project's Auth Webhook URL using the `--auth-webhook-url` flag.
@@ -305,7 +327,7 @@ $ yorkie project update [name] --auth-webhook-url http://localhost:3000/auth-web
 
 Add or remove webhook methods using the `--auth-webhook-method-add` and `--auth-webhook-method-rm` flags.
 When updating methods, remove operations are processed before add operations.
-The `ALL` keyword represents all available webhook methods.
+With `--auth-webhook-method-rm`, the `ALL` keyword removes every method. With `--auth-webhook-method-add`, it adds `ActivateClient`, `DeactivateClient`, `AttachDocument`, `DetachDocument`, `RemoveDocument`, `PushPull`, `Watch`, `WatchDocument`, `WatchChannel` and `Broadcast`; the revision methods (`CreateRevision`, `GetRevision`, `ListRevisions`, `RestoreRevision`) and the channel methods (`AttachChannel`, `DetachChannel`, `RefreshChannel`, `PeekChannel`) are not included, so add them by name.
 
 Here are some examples of managing webhook methods:
 
@@ -316,7 +338,7 @@ $ yorkie project update [name] --auth-webhook-method-add PushPull
 # Remove a method
 $ yorkie project update [name] --auth-webhook-method-rm PushPull
 
-# Add all available webhook methods using ALL keyword
+# Add the methods covered by the ALL keyword
 $ yorkie project update [name] --auth-webhook-method-add ALL
 
 # Remove all webhook methods using ALL keyword
@@ -326,7 +348,7 @@ $ yorkie project update [name] --auth-webhook-method-rm ALL
 $ yorkie project update [name] \
   --auth-webhook-method-add ActivateClient \
   --auth-webhook-method-add PushPull \
-  --auth-webhook-method-add WatchDocuments
+  --auth-webhook-method-add Watch
 ```
 
 For more details on how Auth Webhook works, please refer to the [auth-webhook](/docs/advanced/security#auth-webhook).
@@ -343,11 +365,17 @@ Usage:
   yorkie document [command]
 
 Available Commands:
+  create      Create a new document
   ls          List all documents in the project
   remove      Remove documents in the project
+  update      Update a document
 
 Flags:
   -h, --help   help for document
+
+Global Flags:
+  -o, --output string     One of 'yaml' or 'json'.
+      --rpc-addr string   Address of the rpc server (default "localhost:8080")
 
 Use "yorkie document [command] --help" for more information about a command.
 ```
@@ -364,17 +392,17 @@ Flags:
       --forward              Whether to search forward or backward
   -h, --help                 help for ls
       --previous-id string   The previous document ID to start from
-      --size int32           The number of document to output per page
+      --size int32           The number of document to output per page (default 10)
 ```
 
 ```bash
 $ yorkie document ls test-project 
- ID                        KEY              CREATED AT  ACCESSED AT  UPDATED AT  ROOT       
- 6482cea1c38d5a06529bbaa7  test-document-5  ...         ...          ...         ...
- 6482cea0c38d5a06529bba96  test-document-4  ...         ...          ...         ...
- 6482ce9fc38d5a06529bba85  test-document-3  ...         ...          ...         ...
- 6482ce9dc38d5a06529bba69  test-document-2  ...         ...          ...         ...
- 6482ce97c38d5a06529bba1b  test-document-1  ...         ...          ...         ...
+ ID                        KEY              CLIENTS  CREATED AT  ACCESSED AT  UPDATED AT  SNAPSHOT 
+ 6482cea1c38d5a06529bbaa7  test-document-5        0  ...         ...          ...         ...
+ 6482cea0c38d5a06529bba96  test-document-4        0  ...         ...          ...         ...
+ 6482ce9fc38d5a06529bba85  test-document-3        0  ...         ...          ...         ...
+ 6482ce9dc38d5a06529bba69  test-document-2        0  ...         ...          ...         ...
+ 6482ce97c38d5a06529bba1b  test-document-1        0  ...         ...          ...         ...
 ```
 
 Several flags control the output of the command, allowing you to paginate the output.
@@ -383,29 +411,29 @@ Use the `--size` flag to limit the number of documents to output per page.
 
 ```bash
 $ yorkie document ls default --size 1
- ID                        KEY              CREATED AT  ACCESSED AT  UPDATED AT  ROOT       
- 6482cea1c38d5a06529bbaa7  test-document-5  ...         ...          ...         ...
+ ID                        KEY              CLIENTS  CREATED AT  ACCESSED AT  UPDATED AT  SNAPSHOT 
+ 6482cea1c38d5a06529bbaa7  test-document-5        0  ...         ...          ...         ...
 ```
 
 Use the `--previous-id` flag to start after a specific document.
 
 ```bash
 $ yorkie document ls default --previous-id 6482ce9fc38d5a06529bba85
- ID                        KEY              CREATED AT  ACCESSED AT  UPDATED AT  ROOT       
- 6482ce9dc38d5a06529bba69  test-document-2  ...         ...          ...         ...
- 6482ce97c38d5a06529bba1b  test-document-1  ...         ...          ...         ...
+ ID                        KEY              CLIENTS  CREATED AT  ACCESSED AT  UPDATED AT  SNAPSHOT 
+ 6482ce9dc38d5a06529bba69  test-document-2        0  ...         ...          ...         ...
+ 6482ce97c38d5a06529bba1b  test-document-1        0  ...         ...          ...         ...
 ```
 
 Use the `--forward` flag to search forward or backward.
 
 ```bash
 $ yorkie document ls default --forward
- ID                        KEY              CREATED AT  ACCESSED AT  UPDATED AT  ROOT       
- 6482ce97c38d5a06529bba1b  test-document-1  ...         ...          ...         ...
- 6482ce9dc38d5a06529bba69  test-document-2  ...         ...          ...         ...
- 6482ce9fc38d5a06529bba85  test-document-3  ...         ...          ...         ...
- 6482cea0c38d5a06529bba96  test-document-4  ...         ...          ...         ...
- 6482cea1c38d5a06529bbaa7  test-document-5  ...         ...          ...         ...
+ ID                        KEY              CLIENTS  CREATED AT  ACCESSED AT  UPDATED AT  SNAPSHOT 
+ 6482ce97c38d5a06529bba1b  test-document-1        0  ...         ...          ...         ...
+ 6482ce9dc38d5a06529bba69  test-document-2        0  ...         ...          ...         ...
+ 6482ce9fc38d5a06529bba85  test-document-3        0  ...         ...          ...         ...
+ 6482cea0c38d5a06529bba96  test-document-4        0  ...         ...          ...         ...
+ 6482cea1c38d5a06529bbaa7  test-document-5        0  ...         ...          ...         ...
 ```
 
 #### Creating a Document
@@ -414,16 +442,16 @@ Create a new document using `create`.
 
 ```
 Usage:
-  yorkie document create [project name] [document key]
+  yorkie document create [project name] [document key] [flags]
 
 Flags:
-  -h, --help                 help for create
-      --initial-root string  YSON-formatted string to initialize the document root. Default: `{}`
+  -h, --help                  help for create
+      --initial-root string   (optional) YSON string representing the initial root of the document
 ```
 
 ```bash
 $ yorkie document create test-project test-document
- Document created: test-document (686e2aa9666f9626c2d62cb4)
+Document created: test-document (686e2aa9666f9626c2d62cb4)
 ```
 
 #### Updating a Document
@@ -435,13 +463,13 @@ Usage:
   yorkie document update [project name] [document key] [flags]
 
 Flags:
-  -h, --help    help for remove
-      --root string   Content of the updated root in YSON format (required)
+  -h, --help          help for update
+      --root string   (required) YSON string representing the new root of the document
 ```
 
 ```bash
 $ yorkie document update test-project test-document --root '{"abs": true}'
- Document updated: test-document (686e2aa9666f9626c2d62cb4)
+Document updated: test-document (686e2aa9666f9626c2d62cb4)
 ```
 
 #### Removing a Document
@@ -456,6 +484,7 @@ Examples:
 yorkie document remove sample-project sample-document [options]
 
 Flags:
+      --force   force remove document even if it is attached to clients
   -h, --help    help for remove
 ```
 
@@ -471,7 +500,7 @@ Set the client deactivate threshold of the project with the `--client-deactivate
 
 ```bash
 $ yorkie project update test-project --client-deactivate-threshold 1h30m20s
-{"id":"63fdc721b48d9fd33996b38b","name":"test-project","owner":"","auth_webhook_url":"","auth_webhook_methods":null,"ClientDeactivateThreshold":"1h30m20s","public_key":"cfuse8a6qdop9v48o100","secret_key":"cfuse8a6qdop9v48o10g","created_at":"2023-02-28T09:19:29.269875Z","updated_at":"2023-02-28T09:19:41.7616869Z"}
+{"id":"6ac32edca4736914b08f6be3","name":"test-project","owner":"","auth_webhook_url":"","auth_webhook_methods":null,"AuthWebhookMaxRetries":10,"AuthWebhookMinWaitInterval":"100ms","AuthWebhookMaxWaitInterval":"3s","AuthWebhookRequestTimeout":"3s","event_webhook_url":"","event_webhook_events":null,"EventWebhookMaxRetries":10,"EventWebhookMinWaitInterval":"100ms","EventWebhookMaxWaitInterval":"3s","EventWebhookRequestTimeout":"3s","ClientDeactivateThreshold":"1h30m20s","ChannelSessionTTL":"15s","SnapshotThreshold":500,"SnapshotInterval":500,"MaxSubscribersPerDocument":0,"MaxAttachmentsPerDocument":0,"MaxSizePerDocument":10485760,"remove_on_detach":false,"auto_revision_enabled":true,"allowed_origins":null,"public_key":"KMtw3F2MhLRQyYzHfryUpA","secret_key":"MmQRTFYFKckaeJBUkcUkpS","created_at":"2026-10-05T05:00:12.110212Z","updated_at":"2026-10-05T05:00:12.199159Z"}
 ```
 
 Setting the client deactivation threshold to `1h30m20s` deactivates clients that have been inactive for 1 hour, 30 minutes, and 20 seconds but remained activated. This helps document GC by not counting the deactivated client's document sequence.
