@@ -30,6 +30,8 @@ Each entry must be either `*` (allow any origin) or a full origin URL. The host 
 
 `*` matches any sequence of characters within a single DNS label only. `.` is a hard boundary, so `https://*.example.com` does **not** match `https://a.b.example.com`. The scheme and port must match exactly.
 
+A request from a disallowed origin is rejected with `codes.PermissionDenied`. The check applies only to requests that come from a browser (judged by the `User-Agent` header) and carry an `Origin` header. Requests from servers, scripts or other non-browser clients are not checked. Allowed origins are therefore not a substitute for authentication; use the [Auth Webhook](#auth-webhook) to control who can access your documents.
+
 ### Auth Webhook
 
 The Auth Webhook provides fine-grained access control by validating client requests through an external authentication server. This allows you to enforce custom authorization logic, ensuring only authorized users can access and modify Yorkie documents.
@@ -66,7 +68,7 @@ You can set up the Auth Webhook via the [Dashboard]({{DASHBOARD_PATH}}):
 
 <Image alt="setting auth-webhook" src="/assets/images/docs/auth-webhook-dashboard.png" width={1300} height={840} style={{ maxWidth: '1000px' }} />
 
-Alternatively, configure the webhook using the Yorkie CLI. See [Updating the Project](/docs/tools/cli#updating-the-project) for details.
+Alternatively, configure the webhook using the Yorkie CLI. See [Updating the Project](/docs/tools/cli#updating-the-project) for details. If a method you want to enable is not listed in the Dashboard, enable it with the CLI.
 
 ##### 2. Client Configuration
 
@@ -182,6 +184,10 @@ This affects how quickly a permission change takes effect:
 For `PushPull` (realtime sync) and `Watch`:
 - Yorkie automatically retries the request after refreshing the token
 - Notifies via [`document.subscribe('auth-error')`](/docs/sdks/js-sdk#documentsubscribeauth-error)
+
+For `Broadcast`:
+- Yorkie automatically retries the request after refreshing the token
+- Notifies via `channel.subscribe('auth-error', ...)`
 
 For other API calls:
 - The system does not automatically retry; the client must manually handle the `codes.Unauthenticated` error and retry the request
