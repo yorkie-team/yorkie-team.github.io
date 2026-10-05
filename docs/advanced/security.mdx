@@ -94,13 +94,42 @@ When a client makes a request, the Yorkie server sends the following JSON payloa
 ```json
 {
   "token": "SOME_TOKEN",          // Token from authTokenInjector
-  "method": "PushPull",           // Method being called: ActivateClient, DeactivateClient, AttachDocument, DetachDocument, WatchDocuments
-  "documentAttributes": [{
-    "key": "DOCUMENT_KEY",        // Document key
+  "method": "PushPull",           // Method being called; see the table below
+  "attributes": [{
+    "key": "DOCUMENT_KEY",        // Document or channel key
     "verb": "r"                   // Access level: 'r' or 'rw'
   }]
 }
 ```
+
+The webhook is called only for the methods enabled in the project settings. What `attributes` contains depends on the method:
+
+| Method | Attributes | Key | Verb | Notes |
+|--------|------------|-----|------|-------|
+| `ActivateClient` | — | — | — | Also sent on a client's first `RefreshChannel` call |
+| `DeactivateClient` | — | — | — | |
+| `AttachDocument` | 1 | Document | `r` or `rw` | Verb derived from the change pack (see below) |
+| `DetachDocument` | 1 | Document | `r` or `rw` | Verb derived from the change pack |
+| `PushPull` | 1 | Document | `r` or `rw` | Verb derived from the change pack |
+| `RemoveDocument` | 1 | Document | `r` or `rw` | Verb derived from the change pack |
+| `Watch` | — | — | — | The watch stream used by current SDKs |
+| `WatchDocument` | — | — | — | Deprecated: sent by the legacy document watch RPC |
+| `WatchChannel` | — | — | — | Deprecated: sent by the legacy channel watch RPC |
+| `CreateRevision` | — | — | — | |
+| `ListRevisions` | 1 | Document | `r` | |
+| `GetRevision` | 1 | Document | `r` | |
+| `RestoreRevision` | 1 | Document | `rw` | |
+| `AttachChannel` | 1 | Channel | `rw` | Also sent on a client's first `RefreshChannel` call |
+| `DetachChannel` | 1 | Channel | `rw` | |
+| `RefreshChannel` | 1 | Channel | `rw` | Sent on heartbeats; the first call sends `ActivateClient` and `AttachChannel` instead |
+| `PeekChannel` | 1 | Channel | `r` | |
+| `Broadcast` | 1 | Channel | `r` | |
+
+A method marked "—" sends `"attributes": null`. The webhook can only allow or deny such a request as a whole, based on the token; it cannot authorize it per document or channel.
+
+For the methods that carry a change pack (`AttachDocument`, `DetachDocument`, `PushPull` and `RemoveDocument`), the verb is `rw` when the pack contains **any** change and `r` otherwise. Presence updates are changes too, so a pack that only moves a cursor is reported as `rw`, the same as one that edits the document. Do not read `rw` as "this request modifies the document content".
+
+Enabling `Watch` in the project also enables the webhook for the deprecated `WatchDocument` and `WatchChannel` RPCs, and enabling either deprecated name also enables it for `Watch`. The `method` field always carries the name of the RPC that was actually called.
 
 ##### 4. Webhook Response Format
 
@@ -128,8 +157,29 @@ Yorkie handles authentication failures based on the webhook response and HTTP st
 | 401 Unauthenticated | The token is invalid or missing (allowed: false) | Yorkie attempts to refresh the token via `authTokenInjector` |
 | 403 Permission Denied | The token is valid but lacks the required permissions (allowed: false) | The request is rejected with `codes.PermissionDenied` |
 
+The status code and `allowed` must agree. A `200` with `"allowed": false`, a `401` or `403` with `"allowed": true`, or a body that is not valid JSON is treated as an invalid response, and the request is rejected with an internal error. To deny a request, return `403` (or `401`), not `200`.
+
+##### Timeouts and Failures
+
+The auth webhook fails closed: unless Yorkie gets a `200` response with `"allowed": true`, the request is rejected.
+
+- **Timeout**: each webhook request times out after 3 seconds by default. A request that times out is not retried, and the client's request is rejected.
+- **Retries**: Yorkie retries only when the webhook returns `500`, `503`, `504` or `429`, or when the connection is reset. It retries up to 10 times by default, with exponential backoff starting at 100ms and capped at 3s. If every attempt fails, the request is rejected.
+- **Other errors**: any other status code (for example `400`, `404` or `502`) and other connection errors, such as a refused connection, are not retried, and the request is rejected.
+
+The timeout and retry settings are per project. Change them with `yorkie project update` using `--auth-webhook-request-timeout`, `--auth-webhook-max-retries`, `--auth-webhook-min-wait-interval` and `--auth-webhook-max-wait-interval`. The values above are the defaults for a new project.
+
+##### Response Caching
+
+Each Yorkie server caches webhook responses in memory, for 10 seconds by default. A request whose token, method and attributes all match a cached response gets the cached decision without calling the webhook. `200` and `403` responses are cached; `401` responses and failed calls (timeouts, invalid responses) are not. The cache TTL and size are server settings: `--auth-webhook-cache-auth-ttl` (default `10s`) and `--auth-webhook-cache-size` (default `5000`) on `yorkie server`.
+
+This affects how quickly a permission change takes effect:
+
+- After you revoke or change a user's permission, requests that match a cached `200` response are still allowed until that entry expires, which takes up to the cache TTL.
+- The webhook is checked when a request is made. A `Watch` stream is authorized once, when it opens, so a stream that is already open keeps delivering events after a permission change until it closes.
+
 ##### Token Refresh & Retry Behavior
-For `PushPull` (realtime sync) and `WatchDocuments`:
+For `PushPull` (realtime sync) and `Watch`:
 - Yorkie automatically retries the request after refreshing the token
 - Notifies via [`document.subscribe('auth-error')`](/docs/sdks/js-sdk#documentsubscribeauth-error)
 
