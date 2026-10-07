@@ -250,13 +250,9 @@ When a permission changes, call the [`RevalidateAccess`](/docs/tools/admin-api#p
 Streams the webhook still allows keep running. Calling it without keys re-checks every open stream of the project.
 
 ##### Token Refresh & Retry Behavior
-For `PushPull` (realtime sync) and `Watch`:
-- Yorkie automatically retries the request after refreshing the token
-- Notifies via [`document.subscribe('auth-error')`](/docs/sdks/js-sdk#documentsubscribeauth-error)
-
-For `Broadcast`:
-- Yorkie automatically retries the request after refreshing the token
-- Notifies via `channel.subscribe('auth-error', ...)`
+For `PushPull` (realtime sync), `Watch` and `Broadcast`, the SDK refreshes the token and retries the request automatically, and reports the error as an `auth-error` event:
+- `PushPull` and a document's `Watch`: [`document.subscribe('auth-error')`](/docs/sdks/js-sdk#subscribing-to-changes)
+- `Broadcast`: `channel.subscribe('auth-error', ...)`
 
 For other API calls:
 - The system does not automatically retry; the client must manually handle the `codes.Unauthenticated` error and retry the request
