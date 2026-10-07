@@ -107,30 +107,51 @@ When a client makes a request, the Yorkie server sends the following JSON payloa
 }
 ```
 
-The webhook is called only for the methods enabled in the project settings. What `attributes` contains depends on the method:
+The webhook is called only for the methods enabled in the project settings.
 
-| Method | Attributes | Key | Verb | Notes |
-|--------|------------|-----|------|-------|
-| `ActivateClient` | — | — | — | Also sent on a client's first `RefreshChannel` call |
-| `DeactivateClient` | — | — | — | |
-| `AttachDocument` | 1 | Document | `r` or `rw` | Change pack; may be followed by a second request (see below) |
-| `DetachDocument` | 1 | Document | `r` or `rw` | Change pack |
-| `PushPull` | 1 | Document | `r` or `rw` | Change pack |
-| `RemoveDocument` | 1 | Document | `rw` | Change pack; a removal is always `rw` |
-| `Watch` | 1 per resource | Document or channel | `r` | The watch stream used by current SDKs; one entry per document or channel the stream watches |
-| `WatchDocument` | 1 | Document | `r` | Deprecated: sent by the legacy document watch RPC |
-| `WatchChannel` | 1 | Channel | `r` | Deprecated: sent by the legacy channel watch RPC |
-| `CreateRevision` | 1 | Document | `rw` | |
-| `ListRevisions` | 1 | Document | `r` | |
-| `GetRevision` | 1 | Document | `r` | |
-| `RestoreRevision` | 1 | Document | `rw` | |
-| `AttachChannel` | 1 | Channel | `rw` | Also sent on a client's first `RefreshChannel` call |
-| `DetachChannel` | 1 | Channel | `rw` | |
-| `RefreshChannel` | 1 | Channel | `rw` | Sent on heartbeats; the first call sends `ActivateClient` and `AttachChannel` instead |
-| `PeekChannel` | 1 | Channel | `r` | |
-| `Broadcast` | 1 | Channel | `r` | |
+`attributes` is an array with one entry for each document or channel the request touches. Each entry has the resource's `key` and a `verb`; the methods that send a change pack also add `presenceOnly`. Every method sends a single entry, except `Watch`, which sends one per document or channel the stream watches. `ActivateClient` and `DeactivateClient` act on no resource and send `"attributes": null`, so the webhook can only allow or deny them as a whole, based on the token.
 
-`ActivateClient` and `DeactivateClient` send `"attributes": null`. The webhook can only allow or deny them as a whole, based on the token.
+**Document methods** (`key` is the document key)
+
+| Method | `verb` | `presenceOnly` |
+|--------|--------|----------------|
+| `AttachDocument` | `r` or `rw` | `true` or `false` |
+| `DetachDocument` | `r` or `rw` | `true` or `false` |
+| `PushPull` | `r` or `rw` | `true` or `false` |
+| `RemoveDocument` | `rw` | `false` |
+
+**Revision methods** (`key` is the document key)
+
+| Method | `verb` |
+|--------|--------|
+| `CreateRevision` | `rw` |
+| `ListRevisions` | `r` |
+| `GetRevision` | `r` |
+| `RestoreRevision` | `rw` |
+
+**Channel methods** (`key` is the channel key)
+
+| Method | `verb` |
+|--------|--------|
+| `AttachChannel` | `rw` |
+| `DetachChannel` | `rw` |
+| `RefreshChannel` | `rw` |
+| `PeekChannel` | `r` |
+| `Broadcast` | `r` |
+
+**Watch methods**
+
+| Method | `key` | `verb` |
+|--------|-------|--------|
+| `Watch` | Each document or channel the stream watches | `r` |
+| `WatchDocument` (deprecated) | The document key | `r` |
+| `WatchChannel` (deprecated) | The channel key | `r` |
+
+A few methods have more to know:
+
+- `AttachDocument` can be followed by a second `AttachDocument` request for the same document. See [Second request on `AttachDocument`](#second-request-on-attachdocument).
+- `RefreshChannel` is sent on heartbeats. A client's first `RefreshChannel` call sends `ActivateClient` and `AttachChannel` instead.
+- `Watch` is the watch stream current SDKs use. `WatchDocument` and `WatchChannel` are sent only by the legacy watch RPCs.
 
 Enabling `Watch` in the project also enables the webhook for the deprecated `WatchDocument` and `WatchChannel` RPCs, and enabling either deprecated name also enables it for `Watch`. The `method` field always carries the name of the RPC that was actually called.
 
