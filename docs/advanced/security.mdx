@@ -63,12 +63,14 @@ The authentication process follows these steps:
 ##### 1. Configure the Auth Webhook
 
 You can set up the Auth Webhook via the [Dashboard]({{DASHBOARD_PATH}}):
-- Go to the Project Settings page.
+- Go to the Project Settings page and open the Security section.
 - Set the webhook URL and define which methods require authentication.
 
 <Image alt="setting auth-webhook" src="/assets/images/docs/auth-webhook-dashboard.png" width={1300} height={840} style={{ maxWidth: '1000px' }} />
 
-Alternatively, configure the webhook using the Yorkie CLI. See [Updating the Project](/docs/tools/cli#updating-the-project) for details. If a method you want to enable is not listed in the Dashboard, enable it with the CLI.
+The Dashboard lists the methods in four groups: Client, Document, Revision and Channel. The deprecated `WatchDocument` and `WatchChannel` are not listed, because enabling `Watch` covers them.
+
+Alternatively, configure the webhook using the Yorkie CLI. See [Updating the Project](/docs/tools/cli#updating-the-project) for details.
 
 ##### 2. Client Configuration
 
@@ -99,7 +101,8 @@ When a client makes a request, the Yorkie server sends the following JSON payloa
   "method": "PushPull",           // Method being called; see the table below
   "attributes": [{
     "key": "DOCUMENT_KEY",        // Document or channel key
-    "verb": "r"                   // Access level: 'r' or 'rw'
+    "verb": "rw",                 // Access level: 'r' or 'rw'
+    "presenceOnly": true          // Change-pack methods only; see below
   }]
 }
 ```
@@ -110,14 +113,14 @@ The webhook is called only for the methods enabled in the project settings. What
 |--------|------------|-----|------|-------|
 | `ActivateClient` | — | — | — | Also sent on a client's first `RefreshChannel` call |
 | `DeactivateClient` | — | — | — | |
-| `AttachDocument` | 1 | Document | `r` or `rw` | Verb derived from the change pack (see below) |
-| `DetachDocument` | 1 | Document | `r` or `rw` | Verb derived from the change pack |
-| `PushPull` | 1 | Document | `r` or `rw` | Verb derived from the change pack |
-| `RemoveDocument` | 1 | Document | `r` or `rw` | Verb derived from the change pack |
-| `Watch` | — | — | — | The watch stream used by current SDKs |
-| `WatchDocument` | — | — | — | Deprecated: sent by the legacy document watch RPC |
-| `WatchChannel` | — | — | — | Deprecated: sent by the legacy channel watch RPC |
-| `CreateRevision` | — | — | — | |
+| `AttachDocument` | 1 | Document | `r` or `rw` | Change pack; may be followed by a second request (see below) |
+| `DetachDocument` | 1 | Document | `r` or `rw` | Change pack |
+| `PushPull` | 1 | Document | `r` or `rw` | Change pack |
+| `RemoveDocument` | 1 | Document | `rw` | Change pack; a removal is always `rw` |
+| `Watch` | 1 per resource | Document or channel | `r` | The watch stream used by current SDKs; one entry per document or channel the stream watches |
+| `WatchDocument` | 1 | Document | `r` | Deprecated: sent by the legacy document watch RPC |
+| `WatchChannel` | 1 | Channel | `r` | Deprecated: sent by the legacy channel watch RPC |
+| `CreateRevision` | 1 | Document | `rw` | |
 | `ListRevisions` | 1 | Document | `r` | |
 | `GetRevision` | 1 | Document | `r` | |
 | `RestoreRevision` | 1 | Document | `rw` | |
@@ -127,11 +130,41 @@ The webhook is called only for the methods enabled in the project settings. What
 | `PeekChannel` | 1 | Channel | `r` | |
 | `Broadcast` | 1 | Channel | `r` | |
 
-A method marked "—" sends `"attributes": null`. The webhook can only allow or deny such a request as a whole, based on the token; it cannot authorize it per document or channel.
-
-For the methods that carry a change pack (`AttachDocument`, `DetachDocument`, `PushPull` and `RemoveDocument`), the verb is `rw` when the pack contains **any** change and `r` otherwise. Presence updates are changes too, so a pack that only moves a cursor is reported as `rw`, the same as one that edits the document. Do not read `rw` as "this request modifies the document content".
+`ActivateClient` and `DeactivateClient` send `"attributes": null`. The webhook can only allow or deny them as a whole, based on the token.
 
 Enabling `Watch` in the project also enables the webhook for the deprecated `WatchDocument` and `WatchChannel` RPCs, and enabling either deprecated name also enables it for `Watch`. The `method` field always carries the name of the RPC that was actually called.
+
+###### Change packs and `presenceOnly`
+
+`AttachDocument`, `DetachDocument`, `PushPull` and `RemoveDocument` carry a change pack: the client's changes to the document, presence included. For these methods:
+
+- `verb` is `rw` when the pack carries any change, presence included, or removes the document, and `r` otherwise.
+- `presenceOnly` is `true` when the pack writes presence and nothing else: it has changes, none of them edits the document, and it does not ask to remove the document. It is `false` otherwise. It is present only on these four methods.
+
+Presence updates are changes, and the SDKs send one with every attach and detach, so an ordinary attach or detach reports `rw`. `presenceOnly` tells such a request apart from one that edits the document. To let a read-only member open a document, show its presence and leave, while rejecting its edits and removals, allow an entry when `verb` is `r` or `presenceOnly` is `true`:
+
+```javascript
+function isAllowedForReader(attr) {
+  return attr.verb === 'r' || attr.presenceOnly === true;
+}
+```
+
+Treat a missing `presenceOnly` on one of these methods as `false`. Servers before v0.7.24 do not send it.
+
+`presenceOnly` describes the whole pack the client sent. A client sends every local change the server has not acknowledged, so a detach can also carry presence changes from an earlier `PushPull` that was rejected. The SDKs do not know a member's role, so a local edit made by a read-only member is sent with its next `PushPull` or detach. That pack is not presence only and is rejected. Applications should not let read-only members edit.
+
+###### Second request on `AttachDocument`
+
+An attach can write to the document in ways its pack does not show. When the attach was not approved as a document write (`verb` `r`, or `rw` with `presenceOnly: true`), Yorkie sends a second `AttachDocument` request for the same document, with `verb` `rw` and no `presenceOnly`, before it:
+
+- creates the document, when no document with that key exists yet;
+- binds the schema the client attached with to the document, when that schema differs from the document's current one. Binding can happen only while no other client is attached.
+
+A webhook that applies the rule above rejects this second request for a read-only member, so the attach fails. An attach that creates nothing and binds no new schema is asked only once.
+
+###### Removal on the last detach
+
+With the project's `RemoveOnDetach` setting on, the document is removed when its last attached client detaches or is deactivated. This removal is the project's policy, not something the client requested. The webhook decides whether the member may detach, and it is not asked about the removal. So a read-only member can be the one whose leaving removes the document.
 
 ##### 4. Webhook Response Format
 
@@ -173,12 +206,27 @@ The timeout and retry settings are per project. Change them with `yorkie project
 
 ##### Response Caching
 
-Each Yorkie server caches webhook responses in memory, for 10 seconds by default. A request whose token, method and attributes all match a cached response gets the cached decision without calling the webhook. `200` and `403` responses are cached; `401` responses and failed calls (timeouts, invalid responses) are not. The cache TTL and size are server settings: `--auth-webhook-cache-auth-ttl` (default `10s`) and `--auth-webhook-cache-size` (default `5000`) on `yorkie server`.
+Each Yorkie server caches webhook responses in memory, for 10 seconds by default. A request whose token, method and attributes all match a cached response gets the cached decision without calling the webhook. Because `presenceOnly` is part of the attributes, a decision cached for a presence-only pack is never reused for a pack that edits the document. `200` and `403` responses are cached; `401` responses and failed calls (timeouts, connection errors, unexpected status codes) are not.
 
-This affects how quickly a permission change takes effect:
+The cache is configured on `yorkie server`:
 
-- After you revoke or change a user's permission, requests that match a cached `200` response are still allowed until that entry expires, which takes up to the cache TTL.
-- The webhook is checked when a request is made. A `Watch` stream is authorized once, when it opens, so a stream that is already open keeps delivering events after a permission change until it closes.
+- `--auth-webhook-cache-auth-ttl` (default `10s`): how long a response is cached. It must be at least `100ms`.
+- `--auth-webhook-cache-size` (default `5000`): how many responses each server keeps.
+- `--auth-webhook-cache-disabled`: turns the cache off. Every request then calls the webhook.
+
+##### Applying Permission Changes
+
+The webhook is checked when a request is made, so a permission change in your system does not reach Yorkie by itself:
+
+- Requests that match a cached response keep getting the cached decision until it expires, which takes up to the cache TTL.
+- A `Watch` stream is authorized once, when it opens. A stream that is already open keeps delivering events after a permission change.
+
+When a permission changes, call the [`RevalidateAccess`](/docs/tools/admin-api#post-yorkiev1adminservicerevalidateaccess) Admin API with the affected document or channel keys. On every Yorkie server, it drops the project's cached decisions about those keys and asks the webhook again for each open `Watch` stream that watches any of them. A stream the webhook now denies is closed:
+
+- With `403`, the stream ends with `codes.PermissionDenied`, and the SDK does not reconnect.
+- With `401`, the stream ends with `codes.Unauthenticated`. The SDK asks `authTokenInjector` for a new token and reconnects, which asks the webhook again.
+
+Streams the webhook still allows keep running. Calling it without keys re-checks every open stream of the project.
 
 ##### Token Refresh & Retry Behavior
 For `PushPull` (realtime sync) and `Watch`:

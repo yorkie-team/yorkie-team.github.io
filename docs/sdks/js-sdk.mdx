@@ -548,14 +548,14 @@ In web applications, detecting browser closure or navigation is difficult. Yorki
 
 **Document.subscribe('auth-error')**
 
-Subscribe to authentication errors during `PushPull` or `WatchDocuments` operations:
+Subscribe to authentication errors during `PushPull` or `Watch` operations:
 
 ```javascript
 const unsubscribe = doc.subscribe('auth-error', (event) => {
   console.log(event.value);
   // event.value contains:
   // - reason: string
-  // - method: 'PushPull' | 'WatchDocuments'
+  // - method: 'PushPull' | 'Watch'
 });
 ```
 
