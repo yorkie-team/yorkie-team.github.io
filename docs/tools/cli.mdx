@@ -76,7 +76,8 @@ Flags:
       --auth-github-redirect-url string                        GitHub OAuth callback URL (default "http://localhost:8080/auth/github/callback")
       --auth-github-token-url string                           GitHub OAuth2 token URL (default "https://github.com/login/oauth/access_token")
       --auth-github-user-url string                            GitHub User API URL (default "https://api.github.com/user")
-      --auth-webhook-cache-auth-ttl duration                   TTL value to set when caching authorization webhook response. (default 10s)
+      --auth-webhook-cache-auth-ttl duration                   TTL value to set when caching authorization webhook response. Must be at least 100ms. (default 10s)
+      --auth-webhook-cache-disabled                            Disable the authorization webhook response cache server-wide. Every protected RPC then calls the webhook.
       --auth-webhook-cache-size int                            The cache size of the authorization webhook. (default 5000)
       --backend-admin-password string                          The password of the default admin. (default "admin")
       --backend-admin-token-duration duration                  The duration of the admin authentication token. (default 168h0m0s)
@@ -89,7 +90,7 @@ Flags:
       --backend-use-default-project                            Whether to use the default project. Even if public key is not provided from the client, the default project will be used for the request. (default true)
       --channel-session-cleanup-interval duration              The interval for running cleanup of expired channel sessions. (default 10s)
       --channel-session-count-cache-size int                   The cache size of the channel session count. (default 10000)
-      --channel-session-count-cache-ttl duration               The TTL value for channel session count cache. (default 30s)
+      --channel-session-count-cache-ttl duration               The TTL value for channel session count cache. Must be at least 100ms. (default 30s)
       --channel-session-ttl duration                           The TTL value for channel sessions. (default 15s)
       --cluster-client-pool-size int                           The number of connections per host in the cluster client pool. (default 1)
       --cluster-client-timeout duration                        The hard limit for the entire HTTP request lifecycle of cluster communication. (default 30s)
@@ -123,7 +124,7 @@ Flags:
       --mongo-monitoring-slow-query-threshold string           Threshold for logging slow MongoDB queries (e.g. '100ms', '1s') (default "100ms")
       --mongo-ping-timeout duration                            Mongo DB's ping timeout (default 5s)
       --mongo-project-cache-size int                           MongoDB project cache size (default 256)
-      --mongo-project-cache-ttl duration                       TTL for MongoDB project cache (e.g. '5m', '60s') (default 5m0s)
+      --mongo-project-cache-ttl duration                       TTL for MongoDB project cache (e.g. '5m', '60s'). Must be at least 100ms. (default 10m0s)
       --mongo-vector-cache-size int                            MongoDB version vector cache size (default 10000)
       --mongo-yorkie-database string                           Yorkie's database name in MongoDB (default "yorkie-meta")
       --pprof-enabled                                          Enable runtime profiling data via HTTP server.
@@ -312,6 +313,8 @@ Global Flags:
       --rpc-addr string   Address of the rpc server (default "localhost:8080")
 ```
 
+Only the options you pass are changed; every other setting keeps its current value. Running `update` without any option fails with `nothing to update: pass at least one option`.
+
 Update the name of the project with the `--name` flag.
 
 ```bash
@@ -327,7 +330,7 @@ $ yorkie project update [name] --auth-webhook-url http://localhost:3000/auth-web
 
 Add or remove webhook methods using the `--auth-webhook-method-add` and `--auth-webhook-method-rm` flags.
 When updating methods, remove operations are processed before add operations.
-With `--auth-webhook-method-rm`, the `ALL` keyword removes every method. With `--auth-webhook-method-add`, it adds `ActivateClient`, `DeactivateClient`, `AttachDocument`, `DetachDocument`, `RemoveDocument`, `PushPull`, `Watch`, `WatchDocument`, `WatchChannel` and `Broadcast`; the revision methods (`CreateRevision`, `GetRevision`, `ListRevisions`, `RestoreRevision`) and the channel methods (`AttachChannel`, `DetachChannel`, `RefreshChannel`, `PeekChannel`) are not included, so add them by name.
+The `ALL` keyword stands for every method the server can authorize: `ActivateClient`, `DeactivateClient`, `AttachDocument`, `DetachDocument`, `RemoveDocument`, `PushPull`, `Watch`, `CreateRevision`, `GetRevision`, `ListRevisions`, `RestoreRevision`, `AttachChannel`, `DetachChannel`, `RefreshChannel`, `PeekChannel` and `Broadcast`. It leaves out the deprecated `WatchDocument` and `WatchChannel`, which `Watch` already covers. With `--auth-webhook-method-rm`, `ALL` removes every method, deprecated ones included.
 
 Here are some examples of managing webhook methods:
 
@@ -338,7 +341,7 @@ $ yorkie project update [name] --auth-webhook-method-add PushPull
 # Remove a method
 $ yorkie project update [name] --auth-webhook-method-rm PushPull
 
-# Add the methods covered by the ALL keyword
+# Add all webhook methods using ALL keyword
 $ yorkie project update [name] --auth-webhook-method-add ALL
 
 # Remove all webhook methods using ALL keyword
