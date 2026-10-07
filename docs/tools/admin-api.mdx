@@ -390,3 +390,36 @@ In this case, the total session count for `room-1` would include both 10 and 20,
   ]
 }
 ```
+
+### Access Management
+
+#### POST /yorkie.v1.AdminService/RevalidateAccess
+
+This endpoint asks Yorkie to verify again the authorization of the project's open `Watch` streams after a permission changes in your system. On every Yorkie server, it drops the project's cached [Auth Webhook](/docs/advanced/security#auth-webhook) decisions about the given keys, then asks the webhook again for each open `Watch` stream that watches any of them. A stream the webhook now denies is closed; streams it still allows keep running. See [Applying Permission Changes](/docs/advanced/security#applying-permission-changes).
+
+##### Request
+
+Parameters:
+
+- `keys`: The document or channel keys whose access changed, up to 1000. Keys match exactly: a channel key does not cover its sub-level channels. When empty, every open stream of the project is re-checked and all of its cached decisions are dropped.
+
+```bash
+curl '{{API_ADDR}}/yorkie.v1.AdminService/RevalidateAccess' \
+  -H 'content-type: application/json' \
+  -H 'authorization: API-Key PROJECT_SECRET_KEY' \
+  --data-raw '{
+    "keys": ["document-1", "room-1"]
+  }'
+```
+
+##### Response
+
+`closedStreams` is the number of streams closed across all servers.
+
+```json
+{
+  "closedStreams": 2
+}
+```
+
+If the webhook could not be reached for some streams, those streams are left open and the request fails with `codes.Unavailable` (`ErrRevalidationIncomplete`). Retry the whole request.

@@ -17,7 +17,7 @@ Each project in Yorkie can have its own allowed origins settings, which can be m
 1. Navigate to the Security section.
 1. Specify the domains that should be allowed to access your Yorkie server.
 
-<Image alt="setting allowed-origins" src="/assets/images/docs/allowed-origins-dashboard.png" width={1300} height={640} style={{ maxWidth: '1000px' }} />
+<Image alt="setting allowed-origins" src="/assets/images/docs/allowed-origins-dashboard.png" width={1300} height={688} style={{ maxWidth: '1000px' }} />
 
 #### Pattern Syntax
 
@@ -29,6 +29,8 @@ Each entry must be either `*` (allow any origin) or a full origin URL. The host 
 - `https://api-*.example.com` — any subdomain starting with `api-`.
 
 `*` matches any sequence of characters within a single DNS label only. `.` is a hard boundary, so `https://*.example.com` does **not** match `https://a.b.example.com`. The scheme and port must match exactly.
+
+A request from a disallowed origin is rejected with `codes.PermissionDenied`. The check applies only to requests that come from a browser (judged by the `User-Agent` header) and carry an `Origin` header. Requests from servers, scripts or other non-browser clients are not checked. Allowed origins are therefore not a substitute for authentication; use the [Auth Webhook](#auth-webhook) to control who can access your documents.
 
 ### Auth Webhook
 
@@ -61,10 +63,12 @@ The authentication process follows these steps:
 ##### 1. Configure the Auth Webhook
 
 You can set up the Auth Webhook via the [Dashboard]({{DASHBOARD_PATH}}):
-- Go to the Project Settings page.
+- Go to the Project Settings page and open the Security section.
 - Set the webhook URL and define which methods require authentication.
 
-<Image alt="setting auth-webhook" src="/assets/images/docs/auth-webhook-dashboard.png" width={1300} height={840} style={{ maxWidth: '1000px' }} />
+<Image alt="setting auth-webhook" src="/assets/images/docs/auth-webhook-dashboard.png" width={1300} height={913} style={{ maxWidth: '1000px' }} />
+
+The Dashboard lists the methods in four groups: Client, Document, Revision and Channel. The deprecated `WatchDocument` and `WatchChannel` are not listed, because enabling `Watch` covers them.
 
 Alternatively, configure the webhook using the Yorkie CLI. See [Updating the Project](/docs/tools/cli#updating-the-project) for details.
 
@@ -94,13 +98,94 @@ When a client makes a request, the Yorkie server sends the following JSON payloa
 ```json
 {
   "token": "SOME_TOKEN",          // Token from authTokenInjector
-  "method": "PushPull",           // Method being called: ActivateClient, DeactivateClient, AttachDocument, DetachDocument, WatchDocuments
-  "documentAttributes": [{
-    "key": "DOCUMENT_KEY",        // Document key
-    "verb": "r"                   // Access level: 'r' or 'rw'
+  "method": "PushPull",           // Method being called; see the table below
+  "attributes": [{
+    "key": "DOCUMENT_KEY",        // Document or channel key
+    "verb": "rw",                 // Access level: 'r' or 'rw'
+    "presenceOnly": true          // Change-pack methods only; see below
   }]
 }
 ```
+
+The webhook is called only for the methods enabled in the project settings.
+
+`attributes` is an array with one entry for each document or channel the request touches. Each entry has the resource's `key` and a `verb`; the methods that send a change pack also add `presenceOnly`. Every method sends a single entry, except `Watch`, which sends one per document or channel the stream watches. `ActivateClient` and `DeactivateClient` act on no resource and send `"attributes": null`, so the webhook can only allow or deny them as a whole, based on the token.
+
+**Document methods** (`key` is the document key)
+
+| Method | `verb` | `presenceOnly` |
+|--------|--------|----------------|
+| `AttachDocument` | `r` or `rw` | `true` or `false` |
+| `DetachDocument` | `r` or `rw` | `true` or `false` |
+| `PushPull` | `r` or `rw` | `true` or `false` |
+| `RemoveDocument` | `rw` | `false` |
+
+**Revision methods** (`key` is the document key)
+
+| Method | `verb` |
+|--------|--------|
+| `CreateRevision` | `rw` |
+| `ListRevisions` | `r` |
+| `GetRevision` | `r` |
+| `RestoreRevision` | `rw` |
+
+**Channel methods** (`key` is the channel key)
+
+| Method | `verb` |
+|--------|--------|
+| `AttachChannel` | `rw` |
+| `DetachChannel` | `rw` |
+| `RefreshChannel` | `rw` |
+| `PeekChannel` | `r` |
+| `Broadcast` | `r` |
+
+**Watch methods**
+
+| Method | `key` | `verb` |
+|--------|-------|--------|
+| `Watch` | Each document or channel the stream watches | `r` |
+| `WatchDocument` (deprecated) | The document key | `r` |
+| `WatchChannel` (deprecated) | The channel key | `r` |
+
+A few methods have more to know:
+
+- `AttachDocument` can be followed by a second `AttachDocument` request for the same document. See [Second request on `AttachDocument`](#second-request-on-attachdocument).
+- `RefreshChannel` is sent on heartbeats. A client's first `RefreshChannel` call sends `ActivateClient` and `AttachChannel` instead.
+- `Watch` is the watch stream current SDKs use. `WatchDocument` and `WatchChannel` are sent only by the legacy watch RPCs.
+
+Enabling `Watch` in the project also enables the webhook for the deprecated `WatchDocument` and `WatchChannel` RPCs, and enabling either deprecated name also enables it for `Watch`. The `method` field always carries the name of the RPC that was actually called.
+
+###### Change packs and `presenceOnly`
+
+`AttachDocument`, `DetachDocument`, `PushPull` and `RemoveDocument` carry a change pack: the client's changes to the document, presence included. For these methods:
+
+- `verb` is `rw` when the pack carries any change, presence included, or removes the document, and `r` otherwise.
+- `presenceOnly` is `true` when the pack writes presence and nothing else: it has changes, none of them edits the document, and it does not ask to remove the document. It is `false` otherwise. It is present only on these four methods.
+
+Presence updates are changes, and the SDKs send one with every attach and detach, so an ordinary attach or detach reports `rw`. `presenceOnly` tells such a request apart from one that edits the document. To let a read-only member open a document, show its presence and leave, while rejecting its edits and removals, allow an entry when `verb` is `r` or `presenceOnly` is `true`:
+
+```javascript
+function isAllowedForReader(attr) {
+  return attr.verb === 'r' || attr.presenceOnly === true;
+}
+```
+
+Treat a missing `presenceOnly` on one of these methods as `false`. Servers before v0.7.24 do not send it.
+
+`presenceOnly` describes the whole pack the client sent. A client sends every local change the server has not acknowledged, so a detach can also carry presence changes from an earlier `PushPull` that was rejected. The SDKs do not know a member's role, so a local edit made by a read-only member is sent with its next `PushPull` or detach. That pack is not presence only and is rejected. Applications should not let read-only members edit.
+
+###### Second request on `AttachDocument`
+
+An attach can write to the document in ways its pack does not show. When the attach was not approved as a document write (`verb` `r`, or `rw` with `presenceOnly: true`), Yorkie sends a second `AttachDocument` request for the same document, with `verb` `rw` and no `presenceOnly`, before it:
+
+- creates the document, when no document with that key exists yet;
+- binds the schema the client attached with to the document, when that schema differs from the document's current one. Binding can happen only while no other client is attached.
+
+A webhook that applies the rule above rejects this second request for a read-only member, so the attach fails. An attach that creates nothing and binds no new schema is asked only once.
+
+###### Removal on the last detach
+
+With the project's `RemoveOnDetach` setting on, the document is removed when its last attached client detaches or is deactivated. This removal is the project's policy, not something the client requested. The webhook decides whether the member may detach, and it is not asked about the removal. So a read-only member can be the one whose leaving removes the document.
 
 ##### 4. Webhook Response Format
 
@@ -128,10 +213,46 @@ Yorkie handles authentication failures based on the webhook response and HTTP st
 | 401 Unauthenticated | The token is invalid or missing (allowed: false) | Yorkie attempts to refresh the token via `authTokenInjector` |
 | 403 Permission Denied | The token is valid but lacks the required permissions (allowed: false) | The request is rejected with `codes.PermissionDenied` |
 
+The status code and `allowed` must agree. A `200` with `"allowed": false`, a `401` or `403` with `"allowed": true`, or a body that is not valid JSON is treated as an invalid response, and the request is rejected with an internal error. To deny a request, return `403` (or `401`), not `200`.
+
+##### Timeouts and Failures
+
+The auth webhook fails closed: unless Yorkie gets a `200` response with `"allowed": true`, the request is rejected.
+
+- **Timeout**: each webhook request times out after 3 seconds by default. A request that times out is not retried, and the client's request is rejected.
+- **Retries**: Yorkie retries only when the webhook returns `500`, `503`, `504` or `429`, or when the connection is reset. It retries up to 10 times by default, with exponential backoff starting at 100ms and capped at 3s. If every attempt fails, the request is rejected.
+- **Other errors**: any other status code (for example `400`, `404` or `502`) and other connection errors, such as a refused connection, are not retried, and the request is rejected.
+
+The timeout and retry settings are per project. Change them with `yorkie project update` using `--auth-webhook-request-timeout`, `--auth-webhook-max-retries`, `--auth-webhook-min-wait-interval` and `--auth-webhook-max-wait-interval`. The values above are the defaults for a new project.
+
+##### Response Caching
+
+Each Yorkie server caches webhook responses in memory, for 10 seconds by default. A request whose token, method and attributes all match a cached response gets the cached decision without calling the webhook. Because `presenceOnly` is part of the attributes, a decision cached for a presence-only pack is never reused for a pack that edits the document. `200` and `403` responses are cached; `401` responses and failed calls (timeouts, connection errors, unexpected status codes) are not.
+
+The cache is configured on `yorkie server`:
+
+- `--auth-webhook-cache-auth-ttl` (default `10s`): how long a response is cached. It must be at least `100ms`.
+- `--auth-webhook-cache-size` (default `5000`): how many responses each server keeps.
+- `--auth-webhook-cache-disabled`: turns the cache off. Every request then calls the webhook.
+
+##### Applying Permission Changes
+
+The webhook is checked when a request is made, so a permission change in your system does not reach Yorkie by itself:
+
+- Requests that match a cached response keep getting the cached decision until it expires, which takes up to the cache TTL.
+- A `Watch` stream is authorized once, when it opens. A stream that is already open keeps delivering events after a permission change.
+
+When a permission changes, call the [`RevalidateAccess`](/docs/tools/admin-api#post-yorkiev1adminservicerevalidateaccess) Admin API with the affected document or channel keys. On every Yorkie server, it drops the project's cached decisions about those keys and asks the webhook again for each open `Watch` stream that watches any of them. A stream the webhook now denies is closed:
+
+- With `403`, the stream ends with `codes.PermissionDenied`, and the SDK does not reconnect.
+- With `401`, the stream ends with `codes.Unauthenticated`. The SDK asks `authTokenInjector` for a new token and reconnects, which asks the webhook again.
+
+Streams the webhook still allows keep running. Calling it without keys re-checks every open stream of the project.
+
 ##### Token Refresh & Retry Behavior
-For `PushPull` (realtime sync) and `WatchDocuments`:
-- Yorkie automatically retries the request after refreshing the token
-- Notifies via [`document.subscribe('auth-error')`](/docs/sdks/js-sdk#documentsubscribeauth-error)
+For `PushPull` (realtime sync), `Watch` and `Broadcast`, the SDK refreshes the token and retries the request automatically, and reports the error as an `auth-error` event:
+- `PushPull` and a document's `Watch`: [`document.subscribe('auth-error')`](/docs/sdks/js-sdk#subscribing-to-changes)
+- `Broadcast`: `channel.subscribe('auth-error', ...)`
 
 For other API calls:
 - The system does not automatically retry; the client must manually handle the `codes.Unauthenticated` error and retry the request
