@@ -121,6 +121,7 @@ let doc = Document(key: "doc-1", opts: DocumentOptions(disableGC: false, disable
 - `disableGC`: Disables local garbage collection for this document. This argument is required (it has no default). See [Disabling GC](#disabling-gc).
 - `enableDevtools` (Optional): Enables the Devtools recorder for this document. Defaults to `false`.
 - `disablePresence` (Optional): Declares that this document does not use presence. Defaults to `false`. See [Disabling Presence](#disabling-presence).
+- `maxUndoDepth` (Optional): How many changes `undo()` can step back through, and likewise `redo()` forward. Defaults to `50`. A value below `1` falls back to the default, with a warning logged. See [History (Undo/Redo)](#history-undoredo).
 
 The `disablePresence` value seeds the attach-time option of the same name: when the `disablePresence` attach option is omitted, the document's value is used. `DocumentOptions.disableGC` gates local garbage collection and is set independently of the attach-time `disableGC` option, which controls the server wire contract.
 
@@ -343,6 +344,8 @@ try await doc.update({ root, _ in
 
 Under the hood, `root` in the `update` function creates a `change`, a set of operations. Every element has a unique ID created by the logical clock. Yorkie uses this ID to track each object.
 
+`update` throws when the change cannot be applied to the Document — for example, a `JSONTree` edit at an index that splits a UTF-16 surrogate pair throws a `YorkieError` with code `.errInvalidArgument`. Since v0.7.24 the error reaches the caller instead of being swallowed, and the Document is left as it was before the callback ran.
+
 You can get the contents of the Document using `doc.getRoot()`.
 
 ```swift
@@ -394,6 +397,7 @@ await self.document.subscribe { event, _ in
 ```
 
 When the `event.type` is `localChange` or `remoteChange`, the `event.value` is a changeInfo, which has `operations` and `message` properties.
+Since v0.7.24, a local change, `undo()` or `redo()` publishes a `localChange` event whenever it ran an operation, even when `operations` is empty — for example, a style over a range with no text, or removing an attribute that is not set.
 For more information about changeInfo for document events, please refer to the [ChangeInfo](https://yorkie.dev/yorkie-ios-sdk/documentation/yorkie/changeinfo).
 
 The `snapshot` event is triggered when a snapshot is received from the server. This occurs when the number of changes that a document needs to fetch from the server exceeds a certain `SnapshotThreshold`. Instead of sending numerous changes, the server sends a snapshot of the document. In such cases, update your application with data from the Yorkie Document.
@@ -415,6 +419,10 @@ The available Event Types are:
 <Alert status="warning">
 If a client has not synchronized for a prolonged period and then makes a sync request, it might receive a `snapshot` event.
 Ensure your application processes these snapshot events correctly to maintain document synchronization.
+</Alert>
+
+<Alert status="warning">
+When a change from another client cannot be applied, sync fails with a `YorkieError` whose code is `.errChangeApplyFailed`. Its message names the document, the change and the operation that failed, and includes the original error. The change is not skipped: the server sends it again on the next sync, so the error repeats until the cause is fixed.
 </Alert>
 
 ##### Document.subscribe("$.path")
@@ -609,6 +617,10 @@ The bytes are opaque to the SDK, so an implementation is free to compress or enc
 `DocStore` changed shape in v0.7.22. It was previously one opaque blob: `load` returned `Data?` and `save` replaced it. Apps using `MemoryDocStore` are unaffected, but an app with its own store must migrate to `StoredDoc`, `saveSnapshot`, `appendChange` and `saveMeta`.
 </Alert>
 
+<Alert status="warning">
+The key passed to `DocStore` is built from the API key, the client key and the document key. Since v0.7.24, a `/` or `%` in any of them is escaped (`%2F`, `%25`), so two different identities can never share an entry or a session lock. A document stored by an earlier version under a key containing either character is not found after upgrading; push its changes before upgrading. The client also logs a warning when `store` is set without a `ClientOptions.key`, because the stored document cannot be resumed under a new actor.
+</Alert>
+
 ##### Sharing a store across processes
 
 Two sessions resuming the same persisted document would both replay its log and both push, duplicating the work. `ClientOptions.sessionLock` guards against that, and it is consulted only when `store` is set. The default is `NoopSessionLock`, which grants every lease — correct for a single process. Supply your own when a durable store is shared across processes, such as an app and its extensions.
@@ -715,7 +727,7 @@ await doc.clearHistory()
 
 **Limitations**
 
-- **Maximum stack depth**: 50 changes per stack. Pushing beyond that drops the oldest entry.
+- **Maximum stack depth**: 50 changes per stack by default; set `DocumentOptions.maxUndoDepth` to change it. Pushing beyond that drops the oldest entry.
 - **Not available during update**: calling `undo()` or `redo()` inside a `doc.update` callback throws a `YorkieError` with code `.errRefused` ("Undo is not allowed during an update", or "Redo is not allowed during an update" from `redo()`).
 - **Local only**: only the local client's own changes enter the stacks. Remote changes are applied to the Document but are never reverted by your `undo()`.
 
@@ -726,6 +738,8 @@ Undo and redo affect only your own editing history, and the result still converg
 #### Detaching the Document
 
 If the document is no longer needed, detach it to improve the efficiency of garbage collection removing [CRDT tombstones](https://crdt.tech/glossary). For more information about GC, see [Garbage Collection](https://github.com/yorkie-team/yorkie/blob/main/docs/design/garbage-collection.md).
+
+Since v0.7.24, a tombstone is collected only once the element after it is known to every client, so a change still on its way to another client never anchors on a purged node. `getGarbageLength()` can therefore stay higher for a while after a sync, until the other clients catch up or detach.
 
 ```swift
 try await client.detach(doc)
@@ -748,6 +762,8 @@ try await doc.update{ root in
     (root.text as? JSONText)?.setStyle(1, 3, ["color": "red"])   // {"text":[{"attrs":{"bold":true},"val":"H"},{"attrs":{"color":"red"},"val":"el"},{"val":"lo"}]}
 }
 ```
+
+Indexes count UTF-16 code units, the same as the JS SDK, so an emoji such as 👍 takes two. Since v0.7.24, an index that falls between the two halves of such a pair is rejected: `edit` returns `nil` and `setStyle` returns `false`, and the error is logged. `JSONTree` methods throw a `YorkieError` with code `.errInvalidArgument` instead.
 
 **Attribute values**
 

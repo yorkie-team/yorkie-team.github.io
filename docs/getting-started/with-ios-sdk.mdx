@@ -20,7 +20,7 @@ dependencies: [
 ]
 ```
 
-> iOS SDK v0.7.23 and later require a Yorkie server v0.7.23 or later. Several of the SDK's correctness rules — tree node identity, element identity in garbage collection, the checkpoint an offline resume re-anchors against, and how style attributes are stored and sized — are part of the wire contract shared with the server, so an older server can abort a sync rather than degrading. Upgrade every client of a document together: since v0.7.23 a plain string style value is sent as itself (`red`, not `"red"`), which an older iOS client does not render. On a server older than v0.7.16, a `JSONTree` undo or redo aborts with `ErrInvalidArgument: offset out of range`.
+> iOS SDK v0.7.24 and later require a Yorkie server v0.7.24 or later. Several of the SDK's correctness rules — tree node identity, element identity in garbage collection and when a tombstone may be collected, the checkpoint an offline resume re-anchors against, and how style attributes are stored and sized — are part of the wire contract shared with the server, so an older server can abort a sync rather than degrading. Upgrade every client of a document together: since v0.7.23 a plain string style value is sent as itself (`red`, not `"red"`), which an older iOS client does not render. On a server older than v0.7.16, a `JSONTree` undo or redo aborts with `ErrInvalidArgument: offset out of range`.
 
 ### How to use Yorkie
 
