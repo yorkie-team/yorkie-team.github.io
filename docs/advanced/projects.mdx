@@ -48,7 +48,7 @@ Each project has two keys:
 | Key | Purpose | Usage |
 |-----|---------|-------|
 | **Public Key** | Identifies the project for client connections | Used as `apiKey` when creating a [Client](/docs/sdks/js-sdk#client) |
-| **Secret Key** | Authenticates server-side applications | Used in the `authorization` header for [Admin API](/docs/tools/admin-api) requests |
+| **Secret Key** | Authenticates server-side applications | Used in the `authorization` header for project-scoped [Admin API](/docs/tools/admin-api#authentication) requests, such as document, schema and channel endpoints |
 
 ```javascript
 // Connect a client to a specific project using its public key

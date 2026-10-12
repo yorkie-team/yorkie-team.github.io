@@ -13,14 +13,37 @@ The API is implemented using [Connect protocol](https://connectrpc.com/docs/prot
 
 ### Authentication
 
-For APIs that require authentication, you need to add your Project SecretKey to the request's authorization header using the API-Key scheme.
+The Admin API uses two authorization schemes. Which one a request needs depends on the endpoint, not on the caller:
+
+- **Project-scoped endpoints** work on a single project, and accept only the project's secret key with the `API-Key` scheme. These are `GetProjectStats`, the document endpoints (`CreateDocument`, `ListDocuments`, `GetDocument`, `GetDocuments`, `SearchDocuments`, `UpdateDocument`, `RemoveDocumentByAdmin`, `CompactDocumentByAdmin`, `GetSnapshotMeta`, `ListChanges`), the schema endpoints (`CreateSchema`, `ListSchemas`, `GetSchema`, `GetSchemas`, `RemoveSchema`), the channel endpoints (`ListChannels`, `GetChannels`, `BroadcastByAdmin`), and `RevalidateAccess`. Every endpoint documented on this page is project-scoped.
+- **User-scoped endpoints** are every other authenticated endpoint, such as `ListProjects`, `CreateProject`, `GetProject`, `UpdateProject`, `RotateProjectKeys`, the member and invite endpoints, and the revision endpoints (`ListRevisionsByAdmin`, `GetRevisionByAdmin`, `RestoreRevisionByAdmin`). They act as a user account, and accept only a login token with the `Bearer` scheme. If the request has no `authorization` header, the `yorkie_session` cookie set by the Dashboard is used as the token instead.
+
+`LogIn`, `SignUp`, `ChangePassword` and `DeleteAccount` take no authorization header, and `GetServerVersion` accepts either scheme.
+
+A project-scoped endpoint sends the secret key with the `API-Key` scheme:
 
 ```bash
-curl '{{API_ADDR}}/yorkie.v1.AdminService/ListProjects' \
+curl '{{API_ADDR}}/yorkie.v1.AdminService/ListDocuments' \
   -H 'content-type: application/json' \
   -H 'authorization: API-Key PROJECT_SECRET_KEY' \
+  --data-raw '{"page_size": 10}'
+```
+
+A user-scoped endpoint needs a token, which `LogIn` returns:
+
+```bash
+curl '{{API_ADDR}}/yorkie.v1.AdminService/LogIn' \
+  -H 'content-type: application/json' \
+  --data-raw '{"username": "USERNAME", "password": "PASSWORD"}'
+# {"token":"TOKEN"}
+
+curl '{{API_ADDR}}/yorkie.v1.AdminService/ListProjects' \
+  -H 'content-type: application/json' \
+  -H 'authorization: Bearer TOKEN' \
   --data-raw '{}'
 ```
+
+A request that uses the wrong scheme for the endpoint, such as a secret key on `ListProjects` or a token on `ListDocuments`, fails with `permission_denied`. A request with no credential, an empty or blank secret key, or a key or token the server does not recognize fails with `unauthenticated`.
 
 ### Documents Management
 
