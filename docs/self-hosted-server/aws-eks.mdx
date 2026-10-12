@@ -122,7 +122,7 @@ $ export MONGO_USER_ADMIN_PASSWORD="$(openssl rand -base64 32)"
 $ export MONGO_CLUSTER_ADMIN_PASSWORD="$(openssl rand -base64 32)"
 ```
 
-<Alert status="warning">Store these values somewhere safe, such as a password manager or a secret manager. Every later `helm upgrade` must pass the **same** values: an upgrade without them fails to render, and a new signing key invalidates every admin token issued so far, so admin users must log in again. To avoid passing the keys on each upgrade, keep them in Kubernetes Secrets you manage and set `yorkie.args.secretKeyExistingSecret` and `yorkie.args.clusterSecretExistingSecret` instead. See [Yorkie Cluster Helm Chart](https://github.com/yorkie-team/yorkie/tree/main/build/charts/yorkie-cluster#admin-token-signing-key-required) for details.</Alert>
+<Alert status="warning">Store these values somewhere safe, such as a password manager or a secret manager. Every later `helm upgrade` must pass the **same** values: an upgrade without them fails to render, and a new signing key invalidates every admin token issued so far, so admin users must log in again. To keep the signing key and the cluster secret out of upgrade commands, store them under the keys `secret-key` and `cluster-secret` in a Secret you create in the `yorkie` namespace, under any name except `yorkie-credentials`, which the chart owns. Then set `yorkie.args.secretKeyExistingSecret` and `yorkie.args.clusterSecretExistingSecret` to its name instead. The MongoDB passwords have no such option, so every upgrade still passes them. See [Yorkie Cluster Helm Chart](https://github.com/yorkie-team/yorkie/tree/main/build/charts/yorkie-cluster#admin-token-signing-key-required) for details.</Alert>
 
 ### Install Yorkie cluster with Helm chart
 
