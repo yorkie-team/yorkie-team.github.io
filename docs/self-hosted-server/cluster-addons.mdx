@@ -394,8 +394,15 @@ You need to set up the following arguments in your Yorkie cluster:
 helm upgrade yorkie-cluster yorkie-team/yorkie-cluster --namespace yorkie \
   --set yorkie.args.kafkaAddresses=yorkie-analytics-kafka.analytics.svc.cluster.local:9092 \
   --set yorkie.args.kafkaWriteTimeout=5s \
-  --set yorkie.args.starrocksDSN="root:@tcp(kube-starrocks-fe-search.analytics.svc.cluster.local:9030)/yorkie"
+  --set yorkie.args.starrocksDSN="root:@tcp(kube-starrocks-fe-search.analytics.svc.cluster.local:9030)/yorkie" \
+  --set yorkie.args.secretKey="$YORKIE_SECRET_KEY" \
+  --set yorkie.args.clusterSecret="$YORKIE_CLUSTER_SECRET" \
+  --set mongodb.credentials.databaseAdmin.password="$MONGO_DB_ADMIN_PASSWORD" \
+  --set mongodb.credentials.userAdmin.password="$MONGO_USER_ADMIN_PASSWORD" \
+  --set mongodb.credentials.clusterAdmin.password="$MONGO_CLUSTER_ADMIN_PASSWORD"
 ```
+
+<Alert status="warning">Pass the **same** credentials you used to install Yorkie cluster: without them the upgrade fails to render, and a new signing key logs every admin user out. If they are no longer in your shell, read them back from the cluster as shown in [Upgrading Chart](https://github.com/yorkie-team/yorkie/tree/main/build/charts/yorkie-cluster#upgrading-chart). `helm upgrade` also resets omitted values to the chart defaults, so add any other values your release uses, such as the ingress settings from the AWS EKS guide.</Alert>
 
 If clients are connected to Yorkie cluster with `userID`([Measuring MAU](/docs/sdks/js-sdk#measuring-mau)), you can see the user events are collected in StarRocks database.
 
@@ -473,6 +480,8 @@ applications:
 ```
 
 Replace `your-org/your-devops-repo` with your GitOps repository that contains the Helm values files.
+
+<Alert status="warning">ArgoCD renders `yorkie-cluster` from `k8s/cluster/values.yaml`, so that file must set the same required credentials as `helm install`: the signing key, the cluster secret and the three MongoDB passwords. Avoid committing them to Git in plain text: keep the signing key and the cluster secret in Kubernetes Secrets referenced by `yorkie.args.secretKeyExistingSecret` and `yorkie.args.clusterSecretExistingSecret`. See [Yorkie Cluster Helm Chart](https://github.com/yorkie-team/yorkie/tree/main/build/charts/yorkie-cluster#admin-token-signing-key-required) for details.</Alert>
 
 Install the Applications chart:
 
