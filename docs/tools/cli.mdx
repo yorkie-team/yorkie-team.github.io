@@ -145,7 +145,7 @@ Global Flags:
       --rpc-addr string   Address of the rpc server (default "localhost:8080")
 ```
 
-> `--backend-secret-key` has no default. The key is taken from the flag or the config file, then from the `YORKIE_BACKEND_SECRET_KEY` environment variable. If neither is set, the server generates a random key for the process and logs an error: admin login tokens then stop working after a restart, and other server instances reject them. The server refuses to start if the flag or the environment variable is set but blank, or if the key is the old default `yorkie-secret` or shorter than 32 characters. A blank `SecretKey` in a config file counts as unset. When you run more than one server instance, set the same key on all of them, for example one generated with `openssl rand -base64 32`.
+> `--backend-secret-key` has no default. The key is taken from the flag or the config file, then from the `YORKIE_BACKEND_SECRET_KEY` environment variable. If neither is set, the server generates a random key for the process and logs an error: admin login tokens then stop working after a restart, and other server instances reject them. The server refuses to start if the flag or the environment variable is set but blank, or if the key is the old default `yorkie-secret` or shorter than 32 characters. An empty `SecretKey` in a config file counts as unset. When you run more than one server instance, set the same key on all of them, for example one generated with `openssl rand -base64 32`.
 
 ### Signup
 
