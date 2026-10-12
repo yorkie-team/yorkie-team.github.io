@@ -13,12 +13,12 @@ The API is implemented using [Connect protocol](https://connectrpc.com/docs/prot
 
 ### Authentication
 
-The Admin API uses two authorization schemes. Which one a request needs depends on the endpoint, not on the caller:
+The Admin API uses two authorization schemes. Which one a request needs depends on the endpoint:
 
-- **Project-scoped endpoints** work on a single project, and accept only the project's secret key with the `API-Key` scheme. These are `GetProjectStats`, the document endpoints (`CreateDocument`, `ListDocuments`, `GetDocument`, `GetDocuments`, `SearchDocuments`, `UpdateDocument`, `RemoveDocumentByAdmin`, `CompactDocumentByAdmin`, `GetSnapshotMeta`, `ListChanges`), the schema endpoints (`CreateSchema`, `ListSchemas`, `GetSchema`, `GetSchemas`, `RemoveSchema`), the channel endpoints (`ListChannels`, `GetChannels`, `BroadcastByAdmin`), and `RevalidateAccess`. Every endpoint documented on this page is project-scoped.
-- **User-scoped endpoints** are every other authenticated endpoint, such as `ListProjects`, `CreateProject`, `GetProject`, `UpdateProject`, `RotateProjectKeys`, the member and invite endpoints, and the revision endpoints (`ListRevisionsByAdmin`, `GetRevisionByAdmin`, `RestoreRevisionByAdmin`). They act as a user account, and accept only a login token with the `Bearer` scheme. If the request has no `authorization` header, the `yorkie_session` cookie set by the Dashboard is used as the token instead.
+- **Project-scoped endpoints** work on a single project, and accept only the project's secret key with the `API-Key` scheme. These are `GetProjectStats`, the document endpoints (`CreateDocument`, `ListDocuments`, `GetDocument`, `GetDocuments`, `SearchDocuments`, `UpdateDocument`, `RemoveDocumentByAdmin`, `CompactDocumentByAdmin`, `GetSnapshotMeta`, `ListChanges`), the schema endpoints (`CreateSchema`, `ListSchemas`, `GetSchema`, `GetSchemas`, `RemoveSchema`), the channel endpoints (`ListChannels`, `GetChannels`, `BroadcastByAdmin`), and `RevalidateAccess`. Every endpoint documented on this page is project-scoped. Anyone who holds the secret key can call all of these endpoints for the project, so keep it on your server and never ship it in client-side code.
+- **User-scoped endpoints** are every other authenticated endpoint, such as `ListProjects`, `CreateProject`, `GetProject`, `UpdateProject`, `RotateProjectKeys`, the member and invite endpoints, and the revision endpoints (`ListRevisionsByAdmin`, `GetRevisionByAdmin`, `RestoreRevisionByAdmin`). They act as a user account, and accept only a login token with the `Bearer` scheme. If the request has no `authorization` header, the `yorkie_session` cookie, which the server sets when you sign in to the Dashboard, is used as the token instead.
 
-`LogIn`, `SignUp`, `ChangePassword` and `DeleteAccount` take no authorization header, and `GetServerVersion` accepts either scheme.
+`LogIn`, `SignUp`, `ChangePassword` and `DeleteAccount` take no authorization header: `ChangePassword` and `DeleteAccount` check the username and password in the request body instead. `GetServerVersion` needs a valid credential, and accepts either scheme.
 
 A project-scoped endpoint sends the secret key with the `API-Key` scheme:
 
