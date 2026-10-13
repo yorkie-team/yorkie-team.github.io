@@ -71,7 +71,7 @@ Flags:
       --auth-github-auth-url string                            GitHub OAuth2 authorization URL (default "https://github.com/login/oauth/authorize")
       --auth-github-callback-redirect-url string               GitHub OAuth callback redirect URL (default "http://localhost:5173/dashboard")
       --auth-github-client-id string                           GitHub OAuth Client ID
-      --auth-github-client-secret string                       GitHub OAuth Client Secret
+      --auth-github-client-secret string                       GitHub OAuth Client Secret. If empty, it is read from YORKIE_AUTH_GITHUB_CLIENT_SECRET, which keeps it off the command line.
       --auth-github-device-auth-url string                     GitHub OAuth2 device authorization URL (default "https://github.com/login/device/code")
       --auth-github-redirect-url string                        GitHub OAuth callback URL (default "http://localhost:8080/auth/github/callback")
       --auth-github-token-url string                           GitHub OAuth2 token URL (default "https://github.com/login/oauth/access_token")
@@ -85,9 +85,11 @@ Flags:
       --backend-enable-webhook-validation                      Whether to enable webhook URL validation to prevent SSRF attacks.
       --backend-gateway-addr string                            Gateway address (default "localhost:8080")
       --backend-rpc-addr string                                Backend RPC address (default "localhost:8080")
-      --backend-secret-key string                              The secret key for signing authentication tokens for admin users. (default "yorkie-secret")
+      --backend-secret-key string                              The secret key for signing authentication tokens for admin users. If empty, it is read from YORKIE_BACKEND_SECRET_KEY, which keeps it off the command line; if that is unset too, a random key is generated at startup, so tokens do not survive a restart. Set the same key on every node of a cluster, at least 32 characters. Given but blank, it is an error; a blank SecretKey in a config file means unset.
       --backend-snapshot-disable-gc                            Whether to disable garbage collection of snapshots.
       --backend-use-default-project                            Whether to use the default project. Even if public key is not provided from the client, the default project will be used for the request. (default true)
+      --backend-watch-heartbeat-interval-max duration          The longest heartbeat interval the server will serve on an idle Watch stream. 0 turns the heartbeat off server-wide, whatever clients ask for. (default 1m0s)
+      --backend-watch-heartbeat-interval-min duration          The shortest heartbeat interval the server will serve on an idle Watch stream. A client asking for less is clamped up to this. (default 5s)
       --channel-session-cleanup-interval duration              The interval for running cleanup of expired channel sessions. (default 10s)
       --channel-session-count-cache-size int                   The cache size of the channel session count. (default 10000)
       --channel-session-count-cache-ttl duration               The TTL value for channel session count cache. Must be at least 100ms. (default 30s)
@@ -95,7 +97,7 @@ Flags:
       --cluster-client-pool-size int                           The number of connections per host in the cluster client pool. (default 1)
       --cluster-client-timeout duration                        The hard limit for the entire HTTP request lifecycle of cluster communication. (default 30s)
       --cluster-rpc-timeout duration                           The timeout for individual cluster RPC calls. (default 10s)
-      --cluster-secret string                                  The shared secret for authenticating cluster RPC calls. If empty, all requests are allowed.
+      --cluster-secret string                                  The shared secret for authenticating cluster RPC calls. If empty, it is read from YORKIE_CLUSTER_SECRET, which keeps it off the command line; if that is unset too, all requests are allowed, so set one in production.
   -c, --config string                                          Config path
   -h, --help                                                   help for server
       --hostname string                                        Yorkie Server Hostname
@@ -118,7 +120,7 @@ Flags:
       --mongo-change-cache-size int                            MongoDB change cache size (default 10000)
       --mongo-client-cache-size int                            MongoDB client cache size (default 10000)
       --mongo-connection-timeout duration                      Mongo DB's connection timeout (default 5s)
-      --mongo-connection-uri string                            MongoDB's connection URI
+      --mongo-connection-uri string                            MongoDB's connection URI. If empty, it is read from YORKIE_MONGO_CONNECTION_URI, which keeps the database password off the command line.
       --mongo-doc-cache-size int                               MongoDB document cache size (default 10000)
       --mongo-monitoring-enabled                               Enable MongoDB query monitoring
       --mongo-monitoring-slow-query-threshold string           Threshold for logging slow MongoDB queries (e.g. '100ms', '1s') (default "100ms")
@@ -128,6 +130,7 @@ Flags:
       --mongo-vector-cache-size int                            MongoDB version vector cache size (default 10000)
       --mongo-yorkie-database string                           Yorkie's database name in MongoDB (default "yorkie-meta")
       --pprof-enabled                                          Enable runtime profiling data via HTTP server.
+      --presence-base-cache-size int                           The number of (document, client) presences kept to fold presence patches. (default 10000)
       --profiling-port int                                     Profiling port (default 8081)
       --rpc-cert-file string                                   RPC certification file's path
       --rpc-idle-timeout duration                              Maximum duration to wait for the next request on idle keep-alive connections. Should exceed the idle timeout of any fronting load balancer. (default 2m0s)
@@ -142,6 +145,8 @@ Global Flags:
   -o, --output string     One of 'yaml' or 'json'.
       --rpc-addr string   Address of the rpc server (default "localhost:8080")
 ```
+
+> `--backend-secret-key` has no default. The key is taken from the flag or the config file, then from the `YORKIE_BACKEND_SECRET_KEY` environment variable. If neither is set, the server generates a random key for the process and logs an error: admin login tokens then stop working after a restart, and other server instances reject them. The server refuses to start if the flag or the environment variable is set but blank, or if the key is the old default `yorkie-secret` or shorter than 32 characters. An empty `SecretKey` in a config file counts as unset. When you run more than one server instance, set the same key on all of them, for example one generated with `openssl rand -base64 32`.
 
 ### Signup
 

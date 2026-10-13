@@ -79,13 +79,13 @@ Claude should list the available MCP tools for document inspection, schema manag
 
 ### Authentication
 
-MCP uses the same API key authentication as the [Admin API](/docs/tools/admin-api):
+MCP authenticates with the project's secret key, sent with the `API-Key` scheme. Unlike the project-scoped endpoints of the [Admin API](/docs/tools/admin-api#authentication), it does not accept a login token:
 
 ```
 Authorization: API-Key <project-secret-key>
 ```
 
-The secret key is available in the Yorkie Dashboard or can be retrieved via the Admin API.
+The secret key is available in the Yorkie Dashboard or can be retrieved via the Admin API, to project members with the `admin` or `owner` role.
 
 ### Protocol
 

@@ -13,14 +13,56 @@ The API is implemented using [Connect protocol](https://connectrpc.com/docs/prot
 
 ### Authentication
 
-For APIs that require authentication, you need to add your Project SecretKey to the request's authorization header using the API-Key scheme.
+The Admin API accepts two credentials: a project's secret key with the `API-Key` scheme, and a login token with the `Bearer` scheme. Which ones a request may use depends on the endpoint:
+
+- **Project-scoped endpoints** work on a single project. These are `GetProjectStats`, the document endpoints (`CreateDocument`, `ListDocuments`, `GetDocument`, `GetDocuments`, `SearchDocuments`, `UpdateDocument`, `RemoveDocumentByAdmin`, `CompactDocumentByAdmin`, `GetSnapshotMeta`, `ListChanges`), the schema endpoints (`CreateSchema`, `ListSchemas`, `GetSchema`, `GetSchemas`, `RemoveSchema`), the channel endpoints (`ListChannels`, `GetChannels`, `BroadcastByAdmin`), and `RevalidateAccess`. Every endpoint documented on this page is project-scoped. They accept either credential:
+  - The project's **secret key**, which carries the authority of a project admin and can call all of these endpoints. Keep it on your server and never ship it in client-side code.
+  - A **login token** together with an `x-yorkie-project` header that names the project. The request is checked against your role in that project: endpoints that change the project (`CreateDocument`, `UpdateDocument`, `RemoveDocumentByAdmin`, `CompactDocumentByAdmin`, `CreateSchema`, `RemoveSchema`, `BroadcastByAdmin`, `RevalidateAccess`) need the `admin` or `owner` role, and the other, read-only endpoints are open to every member of the project.
+- **User-scoped endpoints** are every other authenticated endpoint, such as `ListProjects`, `CreateProject`, `GetProject`, `UpdateProject`, `RotateProjectKeys`, the member and invite endpoints, and the revision endpoints (`ListRevisionsByAdmin`, `GetRevisionByAdmin`, `RestoreRevisionByAdmin`). They act as a user account, and accept only a login token. `GetProject` and `ListProjects` return a project's secret key only to its `admin` and `owner` members; for the `member` role, `secret_key` is empty.
+
+Wherever a login token is accepted and the request has no `authorization` header, the `yorkie_session` cookie, which the server sets when you sign in to the Dashboard, is used as the token instead.
+
+`LogIn`, `SignUp`, `ChangePassword` and `DeleteAccount` take no authorization header: `ChangePassword` and `DeleteAccount` check the username and password in the request body instead. `GetServerVersion` needs a valid credential, and accepts either scheme.
+
+A project-scoped endpoint can take the secret key with the `API-Key` scheme:
 
 ```bash
-curl '{{API_ADDR}}/yorkie.v1.AdminService/ListProjects' \
+curl '{{API_ADDR}}/yorkie.v1.AdminService/ListDocuments' \
   -H 'content-type: application/json' \
   -H 'authorization: API-Key PROJECT_SECRET_KEY' \
+  --data-raw '{"page_size": 10}'
+```
+
+A login token comes from `LogIn`. A user-scoped endpoint takes it alone:
+
+```bash
+curl '{{API_ADDR}}/yorkie.v1.AdminService/LogIn' \
+  -H 'content-type: application/json' \
+  --data-raw '{"username": "USERNAME", "password": "PASSWORD"}'
+# {"token":"TOKEN"}
+
+curl '{{API_ADDR}}/yorkie.v1.AdminService/ListProjects' \
+  -H 'content-type: application/json' \
+  -H 'authorization: Bearer TOKEN' \
   --data-raw '{}'
 ```
+
+A project-scoped endpoint takes it with the project name:
+
+```bash
+curl '{{API_ADDR}}/yorkie.v1.AdminService/ListDocuments' \
+  -H 'content-type: application/json' \
+  -H 'authorization: Bearer TOKEN' \
+  -H 'x-yorkie-project: PROJECT_NAME' \
+  --data-raw '{"page_size": 10}'
+```
+
+These requests fail with `permission_denied`:
+
+- A credential the endpoint does not accept, such as a secret key on `ListProjects`, or a token without the `x-yorkie-project` header on `ListDocuments`.
+- A token whose user's role in the named project is too low for the endpoint, or whose user is not a member of it. A project that does not exist answers the same way, so the header cannot be used to find out which project names exist.
+
+A request with no credential, an empty or blank secret key, or a key or token the server does not recognize fails with `unauthenticated`.
 
 ### Documents Management
 
