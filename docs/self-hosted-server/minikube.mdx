@@ -117,14 +117,39 @@ Then, update your local repository with the following command:
 $ helm repo update
 ```
 
+### Generate the required credentials
+
+The Yorkie cluster Helm chart has no default credentials, and it refuses to install until you provide them:
+
+- `yorkie.args.secretKey`: the key that signs admin (Dashboard and CLI) tokens. Every replica must share it. It must be at least 32 characters and must not be the old default `yorkie-secret`.
+- `yorkie.args.clusterSecret`: the secret that authenticates RPCs between Yorkie nodes. Nodes call each other through the ingress gateway, so without it anyone who can reach the gateway could make those calls.
+- `mongodb.credentials.{databaseAdmin,userAdmin,clusterAdmin}.password`: the passwords of the three MongoDB users the chart creates. The old defaults `admin`, `useradmin` and `clusteradmin` are rejected.
+
+Generate random values with `openssl` and keep them in shell variables:
+
+```bash
+$ export YORKIE_SECRET_KEY="$(openssl rand -base64 32)"
+$ export YORKIE_CLUSTER_SECRET="$(openssl rand -base64 24)"
+$ export MONGO_DB_ADMIN_PASSWORD="$(openssl rand -base64 32)"
+$ export MONGO_USER_ADMIN_PASSWORD="$(openssl rand -base64 32)"
+$ export MONGO_CLUSTER_ADMIN_PASSWORD="$(openssl rand -base64 32)"
+```
+
+<Alert status="warning">Store these values somewhere safe, such as a password manager or a secret manager. Every later `helm upgrade` must pass the **same** values: an upgrade without them fails to render, and a new signing key invalidates every admin token issued so far, so admin users must log in again. To keep the signing key and the cluster secret out of upgrade commands, store them under the keys `secret-key` and `cluster-secret` in a Secret you create in the `yorkie` namespace, under any name except `yorkie-credentials`, which the chart owns. Then set `yorkie.args.secretKeyExistingSecret` and `yorkie.args.clusterSecretExistingSecret` to its name instead. The MongoDB passwords have no such option, so every upgrade still passes them. See [Yorkie Cluster Helm Chart](https://github.com/yorkie-team/yorkie/tree/main/build/charts/yorkie-cluster#admin-token-signing-key-required) for details.</Alert>
+
 ### Install Yorkie cluster with Helm chart
 
-Now you have added yorkie-team Helm chart repository in your local repository, you can install Yorkie cluster with Helm chart.
+Now you have added yorkie-team Helm chart repository in your local repository and generated the credentials, you can install Yorkie cluster with Helm chart.
 
 Install Yorkie cluster with the following command:
 
 ```bash
-$ helm install yorkie-cluster yorkie-team/yorkie-cluster --namespace yorkie
+$ helm install yorkie-cluster yorkie-team/yorkie-cluster --namespace yorkie \
+    --set yorkie.args.secretKey="$YORKIE_SECRET_KEY" \
+    --set yorkie.args.clusterSecret="$YORKIE_CLUSTER_SECRET" \
+    --set mongodb.credentials.databaseAdmin.password="$MONGO_DB_ADMIN_PASSWORD" \
+    --set mongodb.credentials.userAdmin.password="$MONGO_USER_ADMIN_PASSWORD" \
+    --set mongodb.credentials.clusterAdmin.password="$MONGO_CLUSTER_ADMIN_PASSWORD"
 ```
 
 This will install `yorkie-cluster` release in minikube cluster.
