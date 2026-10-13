@@ -317,10 +317,10 @@ doc.update((root, presence) => {
 
 **Getting presence**
 
-**Document.getPresence(clientID)** returns the presence of a specific client:
+**Document.getPresence(clientID)** returns the presence of a specific client. Presence is keyed by the client's actor ID, `client.getActorID()`, not by the per-session `client.getID()`:
 
 ```javascript
-doc.getPresence(client.getID()); // { color: 'blue', cursor: { x: 1, y: 1 } }
+doc.getPresence(client.getActorID()); // { color: 'blue', cursor: { x: 1, y: 1 } }
 ```
 
 **Document.getMyPresence()** returns the presence of the current client:
