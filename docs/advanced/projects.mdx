@@ -58,7 +58,7 @@ const client = new yorkie.Client({
 });
 ```
 
-> Keep your **Secret Key** confidential. It grants full access to manage documents within the project via the [Admin API](/docs/tools/admin-api). Never expose it in client-side code.
+> Keep your **Secret Key** confidential. It grants full access to manage documents within the project via the [Admin API](/docs/tools/admin-api). Never expose it in client-side code. Only project members with the `admin` or `owner` role can read it; a member with the `member` role sees an empty secret key, and calls the Admin API with a login token instead (see [Authentication](/docs/tools/admin-api#authentication)).
 
 ### Managing Projects
 
