@@ -88,7 +88,8 @@ Flags:
       --backend-secret-key string                              The secret key for signing authentication tokens for admin users. If empty, it is read from YORKIE_BACKEND_SECRET_KEY, which keeps it off the command line; if that is unset too, a random key is generated at startup, so tokens do not survive a restart. Set the same key on every node of a cluster, at least 32 characters. Given but blank, it is an error; a blank SecretKey in a config file means unset.
       --backend-snapshot-disable-gc                            Whether to disable garbage collection of snapshots.
       --backend-use-default-project                            Whether to use the default project. Even if public key is not provided from the client, the default project will be used for the request. (default true)
-      --backend-watch-heartbeat-interval duration              The interval at which the server sends a heartbeat on an idle Watch stream. 0, the default, sends none: a client older than the heartbeat ends its watch on a response it cannot classify, so this is opt-in.
+      --backend-watch-heartbeat-interval-max duration          The longest heartbeat interval the server will serve on an idle Watch stream. 0 turns the heartbeat off server-wide, whatever clients ask for. (default 1m0s)
+      --backend-watch-heartbeat-interval-min duration          The shortest heartbeat interval the server will serve on an idle Watch stream. A client asking for less is clamped up to this. (default 5s)
       --channel-session-cleanup-interval duration              The interval for running cleanup of expired channel sessions. (default 10s)
       --channel-session-count-cache-size int                   The cache size of the channel session count. (default 10000)
       --channel-session-count-cache-ttl duration               The TTL value for channel session count cache. Must be at least 100ms. (default 30s)
