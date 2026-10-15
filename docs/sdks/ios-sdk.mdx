@@ -77,6 +77,17 @@ let actor = client.getActorID() // nil before activation
 Since v0.7.20 the actor — not the session id — is what keys presence and identifies peers in `watched` and `unwatched` events. An app that used `client.id` to find itself among peers must use `client.getActorID()`. Because the actor also breaks ties between concurrent edits and is derived from the client key rather than being time-ordered, the winner of a tie no longer follows client creation order.
 </Alert>
 
+#### Watch Stream Heartbeats
+
+Since v0.7.25, the client asks the server for a heartbeat on an idle Watch stream, and reconnects a stream that stays silent for three of the intervals the server advertises, so a half-open connection no longer goes unnoticed. Set the interval with `ClientOptions.watchHeartbeatInterval`, in **milliseconds** like the other interval options. It defaults to `20000` (20 seconds); zero or a negative value opts out, leaving the stream without an idle watchdog. The server clamps the request into its own bounds (5 to 60 seconds by default) and echoes the effective value back when the stream starts.
+
+```swift
+let client = Client("{{API_ADDR}}", ClientOptions(
+    apiKey: "xxxxxxxxxxxxxxxxxxxx",
+    watchHeartbeatInterval: 30000
+))
+```
+
 #### Syncing Documents Manually
 In `SyncMode.manual`, the client does not automatically synchronize documents with the server. You must manually call the `sync(document:)` method to synchronize the document when necessary.
 
@@ -144,6 +155,10 @@ The `attach` method accepts several options:
 ```swift
 try await clientA.attach(doc, ["color": "blue", "cursor": ["x": 0, "y": 0]], .manual)
 ```
+
+<Alert status="warning">
+Since v0.7.25, when the client key is generated (no `ClientOptions.key`), edits made to a Document before `attach` are re-issued to the client's actor on attach. Positions, element ids or other identifiers taken from the Document before attaching no longer resolve afterwards; read them again once `attach` returns. With an explicit `ClientOptions.key`, pre-attach edits keep their original actor.
+</Alert>
 
 #### Initializing root
 
@@ -217,6 +232,8 @@ try await doc.update { root, presence in
 // presence = { color: 'blue', cursor: { x: 1, y: 1 } }
 // we can see that the changes made were merged and the final state of the current user's presence is as we desire
 ```
+
+Since v0.7.25, when the server advertises support for it, the SDK sends a presence update as a patch against the presence the server already holds for this client, rather than the whole presence. This is transparent to the app: `presence.set` and the presence events behave as before.
 
 <Alert status="warning">
 **Important**: Properties in presence are replaced entirely, not merged. 
@@ -365,7 +382,7 @@ By subscribing to these events, you can update the UI in real-time and handle ex
 
 A Document can be modified by changes generated remotely or locally. Whenever the Document is modified, change events are triggered. You can subscribe to these events using the `document.subscribe(callback)` method to receive updates in real-time, which is useful for updating the UI when the Document changes.
 
-The callback is called with an event object, and the `event.type` property indicates the source of the change, which can be one of the following values: `statusChanged`, `connectionChanged`, `syncStatusChanged`, `snapshot`, `localChange`, `remoteChange`, `initialized`, `watched`, `unwatched`, `presenceChanged`, `broadcast`, `localBroadcast`, `authError`, `epochMismatch` or `localChangesDropped`.
+The callback is called with an event object, and the `event.type` property indicates the source of the change, which can be one of the following values: `statusChanged`, `connectionChanged`, `syncStatusChanged`, `snapshot`, `localChange`, `remoteChange`, `initialized`, `watched`, `unwatched`, `presenceChanged`, `broadcast`, `localBroadcast`, `authError`, `epochMismatch`, `writeRejected` or `localChangesDropped`.
 
 For more information about document events, please refer to the [DocEvent](https://yorkie.dev/yorkie-ios-sdk/documentation/yorkie/docevent).
 
@@ -414,6 +431,7 @@ The available Event Types are:
 | `DocumentStatusChanged`       | Document status changed                                   |
 | `Broadcast`                   | Broadcast message received                                |
 | `AuthError`                   | Authentication error occurred                             |
+| `WriteRejected`               | Server refused to store the pushed changes (see [Document.subscribeWriteRejected()](#documentsubscribewriterejected)) |
 
 
 <Alert status="warning">
@@ -423,6 +441,10 @@ Ensure your application processes these snapshot events correctly to maintain do
 
 <Alert status="warning">
 When a change from another client cannot be applied, sync fails with a `YorkieError` whose code is `.errChangeApplyFailed`. Its message names the document, the change and the operation that failed, and includes the original error. The change is not skipped: the server sends it again on the next sync, so the error repeats until the cause is fixed.
+</Alert>
+
+<Alert status="warning">
+`writeRejected` was added to `DocEventType`, and `writeDenied` to `LocalChangesDroppedValue.Reason`, in v0.7.25. An exhaustive `switch` over either enum will not compile until it handles the new case; add a `default` branch so later additions do not break the build again.
 </Alert>
 
 ##### Document.subscribe("$.path")
@@ -495,6 +517,41 @@ await doc.subscribeAuthError { event, _ in
 ```
 
 This subscription allows you to monitor when token refreshes occur due to authentication errors. For more information about Auth Webhook, see the [Auth Webhook](/docs/advanced/security#auth-webhook) documentation.
+
+Since v0.7.25, an `ErrPermissionDenied` on `PushPull` — for example, an auth webhook that starts refusing this client's writes — also publishes an `AuthErrorEvent` with `method` `.pushPull`, so the app can tell a refused write from a network failure. A denial on the Watch stream does not. Because an `ErrUnauthenticated` on `PushPull` publishes the same event while the token is refreshed and the call retried, and the event carries no error code, tell the two apart by the `reason` your auth webhook returns before recovering. See [Recovering from refused writes](#recovering-from-refused-writes).
+
+##### Document.subscribeWriteRejected()
+
+Since v0.7.25, a push the server refuses with `ErrDocumentSizeExceedsLimit` or `ErrChangeTooLarge` is no longer retried, because resending the same changes cannot change the verdict. The document is parked: the sync loop skips it while the client's other documents keep syncing, and its rejected changes stay applied locally but do not reach the server. Subscribe with `doc.subscribeWriteRejected()` to tell the user, for example by switching the editor to read-only.
+
+```swift
+await doc.subscribeWriteRejected { event, _ in
+    guard let event = event as? WriteRejectedEvent else { return }
+    // event.value.code: .documentSizeExceedsLimit or .changeTooLarge
+    // event.value.reason: the server's message
+    // event.value.method: "PushPull"
+}
+```
+
+The document leaves the parked state when an explicit `client.sync(doc)` is accepted by the server, for example after the document has been shrunk, or when it is recovered with [`client.resync`](#recovering-from-refused-writes).
+
+#### Recovering from refused writes
+
+When the server keeps refusing a document's writes — an `ErrPermissionDenied` from an auth webhook, or a [rejected write](#documentsubscribewriterejected) — the refused changes stay in the queue and every later sync sends them again. `client.resync(_:discardLocalChanges:initialPresence:)` discards them and re-anchors the same `Document` instance on the server's state, so the app's subscriptions and any editor bound to the document survive. It re-attaches with the sync mode, `disableGC` option and poll interval the document had, and with its current presence unless you pass `initialPresence`.
+
+```swift
+// Once the app has decided the server is refusing this document's writes:
+let dropped = try await client.resync(doc, discardLocalChanges: true)
+for change in dropped {
+    print("discarded \(change.operationCount) ops (clientSeq \(change.clientSeq))")
+}
+```
+
+`discardLocalChanges` must be `true`; it keeps the data loss visible at the call site. The call returns the discarded changes, and they are also published as a `LocalChangesDroppedEvent` with reason `writeDenied` once the detach has succeeded. While the document is being re-anchored, `doc.isMintable` is `false` and `update`, `undo()` and `redo()` throw a `YorkieError` with code `.errRefused`; an edit made before the discard is part of the discarded set.
+
+<Alert status="warning">
+If the server refuses the detach, `resync` throws and the document is left attached with its queue intact, so the call can be retried. Offline persistence, if set, is torn down for that attachment and stays off until the next attach, as in the JS SDK: the document keeps working in memory, but its un-pushed changes are not saved in the meantime.
+</Alert>
 
 #### Broadcasting a Message
 
@@ -657,6 +714,7 @@ await doc.subscribe { event, _ in
 | `documentPurged` | The server no longer has the document the changes were made against. |
 | `actorMismatch` | The stored document belongs to a different actor than the one resuming it. |
 | `restoreFailed` | The stored bytes could not be decoded at all, so nothing was restored. |
+| `writeDenied` | The server refused this client's writes, and `client.resync` discarded them to re-anchor the document. See [Recovering from refused writes](#recovering-from-refused-writes). |
 | `logDiscontinuity` | The appended change log had a hole, so it could not be replayed. The snapshot restored normally; what was lost is the log written after it. |
 
 <Alert status="warning">
