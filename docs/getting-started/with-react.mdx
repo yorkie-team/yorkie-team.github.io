@@ -18,8 +18,10 @@ Both approaches provide flexible ways to integrate Yorkie into your React applic
 Before using `YorkieProvider` and `DocumentProvider`, ensure you have installed the Yorkie SDK:
 
 ```sh
-npm install @yorkie-js/react
+npm install @yorkie-js/react @yorkie-js/sdk
 ```
+
+`@yorkie-js/sdk` is a peer dependency of `@yorkie-js/react`, so your app and the hooks share one SDK. npm 7+ and pnpm install it automatically; Yarn does not. Keep both packages on the same version.
 
 > For now, `@yorkie-js/react` requires React 18 or later as a peer dependency. Make sure to install React if you haven't already.
 > ```sh
