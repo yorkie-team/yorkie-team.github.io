@@ -213,13 +213,18 @@ scope.launch {
 
 When creating a client, you can configure various options:
 
-- `key`: Client identifier (default: random UUID)
+- `key`: Client identifier (default: a random UUID generated for every `Client`; see [Client Identity](#client-identity))
 - `apiKey`: API key for the Yorkie project
 - `metadata`: Additional client metadata as key-value pairs
 - `fetchAuthToken`: Optional function to fetch authentication tokens when needed
 - `syncLoopDuration`: Duration between sync loops (default: 50ms)
 - `reconnectStreamDelay`: Delay before reconnecting after stream disconnect (default: 1000ms)
+- `channelHeartbeatInterval`: How often the client refreshes a [Channel](#channel) session (default: `5_000.milliseconds`)
 - `documentPollInterval`: Push-pull interval for documents attached with `SyncMode.Polling`, as a kotlin `Duration` (default: `3_000.milliseconds`, i.e. milliseconds, not seconds). Unused in other sync modes.
+- `watchFallbackDelay`: How long a realtime document's Watch stream may stay silent before that document starts pulling at `documentPollInterval` as if it were `Polling` (default: `10_000.milliseconds`; `Duration.INFINITE` disables the fallback)
+- `watchHeartbeatInterval`: Heartbeat interval requested for the Watch stream, since v0.7.25 (default: `20_000.milliseconds`; see [Watch Stream Heartbeats](#watch-stream-heartbeats))
+- `docStore`: Backing store for [Offline Persistence](#offline-persistence) (default: `null`, which disables persistence)
+- `sessionLock`: Single-active-session guard consulted only when `docStore` is set (default: `NoopSessionLock`)
 
 ```kotlin
 val client = Client(
@@ -234,6 +239,51 @@ val client = Client(
     )
 )
 ```
+
+#### Client Identity
+
+A client carries two identifiers, and they are not interchangeable.
+
+- `Client.requireClientId()` (and `Status.Activated.clientId`) is the **session id**, issued per activation. A new one is minted every time the client activates.
+- `Client.actorId` (and `Client.requireActorId()`, which throws while the client is deactivated) is the **stable actor**, supplied by the server on activation and derived from the project and the client key. It is what the SDK stamps into the document's changes. Against a server older than v0.7.20, which never sends one, it equals the session id.
+
+```kotlin
+val client = Client(
+    host = "{{API_ADDR}}",
+    options = Client.Options(
+        apiKey = "your-api-key",
+        key = myPersistedClientKey
+    )
+)
+scope.launch {
+    client.activateAsync().await()
+    val actor = client.actorId // null while deactivated
+}
+```
+
+<Alert status="warning">
+**The actor is stable only if the client key is.** `Client.Options.key` defaults to a random UUID minted for every `Client`, so the actor changes on every launch. Persist an opaque random key once per signed-in user, pass the same one each time, and clear it on sign-out. Do not derive it from a user id, device id or email: the key is an identifier, not a credential, so a guessable key lets another client of the same project activate under the same actor. This matters most alongside [Offline Persistence](#offline-persistence), where a document stored under one actor and resumed under another has its un-pushed changes dropped with reason `ActorMismatch`.
+</Alert>
+
+<Alert status="warning">
+Since v0.7.19 the actor — not the session id — is what keys presence and identifies peers in presence events. An app that used `Client.requireClientId()` or `Status.Activated.clientId` to find itself among peers must use `Client.actorId` or `Status.Activated.actorId`. Because the actor also breaks ties between concurrent edits and is derived from the client key rather than being time-ordered, the winner of a tie no longer follows client creation order.
+</Alert>
+
+#### Watch Stream Heartbeats
+
+Since v0.7.25, the client asks the server for a heartbeat on an idle Watch stream, and reconnects a stream that stays silent for three of the intervals the server advertises, so a half-open connection no longer goes unnoticed. The stream is aborted with `YorkieException.Code.ErrWatchStreamIdle` and reconnected after `reconnectStreamDelay`. Set the interval with `Client.Options.watchHeartbeatInterval`, a kotlin `Duration` that defaults to `20_000.milliseconds`. A zero or negative value opts out, leaving the stream without an idle watchdog. The server clamps the request into its own bounds (5 to 60 seconds by default) and echoes the effective value back when the stream starts. Against a server older than v0.7.25 no heartbeats are sent, and the stream keeps the old fixed 5-minute timeout.
+
+```kotlin
+val client = Client(
+    host = "{{API_ADDR}}",
+    options = Client.Options(
+        apiKey = "your-api-key",
+        watchHeartbeatInterval = 30.seconds
+    )
+)
+```
+
+This is separate from `channelHeartbeatInterval`, which is how often the client refreshes a channel session, whereas `watchHeartbeatInterval` is how often the server writes to the client's own Watch stream.
 
 
 ### Document
@@ -261,11 +311,12 @@ val document = Document(Document.Key("my-document"))
 
 - `disableGC`: `Boolean` (default: `false`) - disables garbage collection for the document.
 - `disablePresence`: `Boolean` (default: `false`) - seeds the presence-free state before attach; the server-fixated value from the attach response takes precedence once attached.
+- `maxUndoDepth`: `Int` (default: `50`) - how many entries `history.undo()` can go back, and likewise for `history.redo()`. Since v0.7.24. Must be a positive integer; otherwise constructing the options throws `YorkieException` with code `ErrInvalidArgument`. See [History (Undo/Redo)](#history-undoredo).
 
 There is no `enableDevtools` option on Android.
 
 ```kotlin
-val document = Document(Document.Key("my-doc"), Document.Options(disableGC = true))
+val document = Document(Document.Key("my-doc"), Document.Options(disableGC = true, maxUndoDepth = 100))
 ```
 
 #### Attaching a Document
@@ -281,6 +332,10 @@ scope.launch {
     ).await()
 }
 ```
+
+<Alert status="warning">
+Since v0.7.25, when the client key is generated (no `Client.Options.key`), edits made to a Document before `attachDocument` are re-issued to the client's actor on attach. Positions, element ids or other identifiers taken from the Document before attaching no longer resolve afterwards; read them again once the attach returns. With an explicit `Client.Options.key`, pre-attach edits keep their original actor. A Document that has already synced is never re-issued.
+</Alert>
 
 #### Document Status
 
@@ -367,6 +422,9 @@ Subscribe to document events to be notified when changes occur, either locally o
 - `DocumentStatusChanged`: Document status changed
 - `Broadcast`: Broadcast message received
 - `AuthError`: Authentication error occurred
+- `WriteRejected`: Server refused to store the pushed changes, since v0.7.25 (see [Handling Rejected Writes](#handling-rejected-writes))
+- `EpochMismatch`: The document was compacted on the server and this client must detach and reattach to recover
+- `LocalChangesDropped`: Local changes were discarded without reaching the server (see [When local changes are dropped](#when-local-changes-are-dropped))
 
 ```kotlin
 scope.launch {
@@ -381,10 +439,17 @@ scope.launch {
             is Document.Event.RemoteChange -> {
                 println("Remote change from: ${event.changeInfo.actorID}")
             }
+            else -> Unit
         }
     }
 }
 ```
+
+<Alert status="warning">
+`Document.Event` is a sealed interface. `WriteRejected` was added in v0.7.25, and `Document.Event.Reason.WriteDenied` and `LogDiscontinuity` were added to the `LocalChangesDropped` reasons in v0.7.25 and v0.7.20. A `when` over the events or over `Reason` that is used as an expression, or that lists every case, will not compile until it handles the new case; add an `else` branch so later additions do not break the build again.
+</Alert>
+
+When a change from another client cannot be applied, sync fails with a `YorkieException` whose code is `ErrChangeApplyFailed`. Its message names the document, the change and the operation that failed, and includes the original error. The change is not skipped: the server sends it again on the next sync, so the error repeats until the cause is fixed.
 
 **events(targetPath)**
 
@@ -408,6 +473,143 @@ scope.launch {
     event.
     Ensure your application processes these snapshot events correctly to maintain document synchronization.
 </Alert>
+
+#### Handling Rejected Writes
+
+Since v0.7.25, a push the server refuses with `ErrDocumentSizeExceedsLimit` or `ErrChangeTooLarge` is no longer retried, because resending the same changes cannot change the verdict. The document is parked: the sync loop skips it while the client's other documents keep syncing, pulls on it stop too, and its rejected changes stay applied locally but do not reach the server. Collect `Document.Event.WriteRejected` to tell the user, for example by switching the editor to read-only. It is published next to the `SyncFailed` sync status for the same failure, not instead of it.
+
+```kotlin
+scope.launch {
+    document.events.collect { event ->
+        if (event is Document.Event.WriteRejected) {
+            // event.code: YorkieException.Code.ErrDocumentSizeExceedsLimit or ErrChangeTooLarge
+            // event.reason: the server's message
+            // event.method: Document.Event.AuthError.AuthErrorMethod.PushPull
+        }
+    }
+}
+```
+
+A bare `client.syncAsync(document)` does not recover a parked document: the rejected change is still the head of the queue, so the sync fails the same way and the event is published again. Recover with [`client.resyncAsync`](#recovering-from-refused-writes). Any push-pull that the server accepts un-parks the document.
+
+Since v0.7.25, an `ErrPermissionDenied` on `PushPull` — for example, an auth webhook that starts refusing this client's writes — also publishes a `Document.Event.AuthError` with `method` `PushPull`, once per denial episode rather than once per sync-loop tick, and parks the document the same way. A denial on the Watch stream does not. An `ErrUnauthenticated` on `PushPull` publishes the same event while the token is refreshed and the call retried, and the event carries no error code, so tell the two apart by the `reason` your auth webhook returns before recovering. Recover with `client.syncAsync(document)` once the webhook is expected to accept writes again, or with `client.resyncAsync`.
+
+#### Recovering from refused writes
+
+When the server keeps refusing a document's writes — an `ErrPermissionDenied` from an auth webhook, or a [rejected write](#handling-rejected-writes) — the refused changes stay in the queue and every later sync sends them again. `client.resyncAsync(document, discardLocalChanges = true)` discards them and re-anchors the same `Document` instance on the server's state, so your event collectors and any editor bound to the document survive. It re-attaches with the sync mode and `disableGC` option the document had, and with its current presence unless you pass `initialPresence`.
+
+```kotlin
+// Once the app has decided the server is refusing this document's writes:
+scope.launch {
+    client.resyncAsync(document, discardLocalChanges = true).await()
+        .onSuccess { dropped ->
+            dropped.forEach { change ->
+                println("discarded ${change.operationCount} ops (${change.message})")
+            }
+        }
+}
+```
+
+`discardLocalChanges` must be `true`, otherwise the call throws `YorkieException` with code `ErrInvalidArgument`; it keeps the data loss visible at the call site. The returned list is also published as a `Document.Event.LocalChangesDropped` with reason `Reason.WriteDenied`. While the document is being re-anchored, `document.isMintable()` is `false`, `document.history.canUndo()` and `canRedo()` are `false`, and `updateAsync`, `undoAsync` and `redoAsync` fail with a `YorkieException` with code `ErrRefused`; an edit made before the discard is part of the discarded set. An explicit `client.syncAsync(document)` is refused while the document is resyncing, and so is a second `resyncAsync` or a `detachDocument` on it.
+
+<Alert status="warning">
+Failures are not uniform. A call with `discardLocalChanges = false`, on a document that is not attached, or on one already resyncing throws before anything is touched. If the server refuses the detach, `resyncAsync` resolves with `Result.failure`, the queue is restored, and the document is left attached exactly as it was, so the call can be retried. If the re-attach fails after an otherwise successful detach, the call throws, the queue is already discarded, and the document is left detached: attach it again yourself.
+</Alert>
+
+#### Offline Persistence
+
+By default a Document lives only in memory: if the app is killed with changes that have not reached the server, those changes are gone. `Client.Options.docStore` gives the client somewhere to persist every document attached to it. `attachDocument` resumes a previously persisted document before contacting the server, the document is persisted again on every local change, local presence change and successful sync, and its un-pushed edits are replayed and pushed on the next successful sync. The persisted entry is removed once the document is detached, removed, or learned removed via a sync, and is kept across `deactivateAsync` so the next session can resume it. Offline persistence needs Yorkie server v0.7.20 or later.
+
+```kotlin
+val client = Client(
+    host = "{{API_ADDR}}",
+    options = Client.Options(
+        apiKey = "your-api-key",
+        key = myPersistedClientKey,
+        docStore = MyDurableDocStore()
+    )
+)
+```
+
+<Alert status="warning">
+**Surviving an app restart takes a durable store and a stable client key.** The built-in `MemoryDocStore` keeps documents in a process-local map, so it recovers nothing once the process is gone; it is useful for trying the API out or for resuming within a single run, and nothing more. Implement `DocStore` over your own storage (a file, Room, DataStore) to survive restarts, and pass a `Client.Options.key` you persist. With the default random key, the next launch addresses an entry the previous one never wrote, so the un-pushed edits are lost silently and the previous entries are orphaned with nothing to reclaim them. The client logs an error when `docStore` is set without a key you supplied. See [Client Identity](#client-identity).
+</Alert>
+
+##### Implementing a DocStore
+
+A store holds, per document key, a base snapshot plus an append-only log of the changes made since it. That shape is what keeps writes cheap: appending costs the size of one change, which does not grow with the document, whereas re-serializing the whole document costs time proportional to its size — and a document is at its largest exactly while it is being edited. The log is folded back into a fresh snapshot once it grows past a size-relative threshold.
+
+```kotlin
+interface DocStore {
+    suspend fun load(docKey: String): StoredDoc?
+    suspend fun saveSnapshot(docKey: String, bytes: ByteArray)
+    suspend fun appendChange(docKey: String, change: StoredChange)
+    suspend fun saveMeta(docKey: String, bytes: ByteArray)
+    suspend fun remove(docKey: String)
+}
+```
+
+| Method | Contract |
+| --- | --- |
+| `load` | Returns the stored `StoredDoc` (`snapshot`, `meta` and `changes`), whose `changes` must be ordered by ascending `clientSeq`, or `null` when the key is absent. |
+| `saveSnapshot` | Replaces the snapshot and atomically drops every appended change **and any stored meta**. This is compaction — the new snapshot already contains those changes, and it embeds a newer header than meta holds. |
+| `appendChange` | Appends one local change. This is the hot path, so it must not rewrite the whole entry. It is an **upsert keyed by `clientSeq`**: re-appending a stored change replaces it, so a retried write is safe. |
+| `saveMeta` | Records the post-sync header. Leaves the snapshot alone, and leaves the log alone — only compaction trims the log. |
+| `remove` | Removes everything persisted for the key. Removing an absent key succeeds. |
+
+The bytes are opaque to the SDK, so an implementation is free to compress or encrypt what it is handed.
+
+<Alert status="warning">
+`appendChange` and `saveMeta` must be a **no-op when nothing is stored for the key** — they must never create an entry. An entry holding a log with no snapshot under it cannot be restored. The client always writes a base snapshot before it appends.
+</Alert>
+
+<Alert status="warning">
+The key passed to `DocStore` is built from the API key, the client key and the document key. Since v0.7.24, a `/` or `%` in any of them is escaped (`%2F`, `%25`), so two different identities can never share an entry or a session lock. A document stored by an earlier version under a key containing either character is not found after upgrading; push its changes before upgrading.
+</Alert>
+
+##### Sharing a store across processes
+
+Two sessions resuming the same persisted document would both replay its log and both push, duplicating the work and minting colliding `clientSeq` values. `Client.Options.sessionLock` guards against that, and it is consulted only when `docStore` is set. `acquire(name)` returns a `SessionLockHandle`, or `null` when the name is held elsewhere; the attach then fails immediately with `ErrDocumentOpenElsewhere` instead of waiting. The default is `NoopSessionLock`, which grants every lease — correct for a single process, which is how an Android app uses a store by default. Supply your own when a durable store is shared across processes, such as an app and a widget or background service.
+
+```kotlin
+val client = Client(
+    host = "{{API_ADDR}}",
+    options = Client.Options(
+        apiKey = "your-api-key",
+        key = myPersistedClientKey,
+        docStore = MyDurableDocStore(),
+        sessionLock = MySessionLock()
+    )
+)
+```
+
+##### When local changes are dropped
+
+Some resumes cannot be reconciled with the server at all. When that happens the SDK keeps what it can and publishes a `Document.Event.LocalChangesDropped` describing what was lost, so the app can surface the data loss or re-apply the changes on top of the re-anchored state.
+
+```kotlin
+scope.launch {
+    document.events.collect { event ->
+        if (event is Document.Event.LocalChangesDropped) {
+            event.changes.forEach { change ->
+                // change.id, change.message, change.operationCount, change.hasPresenceChange
+                println("dropped ${change.operationCount} ops (${event.reason})")
+            }
+        }
+    }
+}
+```
+
+`event.reason` says why:
+
+| Reason | Meaning |
+| --- | --- |
+| `EpochReanchor` | The document was compacted server-side, so the resume re-anchored from a snapshot. |
+| `DocumentPurged` | The server no longer has the document the changes were made against. |
+| `ActorMismatch` | The stored document belongs to a different actor than the one resuming it. |
+| `RestoreFailed` | The stored bytes could not be decoded at all, so nothing was restored. |
+| `WriteDenied` | The server refused this client's writes, and `client.resyncAsync` discarded them to re-anchor the document. See [Recovering from refused writes](#recovering-from-refused-writes). |
+| `LogDiscontinuity` | The appended change log had a hole, so it could not be replayed. The snapshot restored normally; what was lost is the log written after it. |
 
 #### Changing Synchronization Mode
 
@@ -464,6 +666,21 @@ scope.launch {
 ```
 
 Changes applied with `updateAsync(skipHistory = true)` are excluded from the history stacks, mirroring how remote changes bypass local history.
+
+**Limitations**
+
+- **Maximum stack depth**: 50 entries per stack by default; set `Document.Options.maxUndoDepth` (since v0.7.24) to change it. Each `updateAsync` that changes the document is one entry, and pushing beyond the depth drops the oldest. A reverse entry keeps a copy of the content it would restore, so a larger depth holds more memory.
+- **Not available during update**: calling `undoAsync()` or `redoAsync()` inside an `updateAsync` updater resolves the returned `Deferred` with `Result.failure` holding an `IllegalStateException` ("Undo is not allowed during an update", or "Redo is not allowed during an update"). `canUndo()` and `canRedo()` are `false` while an update is running.
+- **Refused while resyncing**: between the discard and the re-anchor of [`client.resyncAsync`](#recovering-from-refused-writes), `canUndo()` and `canRedo()` are `false` and `undoAsync()` and `redoAsync()` fail with a `YorkieException` with code `ErrRefused`.
+- **Local only**: only the local client's own changes enter the stacks. Remote changes are applied to the Document but are never reverted by your `undoAsync()`.
+
+```kotlin
+val document = Document(Document.Key("my-document"), Document.Options(maxUndoDepth = 10))
+```
+
+<Alert status="info">
+Undo and redo affect only your own editing history, and the result still converges with concurrent edits from other clients.
+</Alert>
 
 ### Json Types
 
@@ -610,6 +827,8 @@ scope.launch {
     }.await()
 }
 ```
+
+> Since v0.7.24, `JsonText.edit()` throws `YorkieException` with code `ErrInvalidArgument`, which fails the whole `updateAsync` call, when `fromIndex` or `toIndex` falls between the two UTF-16 units of a surrogate pair (an emoji, for example) or when `content` holds a lone surrogate half. Indexes are counted in UTF-16 code units. The same applies to `JsonTree` text edits and splits.
 
 **Text Operations:**
 
@@ -968,6 +1187,8 @@ scope.launch {
 **Merge Behavior:**
 
 Presence changes are merged, not replaced. Only the specified keys are updated.
+
+Since v0.7.25, when the server advertises support for it, the SDK sends a presence update as a patch carrying only the changed top-level keys, rather than the whole presence. This is transparent to the app: `presence.put` and the presence events behave as before, and against a server older than v0.7.25 the SDK keeps sending the full presence.
 
 ```kotlin
 // Initial presence: { "name": "Alice", "color": "blue" }

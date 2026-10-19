@@ -40,6 +40,8 @@ Add a dependency to the `<dependencies>` element.
 </dependency>
 ```
 
+> Android SDK v0.7.25 and later require a Yorkie server v0.7.25 or later to send presence as a patch and to receive Watch stream heartbeats; against an older server the SDK falls back to full presence updates and the old fixed stream timeout. Offline persistence and the stable actor need server v0.7.20 or later, and the correctness rules shared with the server (tree node identity, how style attributes are stored, and how a presence patch is stored) mean you should upgrade every server node first and every client of a document together. Do not roll the server back below v0.7.25 once v0.7.25 clients are connected: a presence patch stored by an older server cannot be read back, and every client fails the pulls that include it.
+
 ### How to use Yorkie
 
 #### 1. Creating a Client with API key
