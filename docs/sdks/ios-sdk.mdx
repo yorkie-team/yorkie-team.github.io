@@ -53,6 +53,12 @@ struct MyAuthTokenInjector: AuthTokenInjector {
 
 let client = Client("{{API_ADDR}}", ClientOptions(apiKey: "xxxxxxxxxxxxxxxxxxxx", authTokenInjector: MyAuthTokenInjector()))
 ```
+
+Since v0.7.26, a refresh that fails is handled differently depending on what made the call:
+
+- The background work — the sync loop, Watch streams, broadcast retries and channel heartbeats — keeps the previous token and backs off while the `authTokenInjector` keeps throwing: it calls the injector again only after a wait that starts at 1 second and doubles up to 30 seconds (with ±20% jitter). A retry waits at most 5 seconds for that, so a recovered token API is picked up promptly.
+- A call the app makes itself — `attach`, `detach`, `remove`, `sync`, `syncChannel` and the first try of `broadcast` — throws the error the injector threw. Before v0.7.26 the iOS SDK swallowed it and threw the original `ErrUnauthenticated`. Once the injector succeeds again, such a call stores the new token and throws the `ErrUnauthenticated` it got, for the app to retry.
+- When `deactivate()` is refused with `ErrUnauthenticated` and the refresh fails too, the client stops locally and throws the injector's error, so the background work does not keep resending a refused token.
 ##### Client Identity
 
 A Client carries two identifiers, and they are not interchangeable.
@@ -440,7 +446,7 @@ Ensure your application processes these snapshot events correctly to maintain do
 </Alert>
 
 <Alert status="warning">
-When a change from another client cannot be applied, sync fails with a `YorkieError` whose code is `.errChangeApplyFailed`. Its message names the document, the change and the operation that failed, and includes the original error. The change is not skipped: the server sends it again on the next sync, so the error repeats until the cause is fixed.
+When a change from another client cannot be applied, sync fails with a `YorkieError` whose code is `.errChangeApplyFailed`. Its message names the document, the change and the operation that failed, and includes the original error. The change is not skipped: the server sends it again on the next sync, so the error repeats until the cause is fixed. Since v0.7.26 there is one exception, as on the server: an increase of a `JSONDedupCounter` that cannot be applied — one without an actor, or by a value other than 1 — is skipped when it comes from another client, so it cannot stop the document from syncing. The same increase made locally still throws.
 </Alert>
 
 <Alert status="warning">
