@@ -78,7 +78,12 @@ const LANGUAGE_MAP: ObjectType = {
   yml: 'yaml',
 };
 
-const IGNORE_FILES = ['.DS_Store', 'thumbnail.webp', 'demo.mp4'];
+// BuildInfo.plist is generated per developer and holds their local IP address.
+const IGNORE_FILES = ['.DS_Store', 'thumbnail.webp', 'demo.mp4', 'BuildInfo.plist'];
+
+// SimutaneousCurcors is a leftover of the SimultaneousCursors rename
+// (yorkie-ios-sdk#232) that only holds a stray BuildInfo.plist.
+const IGNORE_EXAMPLES = ['SimutaneousCurcors'];
 
 const IGNORE_DIRECTORIES = ['DerivedData', 'xcuserdata', '.swiftpm', 'build'];
 
@@ -189,7 +194,9 @@ const fetchIOSExamples = () => {
   // Filter out workspace directories and other non-example directories
   const filteredDirectories = exampleDirectories.filter((dirPath) => {
     const dirName = path.basename(dirPath);
-    return !dirName.endsWith('.xcworkspace') && !dirName.endsWith('.xcodeproj');
+    return (
+      !dirName.endsWith('.xcworkspace') && !dirName.endsWith('.xcodeproj') && !IGNORE_EXAMPLES.includes(dirName)
+    );
   });
 
   filteredDirectories.forEach((dirPath) => {
