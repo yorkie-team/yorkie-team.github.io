@@ -307,7 +307,7 @@ sequenceDiagram
 ```
 
 1. The document is removed from Yorkie in one of two ways:
-   - A client calls `client.remove(doc)` in the SDK. When an Auth Webhook is configured, this is checked as the `RemoveDocument` method with `verb` `rw`
+   - A client calls [`client.remove(doc)`](/docs/sdks/js-sdk#removing-the-document) in the SDK. When an Auth Webhook is configured, this is checked as the `RemoveDocument` method with `verb` `rw`
    - Your server calls the Admin API [RemoveDocumentByAdmin](/docs/tools/admin-api#post-yorkiev1adminserviceremovedocumentbyadmin) endpoint with the project's secret key. Clients must not call the Admin API
 2. Server removes document metadata from your database
 3. Document content is automatically removed from Yorkie

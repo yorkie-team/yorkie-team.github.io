@@ -146,7 +146,7 @@ yorkie project update [project-name] \
 
 #### ChannelBatchWindow
 
-The batch window for [Channel](/docs/sdks/js-sdk#channel) events such as presence counts and broadcasts. An event on an idle channel is sent at once, and a busy channel delivers events at most once per window. A longer window lowers the event rate on busy channels at the cost of latency. The value must be between `0s` and `1s`.
+The batch window for [Channel events](/docs/sdks/js-sdk#channel-events) such as presence counts and broadcasts. An event on an idle channel is sent at once, and a busy channel delivers events at most once per window. A longer window lowers the event rate on busy channels at the cost of latency. The value must be between `0s` and `1s`.
 
 When a project does not set it, the server's `--channel-batch-window` flag applies (default `100ms`). To return a project to the server default, set `channel_batch_window` to an empty string with the Admin API [UpdateProject](/docs/tools/admin-api#post-yorkiev1adminserviceupdateproject) endpoint. A channel that is already open picks up a new value when its next subscriber joins.
 
