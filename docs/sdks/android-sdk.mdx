@@ -83,7 +83,7 @@ Attach a document to the client. Once attached, the client synchronizes the docu
 - `disablePresence`: `Boolean` (default: `false`) - declares that this document does not produce, consume, or store presence.
 
 ```kotlin
-val document = Document(Document.Key("my-doc"))
+val document = Document("my-doc")
 scope.launch {
     client.attachDocument(
         document,
@@ -300,7 +300,7 @@ Create a new document instance with a unique key. The document can be modified l
 - `options`: Optional configuration (e.g., disable garbage collection)
 
 ```kotlin
-val document = Document(Document.Key("my-document"))
+val document = Document("my-document")
 ```
 
 > The document key identifies the Document in Yorkie. It is a string that you can freely define, but it can only contain `a-z`, `A-Z`, `0-9`, `-`, `.`, `_`, `~` and must be between 4 and 120 characters.
@@ -316,7 +316,7 @@ val document = Document(Document.Key("my-document"))
 There is no `enableDevtools` option on Android.
 
 ```kotlin
-val document = Document(Document.Key("my-doc"), Document.Options(disableGC = true, maxUndoDepth = 100))
+val document = Document("my-doc", Document.Options(disableGC = true, maxUndoDepth = 100))
 ```
 
 #### Attaching a Document
@@ -339,16 +339,16 @@ Since v0.7.25, when the client key is generated (no `Client.Options.key`), edits
 
 #### Document Status
 
-The document can be in one of three states:
-- `DocStatus.Attached`: Document is attached to a client and synchronized
-- `DocStatus.Detached`: Document is not attached to a client
-- `DocStatus.Removed`: Document has been permanently removed
+The document can be in one of three states, returned by `document.getStatus()` as a `ResourceStatus` (`dev.yorkie.core.ResourceStatus`):
+- `ResourceStatus.Attached`: Document is attached to a client and synchronized
+- `ResourceStatus.Detached`: Document is not attached to a client
+- `ResourceStatus.Removed`: Document has been permanently removed
 
 ```kotlin
-when (document.status) {
-    DocStatus.Attached -> println("Document is attached")
-    DocStatus.Detached -> println("Document is detached")
-    DocStatus.Removed -> println("Document is removed")
+when (document.getStatus()) {
+    ResourceStatus.Attached -> println("Document is attached")
+    ResourceStatus.Detached -> println("Document is detached")
+    ResourceStatus.Removed -> println("Document is removed")
 }
 ```
 
@@ -675,7 +675,7 @@ Changes applied with `updateAsync(skipHistory = true)` are excluded from the his
 - **Local only**: only the local client's own changes enter the stacks. Remote changes are applied to the Document but are never reverted by your `undoAsync()`.
 
 ```kotlin
-val document = Document(Document.Key("my-document"), Document.Options(maxUndoDepth = 10))
+val document = Document("my-document", Document.Options(maxUndoDepth = 10))
 ```
 
 <Alert status="info">
@@ -718,7 +718,7 @@ scope.launch {
     val age = user["age"]    // 30
 
     // Check if key exists
-    val hasEmail = user.has("email")  // false
+    val hasEmail = "email" in user.keys  // false
 
     // Get value or null
     val email = user.getOrNull("email")  // null
@@ -783,11 +783,11 @@ scope.launch {
         // Remove element
         items.removeAt(2)
 
-        // Add at specific position
-        items.insertAt(0, "Avocado")
+        // Insert before the first element
+        items.insertBefore(items[0].id, "Avocado")
 
         // Get array size
-        val size = items.length
+        val size = items.size
     }.await()
 }
 ```
@@ -900,8 +900,7 @@ For sharing text cursor positions between users, convert index positions to CRDT
 // Convert index range to position range (for presence)
 document.updateAsync { root, presence ->
     val text = root.getAs<JsonText>("content")
-    val indexRange = text.edit(from, to, content)
-    val posRange = text.indexRangeToPosRange(indexRange)
+    val posRange = text.edit(from, to, content)?.let { text.indexRangeToPosRange(it) }
     posRange?.let {
         presence.put(mapOf("selection" to gson.toJson(posRange)))
     }
