@@ -137,7 +137,7 @@ const Products: NextPage = () => {
             </strong>
             <p className="sub_desc">
               You can build a sense of presence by tracking the status of users who are editing the same document with{' '}
-              <Link href="/docs/sdks/js-sdk#getting-presence" className="link">
+              <Link href="/docs/sdks/js-sdk#presence" className="link">
                 Presence
               </Link>
               .

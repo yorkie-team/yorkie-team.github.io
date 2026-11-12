@@ -38,7 +38,7 @@ const SimultaneousExampleView: NextPage = () => {
                   </a>{' '}
                   and{' '}
                   <a
-                    href="https://reactjs.org/docs/create-a-new-react-app.html"
+                    href="https://react.dev"
                     className="link"
                     target="_blank"
                     rel="noreferrer"
