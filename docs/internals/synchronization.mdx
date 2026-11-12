@@ -131,7 +131,7 @@ sequenceDiagram
     Note over C: Checkpoint: ServerSeq=8, ClientSeq=6
 ```
 
-Checkpoints are also used by [Garbage Collection](/docs/internals/crdt-concepts#garbage-collection) to determine when tombstoned nodes can be safely removed -- only after all clients have synced past the version where the node was deleted.
+[Garbage Collection](/docs/internals/crdt-concepts#garbage-collection) does not rely on checkpoints. It relies on [version vectors](/docs/internals/crdt-concepts#version-vectors) instead: the server keeps the version vector of every client attached to the document and returns their minimum, the `minVersionVector`, in the PushPull response. A tombstoned node can be removed once the `minVersionVector` shows that every attached client has seen its deletion. A response to a push-only request (`RealtimePushOnly`) carries no `minVersionVector`, so GC only runs after a pull.
 
 ### Snapshots
 
@@ -139,11 +139,7 @@ A **Snapshot** is a complete representation of a document's state at a specific 
 
 #### When Are Snapshots Used?
 
-Instead of sending a potentially large sequence of individual changes, the server sends a single snapshot when:
-
-- The number of changes a client needs to catch up exceeds the **SnapshotThreshold** (configured per project)
-- A client reconnects after being offline for an extended period
-- The gap between the client's checkpoint and the current server state is too large
+Instead of sending a potentially large sequence of individual changes, the server sends a single snapshot when the number of changes a client needs to catch up reaches the project's **SnapshotThreshold**. This is typically a client that reconnects after being offline for a while.
 
 #### How Snapshots Work
 
@@ -173,20 +169,20 @@ doc.subscribe((event) => {
 });
 ```
 
-Snapshot format uses [YSON](/docs/internals/yson) for serialization, supporting all of Yorkie's custom CRDT types.
+Snapshots sent to clients and stored for synchronization are encoded with Protocol Buffers, like the rest of the sync protocol. [YSON](/docs/internals/yson) is used elsewhere, for example for [revisions](/docs/advanced/revisions) and for verifying document content during compaction.
 
 ### The Watch Stream
 
-In `Realtime` sync modes, Yorkie maintains a **watch stream** -- a persistent connection between the client and server, implemented using [gRPC server-side streaming](https://grpc.io/docs/languages/go/basics/#server-side-streaming-rpc).
+In `Realtime` sync modes, Yorkie maintains a **watch stream** -- a persistent server-streaming RPC between the client and server. The SDKs call it over [Connect](https://connectrpc.com/), so it works from browsers over plain HTTP.
 
 #### How the Watch Stream Works
 
 The watch stream uses a **PubSub pattern** on the server:
 
-1. When a client calls `WatchDocument`, the server creates a **Subscription** for that client and adds it to a subscriptions map keyed by document.
-2. When changes occur (via PushPull), the server publishes a `DocChanged` event.
+1. The client calls the `Watch` RPC with the resources it wants to watch (documents or [channels](/docs/sdks/js-sdk#channel)). The server creates a **Subscription** for each resource and adds it to a subscriptions map keyed by that resource. The older `WatchDocument` and `WatchChannel` RPCs are deprecated in favor of `Watch`.
+2. When changes occur (via PushPull), the server publishes a `DocumentChanged` event.
 3. The PubSub system delivers the event to all subscriptions watching that document.
-4. Each subscription's event channel sends the event through the gRPC stream to the client.
+4. Each subscription's event channel sends the event through the stream to the client.
 
 ```mermaid
 sequenceDiagram
@@ -194,25 +190,29 @@ sequenceDiagram
     participant S as Server (PubSub)
     participant B as Client B
 
-    A->>S: WatchDocument (subscribe)
-    B->>S: WatchDocument (subscribe)
+    A->>S: Watch (subscribe)
+    B->>S: Watch (subscribe)
     A->>S: PushPull (edit document)
-    S->>S: Publish DocChanged event
-    S->>B: Stream: DocChanged
+    S->>S: Publish DocumentChanged event
+    S->>B: Stream: DocumentChanged
     B->>S: PushPull (pull changes)
 ```
 
 #### Event Types
 
-The watch stream delivers three types of events:
+For a document, the watch stream delivers three types of events:
 
 | Event | Description |
 |-------|-------------|
-| **DocChanged** | The document has been modified by another client. Triggers a pull operation. |
-| **DocWatched** | A new client has started watching the document (came online). |
-| **DocUnwatched** | A client has stopped watching the document (went offline or detached). |
+| **DocumentChanged** | The document has been modified by another client. Triggers a pull operation. |
+| **DocumentWatched** | A new client has started watching the document (came online). |
+| **DocumentUnwatched** | A client has stopped watching the document (went offline or detached). |
 
-These events power the [Presence](/docs/sdks/js-sdk#presence) system, enabling features like showing who's online and tracking cursor positions.
+These events power the [Presence](/docs/sdks/js-sdk#presence) system, enabling features like showing who's online and tracking cursor positions. Ephemeral messages sent with [broadcast](/docs/sdks/js-sdk#broadcast) are delivered to the subscribers of a channel, not as document events.
+
+#### Heartbeats
+
+A long-lived stream can die silently, for example when a proxy drops an idle connection. To detect this, the client asks the server to send a heartbeat whenever the stream has been idle for a given interval (20 seconds by default in the JS SDK, set with the `watchHeartbeatInterval` client option). The server clamps the requested interval to its own bounds (5 to 60 seconds by default) and reports the value it chose. If nothing arrives on the stream for three times that interval, the client treats the stream as dead and reconnects.
 
 #### Connection Monitoring
 
@@ -244,7 +244,11 @@ Compaction is performed by the [Housekeeping](/docs/internals/housekeeping) back
 - Have at least a configured minimum number of changes (default: 1000)
 - Are not currently attached to any client
 
-This process is transparent to clients -- they continue to operate normally while compaction runs on the server.
+An administrator can also force compaction of a single document, which skips the attachment check.
+
+#### Epoch
+
+Compaction discards the old change history and resets the document's `ServerSeq`, so checkpoints taken before compaction no longer point to valid positions. To detect this, each document has an **epoch**, a counter that increases by one on every compaction. The client's epoch is recorded when it attaches. If a client with a pre-compaction checkpoint sends a PushPull, the server rejects it with `ErrEpochMismatch` instead of serving inconsistent changes. The JS SDK reports this as an `epoch-mismatch` document event, and the application recovers by detaching the document and attaching it again to load the compacted state.
 
 ### Synchronization Lifecycle
 
@@ -252,7 +256,7 @@ Here's the complete lifecycle of a document from attachment to detachment. For t
 
 1. **Attach**: Client calls `client.attach(doc)`. The document is synced from the server and a watch stream is established.
 2. **Edit**: Client makes changes via `doc.update()`. Changes are first applied locally (Root/Clone), then automatically pushed in `Realtime` mode.
-3. **Receive**: Remote changes arrive via the watch stream (`DocChanged` event) and are pulled and merged into the local replica.
+3. **Receive**: Remote changes arrive via the watch stream (`DocumentChanged` event) and are pulled and merged into the local replica.
 4. **Mode changes**: Application can switch sync modes as needed (e.g., pausing sync during bulk operations).
 5. **Detach**: Client calls `client.detach(doc)`. Final changes are pushed, the watch stream is closed, and resources are released.
 
