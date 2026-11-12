@@ -23,11 +23,19 @@ const doc = new yorkie.Document('docKey', {
 });
 ```
 
-<Alert status="warning">Please note that the devtools is available only in yorkie-js-sdk version `0.6.0` or later.</Alert>
+With the [React SDK](/docs/sdks/react), pass the same option to `DocumentProvider`:
+
+```jsx
+<DocumentProvider docKey="docKey" enableDevtools={true}>
+  {children}
+</DocumentProvider>
+```
+
+<Alert status="warning">DevTools requires `@yorkie-js/sdk` v0.4.18 or later, the release that added the `enableDevtools` option. The extension and the SDK are released together and share a version number, so keep your SDK on the same version as the extension to avoid message-protocol mismatches.</Alert>
 
 ### Key Features
 
-Within the `Yorkie 🐾` panel, you will find the `History` panel at the top, the `Document` panel at the bottom left, and the `Presence` panel at the bottom right.
+Within the `Yorkie 🐾` panel, you will find the `History` pane at the top, the `Document` pane in the middle left, the `Presence` pane in the middle right, and the `Notifications` pane at the bottom. To give the Document pane more room, collapse the Presence pane with the `▸` button on the Document pane's toolbar, and expand it again with `◂`.
 
 #### Document pane
 
@@ -76,3 +84,19 @@ Within the `Yorkie 🐾` panel, you will find the `History` panel at the top, th
 <video autoPlay loop muted playsInline style={{ maxWidth: '900px' }}>
     <source src="/assets/images/docs/devtools-history.mov"/>
 </video>
+
+#### Notifications pane
+
+The `Notifications (N)` pane lists document events that are not part of the replay history, newest first, with the time the SDK observed each one. Click the `▸` button next to the title to expand the list.
+
+| Event | Detail shown |
+|-------|--------------|
+| `connection-changed` | The new stream connection status |
+| `sync-status-changed` | The new sync status |
+| `auth-error` | The method and the reason |
+| `epoch-mismatch` | The method |
+| `write-rejected` | The method and the error code |
+| `local-changes-dropped` | The reason and the number of dropped changes |
+| `persist-disabled` | The reason and the size in bytes |
+
+These events help you find out why local edits did not reach the server, for example when the server refused a write or the SDK dropped local changes.
