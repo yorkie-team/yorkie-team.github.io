@@ -19,6 +19,7 @@ For this tutorial, you will need:
 - [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) v1.28+.
 - [Helm](https://helm.sh/docs/intro/install/) v3.0+.
 - [Minikube](https://minikube.sigs.k8s.io/docs/start/) v1.30+ installed on your machine.
+- [Istio](https://istio.io/) 1.25+, which you will install with Helm below.
 
 ### Setup minikube on your machine
 
@@ -160,8 +161,8 @@ After Yorkie cluster is installed, you will see the following output:
 
 ```bash
 NAME: yorkie-cluster
-LAST DEPLOYED: Thu Apr 27 21:49:06 2023
-NAMESPACE: default
+LAST DEPLOYED: Thu Nov 12 10:00:00 2026
+NAMESPACE: yorkie
 STATUS: deployed
 REVISION: 1
 TEST SUITE: None
@@ -247,6 +248,8 @@ $ yorkie project ls
  default  <public-key>  <secret-key>  2 minutes
 ```
 
+<Alert status="warning">`admin`/`admin` is the default admin account of every Yorkie Server, and the Helm chart has no value to change it. If the cluster is reachable from anywhere but your machine, change the password right after you log in with `yorkie passwd`.</Alert>
+
 Then, you can test Yorkie cluster with [yorkie-js-sdk](https://github.com/yorkie-team/yorkie-js-sdk), a JavaScript SDK for Yorkie.
 
 Clone yorkie-js-sdk repository with the following command:
@@ -290,7 +293,7 @@ $ pnpm vanilla-quill dev
 > vite
 
 
-  VITE v5.3.5  ready in 178 ms
+  VITE v7.3.7  ready in 178 ms
 
   ➜  Local:   http://localhost:5173/
   ➜  Network: use --host to expose
@@ -311,7 +314,7 @@ First, stop Quill Example and remove repository folder with the following comman
 Use `Ctrl + C` to stop Quill Example.
 
 ```bash
-  VITE v5.3.5  ready in 178 ms
+  VITE v7.3.7  ready in 178 ms
 
   ➜  Local:   http://localhost:5173/
   ➜  Network: use --host to expose
