@@ -16,7 +16,7 @@ Start a Server with the following command:
 ```bash
 $ yorkie server
 
-backend created: id: cppoq5huevgut6tjo8qg, db: memory
+backend created: db: memory
 serving RPC on 8080
 serving profiling on 8081
 ```
@@ -27,7 +27,7 @@ The Server stores its data using an in-memory database, which does not provide d
 
 If you start the Server with a MongoDB address, you can permanently save the data stored by Yorkie.
 
-> To start MongoDB, `docker-compose -f build/docker/docker-compose.yml up --build -d` in [the project root](https://github.com/yorkie-team/yorkie).
+> To start MongoDB, run `docker compose -f build/docker/docker-compose.yml up -d` in [the project root](https://github.com/yorkie-team/yorkie).
 
 Then, start a Yorkie Server with `--mongo-connection-uri` flag to connect the MongoDB.
 
@@ -35,9 +35,25 @@ Then, start a Yorkie Server with `--mongo-connection-uri` flag to connect the Mo
 $ yorkie server --mongo-connection-uri mongodb://localhost:27017
 
 MongoDB connected, URI: mongodb://localhost:27017, DB: yorkie-meta
-backend created: id: cppoqe9uevguvlsehcg0, rpc: mongodb://localhost:27017
+backend created: db: mongodb://localhost:27017
 serving profiling on 8081
 serving RPC on 8080
+```
+
+The Server prints the MongoDB URI with any password in it masked.
+
+### Production Settings
+
+The defaults above suit local development. Before you run the Server anywhere else, configure the following:
+
+- **Admin token signing key**: The Server signs admin (Dashboard and CLI) tokens with the key given by `--backend-secret-key` or the `YORKIE_BACKEND_SECRET_KEY` environment variable. If neither is set, it generates a random key at startup, so admin tokens stop working whenever the Server restarts. Every node of a cluster must use the same key, and the key must be at least 32 characters.
+- **Default admin user**: On first start, the Server creates the admin user `admin` with the password `admin`. Set `--backend-admin-user` and `--backend-admin-password` before the first start, or log in and change the password with `yorkie passwd`. The flags only apply when the user is created, so changing them later does not change an existing password.
+- **Credentials**: Flag values are visible to anyone who can list the processes on the host. Pass credentials through environment variables instead: `YORKIE_MONGO_CONNECTION_URI` for `--mongo-connection-uri`, `YORKIE_CLUSTER_SECRET` for `--cluster-secret`, and `YORKIE_AUTH_GITHUB_CLIENT_SECRET` for `--auth-github-client-secret`.
+
+```bash
+$ export YORKIE_BACKEND_SECRET_KEY="$(openssl rand -base64 32)"
+$ export YORKIE_MONGO_CONNECTION_URI="mongodb://<user>:<password>@<host>:27017"
+$ yorkie server
 ```
 
 ### Monitoring
@@ -47,7 +63,7 @@ The Server exports metrics under the `/metrics` path on its profiling port. Fetc
 ```bash
 $ curl http://localhost:8081/metrics
 
-yorkie_server_version{server_version="{{site.version}}"} 1
+yorkie_server_version{server_version="{{YORKIE_VERSION}}"} 1
 # HELP yorkie_pushpull_received_changes_total The total count of changes included
 # TYPE yorkie_pushpull_received_changes_total counter
 yorkie_pushpull_received_changes_total 6
@@ -55,30 +71,32 @@ yorkie_pushpull_received_changes_total 6
 ```
 
 These metrics can be collected by [Prometheus](https://prometheus.io/).
+The profiling port also serves Go runtime profiles under `/debug/pprof/` when you start the Server with `--pprof-enabled`.
 
 Running [Prometheus](https://prometheus.io/) and [Grafana](https://grafana.com/oss/grafana/) is the easiest way to monitor the Server's metrics.
 
-First, download all manifest files from the [docker folder](https://github.com/yorkie-team/yorkie/tree/main/build/docker). Then start the applications with `docker-compose`:
+The [docker folder](https://github.com/yorkie-team/yorkie/tree/main/build/docker) of the Yorkie repository has a Compose file that starts Prometheus, Grafana, MongoDB, and a Yorkie Server built from source.
+Clone the repository and start the applications with Docker Compose:
 
 ```bash
-$ docker-compose -f docker-compose-full.yml up --build -d
+$ git clone https://github.com/yorkie-team/yorkie
+$ cd yorkie/build/docker
+$ docker compose -f docker-compose-full.yml up --build -d
 
-Creating prometheus ... done
-Creating grafana    ... done
+[+] Running 4/4
+ ✔ Container yorkie-mongo-1       Started
+ ✔ Container yorkie-prometheus-1  Started
+ ✔ Container yorkie-grafana-1     Started
+ ✔ Container yorkie-yorkie-1      Started
 ```
 
-Now, Prometheus will collect Server metrics every 10 seconds.
+<Alert status="warning">The Compose file runs its own Yorkie Server on ports 8080 and 8081 and MongoDB on port 27017. Stop any `yorkie server` or MongoDB you started earlier on this page first, or the ports clash.</Alert>
 
-Grafana has built-in Prometheus support. Add a Prometheus data source:
+Now, Prometheus will collect Server metrics every 5 seconds.
 
-```
-Name:   prometheus
-Type:   Prometheus
-Url:    http://localhost:9090
-Access: proxy
-```
+Grafana runs on `http://localhost:3000`, and you can log in with `admin` and `admin`. The Prometheus data source is already provisioned with the name `Prometheus`, so you do not need to add it.
 
-Then, import the [default Yorkie dashboard template](https://grafana.com/grafana/dashboards/18560-yorkie-dashboard/) and customize it. For instance, if Prometheus data source name is `my-prometheus`, the datasource field values in JSON also need to be `my-prometheus`.
+Then, import the [default Yorkie dashboard template](https://grafana.com/grafana/dashboards/18560-yorkie-dashboard/) and customize it. Select the `Prometheus` data source when you import it. If you use a data source with a different name, such as `my-prometheus`, the datasource field values in JSON also need to be `my-prometheus`.
 
 Sample dashboard:
 
@@ -139,6 +157,7 @@ Also, you can additionally deploy Yorkie cluster addons on Kubernetes with Helm 
 Yorkie cluster addons include:
 
 - Monitoring: Provides Yorkie metrics and logging via Grafana dashboard.
+- Analytics: Collects usage events of Yorkie cluster with Kafka and StarRocks.
 - GitOps: Provides Yorkie Continuous Delivery via ArgoCD.
 
 Below is guide for deploying Yorkie cluster addons on Kubernetes with Helm Charts.
