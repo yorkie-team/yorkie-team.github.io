@@ -50,6 +50,7 @@ These are the data types you interact with directly when editing documents throu
 | **Array** | Ordered list of values | [RGATreeList](#replicated-growable-array-rga) |
 | **[Text](/docs/sdks/js-sdk#custom-crdt-types)** | Rich text with style attributes for editors like [Quill](/examples/quill) and [CodeMirror](/examples/codemirror) | RGATreeSplit |
 | **[Counter](/docs/sdks/js-sdk#custom-crdt-types)** | Concurrent counter for increment/decrement operations | CRDT Counter |
+| **Dedup Counter** | Counter of unique actors (e.g. unique visitors), where repeated increments by the same actor count once | CRDT Counter with a [HyperLogLog](https://en.wikipedia.org/wiki/HyperLogLog) sketch |
 | **[Tree](/docs/sdks/js-sdk#custom-crdt-types)** | Tree structure for block-based editors like ProseMirror | [CRDTTree](#the-tree-crdt) |
 
 #### CRDT Layer
@@ -135,7 +136,7 @@ The **ElementRHT** variant stores CRDT elements (rather than simple values) as m
 The **Replicated Growable Array (RGA)** is the CRDT that backs Yorkie's `Array` and `Text` types. It provides:
 
 - **Concurrent insertion**: Multiple clients can insert at the same position. Insertions always use `insertAfter` (never `insertBefore`) to ensure deterministic ordering, with ties broken by [TimeTickets](#timetickets).
-- **Positional access via index tree**: Yorkie extends the basic RGA with a [SplayTree](https://en.wikipedia.org/wiki/Splay_tree)-based index, called **RGATreeList**, providing fast access to elements by their integer index.
+- **Positional access via index tree**: Yorkie extends the basic RGA with a **TreeList**-based index (an order-statistic LLRB tree), called **RGATreeList**, providing fast access to elements by their integer index.
 - **Block-based text**: For text editing, **RGATreeSplit** groups consecutive characters inserted by the same operation into blocks rather than storing each character individually. This significantly reduces memory usage and improves performance for text-heavy documents.
 
 ### The Tree CRDT
@@ -158,7 +159,7 @@ For local editing, the conversion follows: `index` → `IndexTree.TreePos` → `
 The Tree CRDT guarantees eventual consistency across 27 concurrent editing cases (combinations of range type, node type, and edit type). Key mechanisms include:
 
 - **`insertAfter` only**: Like the RGA, all insertions reference a left sibling node, ensuring deterministic ordering.
-- **`maxCreatedAtMapByActor`**: A map that tracks the latest creation time per actor within an editing range, enabling the system to distinguish concurrent from causally related operations and prevent unintended deletions.
+- **Version vectors for causality**: Each Edit and Style operation is applied with the [version vector](#version-vectors) of the change that produced it. A node in the target range is deleted or styled only if its creation is covered by that vector, so nodes inserted concurrently by other clients (which the editing client had not seen) are left untouched. This replaces the older per-actor `maxCreatedAtMapByActor` map, whose protobuf fields are now deprecated.
 
 For the full technical design, see the [Tree design document](https://github.com/yorkie-team/yorkie/blob/main/docs/design/tree.md).
 
@@ -199,6 +200,14 @@ sequenceDiagram
     S->>B: PushPull response with minVersionVector
     Note over B: GC: remove node X
 ```
+
+#### Exceptions
+
+A few cases keep tombstones longer than the rule above suggests:
+
+- **Text removed by concurrent deletions**: If the same piece of text is removed by two concurrent deletions, either deletion could still be undone, so the text is kept for the lifetime of the document. It counts toward the document's garbage length and GC size. Undo bookkeeping for deleted text is pruned during GC.
+- **Push-only syncs**: A PushPull response to a push-only request (`RealtimePushOnly` mode) does not include a `minVersionVector`, so GC only advances on syncs that pull.
+- **`disableGC` attachments**: A client can attach with the `disableGC` option to declare that it neither creates nor consumes tombstones. The server then skips tracking that client's version vector, so it does not hold back the `minVersionVector`. Use it only for documents limited to counters and primitive values.
 
 #### Text-Specific Garbage Collection
 
