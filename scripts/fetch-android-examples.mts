@@ -160,6 +160,18 @@ const getDirectoryInfo = (dirPath: string, basePath?: string): DirectoryInfo => 
 const EXAMPLES_PATH = path.join(process.cwd(), 'temp/examples');
 const EXAMPLES_OUTPUT_PATH = path.join(process.cwd(), 'examples');
 
+// Remove example directories owned by this script that the SDK no longer
+// has, so examples removed upstream do not pile up in `examples/`.
+const removeStaleExamples = (isOwned: (name: string) => boolean, keep: Set<string>) => {
+  if (!fs.existsSync(EXAMPLES_OUTPUT_PATH)) return;
+  fs.readdirSync(EXAMPLES_OUTPUT_PATH, { withFileTypes: true }).forEach((entry) => {
+    if (entry.isDirectory() && isOwned(entry.name) && !keep.has(entry.name)) {
+      fs.rmSync(path.join(EXAMPLES_OUTPUT_PATH, entry.name), { recursive: true, force: true });
+      console.log(`[Remove] Stale example: ${entry.name}`);
+    }
+  });
+};
+
 const fetchAndroidExamples = () => {
   const exampleDirectories = getDirectories(EXAMPLES_PATH);
   // Filter out support/utility directories (core and feature modules are not standalone examples)
@@ -168,6 +180,11 @@ const fetchAndroidExamples = () => {
     // Skip directories that are not standalone examples
     return !['core', 'feature'].includes(exampleName);
   });
+
+  removeStaleExamples(
+    (name) => name.startsWith('android-'),
+    new Set(filteredDirectories.map((dirPath) => `android-${path.basename(dirPath)}`)),
+  );
 
   filteredDirectories.forEach((dirPath) => {
     const exampleName = dirPath.replace(EXAMPLES_PATH + '/', '');
