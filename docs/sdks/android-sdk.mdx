@@ -1011,7 +1011,7 @@ document.updateAsync { root, presence ->
 // Convert position range back to index range
 document.events.filterIsInstance<Document.Event.PresenceChanged.Others>().collect { event ->
     if (event is Document.Event.PresenceChanged.Others.PresenceChanged) {
-        val (clientID, presence) = event.changed
+        val (actorID, presence) = event.changed
         val selectionJson = presence["selection"] as? String
         selectionJson?.let {
             val posRange = gson.fromJson(it, TextPosStructRange::class.java)
@@ -1325,7 +1325,7 @@ scope.launch {
 
 #### Updating Presence
 
-Update presence at any time using `document.updateAsync()`. The `presence` parameter in the updater function is a `Presence` instance.
+Update presence at any time using `document.updateAsync()`. The `presence` parameter in the updater function is a `DocPresence` (`dev.yorkie.document.presence.DocPresence`).
 
 **Function Signature:**
 
@@ -1333,12 +1333,12 @@ Update presence at any time using `document.updateAsync()`. The `presence` param
 fun updateAsync(
     message: String? = null,
     skipHistory: Boolean = false,
-    updater: suspend (root: JsonObject, presence: Presence) -> Unit
+    updater: suspend (root: JsonObject, presence: DocPresence) -> Unit
 ): Deferred<OperationResult>
 ```
 
 **Parameters:**
-- `updater: suspend (root: JsonObject, presence: Presence) -> Unit` - Lambda with `presence` parameter for updates
+- `updater: suspend (root: JsonObject, presence: DocPresence) -> Unit` - Lambda with `presence` parameter for updates
 
 **Example:**
 
@@ -1403,6 +1403,35 @@ scope.launch {
 }
 ```
 
+**Clearing Presence:**
+
+`presence.clear()` removes every key of this client's presence.
+
+```kotlin
+scope.launch {
+    document.updateAsync { _, presence ->
+        presence.clear()
+    }.await()
+}
+```
+
+#### Reading Presence
+
+`document.myPresence` returns this client's presence, or an empty map while the document is not attached. `document.presences` is a `StateFlow<Presences>` of the online clients' presences, including this client's, keyed by actor ID.
+
+```kotlin
+val myPresence = document.myPresence
+println("My name: ${myPresence["name"]}")
+
+scope.launch {
+    document.presences.collect { presences ->
+        presences.forEach { (actorID, presence) ->
+            println("$actorID: ${presence["name"]}")
+        }
+    }
+}
+```
+
 #### Presence Events
 
 Presence events notify you when users join, leave, or update their presence. These events are part of `Document.Event.PresenceChanged`:
@@ -1436,32 +1465,32 @@ scope.launch {
                     // Initial presence state loaded from server
                     val onlineUsers = event.initialized
                     println("Online users: ${onlineUsers.size}")
-                    onlineUsers.forEach { (clientID, presence) ->
+                    onlineUsers.forEach { (actorID, presence) ->
                         println("${presence["name"]} is online")
                     }
                 }
 
                 is Document.Event.PresenceChanged.Others.Watched -> {
                     // Another client joined
-                    val (clientID, presence) = event.changed
+                    val (actorID, presence) = event.changed
                     println("${presence["name"]} joined")
                 }
 
                 is Document.Event.PresenceChanged.Others.Unwatched -> {
                     // Another client left
-                    val (clientID, presence) = event.changed
+                    val (actorID, presence) = event.changed
                     println("${presence["name"]} left")
                 }
 
                 is Document.Event.PresenceChanged.Others.PresenceChanged -> {
                     // Another client updated their presence
-                    val (clientID, presence) = event.changed
+                    val (actorID, presence) = event.changed
                     println("${presence["name"]} updated: ${presence["status"]}")
                 }
 
                 is Document.Event.PresenceChanged.MyPresence.PresenceChanged -> {
                     // Current client's presence updated
-                    val (clientID, presence) = event.changed
+                    val (actorID, presence) = event.changed
                     println("My presence updated: $presence")
                 }
             }
@@ -1513,11 +1542,14 @@ scope.launch {
         when (event) {
             is ChannelEvent.Initialized -> println("Initial session count: ${event.sessionCount}")
             is ChannelEvent.Changed -> println("Session count changed: ${event.sessionCount}")
+            is ChannelEvent.SyncError -> println("Channel refresh failed: ${event.cause}")
             else -> {}
         }
     }
 }
 ```
+
+`ChannelEvent.SyncError` is published when a channel refresh fails and cannot be recovered. An expired session (`ErrSessionNotFound`) is not reported this way, because the client attaches the channel again by itself.
 
 > `getCount()` is deprecated - use `getSessionCount()` instead.
 
