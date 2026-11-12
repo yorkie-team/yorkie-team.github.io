@@ -1084,33 +1084,15 @@ Channels are ideal for:
 
 For persistent data that needs to be synchronized and stored, use [Document](#document) instead.
 
-### Logger Options
+### Logging
 
-The Logger outputs SDK events to the console for debugging purposes. To modify these options, use the `Logger.logLevel` variable.
-
-```swift
-Logger.logLevel = .error
-```
-
-The available log levels for `setLogLevel` are:
-
-| LogLevel | Description                     |
-|----------|---------------------------------|
-| `LogLevel.Trivial`  | Most verbose level, displays all logs    |
-| `LogLevel.Debug`    | Detailed information for debugging       |
-| `LogLevel.Info`     | General information                      |
-| `LogLevel.Warn`     | Warnings and potential issues            |
-| `LogLevel.Error`    | Errors and unexpected behavior           |
-| `LogLevel.Fatal`    | Critical errors, may lead to termination |
-
-Adjust the log level for flexible control over log verbosity in your application.
+The SDK writes its logs through [swift-log](https://github.com/apple/swift-log) under the label `Yorkie`. It does not expose a log-level setting of its own. To route or filter these logs, bootstrap swift-log's `LoggingSystem` with your own `LogHandler` once at app startup, before the SDK logs anything; without that, swift-log's default handler prints messages at `info` and above to the console.
 
 ### Performance Best Practices
 
 - Use `SyncMode.realtimePushOnly` for write-heavy operations
 - Batch updates within single `doc.update()` call
 - Detach documents when switching contexts
-- Use `Logger.logLevel = .error` in production
 
 ### Common Use Cases
 
@@ -1179,7 +1161,6 @@ await doc.subscribePresence(.others) { event, _ in
 #### Memory Issues
 
 - Detach unused documents
-- Set appropriate `Logger.logLevel`
 - Monitor document size and consider splitting large documents
 
 ### Reference
