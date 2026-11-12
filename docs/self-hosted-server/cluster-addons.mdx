@@ -14,7 +14,8 @@ Currently, Yorkie addons include:
 - [Prometheus](https://prometheus.io/) for collecting metrics from Yorkie cluster.
 - [Grafana](https://grafana.com/) for monitoring Yorkie cluster via Grafana dashboard.
 - [Loki](https://grafana.com/oss/loki/) for logging aggregation.
-- [ArgoCD](https://argoproj.github.io/argo-cd/) for managing Yorkie cluster via GitOps.
+- [MongoDB exporter](https://github.com/percona/mongodb_exporter) (optional) for collecting MongoDB metrics.
+- [ArgoCD](https://argo-cd.readthedocs.io/) for managing Yorkie cluster via GitOps.
 - [Kafka](https://kafka.apache.org/) for analytics of usage of Yorkie cluster.
 - [StarRocks](https://starrocks.com/) for analytics of usage of Yorkie cluster.
 
@@ -86,14 +87,22 @@ $ kubectl get pods -n monitoring --watch
 After all pods are ready, you will see the following output:
 
 ```bash
-NAME                                               READY   STATUS    RESTARTS   AGE
-prometheus-yorkie-monitoring-prometheus-0          2/2     Running   0          14m
-yorkie-monitoring-grafana-59d4565948-pfstz         3/3     Running   0          14m
-yorkie-monitoring-loki-0                           1/1     Running   0          14m
-yorkie-monitoring-operator-78f75648c-rvjk9         1/1     Running   0          14m
-yorkie-monitoring-prometheus-node-exporter-gr4bn   1/1     Running   0          14m
-yorkie-monitoring-promtail-bwc9g                   1/1     Running   0          14m
+NAME                                                          READY   STATUS    RESTARTS   AGE
+prometheus-yorkie-monitoring-prometheus-stack-prometheus-0    2/2     Running   0          14m
+yorkie-monitoring-grafana-59d4565948-pfstz                    3/3     Running   0          14m
+yorkie-monitoring-loki-0                                      1/1     Running   0          14m
+yorkie-monitoring-prometheus-node-exporter-gr4bn              1/1     Running   0          14m
+yorkie-monitoring-prometheus-stack-operator-78f75648c-rvjk9   1/1     Running   0          14m
+yorkie-monitoring-promtail-bwc9g                              1/1     Running   0          14m
 ```
+
+#### Monitoring options
+
+The monitoring chart also has the following options:
+
+- `monitoring.yorkieName` and `monitoring.yorkieNamespace`: the name and namespace of the Yorkie cluster to scrape (default `yorkie` for both). They must match `yorkie.name` and `yorkie.namespace` of your `yorkie-cluster` release, or Prometheus finds no Yorkie metrics.
+- `monitoring.enableEnhancements`: also deploy Alertmanager and kube-state-metrics, and scrape Kubernetes components such as the API server, kubelet and etcd. They are off by default.
+- `mongodbExporter.enabled`: deploy [MongoDB exporter](https://github.com/percona/mongodb_exporter) with a ServiceMonitor and a MongoDB dashboard in Grafana. Give it the MongoDB connection URI with `mongodbExporter.mongodb.uri`, or with `mongodbExporter.mongodb.existingSecret`, the name of a Secret in the `monitoring` namespace that holds the URI under the key `mongodb-uri`.
 
 ### View Yorkie Metrics and Loki Logs on Grafana dashboard
 
@@ -102,9 +111,9 @@ Now you have Yorkie monitoring installed, you can access Grafana dashboard to vi
 Access Grafana dashboard with following url:
 
 - Minikube: http://`YOUR_MINIKUBE_IP`/grafana/
-- AWS EKS: http://`YOUR_API_DOMAIN_NAME`/grafana/
+- AWS EKS: https://`YOUR_API_DOMAIN_NAME`/grafana/
 
-<Alert status="info">The default username and password are `admin` and `yorkie`.</Alert>
+<Alert status="info">The default username and password are `admin` and `yorkie`. Change the password after your first login, or set `kube-prometheus-stack.grafana.adminPassword` when you install the chart, especially if Grafana is reachable from the internet.</Alert>
 
 Once you are logged in, you will see the following dashboard:
 
@@ -191,11 +200,13 @@ $ helm install argo-cd argo/argo-cd -n argocd --create-namespace \
     --set server.ingress.path=/argocd/ \
     --set server.ingress.annotations."alb\.ingress\.kubernetes\.io/scheme"=internet-facing \
     --set server.ingress.annotations."alb\.ingress\.kubernetes\.io/certificate-arn"={YOUR_CERTIFICATE_ARN} \
+    --set server.ingress.annotations."alb\.ingress\.kubernetes\.io/group\.name"={YOUR_API_DOMAIN_NAME} \
     --set 'server.ingress.annotations.alb\.ingress\.kubernetes\.io/listen-ports=[{"HTTP": 80}\, {"HTTPS": 443}]'
 ```
 
 Replace `{YOUR_API_DOMAIN_NAME}` with your domain name.
 Also, replace `{YOUR_CERTIFICATE_ARN}` with your certificate ARN.
+The `group.name` annotation lets ArgoCD share the ALB that Yorkie cluster and Yorkie monitoring use for the same domain, instead of provisioning another one.
 
 <Alert status="info">For more information about Helm chart configuration, see [argo-cd chart documentation](https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd).</Alert>
 
@@ -244,7 +255,7 @@ Access ArgoCD web UI with following url:
 
 <Alert status="info">The username is `admin`. The password is generated at install time and stored in the `argocd-initial-admin-secret` Secret, which the `kubectl -n argocd get secret argocd-initial-admin-secret` command above prints. Change it after your first login, then delete that Secret.</Alert>
 
-Once you are logged in, you will see the following dashboard:
+The application list stays empty until you [connect Yorkie addons to ArgoCD](#connect-yorkie-addons-to-argocd) later in this guide. After that, you will see the following dashboard:
 
 <ImageWrap>
   <ImageWrap.Box>
@@ -283,8 +294,8 @@ Once you are logged in, you will see the following dashboard:
   <ImageWrap.Box>
     <ImageWrap.Image
       src="/assets/images/docs/yorkie-argocd-argocd-yorkie-monitoring-application.png"
-      alt="Loki Dashboard"
-      title="Loki Dashboard"
+      alt="Yorkie Monitoring Application"
+      title="Yorkie Monitoring Application"
       width={600}
       height={400}
     />
@@ -306,6 +317,8 @@ $ helm install yorkie-analytics yorkie-team/yorkie-analytics -n analytics --crea
 ```
 
 This will install `yorkie-analytics` release.
+
+<Alert status="warning">The chart runs Kafka from the `bitnamilegacy/kafka:latest` image, which is not pinned to a version and no longer receives updates. Review it before you use the analytics addon in production.</Alert>
 
 After Yorkie analytics is installed, you will see the following output:
 
@@ -355,7 +368,8 @@ StarRocks > use yorkie;
 StarRocks > show routine load\G
 ```
 
-Then you can see the following output with the running routine load:
+The chart creates five routine loads, one for each Kafka topic: `user_events`, `document_events`, `channel_events`, `session_events` and `client_events`.
+Then you can see the following output with the running routine loads:
 
 ```sh
 *************************** 1. row ***************************
@@ -402,6 +416,8 @@ helm upgrade yorkie-cluster yorkie-team/yorkie-cluster --namespace yorkie \
   --set mongodb.credentials.clusterAdmin.password="$MONGO_CLUSTER_ADMIN_PASSWORD"
 ```
 
+The server sends events to the topics `user-events`, `document-events`, `client-events`, `channel-events` and `session-events`, which are the topics the analytics chart creates. If you rename a topic, change it on both sides: `yorkie.args.kafka{User,Document,Client,Channel,Session}EventsTopic` in Yorkie cluster, and the topic names in the `yorkie-analytics` values.
+
 <Alert status="warning">Pass the **same** credentials you used to install Yorkie cluster: without them the upgrade fails to render, and a new signing key logs every admin user out. If they are no longer in your shell, `helm get values yorkie-cluster --namespace yorkie` prints the values the release was installed with, and [Upgrading Chart](https://github.com/yorkie-team/yorkie/tree/main/build/charts/yorkie-cluster#upgrading-chart) shows how to read them back from the cluster's Secrets. `helm upgrade` also resets omitted values to the chart defaults, so add any other values your release uses, such as the ingress settings from the AWS EKS guide. If the release was installed with chart v0.7.24 or earlier, which required neither secret and defaulted the MongoDB passwords to values the chart now rejects, follow the upgrade notes in [Upgrading Chart](https://github.com/yorkie-team/yorkie/tree/main/build/charts/yorkie-cluster#upgrading-chart) before running this command, rather than generating new MongoDB passwords.</Alert>
 
 If clients are connected to Yorkie cluster with `userID`([Measuring MAU](/docs/sdks/js-sdk#measuring-mau)), you can see the user events are collected in StarRocks database.
@@ -423,6 +439,14 @@ Then you will see the following output:
 ```
 
 Yorkie analytics collects various information beyond MAU measurement, including client connections, document operations, and other usage metrics on the [Dashboard]({{DASHBOARD_PATH}}).
+
+#### Long-retention project stats (optional)
+
+The analytics init job also creates daily summary tables (`sum_*_hll_daily`), the `rl_session_daily` rollup and the materialized views that fill them. Set `yorkie.args.starrocksSummaryEnabled=true` in Yorkie cluster to serve project stats history from those tables instead of the raw event tables.
+Enable it only once the summary tables hold your existing events and `SELECT 1 FROM rl_session_daily [_SYNC_MV_] LIMIT 1` returns rather than errors; until then, the sessions stats fall back to a slower index.
+For the details, see [Project Stats Long Retention](https://github.com/yorkie-team/yorkie/blob/main/docs/design/project-stats-long-retention.md).
+
+<Alert status="warning">When you upgrade, upgrade `yorkie-analytics` first, and roll out Yorkie cluster only after the `rl_session_daily` query above returns. The init job waits only up to two minutes for the rollup to build, so a completed job does not mean that the rollup is ready.</Alert>
 
 ### Connect Yorkie addons to ArgoCD
 
@@ -497,7 +521,7 @@ After the Applications are created, ArgoCD will detect and manage the Yorkie add
 
 ### Clean up cluster addons
 
-You **have** now installed Yorkie monitoring and ArgoCD, and viewed Yorkie metrics on Grafana dashboard and Yorkie GitOps on ArgoCD web UI.
+You have now installed Yorkie monitoring, ArgoCD and Yorkie analytics, and viewed Yorkie metrics on Grafana dashboard and Yorkie GitOps on ArgoCD web UI.
 
 To learn about how to configure Yorkie Monitoring in Helm Chart, see [Yorkie Chart Repository](https://github.com/yorkie-team/yorkie/tree/main/build/charts/).
 For ArgoCD configuration, see [argo-cd chart documentation](https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd).
