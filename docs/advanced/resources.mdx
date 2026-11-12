@@ -27,12 +27,14 @@ Control the size and scale of documents in your project. These limits help you p
 
 #### MaxSizePerDocument
 
-Limits the maximum size of a single document. When a document exceeds this limit, further modifications that would increase its size are rejected.
+Limits the maximum size of a single document. There is no CLI flag for this setting; set it in the Dashboard or with the Admin API [UpdateProject](/docs/tools/admin-api#post-yorkiev1adminserviceupdateproject) endpoint (`max_size_per_document`, in bytes).
 
-```bash
-# Configure via Admin API (not available via CLI)
-# Use the Dashboard or Admin API to set this value
-```
+The limit is enforced in two places:
+
+- **On the client**: The JS SDK checks the size after each local update and throws `ErrDocumentSizeExceedsLimit` if the document would exceed the limit. This count includes deleted content that has not been garbage-collected yet. Presence-only updates are not checked.
+- **On the server**: When a client pushes changes, the server refuses them with `ErrDocumentSizeExceedsLimit` if the document is already over the limit and the changes can grow it. Changes that only delete content are still accepted, so an over-limit document can always be shrunk.
+
+The server measures the size from the document's latest snapshot, so its check lags behind the document by up to one [SnapshotInterval](#snapshotinterval) of changes. A document that has no measured size yet, for example before its first snapshot, is accepted.
 
 **When to use:**
 - **Rich content editors**: Limit document size to prevent performance degradation when editing large documents with images or complex formatting
@@ -95,7 +97,7 @@ yorkie project update [project-name] \
 ```
 
 <Alert status="info">
-When a client receives a snapshot instead of incremental changes, a `snapshot` event is triggered. Your application should handle this event to update its state. See [Document Events](/docs/sdks/js-sdk#documentsubscribesnapshot) for more details.
+When a client receives a snapshot instead of incremental changes, a `snapshot` event is triggered. Your application should handle this event to update its state. See [Subscribing to Changes](/docs/sdks/js-sdk#subscribing-to-changes) for more details.
 </Alert>
 
 #### SnapshotInterval
@@ -115,6 +117,7 @@ Control how documents and clients are managed over time.
 |---------|---------|-------------|
 | `client-deactivate-threshold` | 24h | Time after which inactive clients are deactivated |
 | `channel-session-ttl` | 15s | Time a presence channel session is retained after its last refresh (1s..5m) |
+| `channel-batch-window` | server default (100ms) | Batch window for channel events (0s..1s) |
 | `remove-on-detach` | false | Automatically remove documents when all clients detach |
 | `auto-revision-enabled` | true | Automatically create revisions during snapshot creation |
 
@@ -141,9 +144,20 @@ yorkie project update [project-name] \
 - **Tight real-time feedback**: Keep at the `15s` default when accurate "live now" counts matter more than smoothing
 - **High-churn rooms**: Combine with the SDK's heartbeat interval (Channel sessions are refreshed every `TTL/3`); lowering the TTL increases refresh traffic linearly
 
+#### ChannelBatchWindow
+
+The batch window for [Channel](/docs/sdks/js-sdk#channel) events such as presence counts and broadcasts. An event on an idle channel is sent at once, and a busy channel delivers events at most once per window. A longer window lowers the event rate on busy channels at the cost of latency. The value must be between `0s` and `1s`.
+
+When a project does not set it, the server's `--channel-batch-window` flag applies (default `100ms`). To return a project to the server default, set `channel_batch_window` to an empty string with the Admin API [UpdateProject](/docs/tools/admin-api#post-yorkiev1adminserviceupdateproject) endpoint. A channel that is already open picks up a new value when its next subscriber joins.
+
+```bash
+yorkie project update [project-name] \
+  --channel-batch-window 300ms
+```
+
 #### RemoveOnDetach
 
-When enabled, documents are automatically removed from the server when the last client detaches. This is useful for temporary collaborative sessions where you don't need to persist the document after collaboration ends.
+When enabled, documents are automatically removed from the server when the last attached client detaches or is deactivated. This is useful for temporary collaborative sessions where you don't need to persist the document after collaboration ends.
 
 ```bash
 yorkie project update [project-name] \
@@ -162,12 +176,9 @@ See [Architecture Patterns - Pattern B](/docs/advanced/architecture-patterns#pat
 
 #### AutoRevisionEnabled
 
-When enabled, revisions are automatically created during snapshot creation. Revisions allow you to restore documents to previous states.
+When enabled, a [revision](/docs/advanced/revisions) is automatically created each time the server stores a snapshot, that is, every [SnapshotInterval](#snapshotinterval) changes. If only presence has changed since the previous snapshot, no revision is created. Revisions allow you to restore documents to previous states.
 
-```bash
-# Configure via Admin API (not available via CLI)
-# Use the Dashboard or Admin API to set this value
-```
+There is no CLI flag for this setting; set it in the Dashboard or with the Admin API [UpdateProject](/docs/tools/admin-api#post-yorkiev1adminserviceupdateproject) endpoint (`auto_revision_enabled`).
 
 ### Configuration Reference
 
@@ -180,8 +191,11 @@ When enabled, revisions are automatically created during snapshot creation. Revi
 | SnapshotInterval | `--snapshot-interval` | 500 | int |
 | ClientDeactivateThreshold | `--client-deactivate-threshold` | 24h | duration |
 | ChannelSessionTTL | `--channel-session-ttl` | 15s | duration (1s..5m) |
+| ChannelBatchWindow | `--channel-batch-window` | server default (100ms) | duration (0s..1s) |
 | RemoveOnDetach | `--remove-on-detach` | false | bool |
 | AutoRevisionEnabled | Admin API only | true | bool |
+
+Webhook retry and timeout settings are also set per project. See [Auth Webhook: Timeouts and Failures](/docs/advanced/security#timeouts-and-failures) and [Event Webhook: Retry Configuration](/docs/advanced/event-webhook#retry-configuration).
 
 ### Example: High-Traffic Configuration
 
@@ -211,4 +225,4 @@ yorkie project update my-project \
 - [CLI Reference](/docs/tools/cli) - Complete CLI command reference
 - [Admin API](/docs/tools/admin-api) - API for project management
 - [Architecture Patterns](/docs/advanced/architecture-patterns) - Document lifecycle patterns
-- [JS SDK - Document Events](/docs/sdks/js-sdk#documentsubscribesnapshot) - Handling snapshot events
+- [JS SDK - Subscribing to Changes](/docs/sdks/js-sdk#subscribing-to-changes) - Handling snapshot events
