@@ -91,7 +91,10 @@ Your webhook server should respond with an HTTP status code:
 | Status Code | Meaning |
 |-------------|---------|
 | `200 OK` | Event received and processed successfully |
-| Other | Yorkie will retry the request based on retry configuration |
+| `500`, `503`, `504`, `429` | Yorkie retries the request based on the [retry configuration](#retry-configuration) |
+| Any other status | The delivery fails without a retry, and the server logs the error |
+
+Yorkie also retries when the connection is reset before a response arrives. Other failures, such as a request timeout or a `400`, `404` or `502` response, are not retried, so the event is dropped. Return one of the retryable status codes if you want Yorkie to try again later.
 
 ### Retry Configuration
 
