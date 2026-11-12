@@ -863,6 +863,37 @@ scope.launch {
 }
 ```
 
+**Moving Elements:**
+
+Move APIs take the element's `id` (a `TimeTicket`), which stays the same when other elements are inserted or removed, so it is safer than an index under concurrent edits.
+
+```kotlin
+scope.launch {
+    document.updateAsync { root, _ ->
+        val items = root.getAs<JsonArray>("items")
+        val first = items[0]
+        val second = items[1]
+
+        // Move to the end or to the front
+        items.moveLast(first.id)
+        items.moveFront(first.id)
+
+        // Move `first` right after `second`, or right before it
+        items.moveAfter(second.id, first.id)
+        items.moveBefore(second.id, first.id)
+
+        // Move the element at index 2 right after the element at index 0
+        items.moveAfterByIndex(0, 2)
+
+        // Remove by id instead of by index
+        items.remove(first.id)
+
+        // Read an element as a specific type, or null if it has another type
+        val nested = items.getAs<JsonObject>(0)
+    }.await()
+}
+```
+
 **Nested Arrays:**
 
 ```kotlin
@@ -1043,6 +1074,27 @@ JsonCounter is ideal for:
 - Collaborative counters
 - Any numeric value that multiple users might modify simultaneously
 
+**Dedup Counter:**
+
+`JsonDedupCounter` counts unique actors, such as unique visitors, instead of summing increments. Create it with `setNewDedupCounter(key)` and register an actor with `add(actor)`; adding the same actor again does not change the count. It is backed by a HyperLogLog sketch, so `value` is an approximate count (about 2% error). `add` throws `IllegalArgumentException` when `actor` is empty, and `JsonDedupCounter` has no `increase`.
+
+```kotlin
+scope.launch {
+    document.updateAsync { root, _ ->
+        root.setNewDedupCounter("uniqueVisitors")
+    }.await()
+
+    document.updateAsync { root, _ ->
+        root.getAs<JsonDedupCounter>("uniqueVisitors")
+            .add("user-1")
+            .add("user-2")
+            .add("user-1")  // ignored, already counted
+    }.await()
+}
+
+val visitors = document.getRoot().getAs<JsonDedupCounter>("uniqueVisitors").value  // 2
+```
+
 #### JsonTree
 
 `JsonTree` is a CRDT-based tree structure designed for representing hierarchical document structures such as HTML or XML. It is ideal for building rich text editors with complex formatting (such as ProseMirror or Quill).
@@ -1084,9 +1136,9 @@ scope.launch {
                 }
                 element("a") {
                     text { "Click here" }
-                    attr {
-                        "href" to "https://example.com"
-                        "target" to "_blank"
+                    // attr { } sets a single attribute; use attrs { } for several
+                    attrs {
+                        mapOf("href" to "https://example.com", "target" to "_blank")
                     }
                 }
             }
@@ -1127,8 +1179,56 @@ scope.launch {
 
         // Apply styles to nodes in range
         tree.style(0, 5, mapOf("color" to "red", "fontSize" to "16"))
+
+        // Remove attributes from nodes in range
+        tree.removeStyle(0, 5, listOf("fontSize"))
     }.await()
 }
+```
+
+**Editing by Path:**
+
+Besides integer indexes, a position can be given as a path: a list of child indexes from the root, where the last number inside an element that holds text is a character offset. For example, in `<doc><p>Hello</p></doc>`, `listOf(0, 1)` is between `H` and `e`. `fromPath` and `toPath` must have the same length. The examples below use the tree from [Creating a Tree](#jsontree).
+
+```kotlin
+scope.launch {
+    document.updateAsync { root, _ ->
+        val tree = root.getAs<JsonTree>("content")
+
+        // Insert text at offset 0 of the first paragraph's text
+        tree.editByPath(listOf(0, 0), listOf(0, 0), text { "Hi " })
+
+        // Split the first paragraph at offset 2 of its text into two paragraphs
+        tree.splitByPath(listOf(0, 2))
+
+        // Merge the second paragraph into the one before it
+        tree.mergeByPath(listOf(1))
+
+        // Set or remove attributes by path
+        tree.styleByPath(listOf(0), mapOf("align" to "center"))
+        tree.removeStyleByPath(listOf(0), listOf(1), listOf("align"))
+    }.await()
+}
+```
+
+`edit(fromIndex, toIndex, splitLevel, vararg contents)` and `editByPath(fromPath, toPath, vararg contents, splitLevel)` also take a `splitLevel` that splits the ancestors at the start position up to that many levels, the way pressing Enter in a paragraph does.
+
+**Converting Tree Positions:**
+
+`pathToIndex` and `indexToPath` convert between the two forms. To share a selection through presence, convert it to a `TreePosStructRange`, which keeps pointing at the same content while others edit, and convert it back when you receive it.
+
+```kotlin
+val tree = document.getRoot().getAs<JsonTree>("content")
+val index = tree.pathToIndex(listOf(0, 1))
+val path = tree.indexToPath(index)
+
+// Index or path range -> position range, to store in presence
+val posRange = tree.indexRangeToPosRange(2 to 5)
+val samePosRange = tree.pathRangeToPosRange(listOf(0, 1) to listOf(0, 4))
+
+// Position range received from another client -> index or path range
+val indexRange = tree.posRangeToIndexRange(posRange)
+val pathRange = tree.posRangeToPathRange(posRange)
 ```
 
 **Getting Tree Properties:**
