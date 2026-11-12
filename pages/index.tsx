@@ -345,7 +345,7 @@ const Home: NextPage = () => {
                   continued development. You can learn more about how to contribute to the Yorkie project on its website
                   or by visiting our{' '}
                   <u>
-                    <a href="https://discord.com/invite/MVEAwz9sBy">Discord</a>
+                    <a href="https://discord.gg/MVEAwz9sBy">Discord</a>
                   </u>
                   .
                 </Accordion.Panel>
