@@ -143,6 +143,17 @@ let doc = Document(key: "doc-1", opts: DocumentOptions(disableGC: false, disable
 
 The `disablePresence` value seeds the attach-time option of the same name: when the `disablePresence` attach option is omitted, the document's value is used. `DocumentOptions.disableGC` gates local garbage collection and is set independently of the attach-time `disableGC` option, which controls the server wire contract.
 
+##### Recording Devtools events
+
+With `enableDevtools: true`, the document records its events in the format the Yorkie Devtools use. `dumpDevtools(pretty:)` returns the recording as JSON `Data` (or `nil` when devtools is disabled or nothing has been recorded yet), and `exportDevtools(to:)` writes it to a file URL. `attachDevtoolsRecorder()` returns the recorder so an inspector UI can observe events live.
+
+```swift
+let doc = Document(key: "doc-1", opts: DocumentOptions(disableGC: false, enableDevtools: true))
+// ... attach and edit ...
+let json = doc.dumpDevtools(pretty: true)
+try doc.exportDevtools(to: fileURL)
+```
+
 
 #### Attaching the Document
 
@@ -544,6 +555,39 @@ await doc.subscribeWriteRejected { event, _ in
 
 The document leaves the parked state when an explicit `client.sync(doc)` is accepted by the server, for example after the document has been shrunk, or when it is recovered with [`client.resync`](#recovering-from-refused-writes).
 
+##### Document.subscribeStatus()
+
+`doc.subscribeStatus()` is called when the document's status changes, for example when it is attached, detached or removed. Read the new status with `doc.getStatus()`, which returns a `ResourceStatus` (`.attached`, `.detached` or `.removed`).
+
+```swift
+await doc.subscribeStatus { _, doc in
+    if doc.getStatus() == .removed {
+        // The document was removed.
+    }
+}
+```
+
+##### Document.subscribeEpochMismatch()
+
+When the server reports that the document was compacted and this client's epoch is stale, the document publishes an `EpochMismatchEvent`. The client must detach and reattach the document to recover.
+
+```swift
+await doc.subscribeEpochMismatch { event, _ in
+    guard let event = event as? EpochMismatchEvent else { return }
+    // event.value.method: "PushPull"
+}
+```
+
+##### Unsubscribing
+
+Each `subscribe*` method has a matching `unsubscribe*` method that removes the callback: `unsubscribe(_:)` (pass the same path, or nothing for the default callback), `unsubscribePresence(_:)`, `unsubscribeConnection()`, `unsubscribeSync()`, `unsubscribeAuthError()`, `unsubscribeEpochMismatch()` and `unsubscribeWriteRejected()`. Each method holds one callback (per path for `subscribe(_:_:)`, per topic for `subscribePresence(_:_:)`), so subscribing again replaces the previous one.
+
+```swift
+doc.unsubscribe()            // the default callback
+doc.unsubscribe("$.todos")   // a path callback
+doc.unsubscribePresence(.others)
+```
+
 #### Recovering from refused writes
 
 When the server keeps refusing a document's writes — an `ErrPermissionDenied` from an auth webhook, or a [rejected write](#documentsubscribewriterejected) — the refused changes stay in the queue and every later sync sends them again. `client.resync(_:discardLocalChanges:initialPresence:)` discards them and re-anchors the same `Document` instance on the server's state, so the app's subscriptions and any editor bound to the document survive. It re-attaches with the sync mode, `disableGC` option and poll interval the document had, and with its current presence unless you pass `initialPresence`.
@@ -716,6 +760,64 @@ await doc.subscribe { event, _ in
 Unlike the JS SDK, the iOS SDK does not yet cap how much work a persist may do — upstream's `maxPersistBytes` and `maxPersistMillis` budgets are not ported. A pulling sync on a very large document re-serializes it with no ceiling, which is a stall proportional to document size rather than a correctness problem.
 </Alert>
 
+#### Document Revisions
+
+Save snapshots of your document at specific points in time, browse them, and restore an earlier version. The document must be attached to an activated client. See [Revisions](/docs/advanced/revisions) for how revisions work on the server.
+
+**Creating a Revision**
+
+```swift
+// Create a revision with a label
+let revision = try await client.createRevision(doc, label: "v1.0")
+
+// Create a revision with a label and description
+try await client.createRevision(doc, label: "Feature complete", description: "Added user profiles")
+```
+
+**Listing Revisions**
+
+```swift
+// The first 10 revisions, newest first
+let revisions = try await client.listRevisions(doc)
+
+// With pagination
+let page = try await client.listRevisions(doc, pageSize: 20, offset: 0, isForward: false)
+
+for revision in page {
+    print("\(revision.id) \(revision.label) \(revision.description) \(revision.createdAt)")
+}
+```
+
+- `pageSize` (Optional): Number of revisions to retrieve. Defaults to `10`.
+- `offset` (Optional): Number of revisions to skip. Defaults to `0`.
+- `isForward` (Optional): `false` for newest first, `true` for oldest first. Defaults to `false`.
+
+Each `RevisionSummary` has `id`, `label`, `description`, `createdAt` (a `Date`) and `snapshot`.
+
+**Getting Revision Details**
+
+`client.getRevision(_:revisionID:)` returns the revision together with its snapshot, the document state at that point in [YSON](/docs/internals/yson) form. Parse it with `YSON.parse(_:)`, which returns a `YSONValue`:
+
+```swift
+let revision = try await client.getRevision(doc, revisionID: revisionID)
+if case .object(let root) = try YSON.parse(revision.snapshot), let title = root["title"] {
+    print(title)
+}
+```
+
+**Restoring a Revision**
+
+```swift
+try await client.restoreRevision(doc, revisionID: revisionID)
+
+// Sync to ensure the restored state is propagated
+try await client.sync(doc)
+```
+
+<Alert status="warning">
+Restoring replaces the entire document state and cannot be undone automatically. Consider creating a new revision before restoring to preserve the current state.
+</Alert>
+
 #### History (Undo/Redo)
 
 A Document keeps an undo stack and a redo stack of the local client's own changes. Unlike the JS SDK, which exposes them through `doc.history`, the iOS SDK puts them directly on `Document`.
@@ -878,6 +980,47 @@ Text selection can be efficiently shared using presence. Refer to the following 
 
 An example of Text Editor: [Text Editor example](https://github.com/yorkie-team/yorkie-ios-sdk/tree/main/Examples/TextEditorApp)
 
+#### JSONTree
+
+`JSONTree` is a CRDT for collaborative rich text editors whose content is a tree of element and text nodes, such as ProseMirror-style documents. Build it with `JSONTreeElementNode(type:children:attributes:)` and `JSONTreeTextNode(value:)`.
+
+```swift
+try await doc.update { root, _ in
+    root.tree = JSONTree(initialRoot:
+        JSONTreeElementNode(type: "doc", children: [
+            JSONTreeElementNode(type: "p", children: [JSONTreeTextNode(value: "hello")])
+        ])
+    )   // <doc><p>hello</p></doc>
+}
+```
+
+Edit the tree by index inside `doc.update`. An index counts positions in the tree: a node's opening and closing tags each take one, and a text node takes one per UTF-16 code unit. Every method throws, for example a `YorkieError` with code `.errInvalidArgument` for an index that splits a surrogate pair.
+
+```swift
+try await doc.update { root, _ in
+    guard let tree = root.tree as? JSONTree else { return }
+
+    try tree.edit(1, 1, JSONTreeTextNode(value: "Hi, "))   // <doc><p>Hi, hello</p></doc>
+    try tree.edit(1, 5)                                    // <doc><p>hello</p></doc>
+    try tree.style(0, 1, ["bold": "true"])                 // <doc><p bold="true">hello</p></doc>
+    try tree.removeStyle(0, 1, ["bold"])                   // <doc><p>hello</p></doc>
+}
+
+let xml = (doc.getRoot().tree as? JSONTree)?.toXML()       // "<doc><p>hello</p></doc>"
+```
+
+The main methods are:
+
+- `edit(_:_:_:_:)` and `editBulk(_:_:_:_:)`: Replace the range between two indexes with one node or several nodes. The optional last argument `splitLevel` splits the enclosing element that many levels, as pressing Enter in a paragraph does.
+- `editByPath(_:_:_:_:)` and `editBulkByPath(_:_:_:_:)`: The same, addressed by paths such as `[0, 0]` (the first child of the first child of the root).
+- `style(_:_:_:)` and `styleByPath`: Set attributes on the elements in a range or at a path.
+- `removeStyle(_:_:_:)` and `removeStyleByPath`: Remove attributes by name.
+- `splitByPath(_:)` and `mergeByPath(_:)`: Split or merge elements at a path.
+- `toXML()` and `toJSON()`: Read the tree's content.
+- `indexToPath(_:)`, `pathToIndex(_:)`, `indexRangeToPosRange(_:)` and `posRangeToIndexRange(_:)`: Convert between indexes, paths and positions. Share positions, not indexes, through presence, as with `JSONText` [selections](#selection-using-presence).
+
+See the [Rich Text Editor example](https://github.com/yorkie-team/yorkie-ios-sdk/tree/main/Examples/RichTextEditor) for a complete editor built on `JSONTree`.
+
 #### JSONCounter
 
 `JSONCounter` supports integer types with addition and subtraction operations. If integer data needs to be modified simultaneously by multiple clients, use `JSONCounter` instead of primitives.
@@ -889,6 +1032,23 @@ try await doc.update { root, _ in
     (root.counter as? JSONCounter<Int64>)?.increase(value: 3)   // {"counter":6}
     (root.counter as? JSONCounter<Int64>)?.increase(value: -4)  // {"counter":2}
 }
+```
+
+#### JSONDedupCounter
+
+`JSONDedupCounter` counts unique actors, such as unique visitors, rather than increments. It uses HyperLogLog, so `value` is an approximate count with about 2% error. Record an actor with `add(_:)`, which throws when called outside a `doc.update` callback or with an empty string. Adding the same actor again does not change the count.
+
+```swift
+try await doc.update { root, _ in
+    root.visitors = JSONDedupCounter()
+}
+
+try await doc.update { root, _ in
+    try (root.visitors as? JSONDedupCounter)?.add("user-abc")
+    try (root.visitors as? JSONDedupCounter)?.add("user-abc")   // no-op
+}
+
+print((doc.getRoot().visitors as? JSONDedupCounter)?.value ?? 0)   // about 1 (an estimate)
 ```
 
 ### Channel
@@ -1053,6 +1213,16 @@ The session count is automatically updated when clients connect or disconnect fr
 <Alert status="warning">
 Sessions are connection-based and managed for scalability. In abnormal cases (such as app crashes or network partitions), a client might not detach cleanly, so the server may keep the session counted until it is considered stale and cleaned up. This means the displayed count can be approximate and may lag briefly. Avoid using session counts as a source of truth for critical business logic such as billing, authorization, or settlements.
 </Alert>
+
+#### Peeking Session Count
+
+Use `client.peekChannel(_:)` to read a channel's current session count without attaching to it. No session is created on the server, no heartbeat is sent, and no broadcast events are received. The client must be activated.
+
+```swift
+let count = try await client.peekChannel("post-writers")
+```
+
+This suits display-only counters, such as an "N people writing" badge on every item in a feed, where attaching would make each viewer count toward the channel they are only looking at. Poll it on your own cadence to refresh the displayed count.
 
 #### Handling Channel Errors
 
