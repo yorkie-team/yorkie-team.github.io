@@ -22,8 +22,8 @@ const Community: NextPage = () => {
           <br className="br_pc" />
           channels.
           <br className="br_mo_xs" /> You can sign up for our Discord or
-          <br className="br_mo" /> raise GitHub
-          <br className="br_tablet" /> discussions.
+          <br className="br_mo" /> open a GitHub
+          <br className="br_tablet" /> issue.
         </p>
         <Button.Box>
           <Button
@@ -39,7 +39,7 @@ const Community: NextPage = () => {
           </Button>
           <Button
             icon={<Icon type="github" />}
-            href="https://github.com/yorkie-team/dashboard/issues"
+            href="https://github.com/yorkie-team/yorkie/issues"
             className="gray50"
             as="a"
             outline
