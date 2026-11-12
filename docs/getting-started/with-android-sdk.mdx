@@ -11,6 +11,8 @@ This guide walks you through the steps to get started with the Yorkie Android SD
 
 - **Kotlin**: 1.9.24 or higher
 - **Android Gradle Plugin**: 8.x or higher
+- **minSdk**: 24 or higher
+- **Java**: 17 or higher, for both the JDK and the Kotlin `jvmTarget`
 
 ### Using in your projects
 
@@ -25,8 +27,6 @@ dependencies {
   implementation("dev.yorkie:yorkie-android:{{YORKIE_ANDROID_VERSION}}")
 }
 ```
-
-Make sure to replace `dev.yorkie` and `{{YORKIE_ANDROID_VERSION}}` with the correct group ID and version number for the Yorkie SDK.
 
 #### Maven
 Add a dependency to the `<dependencies>` element.
