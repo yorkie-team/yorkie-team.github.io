@@ -30,10 +30,10 @@ doc.update((root) => {
 const COUNTER_CODE = ` 
 // Counter supports numeric types that change with addition and subtraction.
 doc.update((root) => {
-  root.cnt = new yorkie.Counter(yorkie.IntType, 1); // {"cnt":1}
-  root.cnt.increase(2);                             // {"cnt":3}
-  root.cnt.increase(3);                             // {"cnt":6}
-  root.cnt.increase(-4);                            // {"cnt":2}
+  root.cnt = new yorkie.Counter(1); // {"cnt":1}, use 1n for a Long counter
+  root.cnt.increase(2);             // {"cnt":3}
+  root.cnt.increase(3);             // {"cnt":6}
+  root.cnt.increase(-4);            // {"cnt":2}
 });
 `;
 
@@ -58,23 +58,28 @@ doc.update((root, presence) => {
 `;
 
 const CHANNEL_PRESENCE_CODE = `
-// Subscribe to a channel and track online users
-const channel = client.subscribe('my-channel');
+// Attach to a channel and track how many users are online
+const channel = new yorkie.Channel('room-123');
+await client.attach(channel);
 
-channel.on('presence-changed', (event) => {
+channel.subscribe('presence', (event) => {
   console.log(\`\${event.count} users online\`);
 });
+
+// The current count is also available at any time
+console.log(channel.getSessionCount());
 `;
 
 const CHANNEL_BROADCAST_CODE = `
-// Publish messages to all subscribers
-const channel = client.subscribe('my-channel');
+// Broadcast messages to all clients attached to the channel
+const channel = new yorkie.Channel('room-123');
+await client.attach(channel);
 
-channel.publish('chat', { user: 'Alice', message: 'Hello everyone!' });
-
-channel.on('chat', (event) => {
-  console.log(event.data.message);
+channel.subscribe('chat', (event) => {
+  console.log(event.payload.message);
 });
+
+channel.broadcast('chat', { user: 'Alice', message: 'Hello everyone!' });
 `;
 
 export const DOCUMENT_CODE = {
