@@ -35,7 +35,6 @@ const Home: NextPage = () => {
     };
   }, []);
 
-  // TODO(hackerwins): Remove examples condition when examples are ready.
   return (
     <Layout className="main_page">
       <Head>
