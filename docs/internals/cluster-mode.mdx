@@ -11,7 +11,7 @@ For production deployments that require high availability, scalability, and reli
 
 In a single-server setup, all documents and clients are handled by one Yorkie instance. As your workload grows, a cluster distributes the load across multiple Yorkie servers, each responsible for a subset of documents.
 
-Yorkie's cluster mode uses **document-based sharding** with consistent hashing to route requests for the same document to the same server. This eliminates the need for servers to share document state with each other.
+Yorkie's cluster mode uses **document-based sharding** with consistent hashing to route requests for the same document to the same server. Because each document lives on one server, servers rarely need to share document state. For the few operations that must reach another server, such as compacting a document hosted elsewhere, servers call each other through an internal [cluster RPC](#cluster-rpc).
 
 ```mermaid
 graph LR
@@ -84,24 +84,23 @@ The recommended way to deploy a Yorkie cluster is with [Kubernetes](https://kube
 Istio's `DestinationRule` resource configures consistent hash-based routing:
 
 ```yaml
-apiVersion: networking.istio.io/v1alpha3
+apiVersion: networking.istio.io/v1beta1
 kind: DestinationRule
 metadata:
   name: yorkie
 spec:
   host: yorkie
   trafficPolicy:
-    portLevelSettings:
-      - port:
-          number: 8080
-        loadBalancer:
-          consistentHash:
-            ringHash:
-              minimumRingSize: 1024
-            httpHeaderName: "x-shard-key"
+    loadBalancer:
+      consistentHash:
+        maglev:
+          tableSize: 65537
+        httpHeaderName: "x-shard-key"
 ```
 
-The `x-shard-key` header (containing the project and document key) determines which server handles the request.
+This matches what the `yorkie-cluster` Helm chart renders by default. The chart uses Maglev; to use Ring Hash instead, disable `ingressGateway.consistentHash.maglev` and enable `ingressGateway.consistentHash.ringHash` in the chart values, which replaces the `maglev` block with `ringHash.minimumRingSize`.
+
+The `x-shard-key` header determines which server handles the request. SDKs set it to the project's public API key followed by the document key. For channels they use the first segment of the channel key path, so a channel and its sub-channels land on the same server.
 
 For step-by-step deployment guides, see [Self-Hosted Server on Minikube](/docs/self-hosted-server/minikube) and [Self-Hosted Server on AWS EKS](/docs/self-hosted-server/aws-eks).
 
@@ -109,7 +108,7 @@ For step-by-step deployment guides, see [Self-Hosted Server on Minikube](/docs/s
 
 In a cluster, Yorkie uses a **leader-member structure** for coordinating cluster-wide tasks:
 
-- **Leader**: A single node elected to handle cluster-wide operations like [Housekeeping](/docs/glossary) (client deactivation and document compaction).
+- **Leader**: A single node elected to handle cluster-wide operations like [Housekeeping](/docs/internals/housekeeping) (client deactivation, document compaction, and project stats refresh).
 - **Members**: All other nodes that process client requests normally.
 
 Leader election is enforced at the database level:
@@ -119,7 +118,7 @@ Leader election is enforced at the database level:
 - If the leader fails to renew, another member acquires leadership.
 - Short periods with no leader are tolerated -- only housekeeping tasks are delayed, and user-facing requests remain unaffected.
 
-All nodes send periodic **heartbeats** to the database to indicate they are alive. The cluster uses a **liveness window** (default: 10 seconds) to detect inactive nodes.
+All nodes send periodic **heartbeats** to the database to indicate they are alive. The cluster uses a **liveness window** (twice the renewal interval, 10 seconds by default) to detect inactive nodes.
 
 For the full design, see the [Membership Management design document](https://github.com/yorkie-team/yorkie/blob/main/docs/design/membership.md).
 
@@ -129,9 +128,11 @@ For large-scale deployments, Yorkie supports **sharded MongoDB clusters** to dis
 
 | Collection Scope | Collections | Shard Key | Method |
 |-----------------|-------------|-----------|--------|
-| **Cluster-wide** | `users`, `projects` | Not sharded (small data volume) | N/A |
+| **Cluster-wide** | `users`, `projects`, `members`, `invites`, `clusternodes` | Not sharded (small data volume) | N/A |
 | **Project-wide** | `clients`, `documents`, `schemas` | `project_id` (+ `_id` for clients) | Ranged / Hashed |
 | **Document-wide** | `changes`, `snapshots`, `versionvectors`, `revisions` | `doc_id` | Hashed |
+
+The `snapshot_bodies` collection is not sharded by the `yorkie-cluster` chart.
 
 Hashed sharding on `doc_id` for document-wide collections provides:
 - **Even data distribution**: Prevents hotspots from sequential ObjectID generation.
@@ -142,12 +143,19 @@ For the full sharding strategy, see the [MongoDB Sharding design document](https
 
 ### Watch Stream in Cluster Mode
 
-The [Watch Stream](/docs/internals/synchronization#the-watch-stream) uses long-lived gRPC connections. When the cluster topology changes (servers added/removed), existing connections may not be automatically rerouted. Yorkie mitigates this with:
+The [Watch Stream](/docs/internals/synchronization#the-watch-stream) uses long-lived connections. When the cluster topology changes (servers added/removed), existing connections may not be automatically rerouted. Yorkie mitigates this with:
 
-- **gRPC Max Connection Age**: Periodically closes long-lived connections, forcing reconnection to the correct server.
+- **Max Connection Age**: Periodically closes long-lived connections, forcing reconnection to the correct server.
 - **Envoy Stream Idle Timeout**: Closes idle connections that may be "split-brained" (connected to the wrong server after a topology change).
+- **Watch heartbeats**: The server sends [heartbeats](/docs/internals/synchronization#heartbeats) on idle watch streams, so a client notices a stream that died silently and reconnects. The server bounds the interval a client may request with `--backend-watch-heartbeat-interval-min` and `--backend-watch-heartbeat-interval-max` (5 and 60 seconds by default).
 
 These mechanisms ensure that all clients eventually reconnect to the correct server after topology changes.
+
+### Cluster RPC
+
+Servers in a cluster talk to each other through an internal `ClusterService`. A server uses it when an operation must run on the server that owns a document or channel, for example to detach, compact, or purge a document, to read a document or channel list, to deliver a broadcast, to count channel sessions, or to invalidate caches and revalidate access across nodes.
+
+Because these calls travel through the same gateway as client traffic, every node must share a **cluster secret**, set with `--cluster-secret` (or the `YORKIE_CLUSTER_SECRET` environment variable). A server without a secret accepts every `ClusterService` request, so anyone who can reach the gateway could call them. The `yorkie-cluster` Helm chart therefore refuses to render unless `clusterSecret` or `clusterSecretExistingSecret` is set.
 
 ### Fine-Grained Document Locking
 
@@ -171,7 +179,7 @@ When deploying a Yorkie cluster in production:
 - **Database redundancy**: Use a MongoDB replica set (recommended: 3 members per shard) for data safety.
 - **Multiple routers**: Deploy at least 2 Istio Ingress Gateways for high availability.
 - **Monitoring**: Track leader election failures, heartbeat timestamps, lock wait times, and broadcast success rates.
-- **Housekeeping tuning**: Adjust the `Interval`, `CandidatesLimit`, and `CompactionMinChanges` settings based on your workload. See the [Housekeeping design document](https://github.com/yorkie-team/yorkie/blob/main/docs/design/housekeeping.md) for configuration examples.
+- **Housekeeping tuning**: Adjust the `Interval`, `CandidatesLimit`, `DeactivateConcurrency`, `CompactionMinChanges`, and `ProjectStatsRefreshInterval` settings based on your workload. See [Housekeeping](/docs/internals/housekeeping#configuration) for the corresponding flags and examples.
 
 ### Further Reading
 
