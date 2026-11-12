@@ -209,7 +209,7 @@ curl '{{API_ADDR}}/yorkie.v1.AdminService/ListDocuments' \
 
 #### POST /yorkie.v1.AdminService/GetDocument
 
-This endpoint returns a document by its key.
+This endpoint returns a document by its key. The response always includes the document's `root` and the `presences` of its attached clients.
 
 ##### Request
 
