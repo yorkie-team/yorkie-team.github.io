@@ -11,11 +11,13 @@ The API is implemented using [Connect protocol](https://connectrpc.com/docs/prot
 
 **Base URL**: `{{API_ADDR}}/yorkie.v1.AdminService/`
 
+Requests accept field names in either `snake_case` or `lowerCamelCase`. Responses use the standard Protobuf JSON mapping: field names are `lowerCamelCase`, 64-bit integers are strings, `bytes` fields are base64 strings, timestamps are RFC 3339 strings, and fields with default values (such as `0`, `false` or an empty string) are omitted.
+
 ### Authentication
 
 The Admin API accepts two credentials: a project's secret key with the `API-Key` scheme, and a login token with the `Bearer` scheme. Which ones a request may use depends on the endpoint:
 
-- **Project-scoped endpoints** work on a single project. These are `GetProjectStats`, the document endpoints (`CreateDocument`, `ListDocuments`, `GetDocument`, `GetDocuments`, `SearchDocuments`, `UpdateDocument`, `RemoveDocumentByAdmin`, `CompactDocumentByAdmin`, `GetSnapshotMeta`, `ListChanges`), the schema endpoints (`CreateSchema`, `ListSchemas`, `GetSchema`, `GetSchemas`, `RemoveSchema`), the channel endpoints (`ListChannels`, `GetChannels`, `BroadcastByAdmin`), and `RevalidateAccess`. Every endpoint documented on this page is project-scoped. They accept either credential:
+- **Project-scoped endpoints** work on a single project. These are `GetProjectStats`, the document endpoints (`CreateDocument`, `ListDocuments`, `GetDocument`, `GetDocuments`, `SearchDocuments`, `UpdateDocument`, `RemoveDocumentByAdmin`, `CompactDocumentByAdmin`, `GetSnapshotMeta`, `ListChanges`), the schema endpoints (`CreateSchema`, `ListSchemas`, `GetSchema`, `GetSchemas`, `RemoveSchema`), the channel endpoints (`ListChannels`, `GetChannels`, `BroadcastByAdmin`), and `RevalidateAccess`. Every endpoint on this page is project-scoped, except `UpdateProject` in [Project Management](#project-management). They accept either credential:
   - The project's **secret key**, which carries the authority of a project admin and can call all of these endpoints. Keep it on your server and never ship it in client-side code.
   - A **login token** together with an `x-yorkie-project` header that names the project. The request is checked against your role in that project: endpoints that change the project (`CreateDocument`, `UpdateDocument`, `RemoveDocumentByAdmin`, `CompactDocumentByAdmin`, `CreateSchema`, `RemoveSchema`, `BroadcastByAdmin`, `RevalidateAccess`) need the `admin` or `owner` role, and the other, read-only endpoints are open to every member of the project.
 - **User-scoped endpoints** are every other authenticated endpoint, such as `ListProjects`, `CreateProject`, `GetProject`, `UpdateProject`, `RotateProjectKeys`, the member and invite endpoints, and the revision endpoints (`ListRevisionsByAdmin`, `GetRevisionByAdmin`, `RestoreRevisionByAdmin`). They act as a user account, and accept only a login token. `GetProject` and `ListProjects` return a project's secret key only to its `admin` and `owner` members; for the `member` role, `secret_key` is empty.
@@ -89,22 +91,26 @@ curl '{{API_ADDR}}/yorkie.v1.AdminService/CreateDocument' \
 
 ##### Response
 
-```bash
+```json
 {
   "document": {
-    "id": "doc_abcdef",
+    "id": "686e2aa9666f9626c2d62cb4",
     "key": "document-1",
-    "project_name": "my-project",
     "root": "{\"content\":[],\"type\":\"doc\"}",
-    "created_at": "2025-05-12T10:00:00.000Z",
-    "updated_at": "2025-05-12T10:00:00.000Z"
+    "documentSize": {
+      "live": { "data": 6, "meta": 96 },
+      "gc": {}
+    },
+    "createdAt": "2025-05-12T10:00:00Z",
+    "accessedAt": "2025-05-12T10:00:00Z",
+    "updatedAt": "2025-05-12T10:00:00Z"
   }
 }
 ```
 
 #### POST /yorkie.v1.AdminService/UpdateDocument
 
-This endpoint updates the content of an existing document.
+This endpoint updates the content of an existing document, the [schema](/docs/advanced/schema-validation) bound to it, or both.
 
 ##### Request
 
@@ -112,6 +118,18 @@ Parameters:
 
 - `document_key`: The key of the document to update.
 - `root`: The new root content ([YSON string](/docs/internals/yson)) of the document.
+- `schema_key`: The schema to bind to the document, in the form `name@version`.
+
+Which fields you set decides what the request does:
+
+| `root` | `schema_key` | Result |
+|--------|--------------|--------|
+| set | empty | Replaces the root. The new root is validated against the schema already bound to the document, if any |
+| empty | set | Binds the document to the given schema. The current root must conform to it |
+| set | set | Replaces the root and binds the schema. The new root must conform to it |
+| empty | empty | Removes the schema binding from the document |
+
+Every request except a root-only update fails with `ErrDocumentAttached` while any client is attached to the document. Note that a request with neither field set is not a no-op: it detaches the document's schema.
 
 ```bash
 curl '{{API_ADDR}}/yorkie.v1.AdminService/UpdateDocument' \
@@ -128,12 +146,12 @@ curl '{{API_ADDR}}/yorkie.v1.AdminService/UpdateDocument' \
 ```json
 {
   "document": {
-    "id": "doc_12345",
+    "id": "686e2aa9666f9626c2d62cb4",
     "key": "document-1",
-    "project_name": "my-project",
-    "root": "{\"type\":\"doc\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"text\":\"Updated content\",\"type\":\"text\"}]}]}",
-    "created_at": "2025-03-24T12:00:00.000Z",
-    "updated_at": "2025-05-12T11:30:00.000Z"
+    "root": "{\"content\":[{\"content\":[{\"text\":\"Updated content\",\"type\":\"text\"}],\"type\":\"paragraph\"}],\"type\":\"doc\"}",
+    "createdAt": "2025-03-24T12:00:00Z",
+    "accessedAt": "2025-05-12T11:30:00Z",
+    "updatedAt": "2025-05-12T11:30:00Z"
   }
 }
 ```
@@ -157,7 +175,7 @@ curl '{{API_ADDR}}/yorkie.v1.AdminService/ListDocuments' \
   -H 'content-type: application/json' \
   -H 'authorization: API-Key PROJECT_SECRET_KEY' \
   --data-raw '{
-    "previous_id": "doc_last_id",
+    "previous_id": "686e2aa9666f9626c2d62cb4",
     "page_size": 20,
     "is_forward": true,
     "include_root": false
@@ -169,24 +187,25 @@ curl '{{API_ADDR}}/yorkie.v1.AdminService/ListDocuments' \
 {
   "documents": [
     {
-      "id": "doc_12345",
-      "key": "document-1",
-      "project_name": "my-project",
-      "created_at": "2025-03-24T12:00:00.000Z",
-      "updated_at": "2025-03-24T13:00:00.000Z",
-      "root": "..."
+      "id": "686e2aa9666f9626c2d62cb5",
+      "key": "document-2",
+      "attachedClients": 2,
+      "createdAt": "2025-03-24T12:00:00Z",
+      "accessedAt": "2025-03-24T13:00:00Z",
+      "updatedAt": "2025-03-24T13:00:00Z"
     },
     {
-      "id": "doc_67890",
-      "key": "document-2",
-      "project_name": "my-project",
-      "created_at": "2025-03-23T10:00:00.000Z",
-      "updated_at": "2025-03-24T09:30:00.000Z",
-      "root": "..."
+      "id": "686e2aa9666f9626c2d62cb6",
+      "key": "document-3",
+      "createdAt": "2025-03-25T10:00:00Z",
+      "accessedAt": "2025-03-25T10:00:00Z",
+      "updatedAt": "2025-03-25T09:30:00Z"
     }
   ]
 }
 ```
+
+`root` is included only when `include_root` is `true`.
 
 #### POST /yorkie.v1.AdminService/GetDocument
 
@@ -210,11 +229,18 @@ curl '{{API_ADDR}}/yorkie.v1.AdminService/GetDocument' \
 ```json
 {
   "document": {
-    "id": "doc_12345",
+    "id": "686e2aa9666f9626c2d62cb4",
     "key": "document-1",
-    "project_name": "my-project",
-    "created_at": "2025-03-24T12:00:00.000Z",
-    "updated_at": "2025-03-24T13:00:00.000Z"
+    "root": "{\"content\":[],\"type\":\"doc\"}",
+    "attachedClients": 1,
+    "documentSize": {
+      "live": { "data": 6, "meta": 96 },
+      "gc": {}
+    },
+    "schemaKey": "my-schema@1",
+    "createdAt": "2025-03-24T12:00:00Z",
+    "accessedAt": "2025-03-24T13:00:00Z",
+    "updatedAt": "2025-03-24T13:00:00Z"
   }
 }
 ```
@@ -246,26 +272,32 @@ curl '{{API_ADDR}}/yorkie.v1.AdminService/GetDocuments' \
 {
   "documents": [
     {
-      "id": "doc_12345",
+      "id": "686e2aa9666f9626c2d62cb4",
       "key": "document-1",
-      "project_name": "my-project",
-      "created_at": "2025-03-24T12:00:00.000Z",
-      "updated_at": "2025-03-24T13:00:00.000Z",
       "root": "...",
-      "presences": "..."
+      "attachedClients": 1,
+      "presences": {
+        "6a1f0c3e9b7d2e4f5a6b7c8d": {
+          "data": { "name": "\"Alice\"" }
+        }
+      },
+      "createdAt": "2025-03-24T12:00:00Z",
+      "accessedAt": "2025-03-24T13:00:00Z",
+      "updatedAt": "2025-03-24T13:00:00Z"
     },
     {
-      "id": "doc_67890",
+      "id": "686e2aa9666f9626c2d62cb5",
       "key": "document-2",
-      "project_name": "my-project",
-      "created_at": "2025-03-23T10:00:00.000Z",
-      "updated_at": "2025-03-24T09:30:00.000Z",
       "root": "...",
-      "presences": "..."
+      "createdAt": "2025-03-23T10:00:00Z",
+      "accessedAt": "2025-03-24T09:30:00Z",
+      "updatedAt": "2025-03-24T09:30:00Z"
     }
   ]
 }
 ```
+
+`root` and `presences` are included only when `include_root` and `include_presences` are `true`. `presences` maps each attached client's ID to its presence, whose values are JSON-encoded strings.
 
 #### POST /yorkie.v1.AdminService/RemoveDocumentByAdmin
 
@@ -314,11 +346,71 @@ curl '{{API_ADDR}}/yorkie.v1.AdminService/GetSnapshotMeta' \
 ```json
 {
   "snapshot": "base64-encoded-snapshot-data",
-  "lamport": 42,
-  "version_vector": {
-    "client1": 5,
-    "client2": 3
+  "lamport": "42",
+  "versionVector": {
+    "vector": {
+      "6a1f0c3e9b7d2e4f5a6b7c8d": "5",
+      "6a1f0c3e9b7d2e4f5a6b7c8e": "3"
+    }
   }
+}
+```
+
+#### POST /yorkie.v1.AdminService/ListChanges
+
+List the changes stored for a document, page by page, by server sequence.
+
+##### Request
+
+Parameters:
+- `document_key`: The key of the document.
+- `previous_seq`: The server sequence to page from. The page starts after it when `is_forward` is `true`, and before it otherwise. Use `0` to start from the first change (forward) or the latest change (backward).
+- `page_size`: The number of changes to return.
+- `is_forward`: Whether to page toward newer changes.
+
+```bash
+curl '{{API_ADDR}}/yorkie.v1.AdminService/ListChanges' \
+  -H 'content-type: application/json' \
+  -H 'authorization: API-Key PROJECT_SECRET_KEY' \
+  --data-raw '{
+    "document_key": "document-1",
+    "previous_seq": 0,
+    "page_size": 10,
+    "is_forward": false
+  }'
+```
+
+##### Response
+
+`changes` is a list of `Change` messages as defined in [`resources.proto`](https://github.com/yorkie-team/yorkie/blob/main/api/yorkie/v1/resources.proto), each with its `id`, `message`, `operations` and `presenceChange`.
+
+#### POST /yorkie.v1.AdminService/CompactDocumentByAdmin
+
+Compact a document's change history. Yorkie rebuilds the document from its latest state as a single initial change and replaces the stored change history with it. The document's content does not change, and the request fails if the rebuilt content would differ.
+
+##### Request
+
+Parameters:
+- `document_key`: The key of the document.
+- `force`: Whether to compact the document even if clients are attached to it.
+
+```bash
+curl '{{API_ADDR}}/yorkie.v1.AdminService/CompactDocumentByAdmin' \
+  -H 'content-type: application/json' \
+  -H 'authorization: API-Key PROJECT_SECRET_KEY' \
+  --data-raw '{
+    "document_key": "document-1",
+    "force": false
+  }'
+```
+
+##### Response
+
+`compacted` is `true` when the document was compacted. Without `force`, a document that is attached to any client is left as is, and the response has no `compacted` field (it is `false`).
+
+```json
+{
+  "compacted": true
 }
 ```
 
@@ -344,27 +436,65 @@ curl '{{API_ADDR}}/yorkie.v1.AdminService/SearchDocuments' \
 ##### Response
 ```json
 {
-  "total_count": 5,
+  "totalCount": 5,
   "documents": [
     {
-      "id": "doc_12345",
+      "id": "686e2aa9666f9626c2d62cb4",
       "key": "document-1",
-      "project_name": "my-project",
-      "created_at": "2025-03-24T12:00:00.000Z",
-      "updated_at": "2025-03-24T13:00:00.000Z"
+      "createdAt": "2025-03-24T12:00:00Z",
+      "accessedAt": "2025-03-24T13:00:00Z",
+      "updatedAt": "2025-03-24T13:00:00Z"
     },
     {
-      "id": "doc_67890",
+      "id": "686e2aa9666f9626c2d62cb5",
       "key": "document-2",
-      "project_name": "my-project",
-      "created_at": "2025-03-23T10:00:00.000Z",
-      "updated_at": "2025-03-24T09:30:00.000Z"
+      "createdAt": "2025-03-23T10:00:00Z",
+      "accessedAt": "2025-03-24T09:30:00Z",
+      "updatedAt": "2025-03-24T09:30:00Z"
     }
   ]
 }
 ```
 
 ### Channel Management
+
+#### POST /yorkie.v1.AdminService/ListChannels
+
+List the active channels of the project, with the session count of each.
+
+##### Request
+
+Parameters:
+
+- `query`: A channel key prefix. Only channels whose keys start with it are returned. When empty, all channels are listed.
+- `limit`: The maximum number of channels to return, from `1` to `100`. A value outside this range fails with `invalid_argument`.
+
+```bash
+curl '{{API_ADDR}}/yorkie.v1.AdminService/ListChannels' \
+  -H 'content-type: application/json' \
+  -H 'authorization: API-Key PROJECT_SECRET_KEY' \
+  --data-raw '{
+    "query": "room-1",
+    "limit": 20
+  }'
+```
+
+##### Response
+
+```json
+{
+  "channels": [
+    {
+      "key": "room-1",
+      "sessionCount": 10
+    },
+    {
+      "key": "room-1.section-1",
+      "sessionCount": 20
+    }
+  ]
+}
+```
 
 #### POST /yorkie.v1.AdminService/GetChannels
 
@@ -433,6 +563,32 @@ In this case, the total session count for `room-1` would include both 10 and 20,
 }
 ```
 
+#### POST /yorkie.v1.AdminService/BroadcastByAdmin
+
+Broadcast a message to the clients attached to a channel, as [`channel.broadcast`](/docs/sdks/js-sdk#channel) does from an SDK client.
+
+##### Request
+
+Parameters:
+
+- `channel_key`: The key of the channel.
+- `topic`: The topic of the message. Clients receive it through `channel.subscribe(topic, callback)`.
+- `payload`: The message, as a base64 string. The JS SDK decodes the payload as UTF-8 JSON, so encode a JSON value. For example, `eyJtZXNzYWdlIjoiaGVsbG8ifQ==` is `{"message":"hello"}`.
+
+```bash
+curl '{{API_ADDR}}/yorkie.v1.AdminService/BroadcastByAdmin' \
+  -H 'content-type: application/json' \
+  -H 'authorization: API-Key PROJECT_SECRET_KEY' \
+  --data-raw '{
+    "channel_key": "room-1",
+    "topic": "notice",
+    "payload": "eyJtZXNzYWdlIjoiaGVsbG8ifQ=="
+  }'
+```
+
+##### Response
+Empty response with success status code.
+
 ### Access Management
 
 #### POST /yorkie.v1.AdminService/RevalidateAccess
@@ -464,4 +620,34 @@ curl '{{API_ADDR}}/yorkie.v1.AdminService/RevalidateAccess' \
 }
 ```
 
-If the webhook could not be reached for some streams, those streams are left open and the request fails with `codes.Unavailable` (`ErrRevalidationIncomplete`). Retry the whole request.
+If the webhook could not be reached for some streams, those streams are left open and the request fails with `unavailable` (`ErrRevalidationIncomplete`). Retry the whole request.
+
+### Project Management
+
+#### POST /yorkie.v1.AdminService/UpdateProject
+
+Update the settings of a project. This is a user-scoped endpoint: it takes a login token with the `Bearer` scheme, not the secret key, and needs the `admin` or `owner` role in the project. Some settings, such as `max_size_per_document` and `auto_revision_enabled`, have no CLI flag and are set through this endpoint or the Dashboard. See [Resources](/docs/advanced/resources) for what each setting does.
+
+##### Request
+
+Parameters:
+
+- `id`: The ID of the project, as returned by `GetProject` or `yorkie project ls --output json`.
+- `fields`: The settings to change. Fields you leave out keep their current values. The available fields are `name`, `auth_webhook_url`, `auth_webhook_methods` (`{"methods": [...]}`), `auth_webhook_max_retries`, `auth_webhook_min_wait_interval`, `auth_webhook_max_wait_interval`, `auth_webhook_request_timeout`, `event_webhook_url`, `event_webhook_events` (`{"events": [...]}`), `event_webhook_max_retries`, `event_webhook_min_wait_interval`, `event_webhook_max_wait_interval`, `event_webhook_request_timeout`, `snapshot_threshold`, `snapshot_interval`, `client_deactivate_threshold`, `max_subscribers_per_document`, `max_attachments_per_document`, `max_size_per_document`, `remove_on_detach`, `auto_revision_enabled`, `channel_session_ttl`, `channel_batch_window` and `allowed_origins` (`{"origins": [...]}`). Durations are Go duration strings such as `"100ms"` or `"24h"`.
+
+```bash
+curl '{{API_ADDR}}/yorkie.v1.AdminService/UpdateProject' \
+  -H 'content-type: application/json' \
+  -H 'authorization: Bearer TOKEN' \
+  --data-raw '{
+    "id": "6ac32edca4736914b08f6be3",
+    "fields": {
+      "max_size_per_document": 5242880,
+      "auto_revision_enabled": false
+    }
+  }'
+```
+
+##### Response
+
+The response has the updated `project`, with the same fields as `GetProject`.
