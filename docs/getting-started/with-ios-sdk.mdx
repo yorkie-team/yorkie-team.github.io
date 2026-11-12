@@ -9,8 +9,12 @@ This guide walks you through the steps to get started with the Yorkie iOS SDK.
 
 ### Using in your projects
 
+The iOS SDK supports iOS 15 or later and macOS 13 or later.
+
 #### Swift Package Manager
 The Swift Package Manager is a tool for automating the distribution of Swift code and is integrated into the Swift compiler.
+
+In Xcode, choose **File > Add Package Dependencies...**, enter `https://github.com/yorkie-team/yorkie-ios-sdk.git`, and add the `Yorkie` library to your app target.
 
 Once you have your Swift package set up, add Yorkie as a dependency in the dependencies section of your `Package.swift`.
 
@@ -27,6 +31,8 @@ targets: [
   )
 ]
 ```
+
+The package also ships `YorkieDevtoolsUI` and `YorkieDevtoolsServer` libraries for inspecting documents during development; add them the same way if you need them.
 
 > iOS SDK v0.7.26 and later require a Yorkie server v0.7.26 or later. Several of the SDK's correctness rules — tree node identity, element identity in garbage collection and when a tombstone may be collected, the checkpoint an offline resume re-anchors against, how style attributes are stored and sized, how presence is sent as a patch, and the record of removals that keeps a Text undo converging through garbage collection — are part of the wire contract shared with the server, so an older server can abort a sync rather than degrading. Watch stream heartbeats also need a v0.7.25 server. Upgrade every server node first, and do not roll the server back once v0.7.26 clients are connected: a server older than v0.7.26 drops that record of removals when it re-encodes a document, and one older than v0.7.25 stores a presence patch that no client can read back. Since v0.7.26 a piece of text removed by two concurrent deletions that nobody undoes is kept rather than collected, and counts toward the document size limit. Upgrade every client of a document together: since v0.7.23 a plain string style value is sent as itself (`red`, not `"red"`), which an older iOS client does not render. On a server older than v0.7.16, a `JSONTree` undo or redo aborts with `ErrInvalidArgument: offset out of range`.
 
@@ -89,7 +95,7 @@ await doc.subscribe { event, _ in
 
 You can execute different actions depending on the source of change. The source can be accessed from `event.type`.
 
-The value can be: `localChange`, `remoteChange` or `snapshot`.
+For content changes, the value can be: `localChange`, `remoteChange` or `snapshot`. Other event types, such as connection and sync status, are covered in the [iOS SDK](/docs/sdks/ios-sdk#subscribing-to-document) reference.
 
 ```swift
 await doc.subscribe { event, _ in
@@ -106,7 +112,7 @@ You can also subscribe to user presence using `doc.subscribePresence(.presence)`
 ```swift
 await doc.subscribePresence { event, doc in
   // get all users connected to the Document.
-  let users = doc.getPresences() // [ (clientID: string, presence: [key: value]), ... ]
+  let users = doc.getPresences() // [(clientID: ActorID, presence: [String: Any]), ...]
   print("There are currently \(users.count) users online")
 }
 ```
