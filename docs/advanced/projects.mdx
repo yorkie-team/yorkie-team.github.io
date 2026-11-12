@@ -58,7 +58,7 @@ const client = new yorkie.Client({
 });
 ```
 
-> Keep your **Secret Key** confidential. It grants full access to manage documents within the project via the [Admin API](/docs/tools/admin-api). Never expose it in client-side code. Only project members with the `admin` or `owner` role can read it; a member with the `member` role sees an empty secret key, and calls the Admin API with a login token instead (see [Authentication](/docs/tools/admin-api#authentication)).
+> Keep your **Secret Key** confidential. It grants full access to manage documents within the project via the [Admin API](/docs/tools/admin-api). Never expose it in client-side code. Only project members with the `admin` or `owner` role can read it; a member with the `member` role sees an empty secret key, and calls the Admin API with a login token instead (see [Authentication](/docs/tools/admin-api#authentication)). The secret key also signs [Event Webhook](/docs/advanced/event-webhook#verifying-requests) requests, so rotating the project's keys changes the key your webhook server must verify with.
 
 ### Managing Projects
 
@@ -70,14 +70,17 @@ Projects are managed through the [CLI](/docs/tools/cli#project) or the [Dashboar
 $ yorkie project create my-app-prod
 ```
 
-This returns the project details including both keys:
+This returns the project details including both keys (abbreviated here; the output includes every project setting):
 
 ```json
 {
+  "id": "...",
   "name": "my-app-prod",
+  ...
   "public_key": "...",
   "secret_key": "...",
-  "created_at": "..."
+  "created_at": "...",
+  "updated_at": "..."
 }
 ```
 
@@ -121,9 +124,16 @@ Each project can be independently configured with the following settings:
 | **Auth Webhook** | External authentication endpoint for validating client requests | [Security: Auth Webhook](/docs/advanced/security#auth-webhook) |
 | **Event Webhook** | Notification endpoint for document events | [Event Webhook](/docs/advanced/event-webhook) |
 | **Allowed Origins** | CORS restrictions for client connections | [Security: Allowed Origins](/docs/advanced/security#allowed-origins) |
-| **Max Attachments** | Maximum clients that can attach to a single document | [Document Limits](/docs/sdks/js-sdk#document-limits) |
-| **Max Subscribers** | Maximum clients that can subscribe to a single document | [Document Limits](/docs/sdks/js-sdk#document-limits) |
-| **Client Deactivate Threshold** | Time after which inactive clients are automatically deactivated by [Housekeeping](/docs/internals/housekeeping) | [CLI](/docs/tools/cli#updating-the-project) |
+| **Max Size per Document** | Maximum size of a single document | [Resources: Document Limits](/docs/advanced/resources#document-limits) |
+| **Max Attachments** | Maximum clients that can attach to a single document | [Resources: Document Limits](/docs/advanced/resources#document-limits) |
+| **Max Subscribers** | Maximum clients that can subscribe to a single document | [Resources: Document Limits](/docs/advanced/resources#document-limits) |
+| **Snapshot Threshold / Interval** | When snapshots are sent to clients and stored | [Resources: Snapshot Configuration](/docs/advanced/resources#snapshot-configuration) |
+| **Client Deactivate Threshold** | Time after which inactive clients are automatically deactivated by [Housekeeping](/docs/internals/housekeeping) | [Resources: Lifecycle Settings](/docs/advanced/resources#lifecycle-settings) |
+| **Channel Session TTL / Batch Window** | How long channel sessions are kept and how often channel events are delivered | [Resources: Lifecycle Settings](/docs/advanced/resources#lifecycle-settings) |
+| **Remove on Detach** | Remove a document when its last client leaves | [Resources: RemoveOnDetach](/docs/advanced/resources#removeondetach) |
+| **Auto Revision** | Create a revision with each stored snapshot | [Revisions](/docs/advanced/revisions) |
+
+For defaults and allowed values of every setting, see [Resources](/docs/advanced/resources#configuration-reference).
 
 ### Common Patterns
 

@@ -109,7 +109,16 @@ When a client makes a request, the Yorkie server sends the following JSON payloa
 
 The webhook is called only for the methods enabled in the project settings.
 
+Unlike [Event Webhook](/docs/advanced/event-webhook#verifying-requests) requests, auth webhook requests are not signed and carry no `X-Signature-256` header. Protect the endpoint by other means, such as keeping it on a private network or behind a hard-to-guess URL.
+
 `attributes` is an array with one entry for each document or channel the request touches. Each entry has the resource's `key` and a `verb`; the methods that send a change pack also add `presenceOnly`. Every method sends a single entry, except `Watch`, which sends one per document or channel the stream watches. `ActivateClient` and `DeactivateClient` act on no resource and send `"attributes": null`, so the webhook can only allow or deny them as a whole, based on the token.
+
+**Client methods** (no resource)
+
+| Method | `attributes` |
+|--------|--------------|
+| `ActivateClient` | `null` |
+| `DeactivateClient` | `null` |
 
 **Document methods** (`key` is the document key)
 
@@ -200,8 +209,8 @@ The webhook server should return a JSON response in the following format:
 
 HTTP Status Codes:
 - `200 OK`: Request is authorized
-- `401 Unauthenticated`: Token is invalid or missing
-- `403 Permission Denied`: Token is valid but lacks required permissions
+- `401 Unauthorized`: Token is invalid or missing. The client receives `codes.Unauthenticated`
+- `403 Forbidden`: Token is valid but lacks required permissions. The client receives `codes.PermissionDenied`
 
 ##### 5. Error Handling and Recovery
 
@@ -210,8 +219,8 @@ Yorkie handles authentication failures based on the webhook response and HTTP st
 | Status Code | Meaning | Action Taken |
 |------------|---------|--------------|
 | 200 OK | Request is authorized (allowed: true) | The request proceeds normally |
-| 401 Unauthenticated | The token is invalid or missing (allowed: false) | Yorkie attempts to refresh the token via `authTokenInjector` |
-| 403 Permission Denied | The token is valid but lacks the required permissions (allowed: false) | The request is rejected with `codes.PermissionDenied` |
+| 401 Unauthorized | The token is invalid or missing (allowed: false) | Yorkie attempts to refresh the token via `authTokenInjector` |
+| 403 Forbidden | The token is valid but lacks the required permissions (allowed: false) | The request is rejected with `codes.PermissionDenied` |
 
 The status code and `allowed` must agree. A `200` with `"allowed": false`, a `401` or `403` with `"allowed": true`, or a body that is not valid JSON is treated as an invalid response, and the request is rejected with an internal error. To deny a request, return `403` (or `401`), not `200`.
 

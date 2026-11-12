@@ -30,7 +30,7 @@ await client.activate();
 #### Auth Token
 
 Configure authentication for the client by setting up an `authTokenInjector` to provide tokens for Auth Webhook verification.
-If a `codes.Unauthenticated` error occurs, the `authTokenInjector` is called again with the webhook's response reason, enabling automatic token refresh.
+When the server answers with `ErrUnauthenticated` (the webhook returned 401), the `authTokenInjector` is called again with the webhook's response reason, so the client can refresh its token.
 For more information about `Auth Webhook`, please refer to the [Auth Webhook](/docs/advanced/security#auth-webhook).
 
 ```javascript
@@ -47,6 +47,13 @@ const client = new yorkie.Client({
 });
 ```
 
+If the `authTokenInjector` rejects, the client keeps the previous token and treats the failure as transient:
+
+- The background loops (the sync loop, Watch streams and broadcast retries) back off before calling the injector again: 1s after the first failure, doubling up to 30s, with jitter. They resume once the token API recovers.
+- One-shot calls such as `attach`, `detach`, `remove` and `sync` call the injector on every 401. They throw the injector's error if it rejects, or the `ErrUnauthenticated` they received otherwise. Retrying them is up to the caller.
+
+When your injector can tell that a refresh will never succeed (for example, the user has signed out), deactivate the client to stop the retries.
+
 #### Measuring MAU
 
 Measure MAU (Monthly Active Users) by setting the `userID` metadata when creating a client. The `userID` should be a unique identifier for each user.
@@ -61,6 +68,46 @@ const client = new yorkie.Client({
 
 You can check the MAU in the [Dashboard]({{DASHBOARD_PATH}}) by selecting the project and clicking the `overview` tab.
 
+#### Client Key
+
+The server derives the actor that is stamped into every change and presence (`client.getActorID()`) from the project and the client key. By default the client key is a random value generated for each `Client` instance, so the actor changes on every page load. Set `key` when the actor must outlive the process, which [Offline Persistence](#offline-persistence) requires:
+
+```javascript
+const client = new yorkie.Client({
+  rpcAddr: '{{API_ADDR}}',
+  apiKey: 'xxxxxxxxxxxxxxxxxxxx',
+  key: clientKey, // An opaque random value the app minted once and stored.
+});
+```
+
+<Alert status="warning">
+The client key is an identifier, not a credential. Mint it once as an opaque random value (for example, `crypto.randomUUID()` kept in local storage), scope it to the signed-in user, and clear it on sign-out. Do not derive it from a user ID, device ID, email, or anything else guessable or shared between users of one browser.
+</Alert>
+
+#### Client Options
+
+`new yorkie.Client(options)` accepts the following `ClientOptions`:
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `rpcAddr` | `https://api.yorkie.dev` | Address of the Yorkie server |
+| `apiKey` | - | API key of the project |
+| `key` | Random per `Client` | Client key the actor is derived from. See [Client Key](#client-key) |
+| `metadata` | - | Additional client information, such as `userID` for [MAU](#measuring-mau) |
+| `authTokenInjector` | - | Provides tokens for the Auth Webhook. See [Auth Token](#auth-token) |
+| `syncLoopDuration` | `50` | Wait (ms) between sync loop iterations |
+| `retrySyncLoopDelay` | `1000` | Wait (ms) before retrying a failed sync loop |
+| `reconnectStreamDelay` | `1000` | Wait (ms) before reconnecting a disconnected watch stream |
+| `channelHeartbeatInterval` | `5000` | Interval (ms) of the `RefreshChannel` heartbeat that keeps a [Channel](#channel) session alive |
+| `watchHeartbeatInterval` | `20000` | Interval (ms) at which the client asks the server to send heartbeats on an idle watch stream. The server clamps it to its own bounds, and the client reconnects a stream that stays silent for three times the interval. `0` asks for no heartbeats |
+| `userAgent` | - | User agent reported to the server |
+| `useGrpcWebTransport` | `false` | Use the gRPC-Web transport instead of the Connect protocol |
+| `deactivateOnUnload` | `true` (`false` when `store` is set) | Deactivate the client on `beforeunload`. See [Deactivate the Client](#deactivate-the-client) |
+| `store` | - | `DocStore` backend for [Offline Persistence](#offline-persistence) |
+| `sessionLock` | `WebLocksSessionLock` | Single-tab guard used with `store` |
+| `maxPersistBytes` | No limit | Largest snapshot (bytes) the client persists before it stops persisting the document |
+| `maxPersistMillis` | No limit | Longest time (ms) serializing a snapshot may take before the client stops persisting the document |
+
 #### Deactivate the Client
 
 When the client is no longer needed, you can deactivate it to release resources and disconnect from the server.
@@ -73,7 +120,7 @@ This will detach all documents attached to the client for efficient [garbage col
 
 `deactivate()` accepts an optional `DeactivateOptions`:
 
-- `keepalive`(Optional): Defaults to `false`. When `true`, the deactivation request is sent immediately using `fetch` with the `keepalive` option, ensuring it completes even while the page is unloading. Use this inside `beforeunload`/`unload` handlers.
+- `keepalive`(Optional): Defaults to `false`. When `true`, the deactivation request is sent immediately using `fetch` with the `keepalive` option, so it can continue while the page is unloading. The client tears down locally and the returned Promise settles without waiting for the response; late responses and errors, including authentication errors, are ignored. This is best-effort and does not confirm that the server accepted the deactivation. Use this inside `beforeunload`/`unload` handlers.
 - `synchronous`(Optional): Defaults to `false`. When `true`, the server waits for all pending operations to complete before deactivating.
 
 ```javascript
@@ -95,6 +142,29 @@ const client = new yorkie.Client({
 
 Set `deactivateOnUnload: false` for apps that don't need GC or presence cleanup on unload — for example, non-collaborative apps or documents attached with `disableGC`. In those cases the unload-time deactivate is pure overhead, and its `fetch({ keepalive: true })` request can reject mid-flight during hard navigation. Opting out is safe: the server reaps the stale client after its [Client Deactivate Threshold](/docs/tools/cli#client-deactivate-threshold).
 
+#### Offline Persistence
+
+Set the `store` option to persist document state locally, so un-pushed local changes survive a reload or a restart while offline. The client writes a base snapshot when a document is attached and then appends each local change, so recording an edit costs the size of that edit rather than the whole document. On the next `attach`, the document is restored from the store, and the restored changes are pushed to the server.
+
+```javascript
+import yorkie, { MemoryDocStore } from '@yorkie-js/sdk';
+
+const client = new yorkie.Client({
+  rpcAddr: '{{API_ADDR}}',
+  apiKey: 'xxxxxxxxxxxxxxxxxxxx',
+  key: clientKey, // Required: a stable client key reused across launches.
+  store: new MemoryDocStore(), // Or your own durable DocStore.
+});
+```
+
+- `store`: A `DocStore` backend. The SDK ships `MemoryDocStore`, which keeps entries in memory for the lifetime of the process. For durability across reloads, implement the `DocStore` interface (`load`, `saveSnapshot`, `appendChange`, `saveMeta`, `remove`) on top of a durable storage such as IndexedDB.
+- `key`: Required. Store entries are keyed by `apiKey/clientKey/docKey`, and the actor is derived from the client key. With the default random key, every restart misses the previous entries and silently loses un-pushed changes. The client logs a warning when `store` is set without `key`. See [Client Key](#client-key).
+- `deactivateOnUnload`: Defaults to `false` when `store` is set, because deactivating on unload would detach the documents and defeat resuming them. Pass it explicitly to override.
+- `sessionLock`: Two tabs of the same app and user share one actor, so only one of them may attach a persisted document at a time. The default `WebLocksSessionLock` holds a [Web Lock](https://developer.mozilla.org/en-US/docs/Web/API/Web_Locks_API) per document for the attachment's lifetime, and `attach` fails fast in a second tab. It is a no-op where the Web Locks API is unavailable.
+- `maxPersistBytes` / `maxPersistMillis`: Budgets for writing a snapshot. When a document exceeds either one, the client stops persisting it and publishes a [`persist-disabled`](#subscribing-to-changes) event. Editing continues, but the document is no longer kept locally.
+
+When the client cannot reconcile persisted changes with the server, it discards them and publishes a [`local-changes-dropped`](#subscribing-to-changes) event that carries the dropped changes.
+
 ### Document
 
 `Document` is the primary data type in Yorkie, providing a JSON-like updating experience for representing your application's model. Documents can be updated without being attached to the client, and changes automatically propagate to other clients when attached or when the network is restored.
@@ -114,6 +184,7 @@ The constructor also accepts an optional second argument, `DocumentOptions`:
 - `disableGC`(Optional): Disables garbage collection for this document. Defaults to `false`. See [Disabling GC](#disabling-gc).
 - `disablePresence`(Optional): Declares that this document does not use presence. Defaults to `false`. See [Disabling Presence](#disabling-presence).
 - `enableDevtools`(Optional): Enables the [Devtools extension](/docs/tools/devtools) for this document. Defaults to `false`.
+- `maxUndoDepth`(Optional): How many changes `history.undo()` and `history.redo()` can go back. Must be a positive integer. Defaults to `50`. See [History](#history-undoredo).
 
 ```javascript
 const doc = new yorkie.Document('doc-1', { disablePresence: true });
@@ -129,6 +200,7 @@ Attach options:
 - `initialPresence`: Sets the client's initial presence when attaching to the document. The presence is shared with other users participating in the document. It must be serializable to JSON.
 - `syncMode`(Optional): Specifies synchronization modes. The default value is `SyncMode.Realtime`, which automatically pushes and pulls changes. See [Synchronization Modes](#synchronization-modes) for the full list, including `SyncMode.Polling` for stream-less periodic sync.
 - `documentPollInterval`(Optional): Polling interval in milliseconds. Used only when `syncMode` is `SyncMode.Polling`. Defaults to `3000`.
+- `schema`(Optional): A schema to validate the document against, given as `name@version` (e.g. `"my-schema@1"`). See [Schema Validation](/docs/advanced/schema-validation).
 - `disableGC`(Optional): Opts the attachment out of server-side `VersionVector` tracking, reducing per-`PushPull` payload for high-fan-out workloads. Defaults to `false`. See [Disabling GC](#disabling-gc) before enabling.
 - `disablePresence`(Optional): Opts the attachment out of presence map propagation for documents that don't need presence (e.g. `Counter`-only, form, or read-mostly documents). Defaults to `false`. See [Disabling Presence](#disabling-presence) before enabling.
 
@@ -273,7 +345,17 @@ Detach documents when no longer needed to improve garbage collection efficiency:
 await client.detach(doc);
 ```
 
+`detach()` also accepts `{ keepalive: true }`, which sends the request with `fetch`'s `keepalive` option so it can continue while the page is unloading.
+
 The `Remove on Detach` project setting enforces server-side removal when the last client detaches from a document.
+
+#### Removing the Document
+
+Remove a document from the server using `client.remove()`. The document moves to `DocStatus.Removed` and can no longer be edited. Other clients attached to it see `DocStatus.Removed` on their next sync.
+
+```javascript
+await client.remove(doc);
+```
 
 #### Presence
 
@@ -337,6 +419,8 @@ for (const { clientID, presence } of users ) {
   // Do something
 }
 ```
+
+**Document.getOthersPresences()** returns the same list without the current client.
 
 Example: [Profile Stack](/examples/profile-stack)
 
@@ -467,14 +551,14 @@ const unsubscribe = doc.subscribe((event) => {
 });
 ```
 
-When the `event.type` is `local-change` or `remote-change`, the `event.value` is a changeInfo, which has `{operations, message}` properties.
+When the `event.type` is `local-change` or `remote-change`, the `event.value` is a changeInfo, which has `{operations, message, actor, clientSeq, serverSeq}` properties. `actor` is the actor ID of the client that made the change.
 For more information about changeInfo for document events, please refer to the [ChangeInfo](https://yorkie.dev/yorkie-js-sdk/api-reference/interfaces/ChangeInfo.html).
 
 <Alert status="warning">
 The `event.rawChange` value for `local-change` and `remote-change` events, and the `event.value.snapshot` for `snapshot` event, are set only when [`enableDevtools`](/docs/tools/devtools/#install-the-extension) option is configured as `true`.
 </Alert>
 
-The `snapshot` event occurs when the number of changes to fetch from the server exceeds `SnapshotThreshold`. The server sends a complete snapshot instead of individual changes. See this [example code](https://github.com/yorkie-team/yorkie-js-sdk/blob/9c7accdfe337b9c9e7c7d0d3b3acc335951866ce/public/index.html#L346-L350) for handling snapshots in CodeMirror.
+The `snapshot` event occurs when the number of changes to fetch from the server exceeds `SnapshotThreshold`. The server sends a complete snapshot instead of individual changes. See the [CodeMirror 6 example](https://github.com/yorkie-team/yorkie-js-sdk/blob/main/examples/vanilla-codemirror6/src/main.ts) for handling snapshots in an editor.
 
 <Alert status="warning">
 Clients that haven't synchronized for a long time may receive a `snapshot` event. Ensure that your application handles these events to maintain synchronization.
@@ -543,7 +627,7 @@ const unsubscribe = doc.subscribe('status', (event) => {
 For more information about `DocStatus`, please refer to the [DocStatus](https://yorkie.dev/yorkie-js-sdk/api-reference/enums/DocStatus.html).
 
 <Alert status="warning">
-In web applications, detecting browser closure or navigation is difficult. Yorkie's `client-deactivate-threshold` automatically deactivates inactive clients, triggering a `DocumentStatus.Detached` event. See [Client Deactivate Threshold](/docs/tools/cli#client-deactivate-threshold).
+In web applications, detecting browser closure or navigation is difficult. Yorkie's `client-deactivate-threshold` automatically deactivates inactive clients, triggering a `DocStatus.Detached` event. See [Client Deactivate Threshold](/docs/tools/cli#client-deactivate-threshold).
 </Alert>
 
 **Document.subscribe('auth-error')**
@@ -562,6 +646,59 @@ const unsubscribe = doc.subscribe('auth-error', (event) => {
 This subscription allows you to monitor when token refreshes occur due to authentication errors.  
 For more information about `Auth Webhook`, please refer to the [Auth Webhook](/docs/advanced/security#auth-webhook).
 
+The same event is published when the server refuses the document's writes with `ErrPermissionDenied`, for example after the user loses write access. See [Recovering from Refused Writes](#recovering-from-refused-writes).
+
+**Document.subscribe('epoch-mismatch')**
+
+Notifies you that the document was compacted on the server and this client can no longer sync it. Detach the document and attach it again to recover. With [Offline Persistence](#offline-persistence), the client re-anchors the document on attach by itself.
+
+```javascript
+const unsubscribe = doc.subscribe('epoch-mismatch', async (event) => {
+  // event.value: { method: 'PushPull' }
+  await client.detach(doc);
+  // Attach a new Document with the same key to load the compacted state.
+});
+```
+
+**Document.subscribe('write-rejected')**
+
+Notifies you that the server refused to store the document's pushed changes for a reason that resending cannot fix. The sync loop parks this document while the client's other documents keep syncing, and the rejected changes stay applied locally. See [Recovering from Refused Writes](#recovering-from-refused-writes).
+
+```javascript
+const unsubscribe = doc.subscribe('write-rejected', (event) => {
+  // event.value contains:
+  // - code: Code.ErrDocumentSizeExceedsLimit | Code.ErrChangeTooLarge
+  // - reason: string
+  // - method: 'PushPull'
+});
+```
+
+**Document.subscribe('local-changes-dropped')**
+
+Notifies you that un-pushed local changes could not be reconciled with the server and were discarded. Use it to tell the user that some edits were not saved.
+
+```javascript
+const unsubscribe = doc.subscribe('local-changes-dropped', (event) => {
+  // event.value contains:
+  // - reason: 'epoch-reanchor' | 'document-purged' | 'actor-mismatch'
+  //         | 'restore-failed' | 'write-denied' | 'log-discontinuity'
+  // - changes: the discarded changes
+});
+```
+
+**Document.subscribe('persist-disabled')**
+
+Notifies you that [Offline Persistence](#offline-persistence) stopped persisting this document because writing a snapshot exceeded `maxPersistBytes` or `maxPersistMillis`. It fires at most once per attachment. Editing continues, but the user's work is no longer kept locally.
+
+```javascript
+const unsubscribe = doc.subscribe('persist-disabled', (event) => {
+  // event.value contains:
+  // - reason: 'too-large' | 'too-slow'
+  // - bytes: number
+  // - millis: number
+});
+```
+
 **Document.subscribe('all')**
 
 Subscribe to all document events. Used for [Devtools extension](/docs/tools/devtools).
@@ -573,6 +710,36 @@ const unsubscribe = doc.subscribe('all', (transactionEvent) => {
   }
 });
 ```
+
+#### Recovering from Refused Writes
+
+The server can refuse a document's local changes in two ways, and each has its own recovery path.
+
+**Size limits.** When the document exceeds its size limit or a single change is too large to store, the client publishes a `write-rejected` event and stops pushing the document. Shrink the document, then call `client.sync(doc)` to let the sync loop take it again. A local `doc.update()` that would exceed the limit throws `ErrDocumentSizeExceedsLimit` before anything is pushed. See [Document Limits](#document-limits).
+
+```javascript
+import { Code } from '@yorkie-js/sdk';
+
+doc.subscribe('write-rejected', (event) => {
+  if (event.value.code === Code.ErrDocumentSizeExceedsLimit) {
+    // Tell the user and switch the editor to read-only.
+  }
+});
+```
+
+**Permission denied.** When the server refuses the writes with `ErrPermissionDenied` (an owner locked the document, the user was downgraded to read-only, a share link was revoked), the client publishes an `auth-error` event and stops syncing. Resending the same changes would be refused again, so recover with `client.resync()`. It discards the un-pushed local changes, re-attaches the same `Document` instance on the server state, and returns the discarded changes. Subscriptions and editor bindings on the document keep working.
+
+```javascript
+const discarded = await client.resync(doc, { discardLocalChanges: true });
+if (discarded.length > 0) {
+  // e.g. "N edits were not saved"
+}
+```
+
+- `discardLocalChanges`: Must be `true`. It is spelled out so the data loss is never implicit.
+- `initialPresence`(Optional): The presence to attach with. Defaults to the document's current presence.
+
+While `resync()` is in flight, `doc.update()` and undo/redo throw `ErrRefused`. Once the changes are discarded, the document also publishes a `local-changes-dropped` event with reason `write-denied`.
 
 #### Custom CRDT Types
 
@@ -593,7 +760,7 @@ doc.update((root) => {
 
 **Selection using presence**
 
-Share text selection using presence instead of storing it permanently. Convert `index` to `position` for `Yorkie.Text`.
+Share text selection using presence instead of storing it permanently. Convert `index` to `position` for `yorkie.Text`. The editor calls below are pseudo-code; see the CodeMirror 6 example for a full integration.
 
 ```javascript
 // Update selection through text editing
@@ -656,6 +823,17 @@ doc.update((root) => {
 
 Tree nodes are either **element nodes** (`type`, `children`, optional `attributes`) or **text nodes** (`type: 'text'`, `value`). Editing and styling use a flat index that counts each node boundary in the flattened tree.
 
+Other Tree methods:
+
+- `edit(fromIdx, toIdx, content?, splitLevel?)`: Replaces the range with `content`. `splitLevel` splits that many ancestor levels at `fromIdx`, e.g. `1` to split a paragraph.
+- `editBulk(fromIdx, toIdx, contents, splitLevel?)`: Like `edit` with several nodes.
+- `editByPath(fromPath, toPath, content?, splitLevel?)` / `editBulkByPath(fromPath, toPath, contents, splitLevel?)`: Like `edit` / `editBulk`, addressed by path (e.g. `[0, 5]`).
+- `style(fromIdx, toIdx, attributes)` / `styleByPath(path, attributes)` / `styleByPath(fromPath, toPath, attributes)`: Sets attributes on the elements. `styleByPath(path, ...)` throws when the path names no node.
+- `removeStyle(fromIdx, toIdx, attributeKeys)` / `removeStyleByPath(fromPath, toPath, attributeKeys)`: Removes attributes.
+- `splitByPath(path)` / `mergeByPath(path)`: Splits the element holding the position the path points to, or merges the element at the path into its previous sibling.
+- `indexToPath(index)` / `pathToIndex(path)`: Converts between flat indexes and paths.
+- `toXML()`: Returns the tree as an XML string, e.g. `<doc><p>hello</p></doc>`.
+
 **Selection using presence**
 
 Share tree selection using presence. Convert `index` to `position` for `yorkie.Tree`.
@@ -687,6 +865,8 @@ doc.subscribe('others', (event) => {
 
 Examples:
 - [ProseMirror example](https://github.com/yorkie-team/yorkie-js-sdk/blob/main/examples/vanilla-prosemirror)
+
+To bind a Tree to a ProseMirror editor, see [ProseMirror](/docs/sdks/prosemirror).
 
 **Counter**
 
@@ -772,7 +952,7 @@ A document's size includes both visible content and CRDT metadata required for s
 - **Local updates** that exceed the size limit are rejected and not pushed to the server
 - **Remote updates** are always applied to ensure state convergence across clients
 
-**Tip**: Monitor connection status using `Document.subscribe('connection')` to detect when limits are reached.
+**Tip**: Wrap `doc.update()` in `try`/`catch` to handle `ErrDocumentSizeExceedsLimit` for local updates, and subscribe to `write-rejected` to learn when the server refuses a push. See [Recovering from Refused Writes](#recovering-from-refused-writes).
 
 #### Document Revisions
 
@@ -808,7 +988,7 @@ Revisions are stored on the server and can be accessed by any client with access
 List all revisions using `client.listRevisions()`:
 
 ```javascript
-// Get the first 50 revisions (newest first)
+// Get the first 10 revisions (newest first)
 const revisions = await client.listRevisions(doc);
 
 // Get revisions with pagination
@@ -824,12 +1004,11 @@ revisions.forEach(revision => {
   console.log(`Label: ${revision.label}`);
   console.log(`Description: ${revision.description}`);
   console.log(`Created at: ${revision.createdAt}`);
-  console.log(`Server Sequence: ${revision.serverSeq}`);
 });
 ```
 
 Available options:
-- `pageSize` (Optional, default: 50): Number of revisions to retrieve per request
+- `pageSize` (Optional, default: 10): Number of revisions to retrieve per request
 - `offset` (Optional, default: 0): Number of revisions to skip for pagination
 - `isForward` (Optional, default: false): Sort order - `false` for newest first, `true` for oldest first
 
@@ -838,7 +1017,7 @@ Each revision summary includes:
 - `label`: The label provided when creating the revision
 - `description`: Optional description of the revision
 - `createdAt`: Timestamp when the revision was created
-- `serverSeq`: Server sequence number at the time of revision creation
+- `snapshot`: The document content in YSON format. It may be empty in list results; use `getRevision()` to read it.
 
 **Getting Revision Details**
 
@@ -1030,11 +1209,11 @@ console.log(doc.history.canRedo()); // false
 **Supported Operations**
 
 History supports all CRDT types and operations including:
-- **Text**: edit operations (setStyle support is under development)
+- **Text**: edit and setStyle operations
 - **Object**: property set, delete operations
 - **Array**: push, insert, delete, move operations
 - **Counter**: increase operations
-- **Tree**: Undo/Redo support is under development
+- **Tree**: edit (including split and merge) and style operations
 
 ```javascript
 doc.update((root) => {
@@ -1052,7 +1231,7 @@ console.log(doc.getRoot().todos.toJS()); // ['Task 1', 'Task 2']
 
 **Limitations**
 
-- **Maximum Stack Depth**: 50 changes per stack.
+- **Maximum Stack Depth**: 50 changes per stack by default. Set it per document with `new yorkie.Document(key, { maxUndoDepth })`.
 - **Not Available During Update**: You cannot call `undo()` or `redo()` inside a `doc.update()` callback.
 
 ```javascript
@@ -1062,6 +1241,7 @@ doc.update((root) => {
 ```
 
 - **Local Only**: History tracks only local changes. Remote changes are applied but not added to undo/redo stacks.
+- **Cleared on Attach**: The history is cleared after `client.attach()`, so changes made before attaching cannot be undone. Calling `undo()` or `redo()` on an empty stack does nothing.
 
 <Alert status="info">
 Undo/redo operations only affect your own editing history and seamlessly integrate with changes from other users.
@@ -1171,7 +1351,7 @@ const unsubscribe = channel.subscribe('chat', (event) => {
 });
 
 // Broadcast a message to all clients in the same channel
-await channel.broadcast('chat', { message: 'Hello, world!' });
+channel.broadcast('chat', { message: 'Hello, world!' });
 ```
 
 The event object contains:
@@ -1192,9 +1372,44 @@ channel.subscribe('notification', (event) => {
 });
 
 // Broadcast to different topics
-await channel.broadcast('chat', { message: 'Hello!' });
-await channel.broadcast('notification', { type: 'user-joined', user: 'Alice' });
+channel.broadcast('chat', { message: 'Hello!' });
+channel.broadcast('notification', { type: 'user-joined', user: 'Alice' });
 ```
+
+`broadcast(topic, payload, options?)` returns immediately and throws if the channel is not attached. The message is sent in the background and retried with backoff on retryable errors. Pass `BroadcastOptions` to handle delivery errors:
+
+- `error`(Optional): Called with the error when the message cannot be delivered.
+- `maxRetries`(Optional): Maximum number of retries. Defaults to unlimited.
+
+```javascript
+channel.broadcast('chat', { message: 'Hello!' }, {
+  maxRetries: 3,
+  error: (err) => console.error('Broadcast failed:', err),
+});
+```
+
+#### Channel Events
+
+Besides broadcast topics, `channel.subscribe()` accepts the following reserved event names:
+
+| Event | Description |
+|-------|-------------|
+| `presence` | The session count changed. `event.type` is `initialized` or `presence-changed`, and `event.count` is the current count |
+| `broadcast` | Every broadcast message received, regardless of topic |
+| `local-broadcast` | A broadcast message sent by this client |
+| `auth-error` | An authentication error occurred. `event.reason` and `event.method` describe it |
+| `sync-error` | A heartbeat (`RefreshChannel`) failed with a non-recoverable error. `event.error` holds the error. The client keeps retrying, so a later `presence` event means it recovered |
+| `all` | Every channel event |
+
+```javascript
+channel.subscribe('sync-error', (event) => {
+  console.error(`${event.method} failed:`, event.error);
+});
+```
+
+<Alert status="warning">
+Because these names are reserved, a broadcast topic named `presence`, `broadcast`, `local-broadcast`, `auth-error`, `sync-error`, or `all` cannot be subscribed to by topic. Use other topic names.
+</Alert>
 
 <Alert status="warning">
 Broadcast messages are ephemeral and only delivered to clients currently connected to the channel. Messages are not persisted or stored, so clients that join later will not receive previous messages.
@@ -1205,7 +1420,8 @@ Broadcast messages are ephemeral and only delivered to clients currently connect
 Channels automatically track the number of connected clients, making it easy to display session counters.
 
 ```javascript
-// Subscribe to presence changes
+// Subscribe to presence changes.
+// event.type is 'initialized' when the watch starts, 'presence-changed' after.
 const unsubscribe = channel.subscribe('presence', (event) => {
   console.log(`Sessions: ${event.count}`);
 });
@@ -1269,7 +1485,7 @@ import { setLogLevel, LogLevel } from '@yorkie-js/sdk';
 setLogLevel(LogLevel.Error); // Display logs with Error or higher
 ```
 
-The available log levels for `setLogLevel` are:
+The default level is `LogLevel.Warn`. The available log levels for `setLogLevel` are:
 
 | LogLevel | Description                     |
 |----------|---------------------------------|

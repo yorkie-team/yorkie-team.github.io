@@ -34,7 +34,7 @@ graph LR
         PS["Project Stats Refresh"]
     end
 
-    subgraph Lock["Distributed Locking"]
+    subgraph Lock["Leader Check + Task Lock"]
         DL["Prevent Duplicate Runs"]
     end
 
@@ -75,11 +75,11 @@ sequenceDiagram
 #### How It Works
 
 1. The scheduler triggers the deactivation task at the configured interval.
-2. For each [Project](/docs/advanced/projects), the system queries for clients that have not communicated with the server for longer than the `client-deactivate-threshold` (default: 24 hours).
-3. Each candidate client is deactivated, removing it from the active client set.
+2. The task reads the next page of activated clients across all projects, up to `housekeeping-candidates-limit`, ordered by client ID and continuing after the last client seen in the previous run.
+3. Each client is checked against its [Project](/docs/advanced/projects)'s `client-deactivate-threshold` (default: 24 hours). Clients that have not communicated with the server for longer than that are deactivated, removing them from the active client set. Up to `housekeeping-deactivate-concurrency` clients are deactivated in parallel.
 4. The `minVersionVector` can now advance, unblocking garbage collection.
 
-Projects are processed in a round-robin fashion across runs, distributing load over time rather than processing all projects in a single cycle.
+When the scan reaches the end of the client list, the cursor resets and the next run starts from the beginning. This spreads the work over several runs instead of scanning every client in a single cycle. Compaction and project stats refresh page through documents and projects the same way.
 
 ### Document Compaction
 
@@ -93,10 +93,10 @@ Over time, a document accumulates a large history of individual changes. Documen
 
 A document is eligible for compaction when:
 
-- It has accumulated at least `CompactionMinChanges` changes (default: 1000).
+- Its server sequence (the number of changes stored for it) is at least `housekeeping-compaction-min-changes` (default: 1000).
 - It is **not** currently attached to any client.
 
-The second condition ensures that compaction does not interfere with active editing sessions. Document content remains identical after compaction -- only the internal change history is consolidated.
+The second condition ensures that compaction does not interfere with active editing sessions. Document content remains identical after compaction -- only the internal change history is consolidated. An administrator can also force compaction of a single document, which skips the attachment check. Compaction bumps the document's [epoch](/docs/internals/synchronization#epoch), so a client still holding a checkpoint from before compaction must reattach.
 
 ### Configuration
 
@@ -150,7 +150,7 @@ $ yorkie server \
 
 ### Cluster Mode Behavior
 
-In a [Cluster Mode](/docs/internals/cluster-mode) deployment, only the leader server executes housekeeping tasks. This is coordinated through leader election, preventing duplicate work across cluster nodes.
+In a [Cluster Mode](/docs/internals/cluster-mode) deployment, only the leader server executes housekeeping tasks. This is coordinated through leader election, preventing duplicate work across cluster nodes. Within a server, each task also takes a lock and skips the run if the previous one is still in progress.
 
 For more on leader election, see [Cluster Mode: Architecture Components](/docs/internals/cluster-mode#architecture-components).
 
@@ -159,11 +159,13 @@ For more on leader election, see [Cluster Mode: Architecture Components](/docs/i
 Housekeeping logs its activity for observability:
 
 ```
-HSKP: candidates 150, deactivated 45, 2.3s
-HSKP: candidates 89, compacted 12, 1.8s
+HSKP: deactivation registered — interval=30s candidates_limit=2000 concurrency=8
+HSKP: deactivation #3 <last-client-id> candidates 150/4210 deactivated 45/1033 cc=8 1.2s
+HSKP: compaction #2 seq:0 id:<last-doc-id> candidates 89/89 compacted 12/12 1.8s
+HSKP: project-stats #5 <last-project-id> refreshed 40/40 310ms
 ```
 
-These logs show the number of candidates processed, the actions taken, and the duration of each run. Use these to tune configuration parameters for your workload.
+Each line shows the task, its term (one full pass over the candidates), the cursor the run started from, the candidates and processed items for this run and for the term so far, and the duration of the run. A run that processes nothing is not logged. Use these to tune configuration parameters for your workload.
 
 ### Further Reading
 

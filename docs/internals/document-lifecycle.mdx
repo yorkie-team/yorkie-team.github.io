@@ -24,11 +24,11 @@ stateDiagram-v2
 | **Deactivated** | The client exists locally but has no connection to the server. No documents can be attached. |
 | **Activated** | The client is registered with the server and can attach to documents and channels. |
 
-When a client is deactivated (via `client.deactivate()` or by the server's [Housekeeping](/docs/glossary) process), all attached documents are detached and resources are released.
+When a client is deactivated (via `client.deactivate()` or by the server's [Housekeeping](/docs/internals/housekeeping) process), all attached documents are detached and resources are released.
 
 ### Document States
 
-A document transitions through several states during its lifecycle:
+A document transitions through several states during its lifecycle. The diagram below is the full state machine from the server's point of view:
 
 ```mermaid
 stateDiagram-v2
@@ -51,6 +51,8 @@ stateDiagram-v2
 | **Attached** | The document is successfully attached and synchronized. | `update()`, `subscribe()`, `detach()`, `remove()`, `PushPull` |
 | **Detached** | The document has been detached but the client is still active. | `attach()` (with a new Document instance) |
 | **Removed** | The document has been soft-deleted and can no longer be edited. | `deactivate()` |
+
+`nil` and `Attaching` are internal states that the SDK passes through while `client.attach()` is in progress. The JS SDK's `DocStatus` enum exposes only the three states an application can observe: `DocStatus.Detached`, `DocStatus.Attached`, and `DocStatus.Removed`. A document that has not been attached yet reports `Detached`.
 
 ### Attach and Detach
 
@@ -86,6 +88,12 @@ await client.attach(doc2);
 
 This design ensures [Garbage Collection](/docs/internals/crdt-concepts#garbage-collection) consistency and prevents internal state conflicts. Detached documents are not included in GC calculations, so reattaching a stale instance could leave inconsistent tombstone nodes.
 
+#### Resuming Offline Edits
+
+By default, a new Document instance starts empty and loads the latest state from the server, so any local changes that were never pushed are lost when the page reloads. The JS SDK can keep them across sessions with the `store` client option, a `DocStore` persistence backend. With a store, the client saves the document's snapshot, checkpoint, and unpushed local changes. On the next `attach` the document is restored from the store, and the server resumes from the saved checkpoint and accepts the re-pushed changes.
+
+Resuming requires a stable client identity: set the `key` client option to a random value that the application generates once and reuses across launches, because the actor stamped into changes and the store keys are derived from it.
+
 ### Document Removal
 
 Documents can be removed (soft-deleted) while in the `Attaching` or `Attached` state:
@@ -102,6 +110,12 @@ The removal process:
 3. All other clients are notified that the document is removed.
 
 Removal is a soft delete. [Housekeeping](/docs/internals/housekeeping) does not delete removed documents later: its tasks only deactivate inactive clients, compact documents, and refresh project stats. A removed document stays in the database with its `RemovedAt` timestamp, and its key can be reused by a new document.
+
+A document can also be removed without calling `client.remove()`. If the project has `remove-on-detach` enabled (see [CLI: Updating the Project](/docs/tools/cli#updating-the-project)), detaching the last client that has the document attached removes it, and that client sees the document in the `Removed` state.
+
+#### Compaction and Epoch
+
+When the server [compacts](/docs/internals/synchronization#document-compaction) a document, it discards the old change history and bumps the document's [epoch](/docs/internals/synchronization#epoch). A client that still holds a checkpoint from before compaction gets `ErrEpochMismatch` on its next sync, which the JS SDK reports as an `epoch-mismatch` document event. To recover, detach the document and attach a new Document instance with the same key.
 
 #### Key-ID Relationship
 
@@ -133,7 +147,7 @@ When a client is deactivated, all of its documents transition according to their
 
 The server's Housekeeping process automatically deactivates clients that have been inactive for longer than the `client-deactivate-threshold` (default: 24 hours). This is important for [Garbage Collection](/docs/internals/crdt-concepts#garbage-collection) -- inactive clients prevent the `minVersionVector` from advancing, blocking GC of tombstoned nodes. By deactivating stale clients, the system can reclaim memory more efficiently.
 
-You can subscribe to connection events to detect when this happens:
+You can subscribe to status events to detect when this happens:
 
 ```javascript
 doc.subscribe('status', (event) => {
@@ -150,8 +164,8 @@ The `PushPull` synchronization operation is **only available in the Attached sta
 
 | State | PushPull Available? |
 |-------|-------------------|
-| nil | No |
-| Attaching | No (PushPull runs as part of the attach process) |
+| nil (internal) | No |
+| Attaching (internal) | No (PushPull runs as part of the attach process) |
 | **Attached** | **Yes** |
 | Detached | No |
 | Removed | No |

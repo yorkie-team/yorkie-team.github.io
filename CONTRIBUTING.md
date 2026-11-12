@@ -6,7 +6,7 @@ Yorkie is Apache 2.0 licensed and accepts contributions via GitHub pull requests
 
 If you have any questions along the way, please don’t hesitate to ask us
 
-- Discord: [Yorkie Discord](https://discord.com/invite/MVEAwz9sBy).
+- Discord: [Yorkie Discord](https://discord.gg/MVEAwz9sBy).
 
 ### Getting started
 

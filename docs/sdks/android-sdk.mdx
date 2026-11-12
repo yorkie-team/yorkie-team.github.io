@@ -107,6 +107,25 @@ scope.launch {
 }
 ```
 
+**initialRoot**
+
+Pass `initialRoot` to seed root keys that the document does not have yet. It is a `Map<String, suspend JsonObject.(key: String) -> Unit>` (typealias `InitialRoot`): after the server's copy of the document is applied, each initializer runs only if its key is still absent from the root, and receives that key. All the initializers that run form one local change, which is excluded from the undo/redo history. Each initializer should write only its own key. Two clients that attach for the first time at once may both initialize a missing key; their changes converge like any other concurrent edit.
+
+```kotlin
+scope.launch {
+    client.attachDocument(
+        document,
+        initialRoot = mapOf(
+            "title" to { key -> this[key] = "Untitled" },
+            "todos" to { key -> setNewArray(key) },
+            "likes" to { key -> setNewCounter(key, 0) },
+        ),
+    ).await()
+}
+```
+
+The document is attached before the initializers run, so if one throws, the returned `Deferred` resolves to a failure but the document stays attached; detach it as usual.
+
 #### Detaching Documents
 
 Detach a document from the client. The client no longer synchronizes the document with the server. This is important for garbage collection to clean up CRDT tombstones.
@@ -126,7 +145,7 @@ scope.launch {
 Manually push local changes to the server and pull remote changes. This is useful when using `Manual` sync mode or when you need to force synchronization.
 
 **Parameters:**
-- `document`: Specific document to sync. If `null`, syncs all attached documents (optional)
+- `resource`: The document or [channel](#channel) to sync. If `null`, syncs all attached documents, but not channels (optional)
 
 ```kotlin
 // Sync a specific document
@@ -183,6 +202,18 @@ scope.launch {
 }
 ```
 
+Other clients attached to the document receive the message as a `Document.Event.Broadcast` event, which carries the sender's `actorID`, the `topic` and the `payload`.
+
+```kotlin
+scope.launch {
+    document.events.filterIsInstance<Document.Event.Broadcast>().collect { event ->
+        if (event.topic == "cursor-moved") {
+            println("${event.actorID} moved the cursor: ${event.payload}")
+        }
+    }
+}
+```
+
 #### Removing Documents
 
 Permanently remove a document from the server. This operation is irreversible and deletes the document for all clients.
@@ -196,16 +227,56 @@ scope.launch {
 }
 ```
 
+#### Document Revisions
+
+Save snapshots of an attached document on the server, browse them, and restore one. Each call requires the client to be activated and the document to be attached to it. `createRevision`, `listRevisions` and `getRevision` return a `RevisionSummary`, with `id`, `label`, `description`, `snapshot` (the document content as [YSON](/docs/internals/yson)) and `createdAt` (`java.util.Date`). Unlike most client calls, these do not wrap failures in a `Result`: `await()` throws the error instead.
+
+```kotlin
+scope.launch {
+    // Create a revision; description is optional (default: "")
+    val revision = client.createRevision(document, "v1.0", "Before the redesign").await()
+
+    // List revisions, newest first by default
+    val revisions = client.listRevisions(
+        document,
+        pageSize = 20,     // default: 10
+        offset = 0,        // default: 0
+        isForward = false, // false = newest first, true = oldest first
+    ).await()
+    revisions.forEach { println("${it.id} ${it.label} ${it.createdAt}") }
+
+    // Get one revision with its snapshot
+    val detail = client.getRevision(document, revision.id).await()
+    println(detail.snapshot)
+
+    // Restore the document to that revision
+    client.restoreRevision(document, revision.id).await()
+}
+```
+
+`listRevisions` leaves `snapshot` empty; use `getRevision` to read it.
+
+<Alert status="warning">
+Restoring replaces the entire document state and cannot be undone automatically. Consider creating a new revision before restoring to preserve the current state.
+</Alert>
+
 #### Deactivating a Client
 
 Deactivate the client and disconnect from the server. All attached documents are detached automatically.
 
 **Parameters:**
-- `keepalive`: If `true`, ensures the deactivation request completes even if the app terminates (optional, default: `false`)
+- `deactivateOptions`: `Client.DeactivateOptions` (optional, default: `Client.DeactivateOptions()`)
+  - `keepalive`: If `true`, ensures the deactivation request completes even if the app terminates (default: `null`, treated as `false`)
+  - `synchronous`: If `true`, the server waits for all pending operations to complete before deactivating (default: `null`, treated as `false`)
 
 ```kotlin
 scope.launch {
     client.deactivateAsync().await()
+}
+
+// Make sure the request completes while the app is shutting down
+scope.launch {
+    client.deactivateAsync(Client.DeactivateOptions(keepalive = true)).await()
 }
 ```
 
@@ -311,7 +382,7 @@ val document = Document("my-document")
 
 - `disableGC`: `Boolean` (default: `false`) - disables garbage collection for the document.
 - `disablePresence`: `Boolean` (default: `false`) - seeds the presence-free state before attach; the server-fixated value from the attach response takes precedence once attached.
-- `maxUndoDepth`: `Int` (default: `50`) - how many entries `history.undo()` can go back, and likewise for `history.redo()`. Since v0.7.24. Must be a positive integer; otherwise constructing the options throws `YorkieException` with code `ErrInvalidArgument`. See [History (Undo/Redo)](#history-undoredo).
+- `maxUndoDepth`: `Int` (default: `50`) - how many entries `history.undoAsync()` can go back, and likewise for `history.redoAsync()`. Since v0.7.24. Must be a positive integer; otherwise constructing the options throws `YorkieException` with code `ErrInvalidArgument`. See [History (Undo/Redo)](#history-undoredo).
 
 There is no `enableDevtools` option on Android.
 
@@ -611,7 +682,7 @@ scope.launch {
 | `WriteDenied` | The server refused this client's writes, and `client.resyncAsync` discarded them to re-anchor the document. See [Recovering from refused writes](#recovering-from-refused-writes). |
 | `LogDiscontinuity` | The appended change log had a hole, so it could not be replayed. The snapshot restored normally; what was lost is the log written after it. |
 
-#### Changing Synchronization Mode
+#### Document Sync Mode
 
 Change how the document synchronizes with the server. See the [Client Changing Synchronization Mode](#changing-synchronization-mode) section for available modes and their descriptions.
 
@@ -792,6 +863,37 @@ scope.launch {
 }
 ```
 
+**Moving Elements:**
+
+Move APIs take the element's `id` (a `TimeTicket`), which stays the same when other elements are inserted or removed, so it is safer than an index under concurrent edits.
+
+```kotlin
+scope.launch {
+    document.updateAsync { root, _ ->
+        val items = root.getAs<JsonArray>("items")
+        val first = items[0]
+        val second = items[1]
+
+        // Move to the end or to the front
+        items.moveLast(first.id)
+        items.moveFront(first.id)
+
+        // Move `first` right after `second`, or right before it
+        items.moveAfter(second.id, first.id)
+        items.moveBefore(second.id, first.id)
+
+        // Move the element at index 2 right after the element at index 0
+        items.moveAfterByIndex(0, 2)
+
+        // Remove by id instead of by index
+        items.remove(first.id)
+
+        // Read an element as a specific type, or null if it has another type
+        val nested = items.getAs<JsonObject>(0)
+    }.await()
+}
+```
+
 **Nested Arrays:**
 
 ```kotlin
@@ -909,7 +1011,7 @@ document.updateAsync { root, presence ->
 // Convert position range back to index range
 document.events.filterIsInstance<Document.Event.PresenceChanged.Others>().collect { event ->
     if (event is Document.Event.PresenceChanged.Others.PresenceChanged) {
-        val (clientID, presence) = event.changed
+        val (actorID, presence) = event.changed
         val selectionJson = presence["selection"] as? String
         selectionJson?.let {
             val posRange = gson.fromJson(it, TextPosStructRange::class.java)
@@ -972,6 +1074,27 @@ JsonCounter is ideal for:
 - Collaborative counters
 - Any numeric value that multiple users might modify simultaneously
 
+**Dedup Counter:**
+
+`JsonDedupCounter` counts unique actors, such as unique visitors, instead of summing increments. Create it with `setNewDedupCounter(key)` and register an actor with `add(actor)`; adding the same actor again does not change the count. It is backed by a HyperLogLog sketch, so `value` is an approximate count (about 2% error). `add` throws `IllegalArgumentException` when `actor` is empty, and `JsonDedupCounter` has no `increase`.
+
+```kotlin
+scope.launch {
+    document.updateAsync { root, _ ->
+        root.setNewDedupCounter("uniqueVisitors")
+    }.await()
+
+    document.updateAsync { root, _ ->
+        root.getAs<JsonDedupCounter>("uniqueVisitors")
+            .add("user-1")
+            .add("user-2")
+            .add("user-1")  // ignored, already counted
+    }.await()
+}
+
+val visitors = document.getRoot().getAs<JsonDedupCounter>("uniqueVisitors").value  // 2
+```
+
 #### JsonTree
 
 `JsonTree` is a CRDT-based tree structure designed for representing hierarchical document structures such as HTML or XML. It is ideal for building rich text editors with complex formatting (such as ProseMirror or Quill).
@@ -1013,9 +1136,9 @@ scope.launch {
                 }
                 element("a") {
                     text { "Click here" }
-                    attr {
-                        "href" to "https://example.com"
-                        "target" to "_blank"
+                    // attr { } sets a single attribute; use attrs { } for several
+                    attrs {
+                        mapOf("href" to "https://example.com", "target" to "_blank")
                     }
                 }
             }
@@ -1056,8 +1179,56 @@ scope.launch {
 
         // Apply styles to nodes in range
         tree.style(0, 5, mapOf("color" to "red", "fontSize" to "16"))
+
+        // Remove attributes from nodes in range
+        tree.removeStyle(0, 5, listOf("fontSize"))
     }.await()
 }
+```
+
+**Editing by Path:**
+
+Besides integer indexes, a position can be given as a path: a list of child indexes from the root, where the last number inside an element that holds text is a character offset. For example, in `<doc><p>Hello</p></doc>`, `listOf(0, 1)` is between `H` and `e`. `fromPath` and `toPath` must have the same length. The examples below use the tree from [Creating a Tree](#jsontree).
+
+```kotlin
+scope.launch {
+    document.updateAsync { root, _ ->
+        val tree = root.getAs<JsonTree>("content")
+
+        // Insert text at offset 0 of the first paragraph's text
+        tree.editByPath(listOf(0, 0), listOf(0, 0), text { "Hi " })
+
+        // Split the first paragraph at offset 2 of its text into two paragraphs
+        tree.splitByPath(listOf(0, 2))
+
+        // Merge the second paragraph into the one before it
+        tree.mergeByPath(listOf(1))
+
+        // Set or remove attributes by path
+        tree.styleByPath(listOf(0), mapOf("align" to "center"))
+        tree.removeStyleByPath(listOf(0), listOf(1), listOf("align"))
+    }.await()
+}
+```
+
+`edit(fromIndex, toIndex, splitLevel, vararg contents)` and `editByPath(fromPath, toPath, vararg contents, splitLevel)` also take a `splitLevel` that splits the ancestors at the start position up to that many levels, the way pressing Enter in a paragraph does.
+
+**Converting Tree Positions:**
+
+`pathToIndex` and `indexToPath` convert between the two forms. To share a selection through presence, convert it to a `TreePosStructRange`, which keeps pointing at the same content while others edit, and convert it back when you receive it.
+
+```kotlin
+val tree = document.getRoot().getAs<JsonTree>("content")
+val index = tree.pathToIndex(listOf(0, 1))
+val path = tree.indexToPath(index)
+
+// Index or path range -> position range, to store in presence
+val posRange = tree.indexRangeToPosRange(2 to 5)
+val samePosRange = tree.pathRangeToPosRange(listOf(0, 1) to listOf(0, 4))
+
+// Position range received from another client -> index or path range
+val indexRange = tree.posRangeToIndexRange(posRange)
+val pathRange = tree.posRangeToPathRange(posRange)
 ```
 
 **Getting Tree Properties:**
@@ -1154,7 +1325,7 @@ scope.launch {
 
 #### Updating Presence
 
-Update presence at any time using `document.updateAsync()`. The `presence` parameter in the updater function is a `Presence` instance.
+Update presence at any time using `document.updateAsync()`. The `presence` parameter in the updater function is a `DocPresence` (`dev.yorkie.document.presence.DocPresence`).
 
 **Function Signature:**
 
@@ -1162,12 +1333,12 @@ Update presence at any time using `document.updateAsync()`. The `presence` param
 fun updateAsync(
     message: String? = null,
     skipHistory: Boolean = false,
-    updater: suspend (root: JsonObject, presence: Presence) -> Unit
+    updater: suspend (root: JsonObject, presence: DocPresence) -> Unit
 ): Deferred<OperationResult>
 ```
 
 **Parameters:**
-- `updater: suspend (root: JsonObject, presence: Presence) -> Unit` - Lambda with `presence` parameter for updates
+- `updater: suspend (root: JsonObject, presence: DocPresence) -> Unit` - Lambda with `presence` parameter for updates
 
 **Example:**
 
@@ -1232,6 +1403,35 @@ scope.launch {
 }
 ```
 
+**Clearing Presence:**
+
+`presence.clear()` removes every key of this client's presence.
+
+```kotlin
+scope.launch {
+    document.updateAsync { _, presence ->
+        presence.clear()
+    }.await()
+}
+```
+
+#### Reading Presence
+
+`document.myPresence` returns this client's presence, or an empty map while the document is not attached. `document.presences` is a `StateFlow<Presences>` of the online clients' presences, including this client's, keyed by actor ID.
+
+```kotlin
+val myPresence = document.myPresence
+println("My name: ${myPresence["name"]}")
+
+scope.launch {
+    document.presences.collect { presences ->
+        presences.forEach { (actorID, presence) ->
+            println("$actorID: ${presence["name"]}")
+        }
+    }
+}
+```
+
 #### Presence Events
 
 Presence events notify you when users join, leave, or update their presence. These events are part of `Document.Event.PresenceChanged`:
@@ -1265,32 +1465,32 @@ scope.launch {
                     // Initial presence state loaded from server
                     val onlineUsers = event.initialized
                     println("Online users: ${onlineUsers.size}")
-                    onlineUsers.forEach { (clientID, presence) ->
+                    onlineUsers.forEach { (actorID, presence) ->
                         println("${presence["name"]} is online")
                     }
                 }
 
                 is Document.Event.PresenceChanged.Others.Watched -> {
                     // Another client joined
-                    val (clientID, presence) = event.changed
+                    val (actorID, presence) = event.changed
                     println("${presence["name"]} joined")
                 }
 
                 is Document.Event.PresenceChanged.Others.Unwatched -> {
                     // Another client left
-                    val (clientID, presence) = event.changed
+                    val (actorID, presence) = event.changed
                     println("${presence["name"]} left")
                 }
 
                 is Document.Event.PresenceChanged.Others.PresenceChanged -> {
                     // Another client updated their presence
-                    val (clientID, presence) = event.changed
+                    val (actorID, presence) = event.changed
                     println("${presence["name"]} updated: ${presence["status"]}")
                 }
 
                 is Document.Event.PresenceChanged.MyPresence.PresenceChanged -> {
                     // Current client's presence updated
-                    val (clientID, presence) = event.changed
+                    val (actorID, presence) = event.changed
                     println("My presence updated: $presence")
                 }
             }
@@ -1342,11 +1542,14 @@ scope.launch {
         when (event) {
             is ChannelEvent.Initialized -> println("Initial session count: ${event.sessionCount}")
             is ChannelEvent.Changed -> println("Session count changed: ${event.sessionCount}")
+            is ChannelEvent.SyncError -> println("Channel refresh failed: ${event.cause}")
             else -> {}
         }
     }
 }
 ```
+
+`ChannelEvent.SyncError` is published when a channel refresh fails and cannot be recovered. An expired session (`ErrSessionNotFound`) is not reported this way, because the client attaches the channel again by itself.
 
 > `getCount()` is deprecated - use `getSessionCount()` instead.
 

@@ -59,7 +59,7 @@ const Products: NextPage = () => {
               </a>
             </h2>
             <p className="section_desc">
-              Yorkie allow you to build multiplayer products without the need for database configuration and conflict
+              Yorkie allows you to build multiplayer products without the need for database configuration and conflict
               management. This saves time and money.
             </p>
           </div>
@@ -86,7 +86,7 @@ const Products: NextPage = () => {
               <Link href="/docs/sdks/js-sdk#document" className="link">
                 Document
               </Link>{' '}
-              to enable complex application models while some CRDT libraries that only offer basic data types.
+              to enable complex application models, while some CRDT libraries only offer basic data types.
             </p>
             <div className="db_content">
               <CodeBlock.Wrapper>
@@ -137,7 +137,7 @@ const Products: NextPage = () => {
             </strong>
             <p className="sub_desc">
               You can build a sense of presence by tracking the status of users who are editing the same document with{' '}
-              <Link href="/docs/sdks/js-sdk#getting-presence" className="link">
+              <Link href="/docs/sdks/js-sdk#presence" className="link">
                 Presence
               </Link>
               .

@@ -10,7 +10,7 @@ AWS's Elastic Kubernetes Service (EKS) is a managed service that lets you deploy
 In this guide, you will install Yorkie cluster on AWS EKS using Helm.
 Then, you will test Yorkie cluster with Quill Example to see how collaborative editing works with Yorkie.
 
-<Alert status="danger">[AWS EKS clusters cost $0.10 per hour](https://aws.amazon.com/eks/pricing/), so you may incur charges by running this tutorial. The cost should be a few dollars at most, but be sure to delete your infrastructure promptly to avoid additional charges. We are not responsible for any charges you may incur.</Alert>
+<Alert status="danger">[AWS EKS clusters cost $0.10 per hour](https://aws.amazon.com/eks/pricing/), so you may incur charges by running this tutorial. The worker nodes (EC2), the EBS volumes for MongoDB (10Gi for each shard), and the ALB are billed on top of that, and they usually cost more than the control plane. The cost should be a few dollars at most, but be sure to delete your infrastructure promptly to avoid additional charges. We are not responsible for any charges you may incur.</Alert>
 
 ### Prerequisites
 
@@ -20,6 +20,8 @@ For this tutorial, you will need:
 
 - [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) v1.28+.
 - [Helm](https://helm.sh/docs/intro/install/) v3.0+.
+- [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) configured for your AWS account.
+- [Istio](https://istio.io/) 1.25+, which you will install with Helm below.
 
 ### Setup AWS EKS cluster
 
@@ -29,7 +31,7 @@ Below are the list of resources you need to provision:
 
 1. [AWS EKS cluster](https://docs.aws.amazon.com/eks/latest/userguide/getting-started.html) to provision Kubernetes cluster.
 2. [EBS CSI driver](https://docs.aws.amazon.com/eks/latest/userguide/ebs-csi.html) to provision EBS volumes attached to Kubernetes volumes. Note the name of its StorageClass, such as `gp2` or `gp3`: the MongoDB volumes need it.
-3. [ALB ingress controller](https://docs.aws.amazon.com/eks/latest/userguide/alb-ingress.html) to provision ALB ingress controller.
+3. [AWS Load Balancer Controller](https://docs.aws.amazon.com/eks/latest/userguide/aws-load-balancer-controller.html) to provision an ALB for Kubernetes ingresses.
 4. [Domain Name](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/domain-register.html) to access Yorkie cluster with domain name.
 5. [Certificate](https://docs.aws.amazon.com/acm/latest/userguide/gs-acm-request-public.html) to access Yorkie cluster with HTTPS.
 
@@ -223,14 +225,25 @@ Replace `{YOUR_API_DOMAIN_NAME}` with your domain name. Also, replace `{YOUR_CER
 This will install `yorkie-cluster` release in AWS EKS, which can be publicly accessible via `{YOUR_API_DOMAIN_NAME}` with HTTPS
 by provisioning external AWS ALB in front of Yorkie cluster.
 
+The ALB health-checks the `/healthz/ready` path, which the Istio gateway serves on its status port (NodePort `32442` in the `gateway.yaml` values above). If the ALB marks its targets unhealthy, add `--set ingress.awsAlb.healthcheckPort=32442` so that the health check uses that port.
+
+Other options you may want to set for production:
+
+- `mongodb.enabled=false` and `yorkie.args.dbConnectionUri`: use an external MongoDB, such as MongoDB Atlas or Amazon DocumentDB, instead of the MongoDB sharded cluster in the chart. The chart refuses to install without a connection URI when `mongodb.enabled` is `false`, and the MongoDB passwords are then not needed.
+- `yorkie.autoscaling.replicaCount`: the number of Yorkie replicas (default `3`).
+- `yorkie.resources` and `ingressGateway.resources`: resource requests and limits.
+- `yorkie.housekeeping.*`: housekeeping interval and limits. Empty fields keep the server defaults.
+- `ingressGateway.consistentHash.*`: the hash algorithm (`maglev` or `ringHash`) that routes requests for the same document to the same Yorkie node.
+- `ratelimit.*`: request rate limit at the gateway (disabled by default).
+
 <Alert status="info">You can also set other Helm chart configuration options. For more information about Helm chart configuration, see [Yorkie Cluster Helm Chart Configuration](https://github.com/yorkie-team/yorkie/tree/main/build/charts/yorkie-cluster#configuration).</Alert>
 
 After Yorkie cluster is installed, you will see the following output:
 
 ```bash
 NAME: yorkie-cluster
-LAST DEPLOYED: Thu Apr 27 21:49:06 2023
-NAMESPACE: default
+LAST DEPLOYED: Thu Nov 12 10:00:00 2026
+NAMESPACE: yorkie
 STATUS: deployed
 REVISION: 1
 TEST SUITE: None
@@ -282,6 +295,8 @@ $ yorkie project ls
  default  <public-key>  <secret-key>  2 minutes
 ```
 
+<Alert status="danger">Your cluster is now reachable from the internet with the default admin account `admin`/`admin`, and the Helm chart has no value to change it. Change the password right after you log in with `yorkie passwd`.</Alert>
+
 Then, you can test Yorkie cluster with [yorkie-js-sdk](https://github.com/yorkie-team/yorkie-js-sdk), a JavaScript SDK for Yorkie.
 
 Clone yorkie-js-sdk repository with the following command:
@@ -320,7 +335,7 @@ $ pnpm vanilla-quill dev
 > vite
 
 
-  VITE v5.3.5  ready in 178 ms
+  VITE v7.3.7  ready in 178 ms
 
   ➜  Local:   http://localhost:5173/
   ➜  Network: use --host to expose
@@ -355,12 +370,9 @@ $ kubectl delete namespace istio-system
 $ kubectl delete namespace yorkie
 ```
 
-(Optional) Then, delete EKS cluster via AWS Console or AWS CLI.
+(Optional) Then, delete EKS cluster via [AWS Console](https://console.aws.amazon.com/eks/home#/clusters) (`https://{YOUR_REGION}.console.aws.amazon.com/eks/home?region={YOUR_REGION}#/clusters`) or AWS CLI.
 
 ```bash
-# AWS Console
-$ https://{YOUR_REGION}.console.aws.amazon.com/eks/home?region={YOUR_REGION}/clusters
-
 # AWS CLI
 $ aws eks delete-cluster --name {YOUR_CLUSTER_NAME}
 ```

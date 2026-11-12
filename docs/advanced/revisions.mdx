@@ -15,7 +15,6 @@ Revisions are immutable snapshots of a document's state stored on the server. Ea
 - **Description**: Optional detailed explanation of what changed
 - **Snapshot**: The complete document state in [YSON](/docs/internals/yson) format
 - **Timestamp**: When the revision was created
-- **Server Sequence**: The document's server sequence number at creation time
 
 ### Use Cases
 
@@ -66,9 +65,11 @@ For detailed API documentation, see [JS SDK - Document Revisions](/docs/sdks/js-
 | `client.getRevision(doc, revisionId)` | Get revision details with snapshot |
 | `client.restoreRevision(doc, revisionId)` | Restore document to a revision |
 
+Server-side tools can list, read and restore revisions with the Admin API endpoints `ListRevisionsByAdmin`, `GetRevisionByAdmin` and `RestoreRevisionByAdmin`, which take a login token (see [Admin API Authentication](/docs/tools/admin-api#authentication)). The Admin API has no endpoint for creating revisions.
+
 ### Building a Revision UI
 
-This section shows how to build a revision management interface, using patterns from [CodePair](https://github.com/yorkie-team/codepair) as a reference.
+This section shows how to build a revision management interface. The [react-revision](https://github.com/yorkie-team/yorkie-js-sdk/tree/main/examples/react-revision) example puts these patterns together in a working app.
 
 #### React Hook (Recommended)
 
@@ -232,20 +233,23 @@ sequenceDiagram
 Restoring replaces the entire document state. Consider creating a new revision before restoring to preserve the current state as a backup.
 </Alert>
 
+A restore fails with `ErrDocumentSizeExceedsLimit` if the restored document would exceed the project's [MaxSizePerDocument](/docs/advanced/resources#maxsizeperdocument). The size is measured on the restored content, so restoring a smaller revision is allowed even when the current document is over the limit.
+
 ### Auto-Revisions
 
-Yorkie can automatically create revisions during snapshot creation. This is controlled by the `auto-revision-enabled` project setting.
+Yorkie can automatically create a revision each time the server stores a snapshot. This is controlled by the `auto-revision-enabled` project setting.
 
 | Setting | Default | Description |
 |---------|---------|-------------|
 | `auto-revision-enabled` | `true` | Automatically create revisions during snapshots |
 
 When enabled:
-- Revisions are created automatically during garbage collection snapshots
+- A revision is created each time the server stores a snapshot, which happens every [SnapshotInterval](/docs/advanced/resources#snapshotinterval) changes (500 by default)
+- No revision is created if only presence has changed since the previous snapshot
 - Labels follow the format: `snapshot-{serverSeq}`
 - Descriptions: `Auto created revision of snapshot #{serverSeq}`
 
-Configure via the Dashboard or [Admin API](/docs/tools/admin-api#post-yorkiev1adminserviceupdateproject). See [Resources](/docs/advanced/resources#autorevisionenabled) for details.
+Configure via the Dashboard or the Admin API [UpdateProject](/docs/tools/admin-api#post-yorkiev1adminserviceupdateproject) endpoint. See [Resources](/docs/advanced/resources#autorevisionenabled) for details.
 
 ### Best Practices
 
@@ -276,14 +280,14 @@ Use consistent, descriptive labels:
 
 ### Permissions
 
-Revision operations require appropriate document permissions:
+Revision operations require appropriate document permissions. When an [Auth Webhook](/docs/advanced/security#auth-webhook) is configured, each operation is checked as the method below with the document key:
 
-| Operation | Required Permission |
-|-----------|-------------------|
-| Create | Write access |
-| List | Read access |
-| Get | Read access |
-| Restore | Write access |
+| Operation | Auth webhook method | Required `verb` |
+|-----------|---------------------|-----------------|
+| Create | `CreateRevision` | `rw` |
+| List | `ListRevisions` | `r` |
+| Get | `GetRevision` | `r` |
+| Restore | `RestoreRevision` | `rw` |
 
 ### Related Documentation
 
@@ -291,4 +295,4 @@ Revision operations require appropriate document permissions:
 - [React SDK - useRevisions](/docs/sdks/react#userevisions) - React hook for revision management
 - [YSON](/docs/internals/yson) - Understanding snapshot format
 - [Resources](/docs/advanced/resources) - Project configuration including auto-revisions
-- [CodePair](https://github.com/yorkie-team/codepair) - Reference implementation
+- [react-revision](https://github.com/yorkie-team/yorkie-js-sdk/tree/main/examples/react-revision) - Reference implementation

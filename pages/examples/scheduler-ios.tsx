@@ -25,11 +25,7 @@ const SchedulerIOSExampleView: NextPage = () => {
               <Sidebar.TabsPanel value="code">
                 <Sidebar.GuideTitle>{exampleTitle}</Sidebar.GuideTitle>
                 <Sidebar.GuideDescription>
-                  This is an example of real-time collaborative{' '}
-                  <a href="https://todomvc.com" className="link" target="_blank" rel="noreferrer">
-                    Scheduler
-                  </a>{' '}
-                  using{' '}
+                  This is an example of real-time collaborative Scheduler using{' '}
                   <a
                     href="https://github.com/yorkie-team/yorkie-ios-sdk"
                     className="link"

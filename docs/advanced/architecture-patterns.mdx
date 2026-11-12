@@ -27,7 +27,7 @@ In this pattern, your existing database serves as the Source of Truth, while you
 - Explicit "Save" action persists content to your database
 - Server maintains full control over document lifecycle
 
-> **Security Note:** When using Admin API for server-managed lifecycle, secure your API endpoints properly. See [Auth Webhook](/docs/advanced/security#auth-webhook) for authentication setup.
+> **Security Note:** Admin API requests are authenticated with the project's secret key or a login token, not through the Auth Webhook. Call the Admin API only from your server and keep the secret key out of client-side code. See [Admin API Authentication](/docs/tools/admin-api#authentication). To control what clients can do through the SDK, use the [Auth Webhook](/docs/advanced/security#auth-webhook).
 
 **Document Creation Flow:**
 
@@ -215,7 +215,7 @@ sequenceDiagram
 ```
 
 1. Client finishes editing and [detaches](/docs/sdks/js-sdk#detaching-the-document) from document
-2. With project-level `RemoveOnDetach` option enabled, document is automatically removed when no clients are attached
+2. With project-level `RemoveOnDetach` option enabled, document is automatically removed when the last attached client detaches or is deactivated (for example, by [Housekeeping](/docs/internals/housekeeping))
 3. This automatic cleanup reduces server management overhead
 
 **Document Saving Flow:**
@@ -298,7 +298,7 @@ sequenceDiagram
     participant S as Your Server
     participant DB as Your Database
     
-    C->>Y: Remove document (Yorkie API)
+    C->>Y: Remove document (SDK or Admin API)
     Y-->>C: Document removed
     C->>S: Request metadata deletion
     S->>DB: Delete metadata
@@ -306,7 +306,9 @@ sequenceDiagram
     S-->>C: Deletion confirmed
 ```
 
-1. Client or server removes document via [Yorkie Admin API](/docs/tools/admin-api#post-yorkiev1adminserviceremovedocument)
+1. The document is removed from Yorkie in one of two ways:
+   - A client calls [`client.remove(doc)`](/docs/sdks/js-sdk#removing-the-document) in the SDK. When an Auth Webhook is configured, this is checked as the `RemoveDocument` method with `verb` `rw`
+   - Your server calls the Admin API [RemoveDocumentByAdmin](/docs/tools/admin-api#post-yorkiev1adminserviceremovedocumentbyadmin) endpoint with the project's secret key. Clients must not call the Admin API
 2. Server removes document metadata from your database
 3. Document content is automatically removed from Yorkie
 
@@ -338,7 +340,7 @@ Consider these factors when selecting an architecture pattern:
 Explore real-world examples implementing these patterns:
 - [Simultaneous Cursors Example](/examples/simultaneous-cursors) - Pattern C with real-time presence
 - [ToDo MVC Example](/examples/react-todomvc) - Real-time collaboration
-- [Quill Editor Example](/examples/nextjs-quill) - Collaborative text editing
+- [Quill Editor Example](/examples/quill) - Collaborative text editing
 - [View All Examples](/examples)
 
 ### Related Documentation

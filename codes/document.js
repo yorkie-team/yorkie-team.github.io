@@ -17,16 +17,6 @@ doc.update((root) => {
 });
 `;
 
-const RICHTEXT_CODE = `
-// RichText is similar to Text except that we can add attributes to contents.
-doc.update((root) => {
-  root.text = new yorkie.RichText();       // {"text":""}
-  root.text.edit(0, 0, 'hello');           // {"text":"hello"}
-  root.text.edit(0, 1, 'H');               // {"text":"Hello"}
-  root.text.setStyle(0, 1, {bold: true});  // {"text":"<b>H</b>ello"}
-});
-`;
-
 const COUNTER_CODE = ` 
 // Counter supports numeric types that change with addition and subtraction.
 doc.update((root) => {
@@ -85,7 +75,6 @@ channel.broadcast('chat', { user: 'Alice', message: 'Hello everyone!' });
 export const DOCUMENT_CODE = {
   common: COMMON_CODE,
   text: TEXT_CODE,
-  richText: RICHTEXT_CODE,
   counter: COUNTER_CODE,
 };
 

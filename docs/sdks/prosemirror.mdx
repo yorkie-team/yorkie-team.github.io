@@ -21,6 +21,12 @@ The following packages must be installed alongside:
 npm install @yorkie-js/sdk prosemirror-model prosemirror-state prosemirror-view
 ```
 
+The Quick Start below also uses `prosemirror-schema-basic` and `prosemirror-example-setup`:
+
+```bash
+npm install prosemirror-schema-basic prosemirror-example-setup
+```
+
 ### Quick Start
 
 Below is a minimal example that connects a ProseMirror editor to Yorkie for real-time collaboration.
@@ -62,6 +68,7 @@ async function main() {
 
   // 3. Bind ProseMirror to Yorkie
   const binding = new YorkieProseMirrorBinding(view, doc, 'tree', {
+    client, // Lets the binding pause incoming sync during IME composition
     cursors: {
       enabled: true,
       overlayElement: document.getElementById('cursor-overlay')!,
@@ -108,7 +115,11 @@ When you're done, call `binding.destroy()` to clean up subscriptions and event l
 `YorkieProseMirrorBinding` accepts an options object as its fourth argument:
 
 ```typescript
+import { SyncMode } from '@yorkie-js/sdk';
+
 const binding = new YorkieProseMirrorBinding(view, doc, 'tree', {
+  client,
+  syncMode: SyncMode.Realtime,
   markMapping: { strong: 'strong', em: 'em', code: 'code', link: 'link' },
   wrapperElementName: 'span',
   cursors: { enabled: true, overlayElement: cursorOverlayEl },
@@ -118,10 +129,13 @@ const binding = new YorkieProseMirrorBinding(view, doc, 'tree', {
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
+| `client` | Yorkie `Client` | `undefined` | The client the document is attached with. The binding uses it to pause incoming sync during IME composition. Without it, the binding logs a warning once and a remote edit may end a composition early. See [IME Composition Handling](#ime-composition-handling) |
+| `syncMode` | `SyncMode` | `SyncMode.Realtime` | The sync mode the document is attached in, so the binding can restore it after a composition. Pass it whenever it is not the default |
 | `markMapping` | `MarkMapping` | Auto-generated from schema | Maps ProseMirror mark names to Yorkie element type names |
 | `wrapperElementName` | `string` | `'span'` | Element name used to wrap bare text alongside mark elements |
 | `cursors` | `CursorOptions` | `undefined` | Remote cursor display configuration |
-| `onLog` | `(type, message) => void` | `undefined` | Callback for sync event logging |
+| `publishSelection` | `boolean` | Follows `view.editable` | Whether to publish the local selection as presence. By default a read-only editor publishes no selection. Remote cursors are rendered either way |
+| `onLog` | `(type: 'local' \| 'remote' \| 'error', message: string) => void` | `undefined` | Callback for sync event logging |
 
 ### Mark Mapping
 
@@ -220,7 +234,9 @@ The binding automatically dispatches selection updates to this plugin when remot
 
 #### IME Composition Handling
 
-During IME input (Chinese, Japanese, Korean), the binding defers remote changes that overlap the block being composed. Non-overlapping changes in other blocks are applied immediately. Deferred changes are flushed when composition ends, preventing the browser from breaking the active composition.
+During IME input (Chinese, Japanese, Korean), applying a remote change can break the browser's composing text. To avoid this, the binding switches the document to `SyncMode.RealtimePushOnly` while a composition is active: local edits keep flowing to peers, and incoming changes are held back. When the composition ends, the binding returns the document to the mode given in the `syncMode` option.
+
+This requires the `client` option. The binding pauses only documents attached in `SyncMode.Realtime`; with `SyncMode.Polling` or `SyncMode.Manual` it leaves the mode alone. The pause is asynchronous, so a remote change can still arrive mid-composition. Such a change, and any change that arrives when the binding cannot pause, is applied straight away and may end the composition early.
 
 ### Lower-Level Utilities
 
@@ -229,7 +245,11 @@ For custom integrations, the package exports individual functions:
 #### Format Conversion
 
 ```typescript
-import { pmToYorkie, yorkieToJSON } from '@yorkie-js/prosemirror';
+import { pmToYorkie, yorkieToJSON, invertMapping } from '@yorkie-js/prosemirror';
+
+// The downstream functions take the inverse of the mark mapping
+// (Yorkie element name → ProseMirror mark name).
+const elementToMarkMapping = invertMapping(markMapping);
 
 // ProseMirror Node → Yorkie tree JSON
 const yorkieDoc = pmToYorkie(pmNode, markMapping, 'span');
@@ -265,8 +285,13 @@ syncToPMIncremental(view, tree, schema, elementToMarkMapping, onLog, 'span');
 // Downstream: full rebuild (used on initialization and as error recovery)
 syncToPM(view, tree, schema, elementToMarkMapping, onLog, 'span');
 
-// Block-level diff between two PM docs
-const diff = diffDocs(currentDoc, newDoc); // Returns { fromPos, toPos, slice }
+// Block-level diff between two PM docs.
+// Returns { fromPos, toPos, newNodes }, or undefined when the docs are equal.
+const newDoc = buildDocFromYorkieTree(tree, schema, elementToMarkMapping, 'span');
+const diff = diffDocs(view.state.doc, newDoc);
+if (diff) {
+  applyDocDiff(view, diff);
+}
 ```
 
 #### Position Mapping
@@ -284,9 +309,11 @@ const treeJSON = JSON.parse(tree.toJSON());
 const map = buildPositionMap(pmDoc, treeJSON);
 
 // Convert positions between coordinate systems
-const yorkieIdx = pmPosToYorkieIdx(map, pmPos);
+const yorkieIdx = pmPosToYorkieIdx(map, view.state.selection.head);
 const pmPos = yorkieIdxToPmPos(map, yorkieIdx);
 ```
+
+Other exports include `defaultCursorColors`, `CursorManager`, `remoteSelectionsKey`, and the types `YorkieProseMirrorOptions`, `CursorOptions`, `RemoteSelection`, and `DocDiff`.
 
 ### Examples
 

@@ -20,6 +20,8 @@ After that, you can load the SDK by importing it in your JavaScript file:
 import yorkie from '@yorkie-js/sdk';
 ```
 
+Named imports such as `import { Client, Document } from '@yorkie-js/sdk'` work as well.
+
 Alternatively, you can also include the following code in the `<head>` tag of your HTML:
 
 ```html
@@ -125,5 +127,7 @@ doc.subscribe('presence', (event) => {
   console.log(`There are currently ${users.length} users online`);
 });
 ```
+
+Each `clientID` is the actor ID of a client, which `client.getActorID()` returns, not `client.getID()`. See [Presence](/docs/sdks/js-sdk#presence) for details.
 
 Next, let's take a look at the [JS SDK](/docs/sdks/js-sdk).

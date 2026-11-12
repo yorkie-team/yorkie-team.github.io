@@ -13,6 +13,8 @@ order: 22
 
 Both approaches provide flexible ways to integrate Yorkie into your React applications. Choose Providers when you need a global document context, and `useYorkieDoc` for isolated, self-managed instances.
 
+For ephemeral features such as online counts or broadcast messages, see [ChannelProvider](/docs/sdks/react#channelprovider) in the React Guide.
+
 ### Installation
 
 Before using `YorkieProvider` and `DocumentProvider`, ensure you have installed the Yorkie SDK:
@@ -155,10 +157,13 @@ If you prefer not to use `DocumentProvider`, use `useYorkieDoc`, which directly 
 import { useYorkieDoc } from '@yorkie-js/react';
 
 function StandaloneTodoList() {
-  const { root, update, loading, error } = useYorkieDoc(
+  const { root, update, loading, error } = useYorkieDoc<{ todos: string[] }>(
     'PROJECT_API_KEY',
     'DOC_KEY',
-    { initialRoot: { todos: [] } }
+    {
+      rpcAddr: '{{API_ADDR}}',
+      initialRoot: { todos: [] },
+    }
   );
 
   if (loading) return <p>Loading...</p>;

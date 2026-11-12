@@ -20,7 +20,7 @@ Schemas are defined using a TypeScript-like DSL, stored on the server, and deliv
 
     Dashboard->>Server: (1) Create schema
     SDK->>Server: (2) Attach document with schema
-    Server->>Server: (3) Validate existing document
+    Server->>Server: (3) Bind schema to document
     Server-->>SDK: (4) Return document + schema rules
     SDK->>Doc: (5) doc.update()
     Doc->>Doc: (6) Validate changes against rules
@@ -34,7 +34,7 @@ Schemas are defined using a TypeScript-like DSL, stored on the server, and deliv
 
 1. Define a schema in the Dashboard using the Schema DSL
 2. A client attaches a document with a schema reference
-3. The server validates that the existing document conforms to the schema
+3. The server binds the schema to the document, or keeps the schema the document is already bound to. The existing content is not validated on attach
 4. Schema rules are sent to the client along with the document
 5. The client calls `doc.update()` to edit the document
 6. The SDK validates the updated document against the schema rules
@@ -170,7 +170,9 @@ Schemas are managed immutably. Each update creates a new version:
 - **v2**: Updated schema with new fields or modified constraints
 - **v3**: Further revisions
 
-Documents remain bound to the schema version they were attached with. To use a new schema version, detach and reattach the document with the updated schema reference.
+A document has a single schema binding, stored on the server. When a client attaches a document that has no schema yet with a `schema` option, the server binds that schema to the document, provided no other client is attached and the attach is approved as a document write (see [Second request on `AttachDocument`](/docs/advanced/security#second-request-on-attachdocument)). Otherwise the existing binding is kept, and the client receives the rules of the schema the document is already bound to.
+
+Once a document is bound, attaching with a different schema version is not a supported way to change the binding. To move a document to a new schema version, detach all clients and call the Admin API [UpdateDocument](/docs/tools/admin-api#post-yorkiev1adminserviceupdatedocument) endpoint with `schema_key`. The document's current content must conform to the new version.
 
 ### Use Cases
 
@@ -182,5 +184,5 @@ Documents remain bound to the schema version they were attached with. To use a n
 ### Related Documentation
 
 - [JS SDK](/docs/sdks/js-sdk) - Client and Document usage
-- [Dashboard](/docs/tools/dashboard) - Schema creation and management
+- [Dashboard]({{DASHBOARD_PATH}}) - Schema creation and management
 - [Security](/docs/advanced/security) - Auth Webhook for access control

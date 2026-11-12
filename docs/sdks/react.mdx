@@ -36,14 +36,17 @@ npm install @yorkie-js/react @yorkie-js/sdk
 
 | Prop | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
-| apiKey | string | Yes | - | Project API key from the [Dashboard]({{DASHBOARD_PATH}}) |
+| apiKey | string | No (needed for yorkie.dev) | - | Project API key from the [Dashboard]({{DASHBOARD_PATH}}) |
 | rpcAddr | string | No | `https://api.yorkie.dev` | Yorkie API server address |
 | authTokenInjector | `(reason?: string) => Promise<string>` | No | undefined | Async function that returns an auth token for [Auth Webhook](/docs/advanced/security#auth-webhook) verification |
 | metadata | `Record<string, string>` | No | {} | Client metadata (e.g., `{ userID: '...' }` for MAU measurement) |
+| clientKey | string | No | Random per client | Client key, forwarded as `ClientOptions.key`. Required for [offline persistence](/docs/sdks/js-sdk#offline-persistence). React reserves the `key` prop, so the provider takes `clientKey` instead. See [JS SDK: Client Key](/docs/sdks/js-sdk#client-key) |
 | activate | boolean | No | true | Whether to call `client.activate()` on mount and `client.deactivate()` on unmount. Set to `false` for channel-only apps — the SDK lazy-attaches the client on the first heartbeat, so the explicit activate round trips become unnecessary. Document use cases (`useDocument`, `useYorkieDoc`) still require activation, so leave this `true` if any descendant attaches a document. |
 | deactivateOnUnload | boolean | No | true | Whether to deactivate the client on page unload. Set to `false` to skip the unmount-time `client.deactivate({ keepalive: true })` for apps that don't need GC or presence cleanup on unload (e.g. non-collaborative or `disableGC` documents). See [JS SDK: deactivateOnUnload](/docs/sdks/js-sdk#deactivate-the-client). |
 
-`YorkieProviderProps` extends [`ClientOptions`](/docs/sdks/js-sdk), so any client option (e.g. `deactivateOnUnload`) can be passed directly as a prop in addition to the provider-level `activate` flag.
+`YorkieProviderProps` is [`ClientOptions`](/docs/sdks/js-sdk#client-options) without `key`, plus the provider-level `activate` and `clientKey` props, so any other client option (e.g. `deactivateOnUnload`) can be passed directly as a prop.
+
+The provider creates the client once and rebuilds it only when `apiKey`, `rpcAddr`, or `clientKey` changes. Changing other props such as `metadata` or `authTokenInjector` after mount has no effect.
 
 **Basic usage:**
 
@@ -556,6 +559,7 @@ const {
 **Usage example:**
 
 ```tsx
+import { useEffect, useState } from 'react';
 import { useRevisions } from '@yorkie-js/react';
 import type { RevisionSummary } from '@yorkie-js/react';
 
@@ -733,7 +737,7 @@ const { root, presences, connection, update, loading, error } = useYorkieDoc<Doc
 );
 ```
 
-In addition to the document-specific options below, `options` accepts any [`ClientOptions`](/docs/sdks/js-sdk) field except `apiKey` (which is passed as the first argument) — for example `rpcAddr`, `metadata`, or `authTokenInjector`.
+In addition to the document-specific options below, `options` accepts any [`ClientOptions`](/docs/sdks/js-sdk#client-options) field except `apiKey` (which is passed as the first argument) — for example `rpcAddr`, `metadata`, or `authTokenInjector`. Unlike `YorkieProvider`, the client key is passed as `key` here, not `clientKey`.
 
 **When to use:**
 - Isolated features that don't share a client with the rest of the app
@@ -744,7 +748,7 @@ In addition to the document-specific options below, `options` accepts any [`Clie
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| rpcAddr | string | - | Yorkie server address (inherited from `ClientOptions`) |
+| rpcAddr | string | `https://api.yorkie.dev` | Yorkie server address (inherited from `ClientOptions`) |
 | initialRoot | `Record<string, any>` | {} | Initial values for the document root |
 | initialPresence | `Record<string, any>` | {} | Initial presence data for the current client |
 | enableDevtools | boolean | false | Enable [Devtools](/docs/tools/devtools) integration |
@@ -806,6 +810,8 @@ const useDocumentSelector = createDocumentSelector<{ counter: number }>();
 Then use it in your components to select only the data you need:
 
 ```tsx
+import { StreamConnectionStatus } from '@yorkie-js/sdk';
+
 function CounterDisplay() {
   // Only re-renders when root.counter changes
   const { counter } = useDocumentSelector(({ root }) => ({
@@ -823,7 +829,7 @@ function IncrementButton() {
 
   return (
     <button
-      disabled={connection === 'disconnected'}
+      disabled={connection === StreamConnectionStatus.Disconnected}
       onClick={() => update((root) => (root.counter += 1))}
     >
       Increment
@@ -840,22 +846,24 @@ Selectors run on every document update, even if the selected value doesn't chang
 
 #### shallowEqual
 
-When your selector returns a new object on every call, React's default reference equality (`===`) will always detect a change and trigger a re-render. Use `shallowEqual` as the equality function to compare object properties shallowly:
+The selector hook compares the previous and next selected values with `shallowEqual` by default, so a selector that returns a new object on every call (as in the examples above) only re-renders when one of its properties changes. Pass a second argument to use a different equality function, such as a deep comparison or `Object.is`:
 
 ```tsx
-import { createDocumentSelector, shallowEqual } from '@yorkie-js/react';
+import { createDocumentSelector } from '@yorkie-js/react';
 
 const useDocumentSelector = createDocumentSelector<MyDocType>();
 
 function MyComponent() {
-  const { title, count } = useDocumentSelector(
-    ({ root }) => ({ title: root.title, count: root.count }),
-    shallowEqual,
+  const items = useDocumentSelector(
+    ({ root }) => root.items,
+    (a, b) => JSON.stringify(a) === JSON.stringify(b), // custom deep compare
   );
 
-  return <p>{title}: {count}</p>;
+  return <p>{items.length} items</p>;
 }
 ```
+
+`shallowEqual` is also exported from `@yorkie-js/react` for use in your own comparisons.
 
 #### Re-render minimization tips
 
@@ -1011,6 +1019,13 @@ Combine `DocumentProvider` for persistent collaborative data with `ChannelProvid
 > Both `DocumentProvider` and `ChannelProvider` automatically detach their resources when unmounted. You can safely use conditional rendering or route-based mounting to control when documents and channels are active.
 
 ```tsx
+import {
+  YorkieProvider,
+  DocumentProvider,
+  ChannelProvider,
+  useChannel,
+} from '@yorkie-js/react';
+
 function CollaborativeEditor() {
   return (
     <YorkieProvider apiKey="your-api-key" rpcAddr="{{API_ADDR}}">
@@ -1020,7 +1035,7 @@ function CollaborativeEditor() {
       </DocumentProvider>
 
       {/* Ephemeral channel for chat and online count */}
-      <ChannelProvider channelKey="editor-room" isRealtime={true}>
+      <ChannelProvider channelKey="editor-room">
         <ChatPanel />
         <OnlineCounter />
       </ChannelProvider>
@@ -1047,6 +1062,9 @@ The [yorkie-js-sdk repository](https://github.com/yorkie-team/yorkie-js-sdk/tree
 | [react-flow](https://github.com/yorkie-team/yorkie-js-sdk/tree/main/examples/react-flow) | Collaborative node/edge graph editor | `useDocument`, `JSONArray`, complex CRDT mutations |
 | [react-tldraw](https://github.com/yorkie-team/yorkie-js-sdk/tree/main/examples/react-tldraw) | Collaborative whiteboard with undo/redo | Direct SDK usage, presence for cursors, history API |
 | [react-revision](https://github.com/yorkie-team/yorkie-js-sdk/tree/main/examples/react-revision) | Note editor with revision history | `useRevisions`, `useDocument`, create/list/restore revisions |
+| [react-polling-playground](https://github.com/yorkie-team/yorkie-js-sdk/tree/main/examples/react-polling-playground) | Trending-stocks leaderboard with per-ticker watcher counts over Polling channels | `ChannelProvider` with `syncMode`, `useChannel`, `usePeekChannel` |
+| [react-page-view-counter](https://github.com/yorkie-team/yorkie-js-sdk/tree/main/examples/react-page-view-counter) | Page view counter | `useYorkie`, `useDocument`, `Counter`, `SyncMode.Manual` |
+| [simultaneous-cursors](https://github.com/yorkie-team/yorkie-js-sdk/tree/main/examples/simultaneous-cursors) | Shared cursors drawn from presence | `YorkieProvider`, `DocumentProvider`, `useDocument` presence |
 
 **Next.js examples:**
 

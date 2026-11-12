@@ -78,7 +78,12 @@ const LANGUAGE_MAP: ObjectType = {
   yml: 'yaml',
 };
 
-const IGNORE_FILES = ['.DS_Store', 'thumbnail.webp', 'demo.mp4'];
+// BuildInfo.plist is generated per developer and holds their local IP address.
+const IGNORE_FILES = ['.DS_Store', 'thumbnail.webp', 'demo.mp4', 'BuildInfo.plist'];
+
+// SimutaneousCurcors is a leftover of the SimultaneousCursors rename
+// (yorkie-ios-sdk#232) that only holds a stray BuildInfo.plist.
+const IGNORE_EXAMPLES = ['SimutaneousCurcors'];
 
 const IGNORE_DIRECTORIES = ['DerivedData', 'xcuserdata', '.swiftpm', 'build'];
 
@@ -177,6 +182,18 @@ const getDirectoryInfo = (dirPath: string, basePath?: string): DirectoryInfo => 
 const EXAMPLES_PATH = path.join(process.cwd(), 'temp/Examples');
 const EXAMPLES_OUTPUT_PATH = path.join(process.cwd(), 'examples');
 
+// Remove example directories owned by this script that the SDK no longer
+// has, so examples removed upstream do not pile up in `examples/`.
+const removeStaleExamples = (isOwned: (name: string) => boolean, keep: Set<string>) => {
+  if (!fs.existsSync(EXAMPLES_OUTPUT_PATH)) return;
+  fs.readdirSync(EXAMPLES_OUTPUT_PATH, { withFileTypes: true }).forEach((entry) => {
+    if (entry.isDirectory() && isOwned(entry.name) && !keep.has(entry.name)) {
+      fs.rmSync(path.join(EXAMPLES_OUTPUT_PATH, entry.name), { recursive: true, force: true });
+      console.log(`[Remove] Stale example: ${entry.name}`);
+    }
+  });
+};
+
 const fetchIOSExamples = () => {
   if (!fs.existsSync(EXAMPLES_PATH)) {
     console.log(`Examples path does not exist: ${EXAMPLES_PATH}`);
@@ -189,8 +206,15 @@ const fetchIOSExamples = () => {
   // Filter out workspace directories and other non-example directories
   const filteredDirectories = exampleDirectories.filter((dirPath) => {
     const dirName = path.basename(dirPath);
-    return !dirName.endsWith('.xcworkspace') && !dirName.endsWith('.xcodeproj');
+    return (
+      !dirName.endsWith('.xcworkspace') && !dirName.endsWith('.xcodeproj') && !IGNORE_EXAMPLES.includes(dirName)
+    );
   });
+
+  removeStaleExamples(
+    (name) => name.startsWith('ios-'),
+    new Set(filteredDirectories.map((dirPath) => `ios-${path.basename(dirPath).toLowerCase()}`)),
+  );
 
   filteredDirectories.forEach((dirPath) => {
     const exampleName = dirPath.replace(EXAMPLES_PATH + '/', '').toLowerCase();
