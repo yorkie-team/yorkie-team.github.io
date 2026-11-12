@@ -90,6 +90,7 @@ Flags:
       --backend-use-default-project                            Whether to use the default project. Even if public key is not provided from the client, the default project will be used for the request. (default true)
       --backend-watch-heartbeat-interval-max duration          The longest heartbeat interval the server will serve on an idle Watch stream. 0 turns the heartbeat off server-wide, whatever clients ask for. (default 1m0s)
       --backend-watch-heartbeat-interval-min duration          The shortest heartbeat interval the server will serve on an idle Watch stream. A client asking for less is clamped up to this. (default 5s)
+      --channel-batch-window duration                          The default batch window for channel events, within [0s, 1s]: an event on an idle channel goes out at once, a busy channel at most once per window. A project may set its own. (default 100ms)
       --channel-session-cleanup-interval duration              The interval for running cleanup of expired channel sessions. (default 10s)
       --channel-session-count-cache-size int                   The cache size of the channel session count. (default 10000)
       --channel-session-count-cache-ttl duration               The TTL value for channel session count cache. Must be at least 100ms. (default 30s)
@@ -150,7 +151,7 @@ Global Flags:
 
 ### Signup
 
-Sign up for a new account using the `signup` command.
+Sign up for a new account using the `signup` command. Like `login`, it also accepts `-p, --password` to pass the password without a prompt and `--insecure` for a server without TLS.
 
 ```bash
 $ yorkie signup -u <username> --rpc-addr api.yorkie.dev:443
@@ -181,10 +182,17 @@ $ yorkie context ls
  *        localhost:8080      true      eyJhbGciOi...FUT3js73Mw 
 ```
 
+To switch the current context to another server you have logged in to, use `context set`. To delete a stored context, use `context remove`:
+
+```bash
+$ yorkie context set api.yorkie.dev:443
+$ yorkie context remove localhost:8080
+```
 
 ### Logout
 
-To log out from the server, use the `logout` subcommand:
+To log out from a server, use the `logout` subcommand. It logs out from the server given by `--rpc-addr` (default `localhost:8080`), not from the current context. Pass `--force` to log out from all servers at once.
+
 ```bash
 $ yorkie logout
 $ yorkie context ls
@@ -253,7 +261,7 @@ $ yorkie project ls
  default  fUYWjA2SmLrpxvt9hvix62  Qxp5jZeuH45bDmjYLDfZJb  15 minutes 
 ```
 
-Use the `--verbose` (`-v`) flag to show more project settings, such as the auth webhook, event webhook, snapshot and attachment settings. The table does not include every setting (allowed origins, for example); use `--output json` or `--output yaml` to see all of them.
+Use the `--verbose` (`-v`) flag to show more project settings, such as the auth webhook and event webhook settings, client deactivate threshold, channel session TTL, channel batch window, snapshot settings, subscriber and attachment limits, and remove on detach. The table does not include every setting (allowed origins, for example); use `--output json` or `--output yaml` to see all of them.
 
 _The server creates a `default project` automatically. If you create a Client without an apiKey, the Client is created in the default project._
 
@@ -263,7 +271,7 @@ Create a new project with a name using `create`.
 
 ```bash
 $ yorkie project create test-project
-{"id":"6ac32edca4736914b08f6be3","name":"test-project","owner":"","auth_webhook_url":"","auth_webhook_methods":null,"AuthWebhookMaxRetries":10,"AuthWebhookMinWaitInterval":"100ms","AuthWebhookMaxWaitInterval":"3s","AuthWebhookRequestTimeout":"3s","event_webhook_url":"","event_webhook_events":null,"EventWebhookMaxRetries":10,"EventWebhookMinWaitInterval":"100ms","EventWebhookMaxWaitInterval":"3s","EventWebhookRequestTimeout":"3s","ClientDeactivateThreshold":"24h0m0s","ChannelSessionTTL":"15s","SnapshotThreshold":500,"SnapshotInterval":500,"MaxSubscribersPerDocument":0,"MaxAttachmentsPerDocument":0,"MaxSizePerDocument":10485760,"remove_on_detach":false,"auto_revision_enabled":true,"allowed_origins":null,"public_key":"KMtw3F2MhLRQyYzHfryUpA","secret_key":"MmQRTFYFKckaeJBUkcUkpS","created_at":"2026-10-05T05:00:12.110212Z","updated_at":"2026-10-05T05:00:12.110212Z"}
+{"id":"6ac32edca4736914b08f6be3","name":"test-project","owner":"","auth_webhook_url":"","auth_webhook_methods":null,"AuthWebhookMaxRetries":10,"AuthWebhookMinWaitInterval":"100ms","AuthWebhookMaxWaitInterval":"3s","AuthWebhookRequestTimeout":"3s","event_webhook_url":"","event_webhook_events":null,"EventWebhookMaxRetries":10,"EventWebhookMinWaitInterval":"100ms","EventWebhookMaxWaitInterval":"3s","EventWebhookRequestTimeout":"3s","ClientDeactivateThreshold":"24h0m0s","ChannelSessionTTL":"15s","ChannelBatchWindow":"","SnapshotThreshold":500,"SnapshotInterval":500,"MaxSubscribersPerDocument":0,"MaxAttachmentsPerDocument":0,"MaxSizePerDocument":10485760,"remove_on_detach":false,"auto_revision_enabled":true,"allowed_origins":null,"public_key":"KMtw3F2MhLRQyYzHfryUpA","secret_key":"MmQRTFYFKckaeJBUkcUkpS","created_at":"2026-10-05T05:00:12.110212Z","updated_at":"2026-10-05T05:00:12.110212Z"}
 ```
 
 If you create a Client with the project's `public_key` as the `apiKey`, you can manage the Client in the project.
@@ -296,6 +304,7 @@ Flags:
       --auth-webhook-min-wait-interval duration    Minimum wait interval between retries(exponential backoff). (default 100ms)
       --auth-webhook-request-timeout duration      Timeout for each authorization webhook request. (default 3s)
       --auth-webhook-url string                    authorization-webhook update url
+      --channel-batch-window duration              Batch window for channel events (must be between 0s and 1s); unset uses the server's --channel-batch-window. An open channel picks up a change when its next subscriber joins
       --channel-session-ttl duration               Channel session TTL (must be between 1s and 5m) (default 15s)
       --client-deactivate-threshold duration       client deactivate threshold for housekeeping (default 24h0m0s)
       --event-webhook-events-add stringArray       event-webhook events to add ('ALL' for all events)
@@ -324,7 +333,7 @@ Update the name of the project with the `--name` flag.
 
 ```bash
 $ yorkie project update test-project --name new-test-project
-{"id":"6ac32edca4736914b08f6be3","name":"new-test-project","owner":"","auth_webhook_url":"","auth_webhook_methods":null,"AuthWebhookMaxRetries":10,"AuthWebhookMinWaitInterval":"100ms","AuthWebhookMaxWaitInterval":"3s","AuthWebhookRequestTimeout":"3s","event_webhook_url":"","event_webhook_events":null,"EventWebhookMaxRetries":10,"EventWebhookMinWaitInterval":"100ms","EventWebhookMaxWaitInterval":"3s","EventWebhookRequestTimeout":"3s","ClientDeactivateThreshold":"24h0m0s","ChannelSessionTTL":"15s","SnapshotThreshold":500,"SnapshotInterval":500,"MaxSubscribersPerDocument":0,"MaxAttachmentsPerDocument":0,"MaxSizePerDocument":10485760,"remove_on_detach":false,"auto_revision_enabled":true,"allowed_origins":null,"public_key":"KMtw3F2MhLRQyYzHfryUpA","secret_key":"MmQRTFYFKckaeJBUkcUkpS","created_at":"2026-10-05T05:00:12.110212Z","updated_at":"2026-10-05T05:00:12.145846Z"}
+{"id":"6ac32edca4736914b08f6be3","name":"new-test-project","owner":"","auth_webhook_url":"","auth_webhook_methods":null,"AuthWebhookMaxRetries":10,"AuthWebhookMinWaitInterval":"100ms","AuthWebhookMaxWaitInterval":"3s","AuthWebhookRequestTimeout":"3s","event_webhook_url":"","event_webhook_events":null,"EventWebhookMaxRetries":10,"EventWebhookMinWaitInterval":"100ms","EventWebhookMaxWaitInterval":"3s","EventWebhookRequestTimeout":"3s","ClientDeactivateThreshold":"24h0m0s","ChannelSessionTTL":"15s","ChannelBatchWindow":"","SnapshotThreshold":500,"SnapshotInterval":500,"MaxSubscribersPerDocument":0,"MaxAttachmentsPerDocument":0,"MaxSizePerDocument":10485760,"remove_on_detach":false,"auto_revision_enabled":true,"allowed_origins":null,"public_key":"KMtw3F2MhLRQyYzHfryUpA","secret_key":"MmQRTFYFKckaeJBUkcUkpS","created_at":"2026-10-05T05:00:12.110212Z","updated_at":"2026-10-05T05:00:12.145846Z"}
 ```
 
 Configure the project's Auth Webhook URL using the `--auth-webhook-url` flag.
@@ -508,7 +517,7 @@ Set the client deactivate threshold of the project with the `--client-deactivate
 
 ```bash
 $ yorkie project update test-project --client-deactivate-threshold 1h30m20s
-{"id":"6ac32edca4736914b08f6be3","name":"test-project","owner":"","auth_webhook_url":"","auth_webhook_methods":null,"AuthWebhookMaxRetries":10,"AuthWebhookMinWaitInterval":"100ms","AuthWebhookMaxWaitInterval":"3s","AuthWebhookRequestTimeout":"3s","event_webhook_url":"","event_webhook_events":null,"EventWebhookMaxRetries":10,"EventWebhookMinWaitInterval":"100ms","EventWebhookMaxWaitInterval":"3s","EventWebhookRequestTimeout":"3s","ClientDeactivateThreshold":"1h30m20s","ChannelSessionTTL":"15s","SnapshotThreshold":500,"SnapshotInterval":500,"MaxSubscribersPerDocument":0,"MaxAttachmentsPerDocument":0,"MaxSizePerDocument":10485760,"remove_on_detach":false,"auto_revision_enabled":true,"allowed_origins":null,"public_key":"KMtw3F2MhLRQyYzHfryUpA","secret_key":"MmQRTFYFKckaeJBUkcUkpS","created_at":"2026-10-05T05:00:12.110212Z","updated_at":"2026-10-05T05:00:12.199159Z"}
+{"id":"6ac32edca4736914b08f6be3","name":"test-project","owner":"","auth_webhook_url":"","auth_webhook_methods":null,"AuthWebhookMaxRetries":10,"AuthWebhookMinWaitInterval":"100ms","AuthWebhookMaxWaitInterval":"3s","AuthWebhookRequestTimeout":"3s","event_webhook_url":"","event_webhook_events":null,"EventWebhookMaxRetries":10,"EventWebhookMinWaitInterval":"100ms","EventWebhookMaxWaitInterval":"3s","EventWebhookRequestTimeout":"3s","ClientDeactivateThreshold":"1h30m20s","ChannelSessionTTL":"15s","ChannelBatchWindow":"","SnapshotThreshold":500,"SnapshotInterval":500,"MaxSubscribersPerDocument":0,"MaxAttachmentsPerDocument":0,"MaxSizePerDocument":10485760,"remove_on_detach":false,"auto_revision_enabled":true,"allowed_origins":null,"public_key":"KMtw3F2MhLRQyYzHfryUpA","secret_key":"MmQRTFYFKckaeJBUkcUkpS","created_at":"2026-10-05T05:00:12.110212Z","updated_at":"2026-10-05T05:00:12.199159Z"}
 ```
 
 Setting the client deactivation threshold to `1h30m20s` deactivates clients that have been inactive for 1 hour, 30 minutes, and 20 seconds but remained activated. This helps document GC by not counting the deactivated client's document sequence.
@@ -524,3 +533,31 @@ $ yorkie project update test-project --channel-session-ttl 1m
 ```
 
 Values outside the `[1s, 5m]` range are rejected by the admin API. Lowering the TTL increases refresh traffic from active clients linearly (the SDK heartbeat targets `TTL/3`).
+
+#### Channel Batch Window
+
+Channel Batch Window is a per-project duration that controls how often channel events, such as presence counts and broadcasts, are delivered. An event on an idle channel goes out at once, and a busy channel delivers at most once per window. The value must be between `0s` and `1s`. A project that does not set it uses the server's `--channel-batch-window` (default `100ms`); `project ls -v` shows such a project's window as `default`.
+
+Set the channel batch window of the project with the `--channel-batch-window` flag.
+
+```bash
+$ yorkie project update test-project --channel-batch-window 300ms
+```
+
+A channel that is already open picks up the new value when its next subscriber joins. The CLI cannot clear the value; to return a project to the server default, set `channel_batch_window` to an empty string with the Admin API [UpdateProject](/docs/tools/admin-api#post-yorkiev1adminserviceupdateproject) endpoint. See also [Resources](/docs/advanced/resources#channelbatchwindow).
+
+### History
+
+Show the change history of a document using the `history` command. It takes the project name and the document key.
+
+```bash
+$ yorkie history test-project test-document-1 --size 10
+```
+
+The output lists each change's server sequence (`SEQ`), its message, and a snapshot of the document (`SNAPSHOT`). Use `--output json` or `--output yaml` for machine-readable output.
+
+| Flag | Description |
+|------|-------------|
+| `--size` | The number of changes to show per page. When neither `--size` nor `--previous-seq` is set, every change is shown |
+| `--previous-seq` | The server sequence to page from |
+| `--forward` | Page toward newer changes. By default, paging goes backward from the latest change |
