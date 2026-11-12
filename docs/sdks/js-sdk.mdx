@@ -663,9 +663,12 @@ Share tree selection using presence. Convert `index` to `position` for `yorkie.T
 ```javascript
 // Update selection through tree editing
 doc.update((root, presence) => {
-  const range = root.t.edit(from, to, content);
+  // `Tree.edit` returns a boolean, not an index range, so compute
+  // the new caret position from the indexes you passed in.
+  root.t.edit(from, to, { type: 'text', value: text });
+  const caret = from + text.length;
   presence.set({
-    selection: root.t.indexRangeToPosRange(range),
+    selection: root.t.indexRangeToPosRange([caret, caret]),
   });
 });
 ```
@@ -727,11 +730,11 @@ DedupCounter is designed for daily UV tracking. Create a separate document per d
 For stricter type checking, you can use [type variables](https://www.typescriptlang.org/docs/handbook/2/generics.html) in TypeScript when creating a Document.
 
 ```typescript
-import yorkie, { JSONArray } from '@yorkie-js/sdk';
+import yorkie, { JSONArray, Text, Tree } from '@yorkie-js/sdk';
 type DocType = {
   list: JSONArray<number>;
-  text: yorkie.Text;
-  tree: yorkie.Tree;
+  text: Text;
+  tree: Tree;
 };
 type PresenceType = {
   username: string;
@@ -1164,7 +1167,7 @@ Channels support a pub/sub pattern for broadcasting ephemeral messages to all co
 // Subscribe to messages on a specific topic
 const unsubscribe = channel.subscribe('chat', (event) => {
   console.log(`[${event.topic}] ${event.payload.message}`);
-  console.log(`From: ${event.publisher}`);
+  console.log(`From: ${event.clientID}`);
 });
 
 // Broadcast a message to all clients in the same channel
@@ -1174,7 +1177,7 @@ await channel.broadcast('chat', { message: 'Hello, world!' });
 The event object contains:
 - `topic`: The topic name you subscribed to
 - `payload`: The message data (must be JSON serializable)
-- `publisher`: The client ID of the message sender
+- `clientID`: The actor ID of the message sender (`client.getActorID()` on the sending side)
 
 You can subscribe to multiple topics on the same channel.
 

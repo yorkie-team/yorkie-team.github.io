@@ -147,7 +147,11 @@ When enabled, documents are automatically removed from the server when the last 
 
 ```bash
 yorkie project update [project-name] \
-  --remove-on-detach true
+  --remove-on-detach
+
+# To turn it off again
+yorkie project update [project-name] \
+  --remove-on-detach=false
 ```
 
 <Alert status="warning">
@@ -198,7 +202,7 @@ For temporary collaborative sessions that don't need persistence:
 
 ```bash
 yorkie project update my-project \
-  --remove-on-detach true \
+  --remove-on-detach \
   --client-deactivate-threshold 1h
 ```
 

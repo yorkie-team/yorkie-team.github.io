@@ -234,8 +234,14 @@ import { pmToYorkie, yorkieToJSON } from '@yorkie-js/prosemirror';
 // ProseMirror Node → Yorkie tree JSON
 const yorkieDoc = pmToYorkie(pmNode, markMapping, 'span');
 
-// Yorkie tree → ProseMirror-compatible JSON (for Node.fromJSON)
-const pmJSON = yorkieToJSON(tree, schema, elementToMarkMapping, 'span');
+// Yorkie tree JSON → ProseMirror-compatible JSON (for Node.fromJSON)
+// The third argument is the initial mark stack, usually empty.
+const pmJSON = yorkieToJSON(
+  JSON.parse(tree.toJSON()),
+  elementToMarkMapping,
+  [],
+  'span',
+);
 ```
 
 #### Manual Sync

@@ -14,12 +14,13 @@ As documents are edited over time, two types of overhead accumulate:
 1. **Inactive clients** prevent [Garbage Collection](/docs/internals/crdt-concepts#garbage-collection) from reclaiming tombstoned nodes.
 2. **Change history** grows continuously, increasing storage and memory costs.
 
-Housekeeping addresses both by running two scheduled tasks:
+Housekeeping addresses both with two scheduled tasks, and runs a third task that keeps per-project statistics up to date:
 
 | Task | Purpose |
 |------|---------|
 | **Client Deactivation** | Deactivates clients that have been inactive beyond a threshold, enabling more effective garbage collection |
 | **[Document Compaction](/docs/internals/synchronization#document-compaction)** | Consolidates old change history into a single snapshot to reduce storage overhead |
+| **Project Stats Refresh** | Periodically recounts each project's activated clients and alive documents and stores the result in the project's stats |
 
 ```mermaid
 graph LR
@@ -30,6 +31,7 @@ graph LR
     subgraph Tasks["Housekeeping Tasks"]
         CD["Client Deactivation"]
         DC["Document Compaction"]
+        PS["Project Stats Refresh"]
     end
 
     subgraph Lock["Distributed Locking"]
@@ -38,8 +40,10 @@ graph LR
 
     Timer --> CD
     Timer --> DC
+    Timer --> PS
     CD --> DL
     DC --> DL
+    PS --> DL
 ```
 
 ### Client Deactivation for Garbage Collection
@@ -96,27 +100,28 @@ The second condition ensures that compaction does not interfere with active edit
 
 ### Configuration
 
-Housekeeping behavior is configured through server startup flags or the [CLI](/docs/tools/cli). The key parameters are:
+Housekeeping is configured through `yorkie server` startup flags. The key parameters are:
 
 | Parameter | Description | Default |
 |-----------|-------------|---------|
-| `housekeeping-interval` | Time between housekeeping runs | `30s` |
-| `housekeeping-candidates-limit-per-project` | Maximum candidates returned per project in a single run | `500` |
-| `housekeeping-project-fetch-size` | Number of projects fetched per run | `100` |
+| `housekeeping-interval` | Time between deactivation and compaction runs | `30s` |
+| `housekeeping-candidates-limit` | Maximum number of candidates (clients, documents, or projects) processed by a task in a single run | `2000` |
+| `housekeeping-deactivate-concurrency` | Maximum number of client deactivations run in parallel within a single run (`0` or `1` runs them sequentially) | `8` |
 | `housekeeping-compaction-min-changes` | Minimum number of changes before a document is eligible for compaction | `1000` |
-| `client-deactivate-threshold` | Time after which an inactive client is deactivated | `24h` |
+| `housekeeping-project-stats-refresh-interval` | Time between project stats refresh runs. Set to `0s` to disable the task | `5m` |
 
 These can be set when starting the server:
 
 ```bash
 $ yorkie server \
   --housekeeping-interval 30s \
-  --housekeeping-candidates-limit-per-project 500 \
+  --housekeeping-candidates-limit 2000 \
+  --housekeeping-deactivate-concurrency 8 \
   --housekeeping-compaction-min-changes 1000 \
-  --client-deactivate-threshold 24h
+  --housekeeping-project-stats-refresh-interval 5m
 ```
 
-Or updated per project using the [CLI](/docs/tools/cli#updating-the-project):
+The inactivity threshold for client deactivation is not a server flag. It is a per-project setting, `client-deactivate-threshold`, which defaults to `24h` and can be changed with the [CLI](/docs/tools/cli#updating-the-project):
 
 ```bash
 $ yorkie project update <project-name> \
@@ -130,7 +135,7 @@ For **development**, use shorter intervals and lower thresholds for faster feedb
 ```bash
 $ yorkie server \
   --housekeeping-interval 10s \
-  --housekeeping-candidates-limit-per-project 10 \
+  --housekeeping-candidates-limit 10 \
   --housekeeping-compaction-min-changes 100
 ```
 
@@ -139,7 +144,7 @@ For **production**, use longer intervals and higher limits to balance throughput
 ```bash
 $ yorkie server \
   --housekeeping-interval 1m \
-  --housekeeping-candidates-limit-per-project 1000 \
+  --housekeeping-candidates-limit 5000 \
   --housekeeping-compaction-min-changes 5000
 ```
 

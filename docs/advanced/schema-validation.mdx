@@ -112,9 +112,12 @@ Content expression syntax:
 Specify a schema when attaching a document using the `schema` option:
 
 ```javascript
-import yorkie from 'yorkie-js-sdk';
+import yorkie from '@yorkie-js/sdk';
 
-const client = new yorkie.Client('{{API_ADDR}}');
+const client = new yorkie.Client({
+  rpcAddr: '{{API_ADDR}}',
+  apiKey: 'your-api-key',
+});
 await client.activate();
 
 const doc = new yorkie.Document('my-doc');

@@ -291,25 +291,25 @@ Subscribe before attaching the document to ensure you receive the initial `initi
 </Alert>
 
 ```swift
-await doc.subscribePresence { event in
-    if event.type == .initialized {
+await doc.subscribePresence { event, _ in
+    if let event = event as? InitializedEvent {
         // Array of other users currently participating in the document
-        // event.value;
+        // event.value: [(clientID: ActorID, presence: [String: Any])]
     }
-    
-    if event.type == .watched {
+
+    if let event = event as? WatchedEvent {
         // A user has joined the document editing in online
-        // event.value;
+        // event.value: (clientID: ActorID, presence: [String: Any])
     }
-    
-    if event.type == .unwatched {
+
+    if let event = event as? UnwatchedEvent {
         // A user has left the document editing
-        // event.value;
+        // event.value: (clientID: ActorID, presence: [String: Any])
     }
-    
-    if event.type == .presenceChanged {
+
+    if let event = event as? PresenceChangedEvent {
         // A user has updated their presence
-        // event.value;
+        // event.value: (clientID: ActorID, presence: [String: Any])
     }
 }
 ```
@@ -323,7 +323,7 @@ This method subscribes to changes in the presence of the current client that has
 The possible event.type are: `initialized`, `presenceChanged`.
 
 ```swift
-await doc.subscribePresence(.myPresence) { event in
+await doc.subscribePresence(.myPresence) { event, _ in
     // Do something
 }
 ```
@@ -335,16 +335,16 @@ This method subscribes to changes in the presence of other clients participating
 The possible event.type are: `watched`, `unwatched`, `presenceChanged`.
 
 ```swift
-await doc.subscribePresence(.others) { event in
-    if event.type == .watched {
+await doc.subscribePresence(.others) { event, _ in
+    if let event = event as? WatchedEvent {
         addUser(event.value)
     }
-    
-    if event.type == .unwatched {
+
+    if let event = event as? UnwatchedEvent {
         removeUser(event.value)
     }
 
-    if event.type == .presenceChanged {
+    if let event = event as? PresenceChangedEvent {
         updateUser(event.value)
     }
 }
@@ -352,17 +352,17 @@ await doc.subscribePresence(.others) { event in
 
 #### Editing the Document
 
-`Document.update(:,message:)` modifies a Document. The optional `message` parameter allows you to add a description to the change. If the Document is attached to the Client, all changes automatically synchronize with other Clients.
+`Document.update(_:_:)` modifies a Document. The optional `message` parameter allows you to add a description to the change. If the Document is attached to the Client, all changes automatically synchronize with other Clients.
 
 ```swift
-let message = "update document for test";
+let message = "update document for test"
 try await doc.update({ root, _ in
   root.todos = Array<String>()
   (root.todos as? JSONArray)?.append("todo-1")
   root.obj = ["name": "yorkie", "age": Int64(14)]
-  root.counter = JSONCounter(Int64(0))
-  (root.counter as? JSONCounter<Int64>)?.increase(1)
-}, message: message);
+  root.counter = JSONCounter(value: Int64(0))
+  (root.counter as? JSONCounter<Int64>)?.increase(value: 1)
+}, message)
 ```
 
 Under the hood, `root` in the `update` function creates a `change`, a set of operations. Every element has a unique ID created by the logical clock. Yorkie uses this ID to track each object.
@@ -461,11 +461,9 @@ The callback function is called when the target path and its nested values chang
 This feature lets you subscribe to changes for a specific part of the document and perform different actions based on the updated values.
 
 ```swift
-await doc.subscribe("$.todos") { event in 
+await doc.subscribe("$.todos") { event, doc in
   // The callback will be called when the root.todos or its nested values change.
-  Task {
-    let target = try? await target.getValueByPath(path: "$.todos") // You can get the value by path.
-  }
+  let todos = try? doc.getValueByPath("$.todos") // You can get the value by path.
   // Do something...
 }
 ```
@@ -561,36 +559,18 @@ If the server refuses the detach, `resync` throws and the document is left attac
 
 #### Broadcasting a Message
 
-Broadcasting allows clients to share custom events with other clients connected to the same document. Unlike document updates or presence changes, broadcasts are ephemeral messages that are not persisted in the document state.
+In the iOS SDK, broadcast is not part of `Document`: it lives on [`Channel`](#channel). Broadcasts are ephemeral messages that are not persisted in the document state, and they are delivered to the clients attached to the same channel. Attach a `Channel` next to the document, typically keyed after it, and use `channel.broadcast(topic:payload:options:)` with `channel.subscribeTopic(_:_:)` or `channel.subscribeBroadcast(_:)`. See [Broadcast](#broadcast) under Channel.
 
 ```swift
-// Step 1: Define your message structure
-let payload = Payload(["message": "Hello!"])
+let channel = try Channel(key: "doc-1")
+try await client.attachChannel(channel)
 
-// Step 2: Broadcast to topic
-try await doc.broadcast(topic: "chat", payload: payload)
-
-// Step 3: Subscribe and handle
-try await doc.subscribeBroadcast { event, _ in
-    guard let event = event as? BroadcastEvent else { return }
-    print("Received: \(event.value.payload["message"] ?? "")")
+channel.subscribeTopic("chat") { event in
+    print("Received: \(event.payload["message"] ?? "")")
 }
+
+try channel.broadcast(topic: "chat", payload: Payload(["message": "Hello!"]))
 ```
-
-The broadcast event contains:
-- `topic`: A string identifying the type of broadcast message
-- `payload`: The data being broadcast (must be JSON serializable)
-- `clientID`: The ID of the client that sent the broadcast
-
-This feature is useful for sending temporary messages or signals between clients, such as:
-- Chat messages
-- Cursor movement notifications 
-- Application-specific events
-- User action notifications
-
-<Alert status="warning">
-Broadcast messages are not persisted and are only delivered to clients currently connected to the document. Clients that connect later will not receive previous broadcast messages.
-</Alert>
 
 #### Changing Synchronization Mode
 
@@ -610,19 +590,19 @@ Yorkie offers five SyncModes:
 
 ```swift
 // Enable automatic synchronization of both local and remote changes.
-try await client.changeSyncMode(doc, realtime)
+try client.changeSyncMode(doc, .realtime)
 
 // Only push local changes automatically.
-try await client.changeSyncMode(doc, .realtimePushOnly)
+try client.changeSyncMode(doc, .realtimePushOnly)
 
 // Synchronization turned off, but the watch stream remains active.
-try await client.changeSyncMode(doc, .realtimeSyncOff)
+try client.changeSyncMode(doc, .realtimeSyncOff)
 
 // Stream-less periodic sync at the document's poll interval.
-try await client.changeSyncMode(doc, .polling)
+try client.changeSyncMode(doc, .polling)
 
 // Synchronization turned off, and the watch stream is disconnected.
-try await client.changeSyncMode(doc, manual)
+try client.changeSyncMode(doc, .manual)
 try await client.sync(doc) // Trigger synchronization manually using the sync function.
 ```
 
@@ -818,7 +798,7 @@ Custom CRDT types are specialized data types for applications such as text edito
 `JSONText` provides support for collaborative text editing. Contents in `JSONText` can have attributes; for example, characters can be bold, italic, or underlined.
 
 ```swift
-try await doc.update{ root in
+try await doc.update { root, _ in
     root.text = JSONText() // {"text":[]}
     (root.text as? JSONText)?.edit(0, 0, "hello")               // {"text":[{"val":"hello"}]}
     (root.text as? JSONText)?.edit(0, 1, "H")                   // {"text":[{"val":"H"},{"val":"ello"}]}
@@ -865,11 +845,11 @@ try await doc.update { root, presence in
 - When applying other user's selection changes:
 
 ```swift
-await doc.subscribePresence(.others) { event in 
+await doc.subscribePresence(.others) { event, doc in
     if let event = event as? PresenceChangedEvent {
-        if let fromPos: TextPosStruct = decodePresence(event.value["from"]),
-            let toPos: TextPosStruct = decodePresence(event.value["to"]) {
-            if let (fromIdx, toIdx) = try? await(document.getRoot().content as? JSONText)?.posRangeToIndexRange((fromPos, toPos)) {
+        if let fromPos: TextPosStruct = decodePresence(event.value.presence["from"]),
+            let toPos: TextPosStruct = decodePresence(event.value.presence["to"]) {
+            if let (fromIdx, toIdx) = try? (doc.getRoot().content as? JSONText)?.posRangeToIndexRange((fromPos, toPos)) {
                 // Handle the updated selection in the editor
             }
         }
@@ -896,7 +876,7 @@ An example of Text Editor: [Text Editor example](https://github.com/yorkie-team/
 `JSONCounter` supports integer types with addition and subtraction operations. If integer data needs to be modified simultaneously by multiple clients, use `JSONCounter` instead of primitives.
 
 ```swift
-try await doc.update{ root in
+try await doc.update { root, _ in
     root.counter = JSONCounter(value: Int64(1))                 // {"counter":1}
     (root.counter as? JSONCounter<Int64>)?.increase(value: 2)   // {"counter":3}
     (root.counter as? JSONCounter<Int64>)?.increase(value: 3)   // {"counter":6}
@@ -1104,33 +1084,15 @@ Channels are ideal for:
 
 For persistent data that needs to be synchronized and stored, use [Document](#document) instead.
 
-### Logger Options
+### Logging
 
-The Logger outputs SDK events to the console for debugging purposes. To modify these options, use the `Logger.logLevel` variable.
-
-```swift
-Logger.logLevel = .error
-```
-
-The available log levels for `setLogLevel` are:
-
-| LogLevel | Description                     |
-|----------|---------------------------------|
-| `LogLevel.Trivial`  | Most verbose level, displays all logs    |
-| `LogLevel.Debug`    | Detailed information for debugging       |
-| `LogLevel.Info`     | General information                      |
-| `LogLevel.Warn`     | Warnings and potential issues            |
-| `LogLevel.Error`    | Errors and unexpected behavior           |
-| `LogLevel.Fatal`    | Critical errors, may lead to termination |
-
-Adjust the log level for flexible control over log verbosity in your application.
+The SDK writes its logs through [swift-log](https://github.com/apple/swift-log) under the label `Yorkie`. It does not expose a log-level setting of its own. To route or filter these logs, bootstrap swift-log's `LoggingSystem` with your own `LogHandler` once at app startup, before the SDK logs anything; without that, swift-log's default handler prints messages at `info` and above to the console.
 
 ### Performance Best Practices
 
 - Use `SyncMode.realtimePushOnly` for write-heavy operations
 - Batch updates within single `doc.update()` call
 - Detach documents when switching contexts
-- Use `Logger.logLevel = .error` in production
 
 ### Common Use Cases
 
@@ -1175,7 +1137,7 @@ try await doc.update { root, presence in
 }
 
 // Subscribe to others' cursors
-await doc.subscribePresence(.others) { event in
+await doc.subscribePresence(.others) { event, _ in
     if event.type == .presenceChanged {
         // Update UI with new cursor positions
     }
@@ -1199,7 +1161,6 @@ await doc.subscribePresence(.others) { event in
 #### Memory Issues
 
 - Detach unused documents
-- Set appropriate `Logger.logLevel`
 - Monitor document size and consider splitting large documents
 
 ### Reference

@@ -44,8 +44,8 @@ $ helm install yorkie-monitoring yorkie-team/yorkie-monitoring -n monitoring --c
     --set ingress.ingressClassName=alb \
     --set ingress.hosts.enabled=true \
     --set ingress.hosts.apiHost={YOUR_API_DOMAIN_NAME} \
-    --set ingress.hosts.alb.enabled=true \
-    --set ingress.alb.certArn={YOUR_CERTIFICATE_ARN}
+    --set ingress.awsAlb.enabled=true \
+    --set ingress.awsAlb.certArn={YOUR_CERTIFICATE_ARN}
 ```
 
 Replace `{YOUR_API_DOMAIN_NAME}` with your domain name.
@@ -175,7 +175,6 @@ Install ArgoCD with the following command:
 
 ```bash
 $ helm install argo-cd argo/argo-cd -n argocd --create-namespace \
-    --set crds.install=false \
     --set configs.params."server.insecure"=true \
     --set configs.params."server.rootpath"=/argocd
 ```
@@ -184,7 +183,6 @@ If you are using AWS EKS with ALB, add the ingress configuration:
 
 ```bash
 $ helm install argo-cd argo/argo-cd -n argocd --create-namespace \
-    --set crds.install=false \
     --set configs.params."server.insecure"=true \
     --set configs.params."server.rootpath"=/argocd \
     --set server.ingress.enabled=true \
@@ -201,11 +199,7 @@ Also, replace `{YOUR_CERTIFICATE_ARN}` with your certificate ARN.
 
 <Alert status="info">For more information about Helm chart configuration, see [argo-cd chart documentation](https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd).</Alert>
 
-Then, install the ArgoCD Applications chart. This will be configured in a later section after all addons are installed.
-
-```bash
-$ helm install argocd-apps argo/argocd-apps -n argocd -f apps-values.yaml
-```
+You will connect the Yorkie addons to ArgoCD with the ArgoCD Applications chart in [Connect Yorkie addons to ArgoCD](#connect-yorkie-addons-to-argocd), after all addons are installed.
 
 You can get the initial admin password with the following command:
 
@@ -237,12 +231,18 @@ argo-cd-argocd-server-59696d4ccd-d2kjb                     1/1     Running   0  
 
 Now you have ArgoCD installed, you can access ArgoCD web UI to view deployment status of Yorkie cluster.
 
+On Minikube, the ArgoCD install above creates no ingress, so forward the ArgoCD server port to your local machine:
+
+```bash
+$ kubectl port-forward svc/argo-cd-argocd-server -n argocd 8080:80
+```
+
 Access ArgoCD web UI with following url:
 
-- Minikube: http://`YOUR_MINIKUBE_IP`/argocd/
-- AWS EKS: http://`YOUR_API_DOMAIN_NAME`/argocd/
+- Minikube: http://localhost:8080/argocd/
+- AWS EKS: https://`YOUR_API_DOMAIN_NAME`/argocd/
 
-<Alert status="info">The default username and password are `admin` and `yorkie`.</Alert>
+<Alert status="info">The username is `admin`. The password is generated at install time and stored in the `argocd-initial-admin-secret` Secret, which the `kubectl -n argocd get secret argocd-initial-admin-secret` command above prints. Change it after your first login, then delete that Secret.</Alert>
 
 Once you are logged in, you will see the following dashboard:
 
@@ -456,7 +456,7 @@ applications:
     sources:
       - repoURL: https://yorkie-team.github.io/yorkie/helm-charts
         chart: yorkie-monitoring
-        targetRevision: {{YORKIE_VERSION}}
+        targetRevision: 0.7.7
         helm:
           valueFiles:
             - $values/k8s/monitoring/values.yaml
@@ -473,13 +473,15 @@ applications:
     source:
       repoURL: https://yorkie-team.github.io/yorkie/helm-charts
       chart: yorkie-analytics
-      targetRevision: {{YORKIE_VERSION}}
+      targetRevision: 0.7.26
     destination:
       server: https://kubernetes.default.svc
       namespace: analytics
 ```
 
 Replace `your-org/your-devops-repo` with your GitOps repository that contains the Helm values files.
+
+<Alert status="info">Each chart has its own version, so `targetRevision` differs per chart: `yorkie-cluster` follows the Yorkie server version, while `yorkie-monitoring` and `yorkie-analytics` are released separately. Run `helm search repo yorkie-team -l` to list the chart versions you can use.</Alert>
 
 <Alert status="warning">ArgoCD renders `yorkie-cluster` from `k8s/cluster/values.yaml`, so that file must set the same required credentials as `helm install`: the signing key, the cluster secret and the three MongoDB passwords. To keep the signing key and the cluster secret out of Git, store them in a Secret you manage and reference it with `yorkie.args.secretKeyExistingSecret` and `yorkie.args.clusterSecretExistingSecret`. The chart has no such option for the MongoDB passwords, so the values file carries them in plain text: keep that repository private and limit who can read it. See [Yorkie Cluster Helm Chart](https://github.com/yorkie-team/yorkie/tree/main/build/charts/yorkie-cluster#admin-token-signing-key-required) for details.</Alert>
 

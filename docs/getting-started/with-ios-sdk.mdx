@@ -14,9 +14,17 @@ The Swift Package Manager is a tool for automating the distribution of Swift cod
 
 Once you have your Swift package set up, add Yorkie as a dependency in the dependencies section of your `Package.swift`.
 
-```
+```swift
 dependencies: [
-  .Package(url: "https://github.com/yorkie-team/yorkie-ios-sdk.git", from: "{{YORKIE_IOS_VERSION}}")
+  .package(url: "https://github.com/yorkie-team/yorkie-ios-sdk.git", from: "{{YORKIE_IOS_VERSION}}")
+],
+targets: [
+  .target(
+    name: "MyApp",
+    dependencies: [
+      .product(name: "Yorkie", package: "yorkie-ios-sdk")
+    ]
+  )
 ]
 ```
 
@@ -66,7 +74,7 @@ To access document properties, use `doc.getRoot()`. With dot notation, you can a
 try await doc.update{ root, _ in
   root.sharedMessage = "Hello World!"
 }
-await print(self.document.getRoot().sharedMessage!) // "Hello World!"
+print(doc.getRoot().sharedMessage!) // "Hello World!"
 ```
 
 #### 5. Subscribing to the changes that happen in the Document
@@ -74,7 +82,7 @@ await print(self.document.getRoot().sharedMessage!) // "Hello World!"
 Clients sharing the same document can subscribe to changes using `doc.subscribe()`.
 
 ```swift
-await doc.subscribe { event in
+await doc.subscribe { event, _ in
   print("A change event occurred in the Document!")
 }
 ```
@@ -84,7 +92,7 @@ You can execute different actions depending on the source of change. The source 
 The value can be: `localChange`, `remoteChange` or `snapshot`.
 
 ```swift
-await doc.subscribe { event in
+await doc.subscribe { event, _ in
   if event.type == .remoteChange {
     print("A peer has changed the Document!")
   }
@@ -96,7 +104,7 @@ await doc.subscribe { event in
 You can also subscribe to user presence using `doc.subscribePresence(.presence)`. Use `doc.getPresences()` to get the list of users currently participating in the document.
 
 ```swift
-await doc.subscribePresnece { event in 
+await doc.subscribePresence { event, doc in
   // get all users connected to the Document.
   let users = doc.getPresences() // [ (clientID: string, presence: [key: value]), ... ]
   print("There are currently \(users.count) users online")

@@ -100,7 +100,8 @@ The removal process:
 1. The client sends a `RemoveDocument` request to the server.
 2. The server marks the document's `RemovedAt` field with the current time (soft delete).
 3. All other clients are notified that the document is removed.
-4. After a configured period, the [Housekeeping](/docs/glossary) process permanently deletes the document and its data (hard delete).
+
+Removal is a soft delete. [Housekeeping](/docs/internals/housekeeping) does not delete removed documents later: its tasks only deactivate inactive clients, compact documents, and refresh project stats. A removed document stays in the database with its `RemovedAt` timestamp, and its key can be reused by a new document.
 
 #### Key-ID Relationship
 
