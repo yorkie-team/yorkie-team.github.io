@@ -202,6 +202,18 @@ scope.launch {
 }
 ```
 
+Other clients attached to the document receive the message as a `Document.Event.Broadcast` event, which carries the sender's `actorID`, the `topic` and the `payload`.
+
+```kotlin
+scope.launch {
+    document.events.filterIsInstance<Document.Event.Broadcast>().collect { event ->
+        if (event.topic == "cursor-moved") {
+            println("${event.actorID} moved the cursor: ${event.payload}")
+        }
+    }
+}
+```
+
 #### Removing Documents
 
 Permanently remove a document from the server. This operation is irreversible and deletes the document for all clients.
@@ -370,7 +382,7 @@ val document = Document("my-document")
 
 - `disableGC`: `Boolean` (default: `false`) - disables garbage collection for the document.
 - `disablePresence`: `Boolean` (default: `false`) - seeds the presence-free state before attach; the server-fixated value from the attach response takes precedence once attached.
-- `maxUndoDepth`: `Int` (default: `50`) - how many entries `history.undo()` can go back, and likewise for `history.redo()`. Since v0.7.24. Must be a positive integer; otherwise constructing the options throws `YorkieException` with code `ErrInvalidArgument`. See [History (Undo/Redo)](#history-undoredo).
+- `maxUndoDepth`: `Int` (default: `50`) - how many entries `history.undoAsync()` can go back, and likewise for `history.redoAsync()`. Since v0.7.24. Must be a positive integer; otherwise constructing the options throws `YorkieException` with code `ErrInvalidArgument`. See [History (Undo/Redo)](#history-undoredo).
 
 There is no `enableDevtools` option on Android.
 
@@ -670,7 +682,7 @@ scope.launch {
 | `WriteDenied` | The server refused this client's writes, and `client.resyncAsync` discarded them to re-anchor the document. See [Recovering from refused writes](#recovering-from-refused-writes). |
 | `LogDiscontinuity` | The appended change log had a hole, so it could not be replayed. The snapshot restored normally; what was lost is the log written after it. |
 
-#### Changing Synchronization Mode
+#### Document Sync Mode
 
 Change how the document synchronizes with the server. See the [Client Changing Synchronization Mode](#changing-synchronization-mode) section for available modes and their descriptions.
 
