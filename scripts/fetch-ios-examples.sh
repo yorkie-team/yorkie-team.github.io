@@ -11,8 +11,8 @@ fi
 
 git clone https://github.com/yorkie-team/yorkie-ios-sdk.git temp
 cd temp
-git fetch origin mainrefs/tags/$version
-git checkout tags/$version
+git fetch origin refs/tags/$version
+git checkout "tags/$version" || exit 1
 echo "Checked out to tag $version."
 cd ..
 
