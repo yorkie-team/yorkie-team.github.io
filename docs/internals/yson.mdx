@@ -21,10 +21,11 @@ YSON supports standard JSON types and adds specialized types for collaborative a
 | Array | Ordered list of values | `[1, 2, 3]` | Sequential collections |
 | Int | 32-bit integer | `Int(42)` | Precise integer values |
 | Long | 64-bit integer | `Long(64)` | Large integer values |
-| Date | ISO 8601 timestamp | `Date("2025-01-02T15:04:05.058Z")` | Time values |
+| Date | RFC 3339 timestamp | `Date("2025-01-02T15:04:05.058Z")` | Time values |
 | BinData | Binary data with Base64 encoding | `BinData("AQID")` | Binary content |
-| Counter | Concurrent counter | `Counter(Int(10))` | Collaborative counting |
-| Text | List-based Rich Text | `Text({"type":"p",...})` | List-based Rich Text Editor, e.g) Quill |
+| Counter | Concurrent counter | `Counter(Int(10))`, `Counter(Long(10))` | Collaborative counting |
+| DedupCounter | Counter of unique actors | `DedupCounter(Int(3),"AAEC...")` | Unique visitor counts |
+| Text | List-based Rich Text | `Text([{"val":"Hello","attrs":{...}}])` | List-based Rich Text Editor, e.g) Quill |
 | Tree | Tree-based Rich Text | `Tree({"type":"p",...})` | Tree-based Rich Text Editor |
 
 ### Custom Types Details
@@ -39,7 +40,7 @@ YSON provides explicit integer types to ensure consistent handling across platfo
 These types help ensure that numeric values are interpreted consistently when sharing documents across different programming languages.
 
 #### Date
-YSON Date represents a timestamp value in ISO 8601 format:
+YSON Date represents a timestamp value in RFC 3339 format (an ISO 8601 profile), with fractional seconds when present:
 
 ```json
 Date("2025-01-02T15:04:05.058Z")
@@ -61,10 +62,21 @@ This allows binary content to be safely represented and transmitted as text.
 `Counter` type is specifically designed for collaborative counting operations where multiple users might modify a numeric value concurrently:
 
 ```json
-Counter(Int(10))  // A counter with initial value of 10
+Counter(Int(10))   // A 32-bit integer counter with value 10
+Counter(Long(10))  // A 64-bit integer counter with value 10
 ```
 
 Using Counter instead of a regular number prevents conflicts when multiple users increment or decrement values simultaneously.
+
+#### DedupCounter
+
+`DedupCounter` counts unique actors, such as unique visitors, using a [HyperLogLog](https://en.wikipedia.org/wiki/HyperLogLog) sketch. Its YSON form holds the current count followed by the sketch registers encoded in Base64:
+
+```json
+DedupCounter(Int(3),"<base64 HLL registers>")
+```
+
+Only `Int` values are supported for DedupCounter.
 
 #### Text
 The Text type is designed for rich text editing, allowing for complex formatting and attributes:
