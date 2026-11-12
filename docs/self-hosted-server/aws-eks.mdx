@@ -28,7 +28,7 @@ First, you need to setup AWS EKS cluster and addons to deploy Yorkie cluster.
 Below are the list of resources you need to provision:
 
 1. [AWS EKS cluster](https://docs.aws.amazon.com/eks/latest/userguide/getting-started.html) to provision Kubernetes cluster.
-2. [EBS CSI driver](https://docs.aws.amazon.com/eks/latest/userguide/ebs-csi.html) to provision EBS volumes attached to Kubernetes volumes.
+2. [EBS CSI driver](https://docs.aws.amazon.com/eks/latest/userguide/ebs-csi.html) to provision EBS volumes attached to Kubernetes volumes. Note the name of its StorageClass, such as `gp2` or `gp3`: the MongoDB volumes need it.
 3. [ALB ingress controller](https://docs.aws.amazon.com/eks/latest/userguide/alb-ingress.html) to provision ALB ingress controller.
 4. [Domain Name](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/domain-register.html) to access Yorkie cluster with domain name.
 5. [Certificate](https://docs.aws.amazon.com/acm/latest/userguide/gs-acm-request-public.html) to access Yorkie cluster with HTTPS.
@@ -128,12 +128,71 @@ $ export MONGO_CLUSTER_ADMIN_PASSWORD="$(openssl rand -base64 32)"
 
 Now you have added yorkie-team Helm chart repository in your local repository and generated the credentials, you can install Yorkie cluster with Helm chart.
 
+The chart's MongoDB volumes default to the `standard` StorageClass, which exists on minikube but not on EKS.
+Check the StorageClasses that the EBS CSI driver provides in your cluster:
+
+```bash
+$ kubectl get storageclass
+NAME   PROVISIONER             RECLAIMPOLICY   VOLUMEBINDINGMODE      ALLOWVOLUMEEXPANSION   AGE
+gp2    kubernetes.io/aws-ebs   Delete          WaitForFirstConsumer   false                  10m
+```
+
+Then, create an `eks-values.yaml` file that sets it for the MongoDB config server and both shards.
+Replace `gp2` with the StorageClass name in your cluster (for example, `gp3`):
+
+```yaml
+# eks-values.yaml
+yorkie-mongodb:
+  sharding:
+    configrs:
+      volumeSpec:
+        persistentVolumeClaim:
+          storageClassName: gp2
+  # Helm replaces lists as a whole, so list every shard with all of its fields.
+  replsets:
+    - name: rs0
+      size: 1
+      resources:
+        limits:
+          cpu: 500m
+          memory: 512Mi
+        requests:
+          cpu: 100m
+          memory: 256Mi
+      volumeSpec:
+        persistentVolumeClaim:
+          storageClassName: gp2
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 10Gi
+    - name: rs1
+      size: 1
+      resources:
+        limits:
+          cpu: 500m
+          memory: 512Mi
+        requests:
+          cpu: 100m
+          memory: 256Mi
+      volumeSpec:
+        persistentVolumeClaim:
+          storageClassName: gp2
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 10Gi
+```
+
+<Alert status="warning">Without this file, the `mongodb-rs0-0` and `mongodb-rs1-0` volumes stay `Pending` because EKS has no `standard` StorageClass, and Yorkie never becomes ready.</Alert>
+
 Install Yorkie cluster with the following command:
 
 ```bash
 $ helm install yorkie-cluster yorkie-team/yorkie-cluster --namespace yorkie \
-	--set ingress.ingressClassName=alb \
-	--set ingress.hosts.enabled=true \
+    -f eks-values.yaml \
+    --set ingress.ingressClassName=alb \
+    --set ingress.hosts.enabled=true \
     --set ingress.hosts.apiHost={YOUR_API_DOMAIN_NAME} \
     --set ingress.awsAlb.enabled=true \
     --set ingress.awsAlb.certArn={YOUR_CERTIFICATE_ARN} \
@@ -146,8 +205,9 @@ $ helm install yorkie-cluster yorkie-team/yorkie-cluster --namespace yorkie \
 # For example, for domain name `yorkie.dev` and certificate ARN 
 # `arn:aws:acm:ap-northeast-2:123412341234:certificate/12341234-1234-1234-1234-123412341234`, run the following command:
 $ helm install yorkie-cluster yorkie-team/yorkie-cluster --namespace yorkie \
-	--set ingress.ingressClassName=alb \
-	--set ingress.hosts.enabled=true \
+    -f eks-values.yaml \
+    --set ingress.ingressClassName=alb \
+    --set ingress.hosts.enabled=true \
     --set ingress.hosts.apiHost=api.yorkie.dev \
     --set ingress.awsAlb.enabled=true \
     --set ingress.awsAlb.certArn=arn:aws:acm:ap-northeast-2:123412341234:certificate/12341234-1234-1234-1234-123412341234 \
@@ -213,9 +273,10 @@ yorkie-gateway-d8cbfd477-swnfr                   1/1     Running     0          
 ### Test Yorkie cluster
 
 Now that Yorkie cluster is exposed, you can test Yorkie cluster with [Yorkie CLI](/docs/tools/cli).
+The ALB listens only on HTTPS (port 443) with the certificate for your domain, so use `https://` and the domain name rather than `http://` or an IP address.
 
 ```bash
-$ yorkie login -u admin -p admin --rpc-addr http://<YOUR_API_DOMAIN_NAME or IP_ADDRESS>
+$ yorkie login -u admin -p admin --rpc-addr https://<YOUR_API_DOMAIN_NAME>
 $ yorkie project ls
  NAME     PUBLIC KEY    SECRET KEY    CREATED AT 
  default  <public-key>  <secret-key>  2 minutes
@@ -236,13 +297,13 @@ $ cd yorkie-js-sdk
 $ pnpm i
 ```
 
-After dependencies are installed, you need to set `VITE_YORKIE_API_ADDR` in the `.env` file to your AWS api domain name or IP address with the following command:
+After dependencies are installed, you need to set `VITE_YORKIE_API_ADDR` in the `.env` file to your API domain name with the following command:
 
 ```bash
 $ cd examples/vanilla-quill
 $ vi .env
 
-VITE_YORKIE_API_ADDR=http://<YOUR_API_DOMAIN_NAME or IP_ADDRESS>
+VITE_YORKIE_API_ADDR=https://<YOUR_API_DOMAIN_NAME>
 ```
 
 Then, start Quill Example with the following command:
