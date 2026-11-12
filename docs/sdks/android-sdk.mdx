@@ -107,6 +107,25 @@ scope.launch {
 }
 ```
 
+**initialRoot**
+
+Pass `initialRoot` to seed root keys that the document does not have yet. It is a `Map<String, suspend JsonObject.(key: String) -> Unit>` (typealias `InitialRoot`): after the server's copy of the document is applied, each initializer runs only if its key is still absent from the root, and receives that key. All the initializers that run form one local change, which is excluded from the undo/redo history. Each initializer should write only its own key. Two clients that attach for the first time at once may both initialize a missing key; their changes converge like any other concurrent edit.
+
+```kotlin
+scope.launch {
+    client.attachDocument(
+        document,
+        initialRoot = mapOf(
+            "title" to { key -> this[key] = "Untitled" },
+            "todos" to { key -> setNewArray(key) },
+            "likes" to { key -> setNewCounter(key, 0) },
+        ),
+    ).await()
+}
+```
+
+The document is attached before the initializers run, so if one throws, the returned `Deferred` resolves to a failure but the document stays attached; detach it as usual.
+
 #### Detaching Documents
 
 Detach a document from the client. The client no longer synchronizes the document with the server. This is important for garbage collection to clean up CRDT tombstones.
@@ -126,7 +145,7 @@ scope.launch {
 Manually push local changes to the server and pull remote changes. This is useful when using `Manual` sync mode or when you need to force synchronization.
 
 **Parameters:**
-- `document`: Specific document to sync. If `null`, syncs all attached documents (optional)
+- `resource`: The document or [channel](#channel) to sync. If `null`, syncs all attached documents, but not channels (optional)
 
 ```kotlin
 // Sync a specific document
@@ -196,16 +215,56 @@ scope.launch {
 }
 ```
 
+#### Document Revisions
+
+Save snapshots of an attached document on the server, browse them, and restore one. Each call requires the client to be activated and the document to be attached to it. `createRevision`, `listRevisions` and `getRevision` return a `RevisionSummary`, with `id`, `label`, `description`, `snapshot` (the document content as [YSON](/docs/internals/yson)) and `createdAt` (`java.util.Date`). Unlike most client calls, these do not wrap failures in a `Result`: `await()` throws the error instead.
+
+```kotlin
+scope.launch {
+    // Create a revision; description is optional (default: "")
+    val revision = client.createRevision(document, "v1.0", "Before the redesign").await()
+
+    // List revisions, newest first by default
+    val revisions = client.listRevisions(
+        document,
+        pageSize = 20,     // default: 10
+        offset = 0,        // default: 0
+        isForward = false, // false = newest first, true = oldest first
+    ).await()
+    revisions.forEach { println("${it.id} ${it.label} ${it.createdAt}") }
+
+    // Get one revision with its snapshot
+    val detail = client.getRevision(document, revision.id).await()
+    println(detail.snapshot)
+
+    // Restore the document to that revision
+    client.restoreRevision(document, revision.id).await()
+}
+```
+
+`listRevisions` leaves `snapshot` empty; use `getRevision` to read it.
+
+<Alert status="warning">
+Restoring replaces the entire document state and cannot be undone automatically. Consider creating a new revision before restoring to preserve the current state.
+</Alert>
+
 #### Deactivating a Client
 
 Deactivate the client and disconnect from the server. All attached documents are detached automatically.
 
 **Parameters:**
-- `keepalive`: If `true`, ensures the deactivation request completes even if the app terminates (optional, default: `false`)
+- `deactivateOptions`: `Client.DeactivateOptions` (optional, default: `Client.DeactivateOptions()`)
+  - `keepalive`: If `true`, ensures the deactivation request completes even if the app terminates (default: `null`, treated as `false`)
+  - `synchronous`: If `true`, the server waits for all pending operations to complete before deactivating (default: `null`, treated as `false`)
 
 ```kotlin
 scope.launch {
     client.deactivateAsync().await()
+}
+
+// Make sure the request completes while the app is shutting down
+scope.launch {
+    client.deactivateAsync(Client.DeactivateOptions(keepalive = true)).await()
 }
 ```
 
