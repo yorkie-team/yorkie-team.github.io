@@ -35,7 +35,17 @@ When a configured event occurs, Yorkie sends an HTTP POST request to your webhoo
 
 | Event | Description |
 |-------|-------------|
-| `DocumentRootChanged` | Triggered when the document's root content is modified |
+| `DocumentRootChanged` | Triggered after the server stores a pushed change that contains operations on the document's root. Presence-only updates do not trigger it |
+
+### Rate Limiting
+
+Yorkie does not send one request per change. Events are throttled per document and event type with a 1-second window:
+
+- The first event for a document is sent immediately.
+- Further events within the next second are not sent individually. Yorkie keeps only the latest one.
+- After the burst settles, Yorkie sends one trailing request for the suppressed events.
+
+A burst of edits therefore produces at most about one webhook request per second for each document, plus a final request after the burst ends. Treat each request as a signal that the document changed, and read the latest content from Yorkie (for example, through the [Admin API](/docs/tools/admin-api)) if you need it.
 
 ### Setup and Configuration
 
@@ -84,6 +94,15 @@ When an event is triggered, Yorkie sends a POST request with the following JSON 
 | `attributes.key` | The key of the document that triggered the event |
 | `attributes.issuedAt` | ISO 8601 timestamp when the event occurred |
 
+Each request carries these headers:
+
+| Header | Description |
+|--------|-------------|
+| `Content-Type` | `application/json` |
+| `X-Signature-256` | `sha256=` followed by the hex-encoded HMAC-SHA256 of the raw request body, keyed by the project's secret key |
+
+See [Verifying Requests](#verifying-requests) for how to check the signature.
+
 #### 3. Webhook Response
 
 Your webhook server should respond with an HTTP status code:
@@ -98,7 +117,7 @@ Yorkie also retries when the connection is reset before a response arrives. Othe
 
 ### Retry Configuration
 
-The Event Webhook includes configurable retry behavior with exponential backoff for failed requests.
+The Event Webhook includes configurable retry behavior with exponential backoff for failed requests. Before retry `n` (starting at 0), Yorkie waits `min(2^n × min-wait-interval, max-wait-interval)`. With `max-retries` set to 10, a request is attempted up to 11 times.
 
 | Setting | Default | Description |
 |---------|---------|-------------|
@@ -116,6 +135,43 @@ yorkie project update [project-name] \
   --event-webhook-max-wait-interval 5s \
   --event-webhook-request-timeout 10s
 ```
+
+### Verifying Requests
+
+Yorkie signs every event webhook request with the project's secret key. To confirm that a request came from your Yorkie project, compute the HMAC-SHA256 of the raw request body with the secret key and compare it with the `X-Signature-256` header.
+
+Compute the signature over the raw bytes you received. A body that has been parsed and serialized again (for example, by `express.json()`) may differ from what Yorkie signed.
+
+```javascript
+const crypto = require('crypto');
+const express = require('express');
+const app = express();
+
+const SECRET_KEY = process.env.YORKIE_SECRET_KEY;
+
+app.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
+  const expected =
+    'sha256=' +
+    crypto.createHmac('sha256', SECRET_KEY).update(req.body).digest('hex');
+  const received = req.get('X-Signature-256') || '';
+
+  if (
+    received.length !== expected.length ||
+    !crypto.timingSafeEqual(Buffer.from(received), Buffer.from(expected))
+  ) {
+    return res.status(401).send('Invalid signature');
+  }
+
+  const { type, attributes } = JSON.parse(req.body.toString('utf8'));
+  console.log(`Event: ${type}, Document: ${attributes.key}`);
+
+  res.status(200).send('OK');
+});
+```
+
+<Alert status="warning">
+The signing key is the project's secret key. If you rotate the project's keys, update the key your webhook server uses to verify requests. See [API Keys](/docs/advanced/projects#api-keys) for details on project keys.
+</Alert>
 
 ### Example Webhook Server
 
