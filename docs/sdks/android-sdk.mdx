@@ -287,7 +287,7 @@ When creating a client, you can configure various options:
 - `key`: Client identifier (default: a random UUID generated for every `Client`; see [Client Identity](#client-identity))
 - `apiKey`: API key for the Yorkie project
 - `metadata`: Additional client metadata as key-value pairs
-- `fetchAuthToken`: Optional function to fetch authentication tokens when needed
+- `fetchAuthToken`: Optional `suspend (shouldRefresh: Boolean) -> String` that returns the token sent to the project's auth webhook (default: `null`; see [Authentication](#authentication))
 - `syncLoopDuration`: Duration between sync loops (default: 50ms)
 - `reconnectStreamDelay`: Delay before reconnecting after stream disconnect (default: 1000ms)
 - `channelHeartbeatInterval`: How often the client refreshes a [Channel](#channel) session (default: `5_000.milliseconds`)
@@ -309,6 +309,41 @@ val client = Client(
         documentPollInterval = 3_000.milliseconds
     )
 )
+```
+
+#### Authentication
+
+When the project uses an [auth webhook](/docs/advanced/security#auth-webhook), pass `fetchAuthToken`. The client calls it for each request and sends the token it returns in the `authorization` header. `shouldRefresh` is `true` after the server answered a request with `ErrUnauthenticated`, asking for a fresh token rather than a cached one, and `false` otherwise.
+
+```kotlin
+val client = Client(
+    host = "{{API_ADDR}}",
+    options = Client.Options(
+        apiKey = "xxxxxxxxxxxxxxxxxxxx",
+        fetchAuthToken = { shouldRefresh ->
+            if (shouldRefresh) authRepository.refreshToken() else authRepository.currentToken()
+        },
+    ),
+)
+```
+
+Since v0.7.26, when `fetchAuthToken` throws, what happens depends on what made the request:
+
+- **Background work** — the sync loop (including channel heartbeats), document and channel Watch streams, and broadcast retries — does not call `fetchAuthToken` again until a backoff elapses, and meanwhile resends with the last token it returned successfully, or without an `authorization` header if it never succeeded. The backoff starts at 1 second and doubles with each consecutive failure up to 30 seconds, with ±20% jitter; it resets on the next successful call and whenever the client activates.
+- **Calls the app makes** — `activateAsync`, `deactivateAsync`, `attachDocument`, `detachDocument`, `removeDocument`, `syncAsync`, `peekChannel` and the first try of `broadcast` — call `fetchAuthToken` every time, even during the backoff, and when it throws they resolve with `Result.failure` holding the exception it threw. Before v0.7.26 they failed with a connect-kotlin `ConnectException` wrapping it.
+- **`deactivateAsync`**: if `fetchAuthToken` throws for the deactivate request, or the server refuses it with `ErrUnauthenticated` and one more `fetchAuthToken(true)` throws too, the client deactivates locally and the call fails with the exception `fetchAuthToken` threw. If that extra call succeeds, the client stays activated and the call fails with the `ErrUnauthenticated`; call `deactivateAsync()` again.
+
+Since v0.7.26, an `ErrUnauthenticated` in the sync loop no longer deactivates the client. Only the document or channel that was refused waits before its next sync — until the backoff ends, but at least 1 second and at most 5 seconds — while the client's other documents keep syncing. A Watch stream refused with `ErrUnauthenticated` reconnects instead of stopping, after `reconnectStreamDelay` or, when longer, the rest of the backoff up to 5 seconds.
+
+```kotlin
+scope.launch {
+    client.attachDocument(document).await().onFailure { error ->
+        // Since v0.7.26, `error` is what fetchAuthToken threw, not a ConnectException around it.
+        if (error is TokenExpiredException) {
+            showSignIn()
+        }
+    }
+}
 ```
 
 #### Client Identity
@@ -520,7 +555,7 @@ scope.launch {
 `Document.Event` is a sealed interface. `WriteRejected` was added in v0.7.25, and `Document.Event.Reason.WriteDenied` and `LogDiscontinuity` were added to the `LocalChangesDropped` reasons in v0.7.25 and v0.7.20. A `when` over the events or over `Reason` that is used as an expression, or that lists every case, will not compile until it handles the new case; add an `else` branch so later additions do not break the build again.
 </Alert>
 
-When a change from another client cannot be applied, sync fails with a `YorkieException` whose code is `ErrChangeApplyFailed`. Its message names the document, the change and the operation that failed, and includes the original error. The change is not skipped: the server sends it again on the next sync, so the error repeats until the cause is fixed.
+When a change from another client cannot be applied, sync fails with a `YorkieException` whose code is `ErrChangeApplyFailed`. Its message names the document, the change and the operation that failed, and includes the original error. The change is not skipped: the server sends it again on the next sync, so the error repeats until the cause is fixed. Since v0.7.26 there is one exception, as on the server: an increase of a [`JsonDedupCounter`](#jsoncounter) that cannot be applied — one without an actor, or by a value other than 1 — is skipped when it comes from another client, so it cannot stop the document from syncing. The same increase made locally still fails the update.
 
 **events(targetPath)**
 
@@ -752,6 +787,28 @@ val document = Document("my-document", Document.Options(maxUndoDepth = 10))
 <Alert status="info">
 Undo and redo affect only your own editing history, and the result still converges with concurrent edits from other clients.
 </Alert>
+
+**Text undo through garbage collection**
+
+Since v0.7.26, each piece of `JsonText` records every deletion that removed it and every undo that cancelled one. An undo cancels only this client's own deletion: if another client deleted the same text concurrently, that deletion still applies, so the text stays deleted on every replica. Garbage collection keeps a piece that two clients deleted concurrently, so that an undo of either deletion still converges, and an undo of a deletion whose piece was already collected recreates the piece in the right place instead of leaving replicas disagreeing. This needs Yorkie server v0.7.26 or later on every node, with no rollback; see [Getting Started with Android SDK](/docs/getting-started/with-android-sdk).
+
+```kotlin
+scope.launch {
+    // Another client deletes the same "Hello" concurrently.
+    document.updateAsync { root, _ ->
+        root.getAs<JsonText>("content").edit(0, 5, "")
+    }.await()
+
+    // Cancels only this client's deletion; the other client's deletion keeps "Hello" removed.
+    document.history.undoAsync().await()
+
+    // Until every replica has seen this undo, the deleted piece is held and still counts as garbage.
+    val docSize = document.getDocSize()
+    println("garbage: ${docSize.gc.data + docSize.gc.meta} bytes")
+}
+```
+
+A piece kept this way — removed by two concurrent deletions that nobody undoes, or carrying a cancel that not every replica has seen yet — stays in `getDocSize().gc` while it is held, even though it is no longer visible, and counts toward the document size limit: an `updateAsync` that pushes the document past the limit fails with `ErrDocumentSizeExceedsLimit`. An undo or redo that only changes this record, and nothing visible, is still pushed to the server like any other edit.
 
 ### Json Types
 
