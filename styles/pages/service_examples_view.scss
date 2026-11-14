@@ -1301,6 +1301,11 @@
       justify-content: space-between;
       gap: variables.$spacing_16;
     }
+
+    // The actions are right-aligned here, so the limit note goes in front of Add user to leave it in place.
+    .preview_limit {
+      order: -1;
+    }
   }
 
   .preview_note {
@@ -1333,7 +1338,7 @@
       margin: 0;
     }
 
-    .btn_line:not(:disabled):hover {
+    .btn_line:not(:disabled):not(.is_disabled):hover {
       background-color: var(--gray-100);
     }
 

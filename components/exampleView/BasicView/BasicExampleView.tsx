@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useId, useState } from 'react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { Icon } from '@/components';
 import UserContent from './UserContent';
 
@@ -23,6 +23,11 @@ export function BasicExampleView({ iframeURL, userMaxCount = 4 }: { iframeURL: s
   // document as a second client, so the other panes are rendered only once a wide viewport is confirmed.
   const [wide, setWide] = useState(false);
   const limitId = useId();
+  const panesRef = useRef<HTMLUListElement>(null);
+  const addRef = useRef<HTMLButtonElement>(null);
+  // Index of the pane that was just removed. Its remove button had focus and is gone, so focus moves to the
+  // pane that took its place (or the one before it), or to "Add user" once no pane can be removed.
+  const [removedIndex, setRemovedIndex] = useState<number | null>(null);
 
   useEffect(() => {
     const query = window.matchMedia('(min-width: 640px)');
@@ -39,9 +44,22 @@ export function BasicExampleView({ iframeURL, userMaxCount = 4 }: { iframeURL: s
   const canRemove = userList.length > 1;
   const canAdd = userList.length < userMaxCount;
 
-  const deleteUser = useCallback((userId: number) => {
-    setUserList((prev) => (prev.length > 1 ? prev.filter((userNumber) => userNumber !== userId) : prev));
-  }, []);
+  const deleteUser = useCallback(
+    (userId: number) => {
+      if (userList.length <= 1) return;
+      setRemovedIndex(userList.indexOf(userId));
+      setUserList((prev) => (prev.length > 1 ? prev.filter((userNumber) => userNumber !== userId) : prev));
+    },
+    [userList],
+  );
+
+  useEffect(() => {
+    if (removedIndex === null) return;
+    setRemovedIndex(null);
+    const removeButtons = panesRef.current?.querySelectorAll<HTMLButtonElement>('.btn_remove:not(:disabled)');
+    const target = removeButtons?.length ? removeButtons[Math.min(removedIndex, removeButtons.length - 1)] : null;
+    (target ?? addRef.current)?.focus();
+  }, [removedIndex]);
 
   // Reuse the lowest free user number so each user keeps its label.
   const addUser = useCallback(() => {
@@ -66,21 +84,23 @@ export function BasicExampleView({ iframeURL, userMaxCount = 4 }: { iframeURL: s
         </p>
         <div className="preview_actions">
           <span className="preview_add">
-            {!canAdd && (
-              <span id={limitId} className="preview_limit">
-                Up to {userMaxCount} users
-              </span>
-            )}
+            {/* aria-disabled rather than disabled: the click that reaches the limit would otherwise drop focus. */}
             <button
+              ref={addRef}
               type="button"
-              className="btn btn_small btn_line"
+              className={`btn btn_small btn_line${canAdd ? '' : ' is_disabled'}`}
               onClick={addUser}
-              disabled={!canAdd}
+              aria-disabled={!canAdd}
               aria-describedby={canAdd ? undefined : limitId}
             >
               <Icon type="plus" />
               <span className="text">Add user</span>
             </button>
+            {!canAdd && (
+              <span id={limitId} className="preview_limit">
+                Up to {userMaxCount} users
+              </span>
+            )}
           </span>
           <a href={normalizedIframeURL} className="btn btn_small btn_line btn_open" target="_blank" rel="noreferrer">
             <span className="text preview_open_wide">Open in new tab</span>
@@ -89,7 +109,7 @@ export function BasicExampleView({ iframeURL, userMaxCount = 4 }: { iframeURL: s
           </a>
         </div>
       </div>
-      <ul className="preview_panes" data-count={userList.length}>
+      <ul className="preview_panes" data-count={userList.length} ref={panesRef}>
         {(wide ? userList : userList.slice(0, 1)).map((userNumber) => (
           <UserContent
             key={userNumber}
