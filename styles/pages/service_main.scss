@@ -500,8 +500,10 @@
     margin-right: 36px;
 
     @include mixins-lib.tabletStart() {
+      width: 100%;
       margin-right: 0;
       padding: 0 74px;
+      box-sizing: border-box;
     }
 
     @include mixins-lib.mobileStart() {
@@ -652,13 +654,12 @@
     .codeblock {
       overflow-y: overlay;
       height: 100%;
+      border-radius: 0 0 variables.$spacing_16 variables.$spacing_16;
+      border-top: 0;
 
       @include mixins-lib.tabletStart() {
         height: 360px;
       }
-
-      border-radius: 0 0 variables.$spacing_16 variables.$spacing_16;
-      border-top: 0;
 
       &_header {
         padding: variables.$spacing_16;

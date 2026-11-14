@@ -83,6 +83,7 @@ async function main() {
     if (event.type === 'presence-changed') {
       // convert the peer's selection back to an index range and draw it.
       const { clientID, presence } = event.value;
+      if (!presence.selection) return;
       const range = doc.getRoot().content.posRangeToIndexRange(presence.selection);
       updatePeerSelection(clientID, range);
     }
@@ -91,6 +92,13 @@ async function main() {
     initialPresence: {
       selection: null,
     },
+  });
+
+  // create the shared text once.
+  doc.update((root) => {
+    if (!root.content) {
+      root.content = new yorkie.Text();
+    }
   });
 
   // call this when the user moves the selection in your editor.
@@ -156,9 +164,11 @@ scope.launch {
     client.activateAsync().await()
     client.attachDocument(document).await()
 
-    // create the shared text.
+    // create the shared text once.
     document.updateAsync { root, _ ->
-        root.setNewText("content")
+        if (root.getOrNull("content") == null) {
+            root.setNewText("content")
+        }
     }.await()
 
     document.events.collect { event ->
@@ -189,9 +199,11 @@ try await client.activate()
 let doc = Document(key: "multiplayer-editing")
 try await client.attach(doc)
 
-// create the shared text.
+// create the shared text once.
 try await doc.update { root, _ in
-    root.content = JSONText()
+    if root.content as? JSONText == nil {
+        root.content = JSONText()
+    }
 }
 
 await doc.subscribe { event, _ in

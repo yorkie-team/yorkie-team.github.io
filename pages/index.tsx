@@ -5,7 +5,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { Layout, Button, Icon, CodeBlock, CodeBlockHeader, Accordion } from '@/components';
 import { ExampleThumbnailImage } from '@/components/exampleView';
-import { EXAMPLES } from '@/pages/examples';
+import { EXAMPLES, type Example } from '@/codes/examples';
 import { ChartMotion, StateSharingMotion, ServerMotion, MainBannerMotion } from '@/components/motions';
 import UserGroupSVG from '@/public/assets/icons/icon_service_main_users_group.svg';
 import CollaboProfileSVG from '@/public/assets/icons/icon_collaborate_profile.svg';
@@ -16,7 +16,9 @@ import { FEATURES_CODE } from '@/codes/features';
 
 type FeatureType = keyof typeof FEATURES_CODE;
 const FEATURED_EXAMPLE_IDS = ['simultaneous-cursors', 'codemirror'];
-const FEATURED_EXAMPLES = EXAMPLES.filter(({ id }) => FEATURED_EXAMPLE_IDS.includes(id));
+const FEATURED_EXAMPLES = FEATURED_EXAMPLE_IDS.map((id) => EXAMPLES.find((example) => example.id === id)).filter(
+  (example): example is Example => !!example,
+);
 const Home: NextPage = () => {
   const [bannerActive, setBannerActive] = useState(false);
   const [activeFeatureCard, setActiveFeatureCard] = useState<FeatureType>('profile');
@@ -171,28 +173,28 @@ const Home: NextPage = () => {
               </li>
               <li className={classNames('service_card_item', { is_active: activeFeatureCard === 'selection' })}>
                 <button
-              type="button"
-              className="service_card_menu"
-              data-item="selection"
-              aria-pressed={activeFeatureCard === 'selection'}
-            >
+                  type="button"
+                  className="service_card_menu"
+                  data-item="selection"
+                  aria-pressed={activeFeatureCard === 'selection'}
+                >
                   <span className="img_box">
                     <CollaboSelectionSVG />
                   </span>
                   <strong className="service_card_title">Live Selection</strong>
                   <span className="service_card_desc">
-                    Live Selection displays the object selected by each user who accesses the same canvas. Users can
-                    see what each other is doing in real-time.
+                    Live Selection shows what each user has selected, such as a range of text or an object on a
+                    canvas, so everyone can see what the others are working on in real-time.
                   </span>
                 </button>
               </li>
               <li className={classNames('service_card_item', { is_active: activeFeatureCard === 'editing' })}>
                 <button
-              type="button"
-              className="service_card_menu"
-              data-item="editing"
-              aria-pressed={activeFeatureCard === 'editing'}
-            >
+                  type="button"
+                  className="service_card_menu"
+                  data-item="editing"
+                  aria-pressed={activeFeatureCard === 'editing'}
+                >
                   <span className="img_box">
                     <CollaboEditingSVG />
                   </span>
