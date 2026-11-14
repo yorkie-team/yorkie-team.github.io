@@ -79,8 +79,8 @@ const Home: NextPage = () => {
               </Button>
             </Button.Box>
             <p className="desc">
-              Open-source SDKs, a server, and a dashboard for building real-time collaborative apps. Use Yorkie Cloud
-              or host it yourself.
+              Open-source SDKs, a server, and a dashboard for building real-time collaborative apps. Use the managed
+              cloud service or host it yourself.
             </p>
             <a
               href="https://github.com/yorkie-team/yorkie"
@@ -114,9 +114,6 @@ const Home: NextPage = () => {
               <Button.Box>
                 <Button as="link" href="/docs/getting-started" className="orange_0" icon={<Icon type="book" />}>
                   Getting Started
-                </Button>
-                <Button as="link" href="/docs" outline icon={<Icon type="book" />}>
-                  Read documentation
                 </Button>
               </Button.Box>
             </div>
@@ -192,7 +189,7 @@ const Home: NextPage = () => {
                   <strong className="service_card_title">Live Selection</strong>
                   <span className="service_card_desc">
                     Live Selection shows what each user has selected, such as a range of text or an object on a
-                    canvas, so everyone can see what the others are working on in real-time.
+                    canvas, so everyone can see what the others are working on in real time.
                   </span>
                 </button>
               </li>
@@ -297,8 +294,8 @@ const Home: NextPage = () => {
                   <strong className="title">Document and Presence</strong>
                   <p className="desc">
                     Documents are stored as conflict-free replicated data types (CRDTs), so multiple users can edit
-                    the same data at the same time without conflicts. Presence carries each peer&apos;s state, such as
-                    who is online and where their cursor is.
+                    the same data at the same time without conflicts. Presence shares each user&apos;s state, such as
+                    their cursor position and selection, so you can show who is online.
                   </p>
                   <Button
                     as="link"
@@ -317,8 +314,8 @@ const Home: NextPage = () => {
                 <div className="text_box">
                   <strong className="title">Document Management with Dashboard</strong>
                   <p className="desc">
-                    Dashboard lets project members browse the documents stored in a project and monitor them in
-                    real-time.
+                    Dashboard lets project members browse the documents stored in a project and monitor them in real
+                    time.
                   </p>
                   <Button as="link" href="/products#dashboard" className="gray800" icon={<Icon type="book" />}>
                     Learn more about Dashboard
@@ -332,8 +329,8 @@ const Home: NextPage = () => {
                 <div className="text_box">
                   <strong className="title">Cloud or Self-Hosted Server</strong>
                   <p className="desc">
-                    Use Yorkie Cloud to start without setting up any infrastructure, or run the open-source server on
-                    your own machines when you need control over your data.
+                    Start on the managed cloud service without setting up any infrastructure, or run the open-source
+                    server on your own machines when you need control over your data.
                   </p>
                   <Button as="link" href="/products#self-hosted-server" className="gray800" icon={<Icon type="book" />}>
                     Learn more about Self-Hosted Server
