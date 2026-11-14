@@ -19,6 +19,8 @@ export type ThumbnailLayout = {
   // CSS object-position for screenshots cropped by a browser frame. Defaults to 'center top'.
   position?: string;
 };
+// Web thumbnails are named `<sdk-example-dir>.jpg`: `npm run fetch:examples` copies each
+// `examples/<dir>/thumbnail.jpg` from yorkie-js-sdk to `public/assets/images/examples/<dir>.jpg`.
 export type Example = {
   id: string;
   title: string;
@@ -40,8 +42,8 @@ export const EXAMPLES: Example[] = [
   {
     id: 'simultaneous-cursors',
     title: 'Simultaneous Cursors',
-    desc: 'This demo shows the real-time collaborative version of simple drawing, cursor animation with Yorkie and React.',
-    thumbnail: 'simultaneous-cursors.png',
+    desc: 'Live cursors driven by Presence, with reactions and an ephemeral pen trail, built with Yorkie React.',
+    thumbnail: 'simultaneous-cursors.jpg',
     platform: 'web',
     category: [CATEGORIES.PRESENCE, CATEGORIES.REACT],
   },
@@ -57,8 +59,8 @@ export const EXAMPLES: Example[] = [
   {
     id: 'kanban',
     title: 'Kanban Board',
-    desc: 'Kanban Board is a tool for managing tasks and workflow. It is a visual way to manage tasks and workflow.',
-    thumbnail: 'vuejs-kanban-board.jpg',
+    desc: 'A Vue board whose lists and cards are Yorkie Arrays. Add and delete lists and cards together in real time.',
+    thumbnail: 'vuejs-kanban.jpg',
     platform: 'web',
     thumbnailLayout: { position: 'left top' },
     category: [CATEGORIES.PRODUCTIVITY],
@@ -91,7 +93,7 @@ export const EXAMPLES: Example[] = [
     id: 'react-flow',
     title: 'React Flow',
     desc: 'This is an example of real-time collaborative React Flow using Yorkie React.',
-    thumbnail: 'react-flow.png',
+    thumbnail: 'react-flow.jpg',
     platform: 'web',
     category: [CATEGORIES.CANVAS_TOOL, CATEGORIES.REACT],
   },
@@ -115,7 +117,7 @@ export const EXAMPLES: Example[] = [
     id: 'prosemirror',
     title: 'ProseMirror',
     desc: 'This is a real-time collaborative version of the ProseMirror editor. It uses the Tree, a custom CRDT type from Yorkie.',
-    thumbnail: 'vanilla-prosemirror.png',
+    thumbnail: 'vanilla-prosemirror.jpg',
     platform: 'web',
     category: [CATEGORIES.EDITOR],
   },
@@ -123,7 +125,7 @@ export const EXAMPLES: Example[] = [
     id: 'quill',
     title: 'Rich Text Editor',
     desc: 'This demo shows the real-time collaborative version of the Quill editor with Yorkie and Vite.',
-    thumbnail: 'vanilla-quill.png',
+    thumbnail: 'vanilla-quill.jpg',
     platform: 'web',
     category: [CATEGORIES.EDITOR],
   },
@@ -139,7 +141,7 @@ export const EXAMPLES: Example[] = [
     id: 'calendar',
     title: 'Scheduler',
     desc: 'This demo shows the real-time collaborative version of the Scheduler with Yorkie and Next.js.',
-    thumbnail: 'nextjs-scheduler.png',
+    thumbnail: 'nextjs-scheduler.jpg',
     platform: 'web',
     thumbnailLayout: { position: 'left top' },
     category: [CATEGORIES.PRODUCTIVITY],

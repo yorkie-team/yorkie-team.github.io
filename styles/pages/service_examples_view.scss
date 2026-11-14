@@ -15,6 +15,10 @@
   .container {
     flex-direction: row;
 
+    @include mixins-lib.mobileStart() {
+      flex-direction: column;
+    }
+
     .link {
       text-decoration: underline;
     }
@@ -1176,71 +1180,259 @@
     }
   }
 
-  .code_view {
+  // Live preview of a web example (BasicExampleView): one iframe per simulated client.
+  .preview_view {
     display: flex;
     flex-direction: column;
-    max-height: none;
+    max-height: calc(100vh - variables.$spacing_64);
     padding: 0;
+    overflow: hidden;
+    container: preview / inline-size;
+
+    @include mixins-lib.mobileStart() {
+      display: flex;
+      max-height: none;
+      overflow: visible;
+      border-top: 1px solid var(--gray-400);
+    }
+  }
+
+  .preview_bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: variables.$spacing_8 variables.$spacing_16;
+    padding: 12px variables.$spacing_24;
+    border-bottom: 1px solid var(--gray-400);
+
+    @include mixins-lib.mobileStart() {
+      padding: variables.$spacing_16;
+      border-bottom: none;
+    }
+  }
+
+  .preview_note {
+    flex: 1 1 260px;
+    @include mixins-lib.rfonts(14, 22, 500);
+    color: var(--gray-800);
+
+    &_narrow {
+      display: none;
+    }
+
+    @include mixins-lib.mobileStart() {
+      &_wide {
+        display: none;
+      }
+
+      &_narrow {
+        display: inline;
+      }
+    }
+  }
+
+  .preview_actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: variables.$spacing_8;
+
+    .btn {
+      margin: 0;
+    }
+
+    .btn_line:not(:disabled):hover {
+      background-color: var(--gray-100);
+    }
+
+    .btn:focus-visible {
+      outline: 2px solid var(--orange-0);
+      outline-offset: 2px;
+    }
+
+    @include mixins-lib.mobileStart() {
+      width: 100%;
+    }
+  }
+
+  .preview_add {
+    display: inline-flex;
+    align-items: center;
+    gap: variables.$spacing_8;
 
     @include mixins-lib.mobileStart() {
       display: none;
     }
+  }
 
-    .pin_box {
-      height: 81px;
-    }
+  .preview_limit {
+    @include mixins-lib.rfonts(12, 16, 500);
+    color: var(--gray-600);
+  }
 
-    .pin_list {
-      padding: 16px 23px;
-    }
+  .preview_open_narrow {
+    display: none;
+  }
 
-    .pin_item {
-      padding-right: 8px;
+  @include mixins-lib.mobileStart() {
+    .btn_open {
+      width: 100%;
+      padding: 11px variables.$spacing_16;
+      border-color: transparent;
+      background-color: var(--orange-0);
+      color: var(--ink-on-accent);
+      @include mixins-lib.rfonts(14, 22, 600);
 
-      .btn_box {
-        margin-left: 24px;
+      &:hover {
+        background-color: var(--orange-dark);
+      }
+
+      .icon {
+        width: 16px;
+        height: 16px;
       }
     }
 
-    .grid_list2 {
-      overflow-y: auto;
+    .preview_open_wide {
+      display: none;
+    }
+
+    .preview_open_narrow {
+      display: block;
+    }
+  }
+
+  .preview_panes {
+    display: grid;
+    flex: 1;
+    grid-template-columns: minmax(0, 1fr);
+    grid-auto-rows: minmax(260px, 1fr);
+    gap: variables.$spacing_16;
+    min-height: 0;
+    padding: variables.$spacing_16 variables.$spacing_24 variables.$spacing_24;
+    overflow-y: auto;
+
+    @include mixins-lib.tabletStart() {
+      padding: variables.$spacing_16;
+    }
+
+    @include mixins-lib.mobileStart() {
+      display: block;
+      flex: none;
+      padding: 0 variables.$spacing_16 variables.$spacing_24;
+      overflow: visible;
+    }
+  }
+
+  // Side by side once each pane can be at least ~440px wide.
+  @container preview (min-width: 920px) {
+    .preview_panes:not([data-count='1']) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .preview_pane {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    border: 1px solid var(--gray-400);
+    border-radius: 8px;
+    background: var(--gray-000);
+
+    @each $hue in red, yellow, green, orange, blue, purple {
+      &.peer_#{$hue} {
+        --peer: var(--#{$hue}-0);
+      }
+    }
+
+    @include mixins-lib.mobileStart() {
+      height: min(72vh, 600px);
+
+      &:not(:first-child) {
+        display: none;
+      }
+    }
+
+    &_top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: variables.$spacing_8;
+      height: 36px;
+      padding: 0 6px 0 12px;
+      border-bottom: 1px solid var(--gray-400);
+      box-sizing: border-box;
+    }
+
+    &_user {
+      display: inline-flex;
+      align-items: center;
+      gap: variables.$spacing_8;
+      @include mixins-lib.rfonts(12, 16, 600);
+      color: var(--gray-800);
+    }
+
+    &_dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--peer, var(--gray-500));
+    }
+
+    &_body {
       flex: 1;
-      padding: 23px;
+      min-height: 0;
+      background: var(--gray-50);
 
-      .grid_item {
-        &:only-child {
-          flex-basis: 100%;
-          margin: 0;
-
-          @include mixins-lib.tabletStart() {
-            height: 100%;
-            box-sizing: border-box;
-          }
-        }
-
-        &:nth-last-child(n + 2) {
-          &:nth-last-child(-n + 2) {
-            &:first-child,
-            &:first-child ~ .grid_item {
-              flex-basis: 100%;
-              margin-top: 23px;
-              margin-left: 0;
-            }
-
-            &:first-child {
-              margin-top: 0;
-            }
-          }
-        }
+      iframe {
+        display: block;
+        width: 100%;
+        height: 100%;
+        border: 0;
       }
     }
 
-    .dashboard {
-      height: 100%;
+    .btn_remove {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 4px;
+      color: var(--gray-600);
+      transition: background-color 0.2s;
 
-      &_content {
-        height: calc(100% - 41px);
-        min-height: 226px;
+      .icon,
+      svg {
+        display: block;
+        width: 14px;
+        height: 14px;
+      }
+
+      svg path {
+        fill: currentColor;
+      }
+
+      &:hover:not(:disabled) {
+        background-color: var(--gray-100);
+        color: var(--gray-900);
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--orange-0);
+        outline-offset: 1px;
+      }
+
+      &:disabled {
+        cursor: not-allowed;
+        color: var(--gray-300);
+      }
+
+      @include mixins-lib.mobileStart() {
+        display: none;
       }
     }
   }

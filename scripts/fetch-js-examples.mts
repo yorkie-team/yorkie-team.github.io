@@ -90,6 +90,15 @@ const getFileContent = (filePath: string): string => {
   return readFile(filePath);
 };
 
+// Files left out of the code viewer: env files hold build-time addresses and keys,
+// and thumbnails are copied to public/assets/images/examples by fetch-js-examples.sh.
+const isExcludedFile = (filename: string): boolean => {
+  if (filename === '.env' || (filename.startsWith('.env.') && filename !== '.env.example')) {
+    return true;
+  }
+  return /^thumbnail\.(png|jpe?g|gif|webp)$/.test(filename);
+};
+
 const getAbsolutePath = (fullPath: string, basePath: string): string => {
   return fullPath.replace(basePath, '') || '/';
 };
@@ -108,7 +117,7 @@ const getDirectoryInfo = (dirPath: string, basePath?: string): DirectoryInfo => 
       if (file.isDirectory()) {
         const childInfo = getDirectoryInfo(path, _basePath);
         directoryInfo.children.unshift(childInfo);
-      } else {
+      } else if (!isExcludedFile(file.name)) {
         const childInfo: FileInfo = {
           isFile: true,
           isOpen: false,

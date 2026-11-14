@@ -34,6 +34,7 @@ import ViewGridSVG from '@/public/assets/icons/icon_view_grid.svg';
 import ViewSplitSVG from '@/public/assets/icons/icon_view_split.svg';
 import ExpandSVG from '@/public/assets/icons/icon_expand.svg';
 import PlusSVG from '@/public/assets/icons/icon_plus.svg';
+import LinkSVG from '@/public/assets/icons/icon_link.svg';
 import MinimizeSVG from '@/public/assets/icons/icon_minimize.svg';
 import PinSVG from '@/public/assets/icons/icon_pin.svg';
 import PackageSVG from '@/public/assets/icons/icon_package.svg';
@@ -82,6 +83,7 @@ const svgMap = {
   viewSplit: <ViewSplitSVG />,
   expand: <ExpandSVG />,
   plus: <PlusSVG />,
+  link: <LinkSVG />,
   minimize: <MinimizeSVG />,
   pin: <PinSVG />,
   package: <PackageSVG />,

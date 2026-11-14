@@ -21,6 +21,10 @@ dotenv.config({ path: '.env', override: false });
 const YORKIE_SDK_PATH = path.join(process.cwd(), 'temp');
 const EXAMPLES_OUTPUT_PATH = path.join(process.cwd(), 'public/apps');
 
+// Run a pinned pnpm through npx so the build matches the SDK's lockfile no matter
+// which pnpm (if any) is installed globally.
+const PNPM = 'npx -y pnpm@9';
+
 const STATIC_EXAMPLES = [
   'vanilla-quill',
   'nextjs-scheduler',
@@ -87,7 +91,7 @@ const buildAllExamples = async () => {
       console.log('📥 Installing dependencies...');
       // Use --prod=false to install devDependencies even when NODE_ENV=production
       // This is needed because prepare scripts may require dev dependencies (e.g., husky)
-      execSync('pnpm install --prod=false', { cwd: YORKIE_SDK_PATH, stdio: 'inherit' });
+      execSync(`${PNPM} install --prod=false`, { cwd: YORKIE_SDK_PATH, stdio: 'inherit' });
     }
 
     // Build examples using pnpm
@@ -108,7 +112,7 @@ const buildAllExamples = async () => {
         console.log(`Setting NEXT_PUBLIC_BASE_PATH=${buildEnv.NEXT_PUBLIC_BASE_PATH}`);
       }
 
-      execSync(`pnpm ${name} build`, {
+      execSync(`${PNPM} ${name} build`, {
         cwd: YORKIE_SDK_PATH,
         stdio: 'inherit',
         env: buildEnv,
