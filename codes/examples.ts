@@ -10,11 +10,22 @@ export const CATEGORIES = {
   IOS: 'ios',
 } as const;
 export type CategoryType = (typeof CATEGORIES)[keyof typeof CATEGORIES];
+// Platform the example runs on. It picks the device frame drawn around the thumbnail.
+export type ExamplePlatform = 'web' | 'android' | 'ios';
+// Presentation hints for a thumbnail inside its frame. The screenshot always keeps its own aspect ratio.
+export type ThumbnailLayout = {
+  // Mobile screenshots taken in landscape get a landscape device frame instead of a portrait phone.
+  orientation?: 'portrait' | 'landscape';
+  // CSS object-position for screenshots cropped by a browser frame. Defaults to 'center top'.
+  position?: string;
+};
 export type Example = {
   id: string;
   title: string;
   desc: string;
   thumbnail: string;
+  platform: ExamplePlatform;
+  thumbnailLayout?: ThumbnailLayout;
   category: CategoryType[];
 };
 export const EXAMPLES: Example[] = [
@@ -23,6 +34,7 @@ export const EXAMPLES: Example[] = [
     title: 'Profile Stack',
     desc: 'Profile stack shows the list of users currently accessing the Document.',
     thumbnail: 'profile-stack.jpg',
+    platform: 'web',
     category: [CATEGORIES.PRESENCE],
   },
   {
@@ -30,6 +42,7 @@ export const EXAMPLES: Example[] = [
     title: 'Simultaneous Cursors',
     desc: 'This demo shows the real-time collaborative version of simple drawing, cursor animation with Yorkie and React.',
     thumbnail: 'simultaneous-cursors.png',
+    platform: 'web',
     category: [CATEGORIES.PRESENCE, CATEGORIES.REACT],
   },
   {
@@ -37,13 +50,17 @@ export const EXAMPLES: Example[] = [
     title: 'Simultaneous Cursors Android',
     desc: 'This demo shows the real-time collaborative version of simple drawing, cursor animation with Yorkie and Android.',
     thumbnail: 'android-simultaneous-cursors.webp',
+    platform: 'android',
+    thumbnailLayout: { orientation: 'landscape' },
     category: [CATEGORIES.PRESENCE, CATEGORIES.ANDROID],
   },
   {
     id: 'kanban',
     title: 'Kanban Board',
     desc: 'Kanban Board is a tool for managing tasks and workflow. It is a visual way to manage tasks and workflow.',
-    thumbnail: 'vuejs-kanban.jpg',
+    thumbnail: 'vuejs-kanban-board.jpg',
+    platform: 'web',
+    thumbnailLayout: { position: 'left top' },
     category: [CATEGORIES.PRODUCTIVITY],
   },
   {
@@ -51,6 +68,7 @@ export const EXAMPLES: Example[] = [
     title: 'TodoMVC',
     desc: 'This is an example of real-time collaborative TodoMVC using Yorkie React.',
     thumbnail: 'react-todomvc.jpg',
+    platform: 'web',
     category: [CATEGORIES.PRODUCTIVITY, CATEGORIES.REACT],
   },
   {
@@ -58,6 +76,7 @@ export const EXAMPLES: Example[] = [
     title: 'TodoMVC Android',
     desc: 'This is an example of real-time collaborative TodoMVC using Yorkie Android.',
     thumbnail: 'android-todomvc.webp',
+    platform: 'android',
     category: [CATEGORIES.PRODUCTIVITY, CATEGORIES.ANDROID],
   },
   {
@@ -65,6 +84,7 @@ export const EXAMPLES: Example[] = [
     title: 'Todo List',
     desc: 'This is an example of real-time collaborative todo list using Yorkie React.',
     thumbnail: 'nextjs-todolist.jpg',
+    platform: 'web',
     category: [CATEGORIES.PRODUCTIVITY, CATEGORIES.REACT],
   },
   {
@@ -72,6 +92,7 @@ export const EXAMPLES: Example[] = [
     title: 'React Flow',
     desc: 'This is an example of real-time collaborative React Flow using Yorkie React.',
     thumbnail: 'react-flow.png',
+    platform: 'web',
     category: [CATEGORIES.CANVAS_TOOL, CATEGORIES.REACT],
   },
   {
@@ -79,6 +100,7 @@ export const EXAMPLES: Example[] = [
     title: 'CodeMirror',
     desc: 'This is a real-time collaborative version of the CodeMirror editor. It uses the Text, a custom CRDT type from Yorkie.',
     thumbnail: 'vanilla-codemirror6.jpg',
+    platform: 'web',
     category: [CATEGORIES.EDITOR],
   },
   {
@@ -86,6 +108,7 @@ export const EXAMPLES: Example[] = [
     title: 'tldraw',
     desc: 'This is a real-time collaboration example of the tldraw whiteboard editor with Yorkie.',
     thumbnail: 'react-tldraw.jpg',
+    platform: 'web',
     category: [CATEGORIES.CANVAS_TOOL],
   },
   {
@@ -93,6 +116,7 @@ export const EXAMPLES: Example[] = [
     title: 'ProseMirror',
     desc: 'This is a real-time collaborative version of the ProseMirror editor. It uses the Tree, a custom CRDT type from Yorkie.',
     thumbnail: 'vanilla-prosemirror.png',
+    platform: 'web',
     category: [CATEGORIES.EDITOR],
   },
   {
@@ -100,6 +124,7 @@ export const EXAMPLES: Example[] = [
     title: 'Rich Text Editor',
     desc: 'This demo shows the real-time collaborative version of the Quill editor with Yorkie and Vite.',
     thumbnail: 'vanilla-quill.png',
+    platform: 'web',
     category: [CATEGORIES.EDITOR],
   },
   {
@@ -107,6 +132,7 @@ export const EXAMPLES: Example[] = [
     title: 'Rich Text Editor Android',
     desc: 'This demo shows the real-time collaborative version of the rich text editor with Yorkie and Android.',
     thumbnail: 'android-rich-text-editor.webp',
+    platform: 'android',
     category: [CATEGORIES.EDITOR, CATEGORIES.ANDROID],
   },
   {
@@ -114,6 +140,8 @@ export const EXAMPLES: Example[] = [
     title: 'Scheduler',
     desc: 'This demo shows the real-time collaborative version of the Scheduler with Yorkie and Next.js.',
     thumbnail: 'nextjs-scheduler.png',
+    platform: 'web',
+    thumbnailLayout: { position: 'left top' },
     category: [CATEGORIES.PRODUCTIVITY],
   },
   {
@@ -121,6 +149,7 @@ export const EXAMPLES: Example[] = [
     title: 'Scheduler Android',
     desc: 'This demo shows the real-time collaborative version of the Scheduler with Yorkie and Android.',
     thumbnail: 'android-scheduler.webp',
+    platform: 'android',
     category: [CATEGORIES.PRODUCTIVITY, CATEGORIES.ANDROID],
   },
   {
@@ -128,6 +157,7 @@ export const EXAMPLES: Example[] = [
     title: 'Scheduler iOS',
     desc: 'This demo shows the real-time collaborative version of the Scheduler with Yorkie and iOS.',
     thumbnail: 'ios-scheduler.webp',
+    platform: 'ios',
     category: [CATEGORIES.PRODUCTIVITY, CATEGORIES.IOS],
   },
   {
@@ -135,6 +165,8 @@ export const EXAMPLES: Example[] = [
     title: 'Rich Text Editor iOS',
     desc: 'This demo shows the real-time collaborative version of the rich text editor with Yorkie and iOS.',
     thumbnail: 'ios-rich-text-editor.webp',
+    platform: 'ios',
+    thumbnailLayout: { orientation: 'landscape' },
     category: [CATEGORIES.EDITOR, CATEGORIES.IOS],
   },
   {
@@ -142,6 +174,8 @@ export const EXAMPLES: Example[] = [
     title: 'Simultaneous Cursors iOS',
     desc: 'This demo shows the real-time collaborative version of simple drawing, cursor animation with Yorkie and iOS.',
     thumbnail: 'ios-simultaneous-cursors.webp',
+    platform: 'ios',
+    thumbnailLayout: { orientation: 'landscape' },
     category: [CATEGORIES.PRESENCE, CATEGORIES.IOS],
   },
   {
@@ -149,6 +183,8 @@ export const EXAMPLES: Example[] = [
     title: 'TodoMVC iOS',
     desc: 'This is an example of real-time collaborative TodoMVC using Yorkie iOS SDK.',
     thumbnail: 'todomvc-ios.webp',
+    platform: 'ios',
+    thumbnailLayout: { orientation: 'landscape' },
     category: [CATEGORIES.PRODUCTIVITY, CATEGORIES.IOS],
   },
 ];

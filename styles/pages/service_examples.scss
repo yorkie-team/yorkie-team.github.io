@@ -134,16 +134,6 @@
     &_card {
       overflow: hidden;
     }
-
-    &_thumbnail {
-      img {
-        width: 100%;
-        height: auto;
-        vertical-align: top;
-        aspect-ratio: 1200 / 750;
-        object-fit: cover;
-      }
-    }
   }
 }
 
