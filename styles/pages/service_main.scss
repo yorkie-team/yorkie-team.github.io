@@ -253,7 +253,7 @@
         margin-left: 0;
       }
 
-      &:only-child {
+      &:first-child {
         margin-left: 0;
 
         @include mixins-lib.mobileStart() {
@@ -296,6 +296,7 @@
       padding: 9px 12px;
       border-radius: 8px;
       // The link sits on the hero artwork; a paper chip keeps it readable over cursors and shapes.
+      background-color: var(--gray-000);
       background-color: color-mix(in srgb, var(--gray-000) 88%, transparent);
       color: var(--gray-800);
       @include mixins-lib.rfonts(14, 22, 500);
@@ -306,6 +307,11 @@
 
       &:hover {
         text-decoration-color: var(--gray-800);
+      }
+
+      // The hero is one viewport tall; on short viewports the link would be clipped, and the footer has it too.
+      @media screen and (max-height: 620px) {
+        display: none;
       }
 
       .icon {
