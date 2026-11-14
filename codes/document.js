@@ -4,12 +4,12 @@ const COMMON_CODE = `
 doc.update((root) => {
   root.num = 1;           // {"num":1}
   root.obj = {'str':'a'}; // {"num":1,"obj":{"str":"a"}}
-  root.arr = ['1', '2'];  // {"num":1,"obj":{"str":"a"},"arr":[1,2]}
+  root.arr = ['1', '2'];  // {"num":1,"obj":{"str":"a"},"arr":["1","2"]}
 });
 `;
 
-const TEXT_CODE = ` 
-// Text provides supports for collaborative plain text editing.
+const TEXT_CODE = `
+// Text supports collaborative plain text editing.
 doc.update((root) => {
   root.text = new yorkie.Text();  // {"text":""}
   root.text.edit(0, 0, 'hello');  // {"text":"hello"}
@@ -17,7 +17,7 @@ doc.update((root) => {
 });
 `;
 
-const COUNTER_CODE = ` 
+const COUNTER_CODE = `
 // Counter supports numeric types that change with addition and subtraction.
 doc.update((root) => {
   root.cnt = new yorkie.Counter(1); // {"cnt":1}, use 1n for a Long counter
