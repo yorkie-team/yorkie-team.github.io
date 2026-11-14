@@ -50,7 +50,7 @@ const Home: NextPage = () => {
       <div className="content">
         <section className="key_visual">
           <div className="kv_bg" aria-hidden="true">
-            <MainBannerMotion bannerActive={bannerActive} />
+            <MainBannerMotion bannerActive />
           </div>
           <div className="inner">
             <h2 className="title">
@@ -74,10 +74,22 @@ const Home: NextPage = () => {
                 <Icon type="star" />
                 <span className="text">Start for free</span>
               </a>
+              <Button as="link" href="/docs/getting-started" outline className="btn_docs" icon={<Icon type="book" />}>
+                Read the docs
+              </Button>
             </Button.Box>
             <p className="desc">
               Unlock the full potential of real-time collaboration with open-source SDKs and API package.
             </p>
+            <a
+              href="https://github.com/yorkie-team/yorkie"
+              className="link_github"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <Icon type="github" />
+              Open source on GitHub
+            </a>
           </div>
         </section>
         <section className="section section_app">
