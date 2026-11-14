@@ -33,8 +33,8 @@ export function ExampleLayout({
           <h1 className="logo">
             <Link href="/">
               <LogoGnbSVG />
+              <span className="blind">Yorkie</span>
             </Link>
-            <span className="blind">Yorkie</span>
           </h1>
           <span className="nav_text">
             <Link href="/examples">Examples</Link>

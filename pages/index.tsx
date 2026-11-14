@@ -38,8 +38,14 @@ const Home: NextPage = () => {
     window.addEventListener('resize', handleVisualSize);
     handleVisualSize();
 
+    // The hero can grow with its content (font swap, short viewports) without a window resize.
+    const $hero = document.querySelector('.key_visual');
+    const observer = typeof ResizeObserver !== 'undefined' && $hero ? new ResizeObserver(handleVisualSize) : null;
+    if (observer && $hero) observer.observe($hero);
+
     return () => {
       window.removeEventListener('resize', handleVisualSize);
+      observer?.disconnect();
     };
   }, []);
 

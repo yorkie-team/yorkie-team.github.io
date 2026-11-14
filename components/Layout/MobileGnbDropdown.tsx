@@ -19,23 +19,10 @@ export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  useEffect(() => {
-    if (!gnbOpened) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key !== 'Escape') return;
-      setGnbOpened(false);
-      // Popover owns the button's ref, so look the button up to return focus to it.
-      document.querySelector<HTMLButtonElement>('.header_service .btn_menu')?.focus();
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [gnbOpened]);
-
   return (
     <Popover opened={gnbOpened} onChange={setGnbOpened}>
       <Popover.Target>
-        <button type="button" className="btn_menu" aria-expanded={gnbOpened}>
+        <button type="button" className="btn_menu">
           <span className="blind">{gnbOpened ? 'Close menu' : 'Open menu'}</span>
           <Icon type="gnbMenu" className={classNames('icon_menu', { is_active: !gnbOpened })} />
           <Icon type="close" className={classNames('icon_close', { is_active: gnbOpened })} />
@@ -56,6 +43,7 @@ export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
               <button
                 type="button"
                 className={classNames('dropdown_menu', 'btn_docs', { is_show: docsMenuOpened })}
+                aria-expanded={docsMenuOpened}
                 onClick={() => {
                   setDocsMenuOpened((opened) => !opened);
                 }}
