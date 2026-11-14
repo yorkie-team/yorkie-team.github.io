@@ -232,7 +232,10 @@
   }
 
   .codeblock_content {
-    width: 854px;
+    // Up to 854px wide beside the cards, shrinking on narrow desktops instead of overflowing the page.
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: 854px;
     height: 513px;
 
     // Below the desktop breakpoint the code sits under the cards at full width.
