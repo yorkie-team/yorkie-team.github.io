@@ -3,5 +3,4 @@ export * from './ServerMotion';
 export * from './StateSharingMotion';
 export * from './StateSharingDetailMotion';
 export * from './FlexibleDocumentMotion';
-export * from './MainBannerMotion';
 export * from './PresenceMotion';

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import classNames from 'classnames';
 import type { NextPage } from 'next';
 import Head from 'next/head';
@@ -6,8 +6,7 @@ import Link from 'next/link';
 import { Layout, Button, Icon, CodeBlock, CodeBlockHeader, Accordion } from '@/components';
 import { ExampleThumbnailImage } from '@/components/exampleView';
 import { EXAMPLES, type Example } from '@/codes/examples';
-import { ChartMotion, StateSharingMotion, ServerMotion, MainBannerMotion } from '@/components/motions';
-import UserGroupSVG from '@/public/assets/icons/icon_service_main_users_group.svg';
+import { ChartMotion, StateSharingMotion, ServerMotion } from '@/components/motions';
 import CollaboProfileSVG from '@/public/assets/icons/icon_collaborate_profile.svg';
 import CollaboCursorSVG from '@/public/assets/icons/icon_collaborate_cursor.svg';
 import CollaboSelectionSVG from '@/public/assets/icons/icon_collaborate_selection.svg';
@@ -19,35 +18,16 @@ const FEATURED_EXAMPLE_IDS = ['simultaneous-cursors', 'codemirror'];
 const FEATURED_EXAMPLES = FEATURED_EXAMPLE_IDS.map((id) => EXAMPLES.find((example) => example.id === id)).filter(
   (example): example is Example => !!example,
 );
+// The pointer drawn for each scripted collaborator in the hero.
+const PeerCursor = () => (
+  <svg className="peer_pointer" width="20" height="22" viewBox="0 0 20 22" fill="none" aria-hidden="true">
+    <path d="M2 2l15.5 7.2-6.6 2.2-2.6 6.9L2 2z" fill="currentColor" stroke="var(--gray-000)" strokeWidth="1.5" strokeLinejoin="round" />
+  </svg>
+);
+
 const Home: NextPage = () => {
-  const [bannerActive, setBannerActive] = useState(false);
   const [activeFeatureCard, setActiveFeatureCard] = useState<FeatureType>('profile');
   const [activeFeatureCode, setActiveFeatureCode] = useState({ type: 'js', info: FEATURES_CODE.profile.js });
-
-  useEffect(() => {
-    const handleVisualSize = () => {
-      const $visual = document.querySelector('.kv_bg svg') as HTMLElement;
-      const $hero = document.querySelector('.key_visual');
-      if (!$visual || !$hero) return;
-
-      // The artwork is as tall as the hero; scale it up only when that leaves it narrower than the viewport.
-      const SVG_ASPECT_RATIO = 1512 / 868;
-      const scale = window.innerWidth / ($hero.clientHeight * SVG_ASPECT_RATIO);
-      $visual.style.setProperty('--scale', scale < 1 ? '1' : `${scale}`);
-    };
-    window.addEventListener('resize', handleVisualSize);
-    handleVisualSize();
-
-    // The hero can grow with its content (font swap, short viewports) without a window resize.
-    const $hero = document.querySelector('.key_visual');
-    const observer = typeof ResizeObserver !== 'undefined' && $hero ? new ResizeObserver(handleVisualSize) : null;
-    if (observer && $hero) observer.observe($hero);
-
-    return () => {
-      window.removeEventListener('resize', handleVisualSize);
-      observer?.disconnect();
-    };
-  }, []);
 
   return (
     <Layout className="main_page">
@@ -55,74 +35,67 @@ const Home: NextPage = () => {
         <title>Yorkie · Open-source document store for real-time collaboration</title>
       </Head>
       <div className="content">
-        <section className="key_visual">
-          <div className="kv_bg" aria-hidden="true">
-            <MainBannerMotion bannerActive />
-          </div>
-          <div className="inner">
-            <h1 className="title">
-              <span className="text">Bring</span>{' '}
-              <span className={classNames('point', { is_hover: bannerActive })}>
-                collaboration
-                <span className="bg"></span>
-              </span>{' '}
-              <span className="text">to your app</span>
-            </h1>
-            <Button.Box>
-              <a
-                href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`}
-                className="btn orange_0 btn_start"
-                onPointerOver={() => setBannerActive(true)}
-                onPointerOut={() => setBannerActive(false)}
-                onFocus={() => setBannerActive(true)}
-                onBlur={() => setBannerActive(false)}
-              >
-                <span className="bg"></span>
-                <Icon type="star" />
-                <span className="text">Start for free</span>
-              </a>
-              <Button as="link" href="/docs" outline className="btn_docs" icon={<Icon type="book" />}>
-                Read the docs
-              </Button>
-            </Button.Box>
-            <p className="desc">
-              Open-source SDKs, a server, and a dashboard for building real-time collaborative apps. Use the managed
-              cloud service or host it yourself.
-            </p>
-            <a
-              href="https://github.com/yorkie-team/yorkie"
-              className="link_github"
-              target="_blank"
-              rel="noreferrer"
-            >
-              <Icon type="github" />
-              Open source on GitHub
-            </a>
-          </div>
-        </section>
-        <section className="section section_app">
-          <div className="align_box">
-            <div className="app_header">
-              <p className="tag_name">Extend Your App with Yorkie</p>
-              <span className="icon">
-                <UserGroupSVG />
+        <section className="hero_doc">
+          <div className="hero_window">
+            <div className="hero_window_bar" aria-hidden="true">
+              <span className="hero_window_name">yorkie.dev / landing</span>
+              <span className="hero_peers">
+                <span className="hero_peer peer_b">C</span>
+                <span className="hero_peer peer_c">K</span>
+                <span className="hero_peer peer_a">H</span>
               </span>
             </div>
-            <div className="app_body">
-              <h2 className="section_title">
-                Make your product
-                <br />
-                <span className="point">collaborative</span> in a flash!
-              </h2>
-              <p className="section_desc">
-                Yorkie handles synchronization, conflict resolution, and persistence, so you can focus on your
-                product&apos;s features.
-              </p>
-              <Button.Box>
-                <Button as="link" href="/docs/getting-started" className="orange_0" icon={<Icon type="book" />}>
-                  Getting Started
-                </Button>
-              </Button.Box>
+            <div className="hero_window_body">
+              <h1 className="title">
+                <span className="line">Bring</span>{' '}
+                <span className="line">
+                  <span className="point">
+                    collaboration
+                    <span className="peer_selection" aria-hidden="true"></span>
+                    <span className="peer_cursor peer_b" aria-hidden="true">
+                      <PeerCursor />
+                      <span className="peer_tag" data-name="chacha" />
+                    </span>
+                  </span>
+                </span>{' '}
+                <span className="line">
+                  to your app
+                  <span className="peer_caret peer_c" aria-hidden="true">
+                    <span className="peer_tag" data-name="krapie" />
+                  </span>
+                </span>
+              </h1>
+              <div className="hero_aside">
+                <p className="desc">
+                  Open-source SDKs, a server, and a dashboard for building real-time collaborative apps. Use the managed
+                  cloud service or host it yourself.
+                </p>
+                <Button.Box>
+                  <span className="hero_cta">
+                    <a href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`} className="btn orange_0 btn_start">
+                      <span className="bg"></span>
+                      <Icon type="star" />
+                      <span className="text">Start for free</span>
+                    </a>
+                    <span className="peer_cursor peer_a" aria-hidden="true">
+                      <PeerCursor />
+                      <span className="peer_tag" data-name="hackerwins" />
+                    </span>
+                  </span>
+                  <Button as="link" href="/docs" outline className="btn_docs" icon={<Icon type="book" />}>
+                    Read the docs
+                  </Button>
+                </Button.Box>
+                <a
+                  href="https://github.com/yorkie-team/yorkie"
+                  className="link_github"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <Icon type="github" />
+                  Open source on GitHub
+                </a>
+              </div>
             </div>
           </div>
         </section>

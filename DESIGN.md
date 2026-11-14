@@ -142,8 +142,9 @@ A warm neutral canvas with one brand orange and a six-hue peer palette.
 ### Secondary
 
 - **Peer hues** (`yellow-0`, `green-0`, `blue-0`, `red-0`, `purple-0`, plus
-  orange): each represents one collaborator. Used for cursors, avatars,
-  selection outlines, and the paired gradients in the hero. Every hue has
+  orange): each represents one collaborator. Used for cursors, avatars, and
+  selection outlines. The landing hero uses its own darker steps of three of
+  them (see Shared Document Hero). Every hue has
   `dark`, `0`, and `light` steps and three alpha tints (24%, 32%, 40%) as CSS
   custom properties in `styles/base/_color.scss`.
 
@@ -152,9 +153,8 @@ A warm neutral canvas with one brand orange and a six-hue peer palette.
 - **Peer gradients** (`gradient-*-from` paired with the matching `*-0` hue;
   orange runs from `gradient-orange-from` to `gradient-orange-to`): two-stop
   linear gradients defined as `$gradient_90deg_*` and `$gradient_180deg_*` in
-  `styles/base/_variables.scss`. They fill the peer shapes in the hero and
-  the emphasized word in headlines. Use the Sass variables, not literal
-  stops.
+  `styles/base/_variables.scss`. They color the primary button's hover
+  animation. Use the Sass variables, not literal stops.
 
 ### Neutral
 
@@ -192,7 +192,11 @@ from size and weight, not from font contrast. Code is the second voice.
 
 The scale is fixed in `styles/base/_font.scss`:
 
-- **Display** (56px / 64px): the hero headline only.
+- **Hero** (96px / 108px, weight 800): the landing hero headline only. It
+  scales down to 76px in narrow two-column windows and steps to 80px when
+  stacked on a small laptop, 64px on tablet, 40px on mobile, and 36px below
+  360px.
+- **Display** (56px / 64px): page titles on the other pages.
 - **Headline** (46px / 54px and 38px / 46px): section headlines.
 - **Title** (30px / 38px, 24px / 32px, 20px / 28px): card and subsection
   titles.
@@ -273,6 +277,20 @@ and cursors only. Borders are 1px solid.
   and 4px corners. Highlighted lines use the 24% alpha tints of red, green,
   and yellow. Code samples are primary content on this site and
   get as much care as imagery.
+
+### Shared Document Hero
+
+- The landing hero is an app window (16px radius, 1px `gray-400` border, a
+  56px title bar with three peer avatars) whose body is a dotted document
+  holding the headline, pitch, and actions.
+- Three scripted collaborators arrive once, in sequence: one drags a dashed
+  selection across the orange word, one leaves a text caret at the end of the
+  headline, and one points at the primary button. Each has a name tag in its
+  peer color. The sequence does not loop, and under reduced motion everything
+  rests in its final place.
+- Peers use dark steps of blue, purple, and green with white tags on the
+  light theme, and light steps with dark tags on the dark theme. The colors
+  are scoped to the hero in `styles/pages/service_main_hero.scss`.
 
 ## Do's and Don'ts
 
