@@ -189,7 +189,7 @@
     padding: 0 variables.$spacing_16;
     border-radius: 8px;
     @include mixins-lib.rfonts(14, 22, 600);
-    color: var(--gray-600);
+    color: var(--gray-700);
 
     & + .btn_item {
       margin-left: variables.$spacing_8;
@@ -277,6 +277,12 @@
         background-color: var(--gray-400);
         vertical-align: middle;
         content: '';
+      }
+
+      a {
+        display: inline-block;
+        margin: -6px 0;
+        padding: 6px 0;
       }
     }
 

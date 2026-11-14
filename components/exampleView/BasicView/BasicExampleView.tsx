@@ -55,7 +55,7 @@ export function BasicExampleView({ iframeURL, userMaxCount = 4 }: { iframeURL: s
                   <button
                     type="button"
                     className={classNames('btn btn_line btn_pin')}
-                    title="Pin"
+                    title={`Remove User ${userNumber}`}
                     onClick={() => {
                       deleteUser(userNumber);
                     }}
@@ -67,7 +67,7 @@ export function BasicExampleView({ iframeURL, userMaxCount = 4 }: { iframeURL: s
             );
           })}
         </ul>
-        <button type="button" className="btn btn_add" onClick={addUser}>
+        <button type="button" className="btn btn_add" aria-label="Add a user" onClick={addUser}>
           <Icon type="plus" />
         </button>
       </div>
