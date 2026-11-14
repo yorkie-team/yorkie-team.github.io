@@ -44,7 +44,12 @@ const RichTextEditorAndroidExampleView: NextPage = () => {
               <Sidebar.Bottom codeURL={EXAMPLE_ANDROID_CODE_URL + exampleKey} />
             </Sidebar.Tabs>
           </Sidebar>
-          <VideoPlayer videoSrc="/assets/videos/examples/android-rich-text-editor.mp4" />
+          <VideoPlayer
+            videoSrc="/assets/videos/examples/android-rich-text-editor.mp4"
+            title={exampleTitle}
+            description="Two Android clients edit the same text side by side and show each other's cursors."
+            codeURL={EXAMPLE_ANDROID_CODE_URL + exampleKey}
+          />
         </>
       )}
     </ExampleLayout>

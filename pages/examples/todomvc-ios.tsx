@@ -45,7 +45,12 @@ const TodoMVCIOSExampleView: NextPage = () => {
               <Sidebar.Bottom codeURL={EXAMPLE_IOS_CODE_URL + exampleKey} />
             </Sidebar.Tabs>
           </Sidebar>
-          <VideoPlayer videoSrc="/assets/videos/examples/ios-todomvc.mp4" />
+          <VideoPlayer
+            videoSrc="/assets/videos/examples/ios-todomvc.mp4"
+            title={exampleTitle}
+            description="A web client (left) and the iOS app (right) edit the same todo list."
+            codeURL={EXAMPLE_IOS_CODE_URL + exampleKey}
+          />
         </>
       )}
     </ExampleLayout>

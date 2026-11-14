@@ -1570,8 +1570,8 @@
 }
 
 // Recorded preview of a mobile example (VideoPlayer): the iOS and Android examples cannot run in
-// the page, so a screen recording stands in for the live preview. Media sits at the top of the
-// pane, as in the web live preview, framed by a hairline instead of a shadow.
+// the page, so a screen recording stands in for the live preview. Shares `.preview_bar` and
+// `.preview_note` with the web live preview so both pages read the same: bar on top, media below.
 .examples_view_page .video_preview_view {
   display: flex;
   flex-direction: column;
@@ -1579,6 +1579,11 @@
   max-height: none;
   padding: 0;
   overflow: hidden;
+
+  .video_preview_label {
+    font-weight: 600;
+    color: var(--gray-900);
+  }
 
   .video_preview_media {
     display: flex;

@@ -45,7 +45,12 @@ const SchedulerAndroidExampleView: NextPage = () => {
               <Sidebar.Bottom codeURL={EXAMPLE_ANDROID_CODE_URL + exampleKey} />
             </Sidebar.Tabs>
           </Sidebar>
-          <VideoPlayer videoSrc="/assets/videos/examples/android-scheduler.mp4" />
+          <VideoPlayer
+            videoSrc="/assets/videos/examples/android-scheduler.mp4"
+            title={exampleTitle}
+            description="Two Android clients edit the same calendar side by side."
+            codeURL={EXAMPLE_ANDROID_CODE_URL + exampleKey}
+          />
         </>
       )}
     </ExampleLayout>

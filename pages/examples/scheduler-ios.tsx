@@ -41,7 +41,12 @@ const SchedulerIOSExampleView: NextPage = () => {
               <Sidebar.Bottom codeURL={EXAMPLE_IOS_CODE_URL + exampleKey} />
             </Sidebar.Tabs>
           </Sidebar>
-          <VideoPlayer videoSrc="/assets/videos/examples/ios-scheduler.mp4" />
+          <VideoPlayer
+            videoSrc="/assets/videos/examples/ios-scheduler.mp4"
+            title={exampleTitle}
+            description="The iOS app (left) and the Android app (right) edit the same calendar."
+            codeURL={EXAMPLE_IOS_CODE_URL + exampleKey}
+          />
         </>
       )}
     </ExampleLayout>

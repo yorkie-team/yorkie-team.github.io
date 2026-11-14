@@ -50,7 +50,12 @@ const RichTextEditorIOSExampleView: NextPage = () => {
               <Sidebar.Bottom codeURL={EXAMPLE_IOS_CODE_URL + exampleKey} />
             </Sidebar.Tabs>
           </Sidebar>
-          <VideoPlayer videoSrc="/assets/videos/examples/ios-rich-text-editor.mp4" />
+          <VideoPlayer
+            videoSrc="/assets/videos/examples/ios-rich-text-editor.mp4"
+            title={exampleTitle}
+            description="The Android app (left) and the iOS app (right) edit the same text and show each other's cursors."
+            codeURL={EXAMPLE_IOS_CODE_URL + exampleKey}
+          />
         </>
       )}
     </ExampleLayout>
