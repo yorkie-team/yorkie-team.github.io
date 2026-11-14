@@ -99,10 +99,20 @@
       display: block;
       @include mixins-lib.rfonts(16, 24, 500);
       color: var(--gray-800);
+
+      @include mixins-lib.tabletStart() {
+        .link {
+          padding: 10px 0;
+        }
+      }
     }
 
     &_list {
       padding-top: variables.$spacing_24;
+
+      @include mixins-lib.tabletStart() {
+        padding-top: variables.$spacing_8;
+      }
     }
 
     &_item {
@@ -111,6 +121,17 @@
 
       & + .site_item {
         margin-top: variables.$spacing_16;
+      }
+
+      // On touch widths each link is 44px tall; the padding replaces the gap between items.
+      @include mixins-lib.tabletStart() {
+        & + .site_item {
+          margin-top: 0;
+        }
+
+        .link {
+          padding: 11px 0;
+        }
       }
     }
   }

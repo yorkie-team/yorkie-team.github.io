@@ -293,7 +293,7 @@
       align-items: center;
       gap: variables.$spacing_8;
       margin-top: variables.$spacing_16;
-      padding: 9px 12px;
+      padding: 11px 12px;
       border-radius: 8px;
       // The link sits on the hero artwork; a paper chip keeps it readable over cursors and shapes.
       background-color: var(--gray-000);
@@ -699,6 +699,10 @@
       height: variables.$spacing_40;
       border-radius: 4px;
       color: var(--gray-800);
+
+      @include mixins-lib.tabletStart() {
+        height: 44px;
+      }
 
       & + .btn_item {
         margin-left: variables.$spacing_16;
