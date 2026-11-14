@@ -140,6 +140,15 @@ const Home: NextPage = () => {
                   type: codeType,
                   info: (FEATURES_CODE[featureType] as any)[codeType],
                 });
+
+                // Below the desktop breakpoint the code sits under the cards; bring it into view once the card has expanded.
+                if (window.innerWidth <= 1023) {
+                  const $code = e.currentTarget.parentElement?.querySelector('.codeblock_content');
+                  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                  window.setTimeout(() => {
+                    $code?.scrollIntoView({ block: 'nearest', behavior: reduceMotion ? 'auto' : 'smooth' });
+                  }, 400);
+                }
               }}
             >
               <li className={classNames('service_card_item', { is_active: activeFeatureCard === 'profile' })}>

@@ -177,11 +177,19 @@
 
       @media screen and (orientation: landscape) {
         @supports (right: env(safe-area-inset-right)) {
-          right: calc(variables.$spacing_24 + env(safe-area-inset-right));
+          right: calc(18px + env(safe-area-inset-right));
+
+          @include mixins-lib.mobileStart() {
+            right: calc(2px + env(safe-area-inset-right));
+          }
         }
 
         @supports (right: constant(safe-area-inset-right)) {
-          right: calc(variables.$spacing_24 + constant(safe-area-inset-right));
+          right: calc(18px + constant(safe-area-inset-right));
+
+          @include mixins-lib.mobileStart() {
+            right: calc(2px + constant(safe-area-inset-right));
+          }
         }
       }
 
