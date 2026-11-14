@@ -130,7 +130,7 @@ const Products: NextPage = () => {
                 <CodeBlock code={DOCUMENT_CODE[documentType]} language="javascript" withLineNumbers />
               </CodeBlock.Wrapper>
               <div className="img_box">
-                <FlexibleDocumentMotion />
+                <FlexibleDocumentMotion type={documentType} />
               </div>
             </div>
           </div>
