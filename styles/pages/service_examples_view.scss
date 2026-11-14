@@ -152,6 +152,22 @@
     .codeblock_navigator {
       padding-bottom: 0;
       border-bottom: none;
+
+      // Tabs, not buttons: a soft fill marks the open tab instead of a dark
+      // filled pill that reads as the page's primary action.
+      .item {
+        border-radius: 4px;
+        transition: background-color 0.2s;
+
+        &:hover {
+          background: var(--gray-50);
+        }
+
+        &.is_active {
+          background: var(--gray-100);
+          color: var(--gray-900);
+        }
+      }
     }
 
     .btn_toggle {

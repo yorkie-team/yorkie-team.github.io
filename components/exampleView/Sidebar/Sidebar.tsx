@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useId } from 'react';
 import classNames from 'classnames';
 import { Icon } from '@/components';
 import { SidebarContextProvider, useSidebarContext } from './Sidebar.context';
@@ -14,6 +14,7 @@ export function Sidebar({
   children?: React.ReactNode;
 }) {
   const [isOpened, setIsOpened] = useState<boolean>(defaultOpened);
+  const id = useId();
 
   useEffect(() => {
     setIsOpened(defaultOpened);
@@ -25,9 +26,13 @@ export function Sidebar({
         isOpened,
         setIsOpened,
         wide,
+        id,
       }}
     >
-      <div className={classNames('sidebar', { type_shadow: !defaultOpened, is_hide: !isOpened, type_wide: wide })}>
+      <div
+        id={id}
+        className={classNames('sidebar', { type_shadow: !defaultOpened, is_hide: !isOpened, type_wide: wide })}
+      >
         {children}
       </div>
     </SidebarContextProvider>
@@ -39,9 +44,15 @@ function SidebarTop({ children }: { children?: React.ReactNode }) {
   return (
     <div className="sidebar_top">
       {children}
-      <button type="button" className="btn btn_toggle" onClick={() => ctx.setIsOpened((opened) => !opened)}>
+      <button
+        type="button"
+        className="btn btn_toggle"
+        aria-expanded={ctx.isOpened}
+        aria-controls={ctx.id}
+        onClick={() => ctx.setIsOpened((opened) => !opened)}
+      >
         <Icon type="arrow" />
-        <span className="blind">Close sidebar</span>
+        <span className="blind">{ctx.isOpened ? 'Collapse sidebar' : 'Expand sidebar'}</span>
       </button>
     </div>
   );
