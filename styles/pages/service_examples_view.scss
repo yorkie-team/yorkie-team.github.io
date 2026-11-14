@@ -1275,14 +1275,18 @@
     }
   }
 
+  // The note sits above the actions so it reads on one line where it fits and wraps evenly where it does not;
+  // note and actions share a row only once the preview is wide enough for both on one line.
   .preview_bar {
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: variables.$spacing_8 variables.$spacing_16;
+    flex-direction: column;
+    gap: variables.$spacing_8;
     padding: 12px variables.$spacing_24;
     border-bottom: 1px solid var(--gray-400);
+
+    @include mixins-lib.tabletStart() {
+      padding: 12px variables.$spacing_16;
+    }
 
     @include mixins-lib.mobileStart() {
       padding: variables.$spacing_16;
@@ -1290,10 +1294,19 @@
     }
   }
 
+  @container preview (min-width: 900px) {
+    .preview_bar {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: variables.$spacing_16;
+    }
+  }
+
   .preview_note {
-    flex: 1 1 260px;
     @include mixins-lib.rfonts(14, 22, 500);
     color: var(--gray-800);
+    text-wrap: balance;
 
     &_narrow {
       display: none;
