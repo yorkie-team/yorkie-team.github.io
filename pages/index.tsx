@@ -27,11 +27,12 @@ const Home: NextPage = () => {
   useEffect(() => {
     const handleVisualSize = () => {
       const $visual = document.querySelector('.kv_bg svg') as HTMLElement;
-      if (!$visual) return;
+      const $hero = document.querySelector('.key_visual');
+      if (!$visual || !$hero) return;
 
+      // The artwork is as tall as the hero; scale it up only when that leaves it narrower than the viewport.
       const SVG_ASPECT_RATIO = 1512 / 868;
-      const HEADER_HEIGHT = 64;
-      const scale = window.innerWidth / ((window.innerHeight - HEADER_HEIGHT) * SVG_ASPECT_RATIO);
+      const scale = window.innerWidth / ($hero.clientHeight * SVG_ASPECT_RATIO);
       $visual.style.setProperty('--scale', scale < 1 ? '1' : `${scale}`);
     };
     window.addEventListener('resize', handleVisualSize);
@@ -140,6 +141,15 @@ const Home: NextPage = () => {
                   type: codeType,
                   info: (FEATURES_CODE[featureType] as any)[codeType],
                 });
+
+                // Below the desktop breakpoint the code sits under the cards; bring it into view once the card has expanded.
+                if (window.innerWidth <= 1023) {
+                  const $code = e.currentTarget.parentElement?.querySelector('.codeblock_content');
+                  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                  window.setTimeout(() => {
+                    $code?.scrollIntoView({ block: 'nearest', behavior: reduceMotion ? 'auto' : 'smooth' });
+                  }, 400);
+                }
               }}
             >
               <li className={classNames('service_card_item', { is_active: activeFeatureCard === 'profile' })}>

@@ -6,13 +6,19 @@
 
 .main_page {
   .key_visual {
+    display: flex;
     overflow: hidden;
     position: relative;
     width: 100%;
-    height: calc(100vh - 64px);
+    // At least one viewport tall; grows with its content instead of clipping it.
+    min-height: max(520px, calc(100vh - 64px));
 
     @media screen and (max-width: 1023px) and (orientation: landscape) {
-      height: calc(100vh - 70px);
+      min-height: max(520px, calc(100vh - 70px));
+    }
+
+    @include mixins-lib.mobileStart() {
+      min-height: max(480px, calc(100vh - 64px));
     }
 
     .kv_bg {
@@ -34,14 +40,17 @@
       justify-content: center;
       position: relative;
       z-index: 1;
-      height: 100%;
+      // Stretches to the hero's height, including its min-height.
+      flex: 1;
+      min-width: 0;
+      padding: variables.$spacing_24 0;
+      box-sizing: border-box;
 
       @include mixins-lib.tabletStart() {
         display: flex;
         flex-direction: column;
         justify-content: center;
-        height: 100%;
-        padding: 0 variables.$spacing_32;
+        padding: variables.$spacing_24 variables.$spacing_32;
         box-sizing: border-box;
       }
 
@@ -292,7 +301,7 @@
       display: inline-flex;
       align-items: center;
       gap: variables.$spacing_8;
-      margin-top: variables.$spacing_16;
+      margin-top: variables.$spacing_8;
       padding: 11px 12px;
       border-radius: 8px;
       // The link sits on the hero artwork; a paper chip keeps it readable over cursors and shapes.
@@ -330,9 +339,17 @@
     .desc {
       width: 100%;
       margin-top: variables.$spacing_40;
+      max-width: 560px;
+      padding: variables.$spacing_8 12px;
+      border-radius: 8px;
+      // Same paper chip as the GitHub link: the text sits on the hero artwork.
+      background-color: var(--gray-000);
+      background-color: color-mix(in srgb, var(--gray-000) 88%, transparent);
+      box-sizing: border-box;
       @include mixins-lib.rfonts(16, 24, 500);
       color: var(--gray-800);
       text-align: center;
+      text-wrap: balance;
 
       @include mixins-lib.mobileStart() {
         margin-top: variables.$spacing_24;
@@ -734,6 +751,12 @@
             height: variables.$spacing_40;
             padding: 12px;
             color: var(--gray-800);
+
+            @include mixins-lib.tabletStart() {
+              width: 44px;
+              height: 44px;
+              padding: 14px;
+            }
 
             .icon {
               flex: none;
