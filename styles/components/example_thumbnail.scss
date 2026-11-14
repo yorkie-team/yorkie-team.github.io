@@ -1,6 +1,6 @@
 // Example thumbnail stage: one aspect ratio for every card, a quiet warm canvas, and a light device
-// frame drawn per platform. Selectors repeat `.example_thumb` so they win over the page-level
-// `.grid_thumbnail img` rules on the landing page.
+// frame drawn per platform. Selectors repeat `.example_thumb` so they win over page-level
+// `.grid_thumbnail` rules.
 .example_thumb {
   --example-thumb-lift: -4px;
 

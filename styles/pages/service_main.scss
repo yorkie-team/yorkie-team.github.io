@@ -131,65 +131,160 @@
     }
   }
 
-  // Featured examples: two wide thumbnails on desktop and tablet, one column on mobile.
-  .grid_list {
-    gap: variables.$spacing_16;
+  // Apps built on Yorkie: a recording in an app window beside what Yorkie syncs in it.
+  // Desktop alternates the sides; tablet and mobile stack the recording above the text.
+  .showcase_list {
+    display: flex;
+    flex-direction: column;
+    gap: 120px;
     width: 100%;
-    max-width: 1000px;
-    margin-left: 0;
+    max-width: 1120px;
+    margin-top: variables.$spacing_32;
 
     @include mixins-lib.tabletStart() {
+      gap: variables.$spacing_96;
       max-width: none;
       padding: 0 74px;
       box-sizing: border-box;
     }
 
     @include mixins-lib.mobileStart() {
+      gap: variables.$spacing_72;
       padding: 0;
     }
+  }
 
-    .grid_item {
-      flex-basis: calc(50% - 8px);
-      min-width: 0;
-      margin: 0;
+  .showcase_item {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    column-gap: variables.$spacing_64;
+    align-items: center;
 
-      @include mixins-lib.mobileStart() {
-        flex-basis: 100%;
+    &:nth-child(even) {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+
+      .showcase_window {
+        order: 2;
       }
     }
 
-    .grid_card {
-      height: 100%;
+    @include mixins-lib.tabletStart() {
+      display: block;
+    }
+  }
+
+  .showcase_window {
+    border: 1px solid var(--gray-400);
+    border-radius: variables.$spacing_16;
+    background-color: var(--gray-000);
+    overflow: hidden;
+  }
+
+  .showcase_window_bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: variables.$spacing_40;
+    padding: 0 variables.$spacing_16;
+    border-bottom: 1px solid var(--gray-400);
+  }
+
+  .showcase_window_name {
+    font-family: variables.$font-family-roboto;
+    @include mixins-lib.rfonts(12, 16, 400);
+    color: var(--gray-700);
+  }
+
+  // One dot per person in the recording.
+  .showcase_peers {
+    display: flex;
+
+    span {
+      width: 12px;
+      height: 12px;
+      margin-left: -3px;
+      border: 2px solid var(--gray-000);
+      border-radius: 50%;
     }
 
-    // Source thumbnails differ slightly in ratio; crop them to one frame.
-    .grid_thumbnail {
-      aspect-ratio: 16 / 10;
-
-      img {
-        display: block;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        object-position: top left;
-      }
+    .peer_a {
+      background-color: var(--blue-0);
     }
 
-    .grid_card_info {
-      padding: variables.$spacing_16 20px 20px;
-
-      .title {
-        @include mixins-lib.rfonts(20, 28, 600);
-      }
-
-      .desc {
-        display: block;
-        min-height: 0;
-        @include mixins-lib.rfonts(14, 22, 400);
-        word-break: normal;
-        -webkit-line-clamp: initial;
-      }
+    .peer_b {
+      background-color: var(--purple-0);
     }
+
+    .peer_c {
+      background-color: var(--green-0);
+    }
+  }
+
+  .showcase_video {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 3 / 2;
+    background-color: var(--gray-100);
+  }
+
+  .showcase_text {
+    @include mixins-lib.tabletStart() {
+      max-width: 560px;
+      margin-top: variables.$spacing_32;
+    }
+  }
+
+  .showcase_name {
+    @include mixins-lib.rfonts(30, 38, 600);
+    color: var(--gray-900);
+
+    @include mixins-lib.mobileStart() {
+      @include mixins-lib.rfonts(24, 32, 600);
+    }
+  }
+
+  .showcase_lede {
+    margin-top: 12px;
+    @include mixins-lib.rfonts(16, 24, 400);
+    color: var(--gray-800);
+    text-wrap: pretty;
+  }
+
+  .showcase_uses {
+    margin-top: variables.$spacing_24;
+    border-top: 1px solid var(--gray-300);
+  }
+
+  .showcase_use {
+    display: grid;
+    grid-template-columns: 88px minmax(0, 1fr);
+    column-gap: variables.$spacing_16;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--gray-300);
+
+    dt {
+      @include mixins-lib.rfonts(14, 22, 600);
+      color: var(--gray-900);
+    }
+
+    dd {
+      @include mixins-lib.rfonts(14, 22, 400);
+      color: var(--gray-700);
+    }
+
+    code {
+      font-family: variables.$font-family-roboto;
+      font-size: inherit;
+      color: var(--gray-800);
+    }
+  }
+
+  .showcase_links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: variables.$spacing_24;
   }
 
   .horizon_list {
@@ -340,16 +435,6 @@
 
 .darkmode {
   .main_page {
-    .grid_thumbnail {
-      * {
-        &[fill='url(#pattern1)'],
-        &[fill='white'],
-        &[fill='#FEFDFB'] {
-          fill: var(--gray-000);
-        }
-      }
-    }
-
     .horizon_item {
       .img_box * {
         &[fill='#FEFDFB'] {
