@@ -53,6 +53,7 @@ export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
               </button>
               <nav
                 className="navigator"
+                aria-label="Main"
                 onClick={() => {
                   setGnbOpened(false);
                 }}

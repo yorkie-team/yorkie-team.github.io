@@ -34,12 +34,13 @@ import {
 // Custom components/renderers to pass to MDX.
 const components: MDXComponents = {
   a: CustomLink,
-  // Each docs page opens with one `##` heading, which is the page title.
+  // Each docs page opens with one `##` heading, which is the page title, so
+  // every level below it renders one step up to keep the outline unbroken.
   h2: (props) => <h1 className="docs_title" {...props} />,
-  h3: (props) => <h3 className="heading" {...props} />,
-  h4: (props) => <h4 className="heading" {...props} />,
-  h5: (props) => <h5 className="heading" {...props} />,
-  h6: (props) => <h6 className="heading" {...props} />,
+  h3: (props) => <h2 className="heading" {...props} />,
+  h4: (props) => <h3 className="heading" {...props} />,
+  h5: (props) => <h4 className="heading" {...props} />,
+  h6: (props) => <h5 className="heading" {...props} />,
   Button,
   Icon,
   pre: (props) => <CustomCodeBlock {...props} />,

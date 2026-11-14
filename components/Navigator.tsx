@@ -6,7 +6,7 @@ import ArrowSVG from '@/public/assets/icons/icon_arrow.svg';
 
 export function Navigator({ navList }: { navList: DocsOrderList }) {
   return (
-    <nav className="navigator">
+    <nav className="navigator" aria-label="Documentation">
       <NavList navList={navList} />
     </nav>
   );

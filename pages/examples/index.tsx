@@ -73,7 +73,7 @@ const Examples: NextPage = () => {
       </div>
       <div className="content">
         <div className="content_inner">
-          <nav className="navigator">
+          <nav className="navigator" aria-label="Example categories">
             <ul className="navigator_list">
               {CATEGORY_CONFIG.map(({ id, label, icon }) => (
                 <li key={id} className="navigator_group">

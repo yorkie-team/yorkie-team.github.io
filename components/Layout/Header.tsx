@@ -40,7 +40,7 @@ export function Header(): ReactElement {
             <span className="blind">Yorkie</span>
           </Link>
         </div>
-        <nav className="nav">
+        <nav className="nav" aria-label="Main">
           <ul className="gnb">
             <li className={`gnb_item ${pathname == '/products' ? 'is_active' : ''}`}>
               <Link href="/products" className="link">
