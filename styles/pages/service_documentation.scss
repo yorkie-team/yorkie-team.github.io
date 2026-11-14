@@ -355,8 +355,13 @@ html {
       }
 
       th {
-        background: var(--gray-100);
+        background: var(--gray-200);
         font-weight: 600;
+
+        // gray-200 inverts to a mid gray that the light header text cannot sit on.
+        .darkmode & {
+          background: var(--gray-100);
+        }
       }
     }
 

@@ -61,19 +61,30 @@ export function Popover({
     dropdownRef,
   );
 
-  // Escape closes the popover and returns focus to its trigger.
+  // Keep the latest close handler for the key listener without re-subscribing on every render.
+  const closeRef = useRef(_onClose);
+  closeRef.current = _onClose;
+
+  // Escape closes the popover.
   useEffect(() => {
     if (!_opened) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key !== 'Escape') return;
-      onClose && onClose();
-      setOpened(false);
-      targetRef.current?.focus();
+      if (e.key === 'Escape') closeRef.current();
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [_opened]);
+
+  // When it closes while focus was inside it (Escape, or choosing an item), the focused element is gone;
+  // return focus to the trigger instead of dropping it to the top of the page.
+  const wasOpened = useRef(_opened);
+  useEffect(() => {
+    if (wasOpened.current && !_opened) {
+      const active = document.activeElement;
+      if (!active || active === document.body) targetRef.current?.focus();
+    }
+    wasOpened.current = _opened;
   }, [_opened]);
 
   return (
