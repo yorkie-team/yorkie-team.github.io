@@ -147,6 +147,18 @@
     &_top {
       display: flex;
       align-items: center;
+
+      // With a single tab there is no tablist, and mobile hides the toggle,
+      // so the row would only leave an empty gap above the guide.
+      @include mixins-lib.mobileStart() {
+        &:not(:has(.codeblock_navigator)) {
+          display: none;
+
+          + .guide_box {
+            margin-top: 0;
+          }
+        }
+      }
     }
 
     .codeblock_navigator {
