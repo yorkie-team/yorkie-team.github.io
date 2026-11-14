@@ -209,7 +209,6 @@ html {
       min-width: 0;
     }
 
-    h2,
     .docs_title {
       margin-bottom: variables.$spacing_16;
       @include mixins-lib.rfonts(46, 54, 600);
@@ -219,7 +218,8 @@ html {
       }
     }
 
-    h3 {
+    // Markdown `###` to `######` render as h2 to h5 (see the MDX components).
+    h2 {
       margin: variables.$spacing_56 0 variables.$spacing_16;
       @include mixins-lib.rfonts(24, 32, 600);
 
@@ -228,17 +228,17 @@ html {
       }
     }
 
-    h4 {
+    h3 {
       margin: variables.$spacing_56 0 variables.$spacing_16;
       @include mixins-lib.rfonts(20, 28, 600);
     }
 
-    h5 {
+    h4 {
       margin: variables.$spacing_56 0 variables.$spacing_16;
       @include mixins-lib.rfonts(18, 28, 600);
     }
 
-    h6 {
+    h5 {
       margin: variables.$spacing_56 0 variables.$spacing_16;
       @include mixins-lib.rfonts(16, 28, 600);
     }
