@@ -33,8 +33,9 @@ const SimultaneousExampleView: NextPage = () => {
                 <Sidebar.GuideTitle>{exampleTitle}</Sidebar.GuideTitle>
                 <Sidebar.GuideDescription>
                   Each client shares its cursor position and tool through Presence, so moving the mouse in one pane
-                  moves a cursor in the other. Send heart or thumbs-up reactions, or draw with the pen: each peer draws the
-                  trail from that Presence, so the ink is ephemeral and never saved in the Document. Built with{' '}
+                  moves a cursor in the other. Send heart or thumbs-up reactions, or draw with the pen: the stroke you are
+                  drawing travels in Presence, and lifting the pen saves it to the Document, so the ink stays for everyone
+                  who joins later. Built with{' '}
                   <a href="https://react.dev" className="link" target="_blank" rel="noreferrer">
                     React
                   </a>{' '}
