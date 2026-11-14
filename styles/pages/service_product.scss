@@ -299,56 +299,6 @@
     }
   }
 
-  .house_content {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    max-width: 1007px;
-    padding-top: variables.$spacing_32;
-
-    .img_box {
-      overflow: hidden;
-      border: 1px solid var(--gray-400);
-      border-radius: 8px;
-
-      img {
-        width: 100%;
-      }
-
-      *[fill='#514C49'] {
-        fill: var(--gray-800);
-      }
-
-      *[fill='#807B78'] {
-        fill: var(--gray-600);
-      }
-
-      *[fill='#A6A19E'] {
-        fill: var(--gray-500);
-      }
-
-      *[fill='#E2DEDB'] {
-        fill: var(--gray-200);
-      }
-
-      *[stroke='#A6A19E'],
-      *[stroke='#C2BDBA'] {
-        stroke: var(--gray-300);
-        stroke-width: 1;
-      }
-    }
-
-    .img_pc {
-      width: 75%;
-      padding-bottom: 37px;
-    }
-
-    .img_mobile {
-      width: 21%;
-      padding: 11px 0 16px;
-    }
-  }
-
   .package_group {
     position: relative;
 
@@ -391,20 +341,6 @@
 
       @include mixins-lib.tabletStart() {
         order: 3;
-      }
-
-      * {
-        &[fill='#514C49'] {
-          fill: var(--gray-800);
-        }
-
-        &[fill='#855CF9'] {
-          fill: var(--purple-dark);
-        }
-
-        &[stroke='#332E2B'] {
-          stroke: var(--gray-800);
-        }
       }
     }
   }
@@ -469,47 +405,6 @@
       white-space: pre-wrap;
     }
   }
-
-  .conflict_free {
-    .img_box * {
-      &[fill='#514C49'] {
-        fill: var(--gray-800);
-      }
-
-      &[fill='white'] {
-        fill: var(--gray-000);
-      }
-    }
-  }
-
-  .collaboration {
-    .img_box * {
-      &[stroke='#FEFDFB'] {
-        stroke: var(--gray-000);
-      }
-    }
-  }
-
-  .presence_images {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-
-    svg {
-      flex: 1;
-      max-width: 50%;
-      height: auto;
-    }
-
-    @include mixins-lib.tabletStart() {
-      flex-direction: column;
-      gap: 16px;
-
-      svg {
-        max-width: 100%;
-      }
-    }
-  }
 }
 
 .darkmode {
@@ -541,20 +436,6 @@
 
         &[fill='black'] {
           fill: var(--gray-900);
-        }
-      }
-    }
-
-    .img_box * {
-      &[fill='#FEFDFB'] {
-        fill: var(--gray-000);
-      }
-    }
-
-    .house_content {
-      .img_box {
-        *[fill='#332E2B'] + *[fill='#514C49'] {
-          fill: var(--gray-100);
         }
       }
     }

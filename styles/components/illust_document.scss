@@ -1,0 +1,315 @@
+@use '../base/mixins-lib';
+@use '../base/variables';
+
+// Live view of the shared Document next to the Document code tabs on /products.
+.illust_document {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: 336px;
+  max-width: 100%;
+  height: 280px;
+  overflow: hidden;
+  border: 1px solid var(--gray-400);
+  border-radius: 8px;
+  background: var(--gray-000);
+  color: var(--gray-900);
+
+  // Peer hues, applied to whichever element carries the peer.
+  .is_purple {
+    --peer: var(--purple-0);
+    --peer-alpha: var(--purple-alpha-0);
+    --peer-tint: var(--purple-alpha-light);
+  }
+
+  .is_blue {
+    --peer: var(--blue-0);
+    --peer-alpha: var(--blue-alpha-0);
+    --peer-tint: var(--blue-alpha-light);
+  }
+
+  .is_red {
+    --peer: var(--red-0);
+    --peer-alpha: var(--red-alpha-0);
+    --peer-tint: var(--red-alpha-light);
+  }
+
+  &__header {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: space-between;
+    height: 40px;
+    padding: 0 12px 0 16px;
+    border-bottom: 1px solid var(--gray-300);
+  }
+
+  &__title {
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 20px;
+    color: var(--gray-800);
+  }
+
+  &__peers {
+    display: flex;
+    gap: 4px;
+  }
+
+  &__avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: 22px;
+    height: 22px;
+    border: 1px solid transparent;
+    border-radius: 50%;
+    background: var(--peer-tint);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--gray-900);
+    transition: border-color 0.3s ease-out;
+
+    &.is_active {
+      border-color: var(--peer);
+    }
+  }
+
+  &__body {
+    flex: 1 1 auto;
+    // 190px = 280px minus the border, header and footer.
+    padding: calc((190px - var(--rows, 5) * 26px) / 2) 16px 0;
+    font-family: RobotoMono, Consolas, Monaco, monospace;
+    font-size: 14px;
+    line-height: 26px;
+    white-space: pre;
+
+    @include mixins-lib.mobileStart() {
+      padding-top: calc((190px - var(--rows, 5) * 24px) / 2);
+      font-size: 13px;
+      line-height: 24px;
+    }
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    height: 26px;
+
+    @include mixins-lib.mobileStart() {
+      height: 24px;
+    }
+
+    &.is_entry {
+      animation: illust-document-row 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+  }
+
+  &__key {
+    color: var(--gray-900);
+  }
+
+  &__str {
+    color: var(--gray-700);
+  }
+
+  &__num {
+    color: var(--gray-900);
+  }
+
+  &__punc {
+    color: var(--gray-500);
+  }
+
+  &__mark {
+    border-radius: 3px;
+
+    &.is_flash {
+      animation: illust-document-flash 1.8s ease-out forwards;
+    }
+
+    &.is_select {
+      background: var(--peer-alpha);
+    }
+  }
+
+  &__caret {
+    display: inline-block;
+    width: 2px;
+    height: 18px;
+    margin: 0 -1px;
+    border-radius: 1px;
+    vertical-align: middle;
+    background: var(--peer);
+  }
+
+  &__delta {
+    margin-left: 10px;
+    padding: 0 6px;
+    border-radius: 4px;
+    background: var(--peer-tint);
+    font-size: 12px;
+    line-height: 20px;
+    color: var(--gray-900);
+    animation: illust-document-delta 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  &__tag {
+    display: inline-flex;
+    align-items: flex-start;
+    margin-left: 8px;
+    font-family:
+      Pretendard,
+      -apple-system,
+      BlinkMacSystemFont,
+      sans-serif;
+    white-space: nowrap;
+    animation: illust-document-tag 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  // Beats the page-level `.product_page .img_box svg { width: 100% }` rule.
+  .illust_document__tag svg.illust_document__arrow {
+    display: block;
+    flex: 0 0 auto;
+    width: 12px;
+    height: 15px;
+    margin-top: -3px;
+
+    path {
+      fill: var(--peer);
+      stroke: var(--gray-000);
+      stroke-width: 1;
+      stroke-linejoin: round;
+    }
+  }
+
+  &__tag_name {
+    margin: 6px 0 0 -2px;
+    padding: 0 6px;
+    border: 1px solid var(--peer);
+    border-radius: 4px;
+    // A tinted fill keeps the name readable on every peer hue, as in the Presence and Channel tags.
+    background: var(--peer-tint);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 16px;
+    color: var(--gray-900);
+  }
+
+  &__footer {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    height: 48px;
+    padding: 0 12px;
+    border-top: 1px solid var(--gray-300);
+  }
+
+  &__op {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    max-width: 100%;
+    padding: 4px 10px;
+    border: 1px solid var(--gray-300);
+    border-radius: 4px;
+    background: var(--gray-50);
+    animation: illust-document-op 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+
+    &.is_idle {
+      border-style: dashed;
+      background: transparent;
+
+      .illust_document__op_code {
+        color: var(--gray-600);
+      }
+    }
+  }
+
+  &__op_dot {
+    flex: 0 0 auto;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--peer);
+  }
+
+  &__op_code {
+    overflow: hidden;
+    font-family: RobotoMono, Consolas, Monaco, monospace;
+    font-size: 12px;
+    line-height: 20px;
+    color: var(--gray-900);
+    white-space: pre;
+    text-overflow: ellipsis;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    &__row.is_entry {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+}
+
+@keyframes illust-document-row {
+  from {
+    opacity: 0;
+    transform: translateX(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes illust-document-flash {
+  0%,
+  45% {
+    background: var(--peer-alpha);
+  }
+
+  100% {
+    background: transparent;
+  }
+}
+
+@keyframes illust-document-delta {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes illust-document-tag {
+  from {
+    opacity: 0;
+    transform: translate(-4px, 4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes illust-document-op {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

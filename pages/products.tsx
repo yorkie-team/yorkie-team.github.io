@@ -4,11 +4,9 @@ import Head from 'next/head';
 import Link from 'next/link';
 import classNames from 'classnames';
 import { Button, Icon, Layout, CodeBlock, CodeBlockHeader } from '@/components';
-import { StateSharingDetailMotion, FlexibleDocumentMotion, PresenceMotion } from '@/components/motions';
+import { StateSharingDetailMotion, FlexibleDocumentMotion, PresenceMotion, ChannelMotion } from '@/components/motions';
+import { ArchitectureDiagram, DashboardShowcase } from '@/components/illustrations';
 import ProductBannerSVG from '@/public/assets/images/banner/img_product_banner.svg';
-import ProductPCSVG from '@/public/assets/images/banner/img_product_pc.svg';
-import ProductMobileSVG from '@/public/assets/images/banner/img_product_mobile.svg';
-import ProductPackageSVG from '@/public/assets/images/banner/img_product_package.svg';
 import { DOCUMENT_CODE, PRESENCE_CODE, CHANNEL_CODE } from '@/codes/document';
 
 const Products: NextPage = () => {
@@ -130,7 +128,7 @@ const Products: NextPage = () => {
                 <CodeBlock code={DOCUMENT_CODE[documentType]} language="javascript" withLineNumbers />
               </CodeBlock.Wrapper>
               <div className="img_box">
-                <FlexibleDocumentMotion />
+                <FlexibleDocumentMotion type={documentType} />
               </div>
             </div>
           </div>
@@ -177,7 +175,7 @@ const Products: NextPage = () => {
                 <CodeBlock code={PRESENCE_CODE[presenceType]} language="javascript" withLineNumbers />
               </CodeBlock.Wrapper>
               <div className="img_box">
-                <PresenceMotion />
+                <PresenceMotion type={presenceType} />
               </div>
             </div>
           </div>
@@ -193,36 +191,41 @@ const Products: NextPage = () => {
               users, broadcasting messages, and handling ephemeral real-time data like chat messages or live
               notifications.
             </p>
-            <CodeBlock.Wrapper>
-              <CodeBlockHeader>
-                <CodeBlockHeader.LeftBox>
-                  <button
-                    type="button"
-                    className={classNames('btn_item', { is_active: channelType === 'presence' })}
-                    aria-pressed={channelType === 'presence'}
-                    onClick={() => {
-                      setChannelType('presence');
-                    }}
-                  >
-                    Presence
-                  </button>
-                  <button
-                    type="button"
-                    className={classNames('btn_item', { is_active: channelType === 'broadcast' })}
-                    aria-pressed={channelType === 'broadcast'}
-                    onClick={() => {
-                      setChannelType('broadcast');
-                    }}
-                  >
-                    Broadcast
-                  </button>
-                </CodeBlockHeader.LeftBox>
-                <CodeBlockHeader.RightBox>
-                  <CodeBlockHeader.CopyButton value={CHANNEL_CODE[channelType]} />
-                </CodeBlockHeader.RightBox>
-              </CodeBlockHeader>
-              <CodeBlock code={CHANNEL_CODE[channelType]} language="javascript" withLineNumbers />
-            </CodeBlock.Wrapper>
+            <div className="db_content">
+              <CodeBlock.Wrapper>
+                <CodeBlockHeader>
+                  <CodeBlockHeader.LeftBox>
+                    <button
+                      type="button"
+                      className={classNames('btn_item', { is_active: channelType === 'presence' })}
+                      aria-pressed={channelType === 'presence'}
+                      onClick={() => {
+                        setChannelType('presence');
+                      }}
+                    >
+                      Presence
+                    </button>
+                    <button
+                      type="button"
+                      className={classNames('btn_item', { is_active: channelType === 'broadcast' })}
+                      aria-pressed={channelType === 'broadcast'}
+                      onClick={() => {
+                        setChannelType('broadcast');
+                      }}
+                    >
+                      Broadcast
+                    </button>
+                  </CodeBlockHeader.LeftBox>
+                  <CodeBlockHeader.RightBox>
+                    <CodeBlockHeader.CopyButton value={CHANNEL_CODE[channelType]} />
+                  </CodeBlockHeader.RightBox>
+                </CodeBlockHeader>
+                <CodeBlock code={CHANNEL_CODE[channelType]} language="javascript" withLineNumbers />
+              </CodeBlock.Wrapper>
+              <div className="img_box">
+                <ChannelMotion type={channelType} />
+              </div>
+            </div>
           </div>
           <div className="section_content">
             <strong className="sub_title" id="more-features">
@@ -296,14 +299,7 @@ const Products: NextPage = () => {
           <p className="sub_big_desc">
             Dashboard in Cloud is accessible from any device without the need for installation.
           </p>
-          <div className="house_content">
-            <div className="img_box shadow_l img_pc">
-              <ProductPCSVG />
-            </div>
-            <div className="img_box shadow_l img_mobile">
-              <ProductMobileSVG />
-            </div>
-          </div>
+          <DashboardShowcase />
         </section>
         <section className="section">
           <div className="section_title_wrap">
@@ -334,7 +330,7 @@ const Products: NextPage = () => {
               co-editing feature.
             </p>
             <div className="img_box">
-              <ProductPackageSVG />
+              <ArchitectureDiagram />
             </div>
           </div>
         </section>

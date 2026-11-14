@@ -16,7 +16,7 @@ export const CATEGORY_CONFIG = [
   { id: CATEGORIES.PRODUCTIVITY, label: 'Productivity', icon: 'checkCircle' },
   { id: CATEGORIES.REACT, label: 'React Provider', icon: 'reactLogo' },
   { id: CATEGORIES.ANDROID, label: 'Android', icon: 'androidLogo' },
-  {id: CATEGORIES.IOS, label: 'iOS', icon: 'appleLogo'},
+  { id: CATEGORIES.IOS, label: 'iOS', icon: 'appleLogo' },
 ] as const;
 
 const Examples: NextPage = () => {
@@ -134,7 +134,7 @@ const Examples: NextPage = () => {
               <li key={id} className="grid_item">
                 <Link href={`/examples/${id}`} className="grid_card">
                   <div className="grid_thumbnail">
-                    <ExampleThumbnailImage fileName={thumbnail} alt={id} />
+                    <ExampleThumbnailImage fileName={thumbnail} alt={`${title} example screenshot`} />
                   </div>
                   <div className="grid_card_info">
                     <strong className="title">{title}</strong>
