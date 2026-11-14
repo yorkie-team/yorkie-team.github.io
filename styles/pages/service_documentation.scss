@@ -189,9 +189,19 @@ html {
     overflow-x: auto;
     box-sizing: border-box;
     color: var(--gray-800);
-    word-break: break-all;
+    // Break only strings that cannot fit, not ordinary words in the middle.
+    overflow-wrap: break-word;
+
     flex: 1 1 100%;
     order: 1;
+
+    // Prose reads best at about 75 characters; code, tables and diagrams keep the full width.
+    // Markdown quotes render as alerts.
+    > p,
+    > ul,
+    > ol {
+      max-width: 760px;
+    }
 
     @media screen and (min-width: 1600px) {
       padding-right: 48px;
@@ -199,7 +209,8 @@ html {
       min-width: 0;
     }
 
-    h2 {
+    h2,
+    .docs_title {
       margin-bottom: variables.$spacing_16;
       @include mixins-lib.rfonts(46, 54, 600);
 
@@ -341,6 +352,8 @@ html {
 
       td,
       th {
+        // Let long identifiers break inside a cell instead of widening the table.
+        overflow-wrap: anywhere;
         min-width: 143px;
         padding: 4px variables.$spacing_8;
         border-right: 1px solid var(--gray-400);
@@ -480,7 +493,8 @@ html {
 
     .alert {
       width: fit-content;
-      max-width: 100%;
+      // Same measure as the prose around it.
+      max-width: min(100%, 760px);
       display: inline-block;
       align-items: center;
       position: relative;

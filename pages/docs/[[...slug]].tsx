@@ -34,6 +34,8 @@ import {
 // Custom components/renderers to pass to MDX.
 const components: MDXComponents = {
   a: CustomLink,
+  // Each docs page opens with one `##` heading, which is the page title.
+  h2: (props) => <h1 className="docs_title" {...props} />,
   h3: (props) => <h3 className="heading" {...props} />,
   h4: (props) => <h4 className="heading" {...props} />,
   h5: (props) => <h5 className="heading" {...props} />,

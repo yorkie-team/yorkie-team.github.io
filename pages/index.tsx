@@ -60,14 +60,14 @@ const Home: NextPage = () => {
             <MainBannerMotion bannerActive />
           </div>
           <div className="inner">
-            <h2 className="title">
+            <h1 className="title">
               <span className="text">Bring</span>{' '}
               <span className={classNames('point', { is_hover: bannerActive })}>
                 collaboration
                 <span className="bg"></span>
               </span>{' '}
               <span className="text">to your app</span>
-            </h2>
+            </h1>
             <Button.Box>
               <a
                 href={`${process.env.NEXT_PUBLIC_DASHBOARD_PATH}`}

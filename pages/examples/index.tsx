@@ -48,9 +48,9 @@ const Examples: NextPage = () => {
       <div className="top_banner">
         <div className="top_banner_inner">
           <div className="title_group">
-            <h2 className="title">
+            <h1 className="title">
               Explore examples <br /> built by Yorkie
-            </h2>
+            </h1>
             <p className="desc">
               Explore our examples and see how Yorkie can help you bring your products to the next level of
               collaboration.

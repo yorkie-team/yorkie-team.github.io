@@ -30,16 +30,16 @@ export function ExampleLayout({
     <div className="wrap examples_view_page">
       <header className="header_example">
         <nav className="nav">
-          <h1 className="logo">
+          <div className="logo">
             <Link href="/">
               <LogoGnbSVG />
               <span className="blind">Yorkie</span>
             </Link>
-          </h1>
+          </div>
           <span className="nav_text">
             <Link href="/examples">Examples</Link>
           </span>
-          <span className="nav_text">{breadcrumbTitle}</span>
+          <h1 className="nav_text">{breadcrumbTitle}</h1>
         </nav>
       </header>
       <main className="container">{children({ viewType })}</main>
