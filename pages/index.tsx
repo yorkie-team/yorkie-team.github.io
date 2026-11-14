@@ -96,17 +96,17 @@ const Home: NextPage = () => {
         <section className="section section_app">
           <div className="align_box">
             <div className="app_header">
-              <h2 className="tag_name">Extend Your App with Yorkie</h2>
+              <p className="tag_name">Extend Your App with Yorkie</p>
               <span className="icon">
                 <UserGroupSVG />
               </span>
             </div>
             <div className="app_body">
-              <strong className="section_title">
+              <h2 className="section_title">
                 Make your product
                 <br />
                 <span className="point">collaborative</span> in a flash!
-              </strong>
+              </h2>
               <p className="section_desc">
                 Yorkie handles synchronization, conflict resolution, and persistence, so you can focus on your
                 product&apos;s features.

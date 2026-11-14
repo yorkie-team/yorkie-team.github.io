@@ -161,7 +161,7 @@
       margin-left: 0;
 
       @include mixins-lib.tabletStart() {
-        height: 40px;
+        height: 44px;
       }
 
       @include mixins-lib.mobileStart() {
