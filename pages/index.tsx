@@ -2,10 +2,8 @@ import { useState } from 'react';
 import classNames from 'classnames';
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import Link from 'next/link';
 import { Layout, Button, Icon, CodeBlock, CodeBlockHeader, Accordion } from '@/components';
-import { ExampleThumbnailImage } from '@/components/exampleView';
-import { EXAMPLES, type Example } from '@/codes/examples';
+import { ShowcaseVideo } from '@/components/ShowcaseVideo';
 import { ChartMotion, StateSharingMotion, ServerMotion } from '@/components/motions';
 import CollaboProfileSVG from '@/public/assets/icons/icon_collaborate_profile.svg';
 import CollaboCursorSVG from '@/public/assets/icons/icon_collaborate_cursor.svg';
@@ -14,10 +12,48 @@ import CollaboEditingSVG from '@/public/assets/icons/icon_collaborate_editing.sv
 import { FEATURES_CODE } from '@/codes/features';
 
 type FeatureType = keyof typeof FEATURES_CODE;
-const FEATURED_EXAMPLE_IDS = ['simultaneous-cursors', 'codemirror'];
-const FEATURED_EXAMPLES = FEATURED_EXAMPLE_IDS.map((id) => EXAMPLES.find((example) => example.id === id)).filter(
-  (example): example is Example => !!example,
-);
+// Apps the Yorkie team builds on Yorkie, each recorded with three people in it at once.
+const SHOWCASES = [
+  {
+    id: 'wafflebase',
+    name: 'Wafflebase',
+    windowName: 'wafflebase.io / sheet',
+    lede: 'An office suite with sheets, docs, slides, notes, and boards that people edit together in real time.',
+    uses: [
+      {
+        term: 'Document',
+        desc: (
+          <>
+            Every sheet, doc, and note is a Yorkie Document. Pages of a doc live in a <code>Tree</code>, and notes in a{' '}
+            <code>Text</code>.
+          </>
+        ),
+      },
+      { term: 'Presence', desc: <>Each person&apos;s selected cell or caret, drawn in their color.</> },
+    ],
+    video: '/assets/videos/showcase/wafflebase.mp4',
+    poster: '/assets/images/showcase/wafflebase.webp',
+    label: 'Two people fill in a Wafflebase spreadsheet at the same time while the bar chart beside it grows.',
+    action: { label: 'Try Wafflebase', href: 'https://wafflebase.io' },
+    source: 'https://github.com/wafflebase/wafflebase',
+  },
+  {
+    id: 'scary-island',
+    name: 'Scary Island',
+    windowName: 'scary island / play together',
+    lede: 'A cute-spooky 3D adventure in the browser, where up to ten friends explore the island in one game.',
+    uses: [
+      { term: 'Document', desc: <>The quest progress the party shares, and the lobby of open games.</> },
+      { term: 'Presence', desc: <>Where each player is and which way they face, sent up to eight times a second.</> },
+      { term: 'Channel', desc: <>Monster moves, hits, and barks: messages nobody needs to keep.</> },
+    ],
+    video: '/assets/videos/showcase/scary-island.mp4',
+    poster: '/assets/images/showcase/scary-island.webp',
+    label: 'Three Yorkie puppies, each played from a different browser, walk around the beach of Scary Island.',
+    action: { label: 'Play Scary Island', href: 'https://yorkie-labs.github.io/scary-island/' },
+    source: 'https://github.com/yorkie-labs/scary-island',
+  },
+];
 // The pointer drawn for each scripted collaborator in the hero.
 const PeerCursor = () => (
   <svg className="peer_pointer" width="20" height="22" viewBox="0 0 20 22" fill="none" aria-hidden="true">
@@ -235,26 +271,54 @@ const Home: NextPage = () => {
         </section>
         <section className="section">
           <h2 className="section_title">
-            What experiences <br />
-            can you create
-            <br className="br_mo_xs" /> with Yorkie?
+            What can you <br className="br_mo_xs" />
+            build with Yorkie?
           </h2>
           <p className="section_desc">
-            Open an example in two tabs and watch the changes sync. Each one comes with its source code.
+            The Yorkie team builds these two apps on Yorkie. Open one with a friend and watch it sync.
           </p>
           <div className="section_content">
-            <ul className="grid_list">
-              {FEATURED_EXAMPLES.map(({ id, title, desc, thumbnail }) => (
-                <li key={id} className="grid_item">
-                  <Link href={`/examples/${id}`} className="grid_card">
-                    <div className="grid_thumbnail">
-                      <ExampleThumbnailImage fileName={thumbnail} alt="" />
+            <ul className="showcase_list">
+              {SHOWCASES.map(({ id, name, windowName, lede, uses, video, poster, label, action, source }) => (
+                <li key={id} className="showcase_item">
+                  <div className="showcase_window">
+                    <div className="showcase_window_bar" aria-hidden="true">
+                      <span className="showcase_window_name">{windowName}</span>
+                      <span className="showcase_peers">
+                        <span className="peer_a" />
+                        <span className="peer_b" />
+                        <span className="peer_c" />
+                      </span>
                     </div>
-                    <div className="grid_card_info">
-                      <strong className="title">{title}</strong>
-                      <p className="desc">{desc}</p>
+                    <ShowcaseVideo src={video} poster={poster} label={label} />
+                  </div>
+                  <div className="showcase_text">
+                    <h3 className="showcase_name">{name}</h3>
+                    <p className="showcase_lede">{lede}</p>
+                    <dl className="showcase_uses">
+                      {uses.map(({ term, desc }) => (
+                        <div key={term} className="showcase_use">
+                          <dt>{term}</dt>
+                          <dd>{desc}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                    <div className="showcase_links">
+                      <Button as="a" href={action.href} target="_blank" rel="noreferrer" className="gray800">
+                        {action.label}
+                      </Button>
+                      <Button
+                        as="a"
+                        href={source}
+                        target="_blank"
+                        rel="noreferrer"
+                        outline
+                        icon={<Icon type="github" />}
+                      >
+                        Source
+                      </Button>
                     </div>
-                  </Link>
+                  </div>
                 </li>
               ))}
             </ul>

@@ -292,6 +292,19 @@ and cursors only. Borders are 1px solid.
   light theme, and light steps with dark tags on the dark theme. The colors
   are scoped to the hero in `styles/pages/service_main_hero.scss`.
 
+### Built-with Showcase
+
+- The landing page shows apps built on Yorkie, not feature demos: each row is
+  a screen recording in an app window (16px radius, 1px `gray-400` border, a
+  40px title bar with a Roboto Mono name and one peer dot per person in the
+  recording) beside a name, a one-line lede, and a definition list of what
+  Yorkie syncs in that app (Document, Presence, Channel).
+- Recordings are real sessions with three people, 3:2, muted and looping.
+  They play only while on screen; under reduced motion they rest on a poster
+  frame with native controls.
+- Rows alternate sides on desktop and stack the recording above the text on
+  tablet and mobile.
+
 ## Do's and Don'ts
 
 ### Do:
