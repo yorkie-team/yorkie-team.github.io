@@ -5,9 +5,8 @@ import Link from 'next/link';
 import classNames from 'classnames';
 import { Button, Icon, Layout, CodeBlock, CodeBlockHeader } from '@/components';
 import { StateSharingDetailMotion, FlexibleDocumentMotion, PresenceMotion, ChannelMotion } from '@/components/motions';
+import { DashboardShowcase } from '@/components/illustrations';
 import ProductBannerSVG from '@/public/assets/images/banner/img_product_banner.svg';
-import ProductPCSVG from '@/public/assets/images/banner/img_product_pc.svg';
-import ProductMobileSVG from '@/public/assets/images/banner/img_product_mobile.svg';
 import ProductPackageSVG from '@/public/assets/images/banner/img_product_package.svg';
 import { DOCUMENT_CODE, PRESENCE_CODE, CHANNEL_CODE } from '@/codes/document';
 
@@ -301,14 +300,7 @@ const Products: NextPage = () => {
           <p className="sub_big_desc">
             Dashboard in Cloud is accessible from any device without the need for installation.
           </p>
-          <div className="house_content">
-            <div className="img_box shadow_l img_pc">
-              <ProductPCSVG />
-            </div>
-            <div className="img_box shadow_l img_mobile">
-              <ProductMobileSVG />
-            </div>
-          </div>
+          <DashboardShowcase />
         </section>
         <section className="section">
           <div className="section_title_wrap">

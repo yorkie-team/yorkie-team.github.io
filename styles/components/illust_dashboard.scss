@@ -1,0 +1,546 @@
+@use '../base/mixins-lib';
+@use '../base/variables';
+
+// Coded miniature of the Dashboard (components/illustrations/DashboardShowcase.tsx).
+.illust_dashboard {
+  $mono: RobotoMono, Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+  max-width: 1007px;
+  padding-top: variables.$spacing_32;
+  color: var(--gray-800);
+  font-size: 13px;
+  line-height: 20px;
+
+  .dash_icon {
+    flex: none;
+    width: 16px;
+    height: 16px;
+  }
+
+  // Desktop browser window
+  .dash_window {
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: 760px;
+    overflow: hidden;
+    border: 1px solid var(--gray-400);
+    border-radius: 8px;
+    background: var(--gray-000);
+  }
+
+  .dash_browser_bar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    height: 36px;
+    padding: 0 12px;
+    border-bottom: 1px solid var(--gray-300);
+    background: var(--gray-100);
+  }
+
+  .dash_dots {
+    display: flex;
+    flex: none;
+    gap: 6px;
+
+    i {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--gray-400);
+    }
+  }
+
+  .dash_url {
+    @include mixins-lib.ellipsis;
+    min-width: 0;
+    margin: 0 auto;
+    padding: 2px 12px;
+    border-radius: 4px;
+    background: var(--gray-000);
+    color: var(--gray-600);
+    font-size: 12px;
+    line-height: 18px;
+  }
+
+  .dash_app_header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 44px;
+    padding: 0 20px;
+    border-bottom: 1px solid var(--gray-300);
+    white-space: nowrap;
+  }
+
+  .dash_logo {
+    display: flex;
+    flex: none;
+    width: 24px;
+    margin-right: 4px;
+
+    svg {
+      width: 100%;
+      height: auto;
+    }
+
+    path:first-child {
+      fill: var(--gray-800);
+    }
+  }
+
+  .dash_crumb {
+    color: var(--gray-600);
+
+    &.is_current {
+      color: var(--gray-900);
+      font-weight: 600;
+    }
+  }
+
+  .dash_crumb_sep {
+    color: var(--gray-400);
+  }
+
+  .dash_util {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-left: auto;
+    color: var(--gray-600);
+  }
+
+  .dash_avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--gray-300);
+  }
+
+  .dash_project {
+    padding: 16px 20px 0;
+  }
+
+  .dash_project_title {
+    display: block;
+    color: var(--gray-900);
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 26px;
+  }
+
+  .dash_tabs {
+    display: flex;
+    gap: 18px;
+    margin-top: 8px;
+    overflow: hidden;
+    border-bottom: 1px solid var(--gray-400);
+    white-space: nowrap;
+    // The tab list scrolls sideways in the real Dashboard; fade the clipped end instead of cutting a word.
+    mask-image: linear-gradient(to right, var(--gray-900) calc(100% - 32px), transparent);
+  }
+
+  .dash_tab {
+    position: relative;
+    flex: none;
+    padding: 6px 0 8px;
+    color: var(--gray-600);
+
+    &.is_active {
+      color: var(--gray-900);
+      font-weight: 600;
+
+      &::after {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        height: 2px;
+        background: var(--orange-0);
+        content: '';
+      }
+    }
+  }
+
+  .dash_body {
+    display: flex;
+    gap: 20px;
+    padding: 16px 20px 20px;
+  }
+
+  .dash_sidebar {
+    flex: 0 0 164px;
+  }
+
+  .dash_search {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 32px;
+    padding: 0 10px;
+    border: 1px solid var(--gray-400);
+    border-radius: 4px;
+    color: var(--gray-500);
+    font-size: 12px;
+
+    .dash_icon {
+      width: 14px;
+      height: 14px;
+    }
+  }
+
+  .dash_doc_list {
+    margin-top: 8px;
+  }
+
+  .dash_doc_item {
+    padding: 6px 10px;
+    border-radius: 4px;
+    color: var(--gray-700);
+
+    &.is_active {
+      background: var(--gray-100);
+      color: var(--gray-900);
+      font-weight: 600;
+    }
+  }
+
+  .dash_detail {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .dash_title_box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .dash_back {
+    display: flex;
+    color: var(--gray-600);
+  }
+
+  .dash_title_inner {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .dash_doc_title {
+    color: var(--gray-900);
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 20px;
+  }
+
+  .dash_date {
+    color: var(--gray-600);
+    font-size: 12px;
+    line-height: 16px;
+  }
+
+  .dash_info_list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 28px;
+    margin-top: 12px;
+    white-space: nowrap;
+  }
+
+  .dash_info_item {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+
+    dt {
+      color: var(--gray-700);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    dd {
+      color: var(--gray-800);
+      font-weight: 500;
+    }
+  }
+
+  .dash_code_toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--gray-300);
+  }
+
+  .dash_badge {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: var(--gray-100);
+    color: var(--gray-700);
+    font-size: 12px;
+    line-height: 18px;
+
+    .dash_icon {
+      width: 12px;
+      height: 12px;
+    }
+  }
+
+  .dash_toggles {
+    display: flex;
+    gap: 4px;
+  }
+
+  .dash_toggle {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    color: var(--gray-600);
+    font-size: 12px;
+    line-height: 16px;
+
+    .dash_icon {
+      width: 14px;
+      height: 14px;
+    }
+
+    &.is_active {
+      background: var(--gray-200);
+      color: var(--gray-900);
+    }
+  }
+
+  .dash_codeblock {
+    margin-top: 8px;
+    padding: 10px 0;
+    overflow: hidden;
+    border: 1px solid var(--gray-300);
+    border-radius: 8px;
+    background: var(--gray-50);
+
+    // Reserve the final line count so the frame does not grow while lines arrive.
+    @each $lines in 7, 8 {
+      &.lines_#{$lines} {
+        min-height: #{$lines * 20}px;
+      }
+    }
+  }
+
+  // Overrides the global Prism `pre[class*='language-']` rules; the class is kept for its code color tokens.
+  .dash_code {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    color: var(--code-gray);
+    font-family: $mono;
+    font-size: 12px;
+    line-height: 20px;
+  }
+
+  .code_line {
+    display: flex;
+    padding-right: 12px;
+  }
+
+  .line_num {
+    flex: none;
+    width: 32px;
+    padding-right: 12px;
+    color: var(--gray-500);
+    text-align: right;
+    user-select: none;
+  }
+
+  code {
+    min-width: 0;
+    font-family: inherit;
+    white-space: pre;
+
+    @for $i from 1 through 2 {
+      &.indent_#{$i} {
+        padding-left: #{$i * 2}ch;
+      }
+    }
+  }
+
+  .tk_key {
+    color: var(--code-blue);
+  }
+
+  .tk_str {
+    color: var(--code-green);
+  }
+
+  .tk_bool {
+    color: var(--code-orange);
+  }
+
+  .tk_punc {
+    color: var(--code-gray);
+  }
+
+  // Phone
+  .dash_phone {
+    box-sizing: border-box;
+    flex: 0 0 215px;
+    width: 215px;
+    min-width: 0;
+    padding: 6px;
+    border: 1px solid var(--gray-400);
+    border-radius: 28px;
+    background: var(--gray-100);
+  }
+
+  .dash_phone_screen {
+    overflow: hidden;
+    border: 1px solid var(--gray-300);
+    border-radius: 22px;
+    background: var(--gray-000);
+    padding-top: 8px;
+
+    .dash_app_header {
+      justify-content: space-between;
+      height: 40px;
+      padding: 0 14px;
+    }
+
+    .dash_project {
+      padding: 12px 14px 0;
+    }
+
+    .dash_project_title {
+      font-size: 16px;
+      line-height: 22px;
+    }
+
+    .dash_tabs {
+      gap: 14px;
+    }
+
+    .dash_detail {
+      padding: 14px 12px 16px;
+    }
+
+    .dash_title_box {
+      gap: 8px;
+    }
+
+    .dash_info_list {
+      margin-top: 10px;
+    }
+
+    .dash_code_toolbar {
+      margin-top: 10px;
+      padding-top: 10px;
+    }
+
+    .code_line {
+      padding-right: 8px;
+    }
+
+    .line_num {
+      width: 24px;
+      padding-right: 8px;
+    }
+  }
+
+  .dash_menu {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    width: 14px;
+
+    i {
+      height: 2px;
+      border-radius: 1px;
+      background: var(--gray-700);
+    }
+  }
+
+  @include mixins-lib.tabletStart() {
+    gap: 24px;
+
+    .dash_sidebar,
+    .dash_util span:not(.dash_avatar) {
+      display: none;
+    }
+  }
+
+  @include mixins-lib.mobileStart() {
+    padding-top: variables.$spacing_24;
+
+    .dash_phone {
+      display: none;
+    }
+
+    .dash_app_header,
+    .dash_project,
+    .dash_body {
+      padding-right: 12px;
+      padding-left: 12px;
+    }
+
+    .dash_body {
+      padding-bottom: 12px;
+    }
+
+    .line_num {
+      width: 26px;
+      padding-right: 8px;
+    }
+
+    code.indent_1 {
+      padding-left: 1ch;
+    }
+
+    code.indent_2 {
+      padding-left: 2ch;
+    }
+  }
+}
+
+// The dark gray scale is compressed (gray-100 to gray-400 stay light), so the inner surfaces and
+// hairlines step down to the darkest tones to keep the window quiet.
+.darkmode .illust_dashboard {
+  .dash_browser_bar,
+  .dash_doc_item.is_active,
+  .dash_badge,
+  .dash_toggle.is_active,
+  .dash_phone {
+    background: var(--gray-50);
+  }
+
+  .dash_browser_bar,
+  .dash_app_header,
+  .dash_tabs,
+  .dash_code_toolbar,
+  .dash_codeblock,
+  .dash_phone_screen {
+    border-color: var(--gray-100);
+  }
+
+  .dash_dots i,
+  .dash_avatar {
+    background: var(--gray-200);
+  }
+
+  .dash_search {
+    border-color: var(--gray-200);
+  }
+
+  .dash_codeblock {
+    background: transparent;
+  }
+}
