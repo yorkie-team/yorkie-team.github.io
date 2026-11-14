@@ -61,7 +61,7 @@ function SidebarBottom({
     <div className="sidebar_bottom">
       <div className={classNames('btn_box', { full_width: !ctx.wide })}>
         <a href={codeURL} className="btn gray700" target="_blank" rel="noreferrer">
-          GitHub
+          View code on GitHub
         </a>
         {shareButton && (
           <a href="#" className="btn gray900 btn_share">
