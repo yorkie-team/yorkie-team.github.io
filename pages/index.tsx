@@ -27,11 +27,12 @@ const Home: NextPage = () => {
   useEffect(() => {
     const handleVisualSize = () => {
       const $visual = document.querySelector('.kv_bg svg') as HTMLElement;
-      if (!$visual) return;
+      const $hero = document.querySelector('.key_visual');
+      if (!$visual || !$hero) return;
 
+      // The artwork is as tall as the hero; scale it up only when that leaves it narrower than the viewport.
       const SVG_ASPECT_RATIO = 1512 / 868;
-      const HEADER_HEIGHT = 64;
-      const scale = window.innerWidth / ((window.innerHeight - HEADER_HEIGHT) * SVG_ASPECT_RATIO);
+      const scale = window.innerWidth / ($hero.clientHeight * SVG_ASPECT_RATIO);
       $visual.style.setProperty('--scale', scale < 1 ? '1' : `${scale}`);
     };
     window.addEventListener('resize', handleVisualSize);

@@ -10,16 +10,15 @@
     overflow: hidden;
     position: relative;
     width: 100%;
-    height: calc(100vh - 64px);
-    // On short viewports the hero grows with its content instead of clipping it.
-    min-height: 520px;
+    // At least one viewport tall; grows with its content instead of clipping it.
+    min-height: max(520px, calc(100vh - 64px));
 
     @media screen and (max-width: 1023px) and (orientation: landscape) {
-      height: calc(100vh - 70px);
+      min-height: max(520px, calc(100vh - 70px));
     }
 
     @include mixins-lib.mobileStart() {
-      min-height: 480px;
+      min-height: max(480px, calc(100vh - 64px));
     }
 
     .kv_bg {
