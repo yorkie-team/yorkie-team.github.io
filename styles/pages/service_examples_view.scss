@@ -331,28 +331,54 @@
     .folder_box {
       $fd: '.folder';
       display: flex;
+      flex-direction: column;
+      container: code-viewer / inline-size;
       height: 100%;
       max-height: calc(100% - 124px);
       margin-top: 16px;
       border: 1px solid var(--gray-400);
       border-radius: 4px;
+      overflow: hidden;
 
       @include mixins-lib.mobileStart() {
         display: none;
       }
 
+      // The tree sits above the code by default: next to it, a tree column
+      // leaves the code too narrow to read at every sidebar width but the
+      // widest. The container query keys off the box, not the viewport.
+      #{$fd}_layout {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 0;
+      }
+
       #{$fd}_list {
+        position: relative;
         overflow-y: auto;
-        flex-basis: 30%;
-        min-width: 150px;
-        padding-top: 10px;
-        padding-bottom: 10px;
-        border-right: 1px solid var(--gray-400);
+        flex: 0 0 auto;
+        max-height: clamp(116px, 30%, 216px);
+        padding: 8px 0;
+        border-bottom: 1px solid var(--gray-400);
         box-sizing: border-box;
       }
 
+      @container code-viewer (min-width: 800px) {
+        #{$fd}_layout {
+          flex-direction: row;
+        }
+
+        #{$fd}_list {
+          flex: 0 0 240px;
+          max-height: none;
+          border-bottom: 0;
+          border-right: 1px solid var(--gray-400);
+        }
+      }
+
       #{$fd}_item {
-        margin-top: 4px;
+        margin-top: 2px;
 
         &:first-child {
           margin-top: 0;
@@ -371,27 +397,28 @@
       }
 
       #{$fd}_sub_list {
-        padding-top: 4px;
-        padding-left: 24px;
-
-        .btn_folder {
-          align-items: center;
-        }
+        padding-top: 2px;
+        padding-left: 16px;
       }
 
       .btn_folder {
         display: flex;
         align-items: center;
         width: 100%;
-        padding: 3px 14px;
+        padding: 3px 12px;
         box-sizing: border-box;
-        @include mixins-lib.rfonts(14, 22, 400);
+        @include mixins-lib.rfonts(12, 18, 400);
         text-align: left;
 
         &:hover {
           .name {
             font-weight: 600;
           }
+        }
+
+        // The list scrolls, so an outset ring would be clipped at its edges.
+        &:focus-visible {
+          outline-offset: -2px;
         }
 
         .icon {
@@ -412,39 +439,72 @@
         }
 
         .name {
-          flex-basis: calc(100% - 22px);
+          flex: 1;
+          min-width: 0;
           color: var(--gray-800);
           @include mixins-lib.rfonts(12, 18, 400);
+          @include mixins-lib.ellipsis;
         }
       }
 
+      .codeblock_area {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-width: 0;
+        min-height: 0;
+      }
+
       .file_title {
-        display: block;
+        flex: 0 0 auto;
         height: 32px;
+        margin: 0;
+        padding: 0 12px;
         border-bottom: 1px solid var(--gray-400);
-        border-top-right-radius: 4px;
         background-color: var(--gray-000);
         color: var(--gray-800);
         @include mixins-lib.rfonts(14, 32, 600);
         text-align: center;
-      }
-
-      .codeblock_area {
-        overflow-x: auto;
-        flex: 1;
-        flex-basis: 70%;
+        @include mixins-lib.ellipsis;
       }
 
       .codeblock_box {
-        height: calc(100% - 33px);
+        flex: 1;
+        min-height: 0;
+        height: auto;
         margin-top: 0;
         padding-bottom: 0;
         border: none;
         border-radius: 0;
-      }
+        overflow: auto;
+        background: var(--gray-000);
 
-      .codeblock {
-        border-radius: 0;
+        &:focus-visible {
+          outline: 2px solid var(--gray-900);
+          outline-offset: -2px;
+        }
+
+        // The box scrolls; the code block grows to its content so the
+        // background follows long lines.
+        // Static, so the inset focus ring of the box paints over it.
+        .codeblock {
+          position: static;
+          overflow: visible;
+          width: max-content;
+          min-width: 100%;
+          height: auto;
+          min-height: 100%;
+          border-radius: 0;
+        }
+
+        // A tighter gutter leaves more of the narrow sidebar to the code.
+        .line-number {
+          padding: 0 8px 0 12px;
+        }
+
+        .line-content {
+          padding: 0 16px 0 8px;
+        }
       }
     }
   }
