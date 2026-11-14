@@ -99,6 +99,11 @@
       display: block;
     }
 
+    // Stacked on a small laptop: tighter padding keeps the primary action in the first viewport.
+    @media screen and (min-width: 1024px) and (max-width: 1244px) {
+      padding: variables.$spacing_56 variables.$spacing_72 variables.$spacing_64;
+    }
+
     @include mixins-lib.tabletStart() {
       padding: variables.$spacing_56 variables.$spacing_40 variables.$spacing_64;
     }
@@ -114,12 +119,26 @@
     @include mixins-lib.rfonts(96, 108, 800);
     letter-spacing: -0.02em;
 
+    // Two columns: scale the headline with the window so the selection and its name tag stay clear of the pitch.
+    @media screen and (min-width: 1245px) {
+      font-size: clamp(76px, calc(17.5vw - 142px), 96px);
+      line-height: 1.13;
+    }
+
+    @media screen and (min-width: 1024px) and (max-width: 1244px) {
+      @include mixins-lib.rfonts(80, 90);
+    }
+
     @include mixins-lib.tabletStart() {
       @include mixins-lib.rfonts(64, 72);
     }
 
     @include mixins-lib.mobileStart() {
       @include mixins-lib.rfonts(40, 48);
+    }
+
+    @include mixins-lib.mobileXS() {
+      @include mixins-lib.rfonts(36, 44);
     }
 
     .line {
@@ -157,6 +176,16 @@
     left: 100%;
     margin: -10px 0 0 4px;
     animation: hero-drag 1.8s var(--hero-ease) 0.3s both;
+
+    // On a phone the word nearly fills the window, so the tag hangs up and to the left of the pointer.
+    @include mixins-lib.mobileStart() {
+      .peer_tag {
+        position: absolute;
+        right: variables.$spacing_8;
+        bottom: 100%;
+        margin: 0;
+      }
+    }
   }
 
   .peer_cursor {
@@ -191,6 +220,11 @@
 
     // The tag's fill is the peer color (currentColor), so the label is set on an inner layer.
     -webkit-text-fill-color: var(--peer-ink);
+
+    // The name is decoration, so it comes from CSS and stays out of the heading's text.
+    &::before {
+      content: attr(data-name);
+    }
   }
 
   // A text caret another collaborator leaves at the end of the headline.
@@ -234,6 +268,7 @@
     max-width: 560px;
     color: var(--gray-800);
     @include mixins-lib.rfonts(18, 28, 500);
+    text-wrap: pretty;
 
     @include mixins-lib.mobileStart() {
       @include mixins-lib.rfonts(16, 24);
@@ -249,7 +284,8 @@
     @include mixins-lib.mobileStart() {
       flex-direction: column;
       align-items: stretch;
-      gap: 12px;
+      // Room for the pointer's name tag between the two buttons.
+      gap: 20px;
       margin-top: variables.$spacing_32;
     }
 
@@ -270,14 +306,14 @@
     .peer_cursor {
       top: 100%;
       left: 100%;
-      margin: -14px 0 0 -18px;
-      animation: hero-cursor-in 0.8s var(--hero-ease) 2.9s both;
+      margin: -8px 0 0 -18px;
+      animation: hero-cursor-in 0.8s cubic-bezier(0.4, 0, 0.2, 1) 2.9s both;
 
       // On a phone the button spans the window, so the pointer sits inside its right edge.
       @include mixins-lib.mobileStart() {
         left: auto;
         right: variables.$spacing_16;
-        margin: -12px 0 0;
+        margin: -16px 0 0;
       }
     }
   }
@@ -373,6 +409,11 @@
     opacity: 0;
     transform: translate(180px, -120px);
   }
+
+  // Visible early, so the travel reads as a flight and not a fade.
+  15% {
+    opacity: 1;
+  }
 }
 
 // Arrive at the left edge (first 0.7s), then drag to the right edge in step with the selection.
@@ -381,6 +422,10 @@
     left: 0;
     opacity: 0;
     transform: translate(180px, -120px);
+  }
+
+  8% {
+    opacity: 1;
   }
 
   39% {
@@ -398,7 +443,7 @@
 @keyframes hero-select {
   from {
     opacity: 0;
-    clip-path: inset(0 100% 0 0 round 8px);
+    clip-path: inset(0 100% 0 0);
   }
 
   20% {
@@ -406,12 +451,13 @@
   }
 
   to {
-    clip-path: inset(0 0 0 0 round 8px);
+    clip-path: inset(0 0 0 0);
   }
 }
 
+// Only the bar blinks; the name tag keeps its own fill.
 @keyframes hero-caret-blink {
   50% {
-    opacity: 0;
+    background-color: transparent;
   }
 }

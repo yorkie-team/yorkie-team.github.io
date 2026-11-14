@@ -142,8 +142,9 @@ A warm neutral canvas with one brand orange and a six-hue peer palette.
 ### Secondary
 
 - **Peer hues** (`yellow-0`, `green-0`, `blue-0`, `red-0`, `purple-0`, plus
-  orange): each represents one collaborator. Used for cursors, avatars,
-  selection outlines, and the paired gradients in the hero. Every hue has
+  orange): each represents one collaborator. Used for cursors, avatars, and
+  selection outlines. The landing hero uses its own darker steps of three of
+  them (see Shared Document Hero). Every hue has
   `dark`, `0`, and `light` steps and three alpha tints (24%, 32%, 40%) as CSS
   custom properties in `styles/base/_color.scss`.
 
@@ -152,9 +153,8 @@ A warm neutral canvas with one brand orange and a six-hue peer palette.
 - **Peer gradients** (`gradient-*-from` paired with the matching `*-0` hue;
   orange runs from `gradient-orange-from` to `gradient-orange-to`): two-stop
   linear gradients defined as `$gradient_90deg_*` and `$gradient_180deg_*` in
-  `styles/base/_variables.scss`. They fill the peer shapes in the hero and
-  the emphasized word in headlines. Use the Sass variables, not literal
-  stops.
+  `styles/base/_variables.scss`. They color the primary button's hover
+  animation. Use the Sass variables, not literal stops.
 
 ### Neutral
 
@@ -192,7 +192,10 @@ from size and weight, not from font contrast. Code is the second voice.
 
 The scale is fixed in `styles/base/_font.scss`:
 
-- **Display** (56px / 64px): the hero headline only.
+- **Hero** (96px / 108px, weight 800; scales down to 76px in narrow
+  two-column windows, 64px on tablet, 40px on mobile): the landing hero
+  headline only.
+- **Display** (56px / 64px): page titles on the other pages.
 - **Headline** (46px / 54px and 38px / 46px): section headlines.
 - **Title** (30px / 38px, 24px / 32px, 20px / 28px): card and subsection
   titles.

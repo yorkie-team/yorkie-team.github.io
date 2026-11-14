@@ -40,9 +40,9 @@ const Home: NextPage = () => {
             <div className="hero_window_bar" aria-hidden="true">
               <span className="hero_window_name">yorkie.dev / landing</span>
               <span className="hero_peers">
-                <span className="hero_peer peer_a">H</span>
                 <span className="hero_peer peer_b">C</span>
                 <span className="hero_peer peer_c">K</span>
+                <span className="hero_peer peer_a">H</span>
               </span>
             </div>
             <div className="hero_window_body">
@@ -54,14 +54,14 @@ const Home: NextPage = () => {
                     <span className="peer_selection" aria-hidden="true"></span>
                     <span className="peer_cursor peer_b" aria-hidden="true">
                       <PeerCursor />
-                      <span className="peer_tag">chacha</span>
+                      <span className="peer_tag" data-name="chacha" />
                     </span>
                   </span>
                 </span>{' '}
                 <span className="line">
                   to your app
                   <span className="peer_caret peer_c" aria-hidden="true">
-                    <span className="peer_tag">krapie</span>
+                    <span className="peer_tag" data-name="krapie" />
                   </span>
                 </span>
               </h1>
@@ -79,7 +79,7 @@ const Home: NextPage = () => {
                     </a>
                     <span className="peer_cursor peer_a" aria-hidden="true">
                       <PeerCursor />
-                      <span className="peer_tag">hackerwins</span>
+                      <span className="peer_tag" data-name="hackerwins" />
                     </span>
                   </span>
                   <Button as="link" href="/docs" outline className="btn_docs" icon={<Icon type="book" />}>
