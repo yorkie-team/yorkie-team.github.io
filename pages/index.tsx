@@ -366,11 +366,7 @@ const Home: NextPage = () => {
                   Can I use Yorkie for free?
                 </Accordion.Control>
                 <Accordion.Panel>
-                  Yes, Yorkie is free to use. <br />
-                  <br />
-                  You can access it at no cost. Please note that the availability of the service and any associated
-                  features may be subject to change without notice. It is always a good idea to check the latest
-                  information on the service&apos;s website to ensure that it is still available and meets your needs.
+                  Yes, Yorkie is free to use. You can access it at no cost.
                 </Accordion.Panel>
               </Accordion.Item>
               <Accordion.Item value="faq2">
@@ -383,9 +379,9 @@ const Home: NextPage = () => {
                   <br />
                   Yorkie has achieved production-ready status and is currently operating as a stable and reliable
                   service. Its robustness has been thoroughly validated through extensive testing at NAVER, establishing
-                  it as a dependable solution for production environments. But it is not a guarantee that there will be
-                  no issues or bugs when using the service. If you encounter any problems while using Yorkie, please
-                  report them to the Yorkie community so that they can be addressed as quickly as possible.
+                  it as a dependable solution for production environments. If you encounter any problems while using
+                  Yorkie, please report them to the Yorkie community so that they can be addressed as quickly as
+                  possible.
                 </Accordion.Panel>
               </Accordion.Item>
               <Accordion.Item value="faq3">
