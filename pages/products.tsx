@@ -29,9 +29,9 @@ const Products: NextPage = () => {
               Stay in control
             </h2>
             <p className="desc">
-              Yorkie provides synchronization primitives such as JSON-like document <br className="br_pc" />
-              and Peer Awareness API. Dashboard allows for efficient management of documents <br className="br_pc" />
-              as a document store.
+              Yorkie provides synchronization primitives: a JSON-like Document, <br className="br_pc" />
+              Presence, and Channel. Dashboard lets you manage the documents <br className="br_pc" />
+              stored in each project.
             </p>
             <Button.Box>
               <Button
@@ -95,6 +95,7 @@ const Products: NextPage = () => {
                     <button
                       type="button"
                       className={classNames('btn_item', { is_active: documentType === 'common' })}
+                      aria-pressed={documentType === 'common'}
                       onClick={() => {
                         setDocumentType('common');
                       }}
@@ -104,6 +105,7 @@ const Products: NextPage = () => {
                     <button
                       type="button"
                       className={classNames('btn_item', { is_active: documentType === 'text' })}
+                      aria-pressed={documentType === 'text'}
                       onClick={() => {
                         setDocumentType('text');
                       }}
@@ -113,6 +115,7 @@ const Products: NextPage = () => {
                     <button
                       type="button"
                       className={classNames('btn_item', { is_active: documentType === 'counter' })}
+                      aria-pressed={documentType === 'counter'}
                       onClick={() => {
                         setDocumentType('counter');
                       }}
@@ -149,6 +152,7 @@ const Products: NextPage = () => {
                     <button
                       type="button"
                       className={classNames('btn_item', { is_active: presenceType === 'update' })}
+                      aria-pressed={presenceType === 'update'}
                       onClick={() => {
                         setPresenceType('update');
                       }}
@@ -158,6 +162,7 @@ const Products: NextPage = () => {
                     <button
                       type="button"
                       className={classNames('btn_item', { is_active: presenceType === 'watch' })}
+                      aria-pressed={presenceType === 'watch'}
                       onClick={() => {
                         setPresenceType('watch');
                       }}
@@ -194,6 +199,7 @@ const Products: NextPage = () => {
                   <button
                     type="button"
                     className={classNames('btn_item', { is_active: channelType === 'presence' })}
+                    aria-pressed={channelType === 'presence'}
                     onClick={() => {
                       setChannelType('presence');
                     }}
@@ -203,6 +209,7 @@ const Products: NextPage = () => {
                   <button
                     type="button"
                     className={classNames('btn_item', { is_active: channelType === 'broadcast' })}
+                    aria-pressed={channelType === 'broadcast'}
                     onClick={() => {
                       setChannelType('broadcast');
                     }}
@@ -279,7 +286,7 @@ const Products: NextPage = () => {
               </a>
             </h2>
             <p className="section_desc">
-              Dashboard allows project members to browse stored documents and supervise the data warehouse easily.
+              Dashboard lets project members browse the documents stored in a project and monitor them in real time.
             </p>
           </div>
           <strong className="sub_big_title">
