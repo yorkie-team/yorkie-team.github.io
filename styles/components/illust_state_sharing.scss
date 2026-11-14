@@ -1,0 +1,658 @@
+@use '../base/mixins-lib';
+@use '../base/variables';
+
+// "Conflict-free state sharing" illustration on /products.
+// Two clients edit the same todo list concurrently; changes cross through the
+// Yorkie Server and both replicas converge. State is driven by step classes:
+// `.is-stepN` (exact) and `.is-fromN` (cumulative) set by StateSharingDetailMotion.
+.illust_state_sharing {
+  --iss-alice: var(--blue-0);
+  --iss-alice-tint: var(--blue-alpha-light);
+  --iss-york: var(--purple-0);
+  --iss-york-tint: var(--purple-alpha-light);
+  --iss-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  overflow: hidden;
+  padding: 40px 32px 24px;
+  border: 1px solid var(--gray-400);
+  border-radius: 8px;
+  background: var(--gray-000);
+  color: var(--gray-900);
+
+  .iss_stage {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(40px, 72px) minmax(168px, 200px) minmax(40px, 72px) minmax(0, 1fr);
+    align-items: center;
+  }
+
+  // Client window
+  .iss_window {
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--iss-peer);
+    border-radius: 8px;
+    background: var(--gray-000);
+
+    &--alice {
+      --iss-peer: var(--iss-alice);
+      --iss-peer-tint: var(--iss-alice-tint);
+    }
+
+    &--york {
+      --iss-peer: var(--iss-york);
+      --iss-peer-tint: var(--iss-york-tint);
+    }
+  }
+
+  .iss_titlebar {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    height: 40px;
+    padding: 0 12px;
+    border-bottom: 1px solid var(--gray-300);
+    background: var(--gray-50);
+  }
+
+  .iss_avatar {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--iss-peer);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
+  }
+
+  .iss_name {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+  }
+
+  .iss_status {
+    display: grid;
+    margin-left: auto;
+    justify-items: end;
+  }
+
+  .iss_status_item {
+    display: inline-flex;
+    gap: 4px;
+    align-items: center;
+    grid-area: 1 / 1;
+    color: var(--gray-700);
+    font-size: 12px;
+    line-height: 18px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.3s ease-out;
+  }
+
+  .iss_status--synced {
+    color: var(--orange-dark);
+    font-weight: 600;
+  }
+
+  &.is-step1 .iss_status--local,
+  &.is-step2 .iss_status--syncing,
+  &.is-step3 .iss_status--syncing,
+  &.is-step4 .iss_status--synced {
+    opacity: 1;
+  }
+
+  // Keep the icon at its own size; the product page stretches `.img_box svg`.
+  .iss_window svg.iss_icon {
+    display: block;
+    flex: none;
+    width: 12px;
+    height: 12px;
+  }
+
+  .iss_list {
+    margin: 0;
+    padding: 8px;
+    list-style: none;
+  }
+
+  .iss_row {
+    position: relative;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    height: 36px;
+    padding: 0 8px;
+    border-radius: 4px;
+    font-size: 14px;
+    line-height: 20px;
+    transition:
+      background-color 0.4s ease-out,
+      opacity 0.5s var(--iss-ease),
+      transform 0.5s var(--iss-ease);
+  }
+
+  .iss_box {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border: 1px solid var(--gray-500);
+    border-radius: 4px;
+    background: var(--gray-000);
+    color: var(--gray-000);
+    transition:
+      background-color 0.3s ease-out,
+      border-color 0.3s ease-out;
+
+    .iss_icon {
+      opacity: 0;
+      transform: scale(0.6);
+      transition:
+        opacity 0.3s ease-out,
+        transform 0.4s var(--iss-ease);
+    }
+  }
+
+  .iss_text {
+    position: relative;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: color 0.3s ease-out;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: currentColor;
+      transform: scaleX(0);
+      transform-origin: left center;
+      transition: transform 0.4s var(--iss-ease);
+    }
+  }
+
+  .iss_author {
+    display: inline-flex;
+    flex: none;
+    gap: 4px;
+    align-items: center;
+    margin-left: auto;
+    color: var(--gray-700);
+    font-size: 12px;
+    line-height: 18px;
+    opacity: 0;
+    transition: opacity 0.3s ease-out;
+  }
+
+  .iss_author_dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  .iss_author--alice .iss_author_dot {
+    background: var(--iss-alice);
+  }
+
+  .iss_author--york .iss_author_dot {
+    background: var(--iss-york);
+  }
+
+  // Row states. "Write spec" is checked by York; "Ship v1" is added by Alice.
+  @mixin checked {
+    background: var(--iss-york-tint);
+
+    .iss_box {
+      border-color: var(--iss-york);
+      background: var(--iss-york);
+
+      .iss_icon {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .iss_text {
+      color: var(--gray-700);
+
+      &::after {
+        transform: scaleX(1);
+      }
+    }
+
+    .iss_author {
+      opacity: 1;
+    }
+  }
+
+  @mixin added {
+    background: var(--iss-alice-tint);
+    opacity: 1;
+    transform: none;
+
+    .iss_author {
+      opacity: 1;
+    }
+  }
+
+  .iss_row--ship {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  &.is-from1 .iss_window--york .iss_row--spec,
+  &.is-from4 .iss_window--alice .iss_row--spec {
+    @include checked;
+  }
+
+  &.is-from1 .iss_window--alice .iss_row--ship,
+  &.is-from4 .iss_window--york .iss_row--ship {
+    @include added;
+  }
+
+  .iss_code {
+    display: block;
+    height: 36px;
+    padding: 0 12px;
+    overflow: hidden;
+    border-top: 1px solid var(--gray-300);
+    background: var(--gray-50);
+    color: var(--gray-800);
+    font-family: RobotoMono, Consolas, Monaco, monospace;
+    font-size: 12px;
+    line-height: 36px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    transition: color 0.3s ease-out;
+  }
+
+  &:not(.is-from1) .iss_code {
+    color: transparent;
+  }
+
+  // Server
+  .iss_server {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: 14px 14px 12px;
+    border: 1px solid var(--gray-400);
+    border-radius: 8px;
+    background: var(--gray-50);
+  }
+
+  .iss_server_title {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+
+    &::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 2px;
+      background: var(--orange-0);
+    }
+  }
+
+  .iss_server_doc {
+    margin-top: 2px;
+    color: var(--gray-700);
+    font-size: 12px;
+    line-height: 18px;
+
+    code {
+      color: var(--gray-800);
+      font-family: RobotoMono, Consolas, Monaco, monospace;
+    }
+  }
+
+  .iss_log {
+    margin: 10px 0 0;
+    padding: 8px 0 0;
+    border-top: 1px solid var(--gray-300);
+    list-style: none;
+  }
+
+  .iss_log_item {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    height: 26px;
+    font-size: 12px;
+    line-height: 18px;
+    opacity: 0;
+    transform: translateY(4px);
+    transition:
+      opacity 0.4s ease-out,
+      transform 0.4s var(--iss-ease);
+
+    .iss_author {
+      margin-left: 0;
+      color: var(--gray-900);
+      font-weight: 600;
+      opacity: 1;
+    }
+  }
+
+  .iss_log_op {
+    color: var(--gray-700);
+    white-space: nowrap;
+  }
+
+  &.is-from2 .iss_log_item {
+    opacity: 1;
+    transform: none;
+  }
+
+  // Log entries land when the outgoing packets reach the server.
+  &.is-step2 .iss_log_item {
+    transition-delay: 0.9s;
+  }
+
+  // Tracks and change packets
+  .iss_track {
+    position: relative;
+    height: 12px;
+  }
+
+  .iss_line {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 0;
+    border-top: 1px dashed var(--gray-400);
+  }
+
+  .iss_runner {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+  }
+
+  .iss_packet {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 12px;
+    height: 12px;
+    margin: -6px 0 0 -6px;
+    border: 2px solid var(--gray-000);
+    border-radius: 50%;
+  }
+
+  .iss_runner--alice .iss_packet {
+    background: var(--iss-alice);
+  }
+
+  .iss_runner--york .iss_packet {
+    background: var(--iss-york);
+  }
+
+  // Forward = toward York's side (left to right), reverse = toward Alice's side.
+  &.is-step2 .iss_track--left .iss_runner--out,
+  &.is-step3 .iss_track--right .iss_runner--back {
+    animation: iss-forward 1.1s var(--iss-ease) forwards;
+  }
+
+  &.is-step2 .iss_track--right .iss_runner--out,
+  &.is-step3 .iss_track--left .iss_runner--back {
+    animation: iss-reverse 1.1s var(--iss-ease) forwards;
+  }
+
+  // Step captions
+  .iss_steps {
+    display: flex;
+    gap: 32px;
+    justify-content: center;
+    margin: 32px 0 0;
+    padding: 16px 0 0;
+    border-top: 1px solid var(--gray-300);
+    list-style: none;
+  }
+
+  .iss_step {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    color: var(--gray-600);
+    font-size: 13px;
+    line-height: 20px;
+    transition: color 0.3s ease-out;
+
+    &.is-active {
+      color: var(--gray-900);
+    }
+  }
+
+  .iss_step_num {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border: 1px solid var(--gray-400);
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
+    transition:
+      background-color 0.3s ease-out,
+      border-color 0.3s ease-out,
+      color 0.3s ease-out;
+  }
+
+  .iss_step.is-active .iss_step_num {
+    border-color: var(--orange-0);
+    background: var(--orange-0);
+    color: #fff;
+  }
+
+  // Narrow desktop: tighten the middle so the code lines fit.
+  @media screen and (min-width: 1024px) and (max-width: 1239px) {
+    padding: 32px 24px 24px;
+
+    .iss_stage {
+      grid-template-columns: minmax(0, 1fr) 40px 176px 40px minmax(0, 1fr);
+    }
+  }
+
+  // Stack the three nodes vertically on narrower screens.
+  @include mixins-lib.tabletStart() {
+    padding: 24px 16px 16px;
+
+    .iss_stage {
+      grid-template-columns: minmax(0, 420px);
+      justify-content: center;
+    }
+
+    .iss_track {
+      width: 12px;
+      height: 40px;
+      justify-self: center;
+    }
+
+    .iss_line {
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      right: auto;
+      width: 0;
+      height: auto;
+      border-top: 0;
+      border-left: 1px dashed var(--gray-400);
+    }
+
+    .iss_packet {
+      top: 0;
+      left: 50%;
+    }
+
+    .iss_server {
+      padding: 12px;
+    }
+
+    .iss_log {
+      display: flex;
+      flex-wrap: wrap;
+      column-gap: 16px;
+    }
+
+    &.is-step2 .iss_track--left .iss_runner--out,
+    &.is-step3 .iss_track--right .iss_runner--back {
+      animation-name: iss-down;
+    }
+
+    &.is-step2 .iss_track--right .iss_runner--out,
+    &.is-step3 .iss_track--left .iss_runner--back {
+      animation-name: iss-up;
+    }
+
+    // Tablet: both clients side by side, the server below them.
+    @media screen and (min-width: variables.$tabletMin) {
+      .iss_stage {
+        grid-template-areas:
+          'alice york'
+          'tl tr'
+          'server server';
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        column-gap: 16px;
+      }
+
+      .iss_window--alice {
+        grid-area: alice;
+      }
+
+      .iss_window--york {
+        grid-area: york;
+      }
+
+      .iss_track--left {
+        grid-area: tl;
+      }
+
+      .iss_track--right {
+        grid-area: tr;
+      }
+
+      .iss_server {
+        grid-area: server;
+      }
+
+      // Both clients sit above the server, so outgoing changes travel down.
+      &.is-step2 .iss_track--right .iss_runner--out {
+        animation-name: iss-down;
+      }
+
+      &.is-step3 .iss_track--right .iss_runner--back {
+        animation-name: iss-up;
+      }
+    }
+
+    .iss_steps {
+      flex-direction: column;
+      gap: 8px;
+      align-items: flex-start;
+      max-width: 420px;
+      margin: 24px auto 0;
+    }
+  }
+
+  &.is-static,
+  &.is-static * {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &,
+    * {
+      transition: none !important;
+      animation: none !important;
+    }
+  }
+}
+
+@keyframes iss-forward {
+  0% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+
+  15%,
+  85% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+@keyframes iss-reverse {
+  0% {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+
+  15%,
+  85% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+}
+
+@keyframes iss-down {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+
+  15%,
+  85% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+}
+
+@keyframes iss-up {
+  0% {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+
+  15%,
+  85% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+}

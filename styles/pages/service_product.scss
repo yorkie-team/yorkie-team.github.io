@@ -470,18 +470,6 @@
     }
   }
 
-  .conflict_free {
-    .img_box * {
-      &[fill='#514C49'] {
-        fill: var(--gray-800);
-      }
-
-      &[fill='white'] {
-        fill: var(--gray-000);
-      }
-    }
-  }
-
   .collaboration {
     .img_box * {
       &[stroke='#FEFDFB'] {
