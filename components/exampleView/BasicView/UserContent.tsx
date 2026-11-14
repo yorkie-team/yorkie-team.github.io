@@ -11,7 +11,7 @@ function UserContent({ userNumber, iframeURL }: { userNumber: number; iframeURL:
           </span>
         </div>
         <div className="dashboard_content">
-          <iframe title="Example" frameBorder="0" src={iframeURL} width="100%" height="100%"></iframe>
+          <iframe title={`Example as User ${userNumber}`} frameBorder="0" src={iframeURL} width="100%" height="100%"></iframe>
         </div>
       </div>
     </li>
