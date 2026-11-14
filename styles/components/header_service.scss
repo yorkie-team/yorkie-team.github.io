@@ -126,9 +126,14 @@
         margin-left: variables.$spacing_16;
       }
 
+      // Orange text on paper is about 2.7:1, so the active page keeps ink text and takes an orange underline.
       &.is_active {
         .link {
-          color: var(--orange-dark);
+          color: var(--gray-900);
+          text-decoration: underline;
+          text-decoration-color: var(--orange-0);
+          text-decoration-thickness: 2px;
+          text-underline-offset: 6px;
         }
       }
 
@@ -314,13 +319,18 @@
         padding-right: 36px;
 
         &:hover {
-          color: var(--orange-0);
+          color: var(--gray-900);
         }
 
         &.is_active {
           border: none;
           background: var(--gray-000);
-          color: var(--orange-0);
+          color: var(--gray-900);
+          font-weight: 600;
+          text-decoration: underline;
+          text-decoration-color: var(--orange-0);
+          text-decoration-thickness: 2px;
+          text-underline-offset: 4px;
         }
       }
     }
