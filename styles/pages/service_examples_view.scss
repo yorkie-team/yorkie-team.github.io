@@ -147,11 +147,39 @@
     &_top {
       display: flex;
       align-items: center;
+
+      // With a single tab there is no tablist, and mobile hides the toggle,
+      // so the row would only leave an empty gap above the guide.
+      @include mixins-lib.mobileStart() {
+        &:not(:has(.codeblock_navigator)) {
+          display: none;
+
+          + .guide_box {
+            margin-top: 0;
+          }
+        }
+      }
     }
 
     .codeblock_navigator {
       padding-bottom: 0;
       border-bottom: none;
+
+      // Tabs, not buttons: a soft fill marks the open tab instead of a dark
+      // filled pill that reads as the page's primary action.
+      .item {
+        border-radius: 4px;
+        transition: background-color 0.2s;
+
+        &:hover {
+          background: var(--gray-50);
+        }
+
+        &.is_active {
+          background: var(--gray-100);
+          color: var(--gray-900);
+        }
+      }
     }
 
     .btn_toggle {
@@ -293,10 +321,20 @@
       .btn_box {
         position: relative;
         z-index: 20;
+        gap: variables.$spacing_8;
         margin-top: variables.$spacing_16;
 
         @include mixins-lib.tabletStart() {
           flex-wrap: wrap;
+        }
+
+        // The gap spaces the buttons, so a wrapped button starts flush left.
+        .btn {
+          margin-left: 0;
+
+          @include mixins-lib.tabletStart() {
+            flex: 1 1 auto;
+          }
         }
 
         @include mixins-lib.mobileStart() {
@@ -311,14 +349,6 @@
 
         @include mixins-lib.tabletStart() {
           flex-basis: 100%;
-          margin-top: variables.$spacing_8;
-          margin-left: 0;
-        }
-
-        &:only-child {
-          @include mixins-lib.tabletStart() {
-            margin-top: 0;
-          }
         }
       }
 
@@ -331,28 +361,54 @@
     .folder_box {
       $fd: '.folder';
       display: flex;
+      flex-direction: column;
+      container: code-viewer / inline-size;
       height: 100%;
       max-height: calc(100% - 124px);
       margin-top: 16px;
       border: 1px solid var(--gray-400);
       border-radius: 4px;
+      overflow: hidden;
 
       @include mixins-lib.mobileStart() {
         display: none;
       }
 
+      // The tree sits above the code by default: next to it, a tree column
+      // leaves the code too narrow to read at every sidebar width but the
+      // widest. The container query keys off the box, not the viewport.
+      #{$fd}_layout {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 0;
+      }
+
       #{$fd}_list {
+        position: relative;
         overflow-y: auto;
-        flex-basis: 30%;
-        min-width: 150px;
-        padding-top: 10px;
-        padding-bottom: 10px;
-        border-right: 1px solid var(--gray-400);
+        flex: 0 0 auto;
+        max-height: clamp(116px, 30%, 216px);
+        padding: 8px 0;
+        border-bottom: 1px solid var(--gray-400);
         box-sizing: border-box;
       }
 
+      @container code-viewer (min-width: 800px) {
+        #{$fd}_layout {
+          flex-direction: row;
+        }
+
+        #{$fd}_list {
+          flex: 0 0 240px;
+          max-height: none;
+          border-bottom: 0;
+          border-right: 1px solid var(--gray-400);
+        }
+      }
+
       #{$fd}_item {
-        margin-top: 4px;
+        margin-top: 2px;
 
         &:first-child {
           margin-top: 0;
@@ -371,27 +427,28 @@
       }
 
       #{$fd}_sub_list {
-        padding-top: 4px;
-        padding-left: 24px;
-
-        .btn_folder {
-          align-items: center;
-        }
+        padding-top: 2px;
+        padding-left: 16px;
       }
 
       .btn_folder {
         display: flex;
         align-items: center;
         width: 100%;
-        padding: 3px 14px;
+        padding: 3px 12px;
         box-sizing: border-box;
-        @include mixins-lib.rfonts(14, 22, 400);
+        @include mixins-lib.rfonts(12, 18, 400);
         text-align: left;
 
         &:hover {
           .name {
             font-weight: 600;
           }
+        }
+
+        // The list scrolls, so an outset ring would be clipped at its edges.
+        &:focus-visible {
+          outline-offset: -2px;
         }
 
         .icon {
@@ -412,39 +469,72 @@
         }
 
         .name {
-          flex-basis: calc(100% - 22px);
+          flex: 1;
+          min-width: 0;
           color: var(--gray-800);
           @include mixins-lib.rfonts(12, 18, 400);
+          @include mixins-lib.ellipsis;
         }
       }
 
+      .codeblock_area {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-width: 0;
+        min-height: 0;
+      }
+
       .file_title {
-        display: block;
+        flex: 0 0 auto;
         height: 32px;
+        margin: 0;
+        padding: 0 12px;
         border-bottom: 1px solid var(--gray-400);
-        border-top-right-radius: 4px;
         background-color: var(--gray-000);
         color: var(--gray-800);
         @include mixins-lib.rfonts(14, 32, 600);
         text-align: center;
-      }
-
-      .codeblock_area {
-        overflow-x: auto;
-        flex: 1;
-        flex-basis: 70%;
+        @include mixins-lib.ellipsis;
       }
 
       .codeblock_box {
-        height: calc(100% - 33px);
+        flex: 1;
+        min-height: 0;
+        height: auto;
         margin-top: 0;
         padding-bottom: 0;
         border: none;
         border-radius: 0;
-      }
+        overflow: auto;
+        background: var(--gray-000);
 
-      .codeblock {
-        border-radius: 0;
+        &:focus-visible {
+          outline: 2px solid var(--gray-900);
+          outline-offset: -2px;
+        }
+
+        // The box scrolls; the code block grows to its content so the
+        // background follows long lines.
+        // Static, so the inset focus ring of the box paints over it.
+        .codeblock {
+          position: static;
+          overflow: visible;
+          width: max-content;
+          min-width: 100%;
+          height: auto;
+          min-height: 100%;
+          border-radius: 0;
+        }
+
+        // A tighter gutter leaves more of the narrow sidebar to the code.
+        .line-number {
+          padding: 0 8px 0 12px;
+        }
+
+        .line-content {
+          padding: 0 16px 0 8px;
+        }
       }
     }
   }
@@ -1197,14 +1287,18 @@
     }
   }
 
+  // The note sits above the actions so it reads on one line where it fits and wraps evenly where it does not;
+  // note and actions share a row only once the preview is wide enough for both on one line.
   .preview_bar {
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: variables.$spacing_8 variables.$spacing_16;
+    flex-direction: column;
+    gap: variables.$spacing_8;
     padding: 12px variables.$spacing_24;
     border-bottom: 1px solid var(--gray-400);
+
+    @include mixins-lib.tabletStart() {
+      padding: 12px variables.$spacing_16;
+    }
 
     @include mixins-lib.mobileStart() {
       padding: variables.$spacing_16;
@@ -1212,10 +1306,24 @@
     }
   }
 
+  @container preview (min-width: 900px) {
+    .preview_bar {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: variables.$spacing_16;
+    }
+
+    // The actions are right-aligned here, so the limit note goes in front of Add user to leave it in place.
+    .preview_limit {
+      order: -1;
+    }
+  }
+
   .preview_note {
-    flex: 1 1 260px;
     @include mixins-lib.rfonts(14, 22, 500);
     color: var(--gray-800);
+    text-wrap: balance;
 
     &_narrow {
       display: none;
@@ -1242,7 +1350,7 @@
       margin: 0;
     }
 
-    .btn_line:not(:disabled):hover {
+    .btn_line:not(:disabled):not(.is_disabled):hover {
       background-color: var(--gray-100);
     }
 
@@ -1342,12 +1450,6 @@
     border-radius: 8px;
     background: var(--gray-000);
 
-    @each $hue in red, yellow, green, orange, blue, purple {
-      &.peer_#{$hue} {
-        --peer: var(--#{$hue}-0);
-      }
-    }
-
     @include mixins-lib.mobileStart() {
       height: min(72vh, 600px);
 
@@ -1368,18 +1470,8 @@
     }
 
     &_user {
-      display: inline-flex;
-      align-items: center;
-      gap: variables.$spacing_8;
       @include mixins-lib.rfonts(12, 16, 600);
       color: var(--gray-800);
-    }
-
-    &_dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: var(--peer, var(--gray-500));
     }
 
     &_body {
@@ -1485,6 +1577,64 @@
 
     &::after {
       box-shadow: 0 15px 14px 0 var(--gray-000);
+    }
+  }
+}
+
+// Recorded preview of a mobile example (VideoPlayer): the iOS and Android examples cannot run in
+// the page, so a screen recording stands in for the live preview. Shares `.preview_bar` and
+// `.preview_note` with the web live preview so both pages read the same: bar on top, media below.
+.examples_view_page .video_preview_view {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - variables.$spacing_64);
+  max-height: none;
+  padding: 0;
+  overflow: hidden;
+
+  .video_preview_label {
+    font-weight: 600;
+    color: var(--gray-900);
+  }
+
+  .video_preview_media {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: flex-start;
+    justify-content: center;
+    min-height: 0;
+    padding: variables.$spacing_24;
+  }
+
+  .video_preview_video {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    border: 1px solid var(--gray-300);
+    border-radius: 8px;
+    background-color: var(--gray-100);
+  }
+
+  .video_preview_fallback {
+    @include mixins-lib.rfonts(14, 22, 500);
+    color: var(--gray-800);
+  }
+
+  @include mixins-lib.mobileStart() {
+    height: auto;
+    overflow: visible;
+    border-top: 1px solid var(--gray-400);
+
+    .video_preview_media {
+      padding: 0 variables.$spacing_16 variables.$spacing_24;
+    }
+
+    .video_preview_video {
+      width: 100%;
+      max-height: 80vh;
+      object-fit: contain;
     }
   }
 }

@@ -44,7 +44,12 @@ const SimultaneousCursorsAndroidExampleView: NextPage = () => {
               <Sidebar.Bottom codeURL={EXAMPLE_ANDROID_CODE_URL + exampleKey} />
             </Sidebar.Tabs>
           </Sidebar>
-          <VideoPlayer videoSrc="/assets/videos/examples/android-simultaneous-cursors.mp4" />
+          <VideoPlayer
+            videoSrc="/assets/videos/examples/android-simultaneous-cursors.mp4"
+            title={exampleTitle}
+            description="Two Android clients (top and bottom) share one canvas and show each other's cursors and drawings."
+            codeURL={EXAMPLE_ANDROID_CODE_URL + exampleKey}
+          />
         </>
       )}
     </ExampleLayout>

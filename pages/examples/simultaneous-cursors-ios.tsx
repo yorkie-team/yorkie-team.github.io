@@ -41,7 +41,12 @@ const SimultaneousCursorsIOSExampleView: NextPage = () => {
               <Sidebar.Bottom codeURL={EXAMPLE_IOS_CODE_URL + exampleKey} />
             </Sidebar.Tabs>
           </Sidebar>
-          <VideoPlayer videoSrc="/assets/videos/examples/ios-simultaneous-cursors.mp4" />
+          <VideoPlayer
+            videoSrc="/assets/videos/examples/ios-simultaneous-cursors.mp4"
+            title={exampleTitle}
+            description="The Android app (top) and the iOS app (bottom) share one canvas and show each other's cursors and drawings."
+            codeURL={EXAMPLE_IOS_CODE_URL + exampleKey}
+          />
         </>
       )}
     </ExampleLayout>

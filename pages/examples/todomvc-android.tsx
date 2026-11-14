@@ -50,7 +50,12 @@ const TodoMVCAndroidExampleView: NextPage = () => {
               <Sidebar.Bottom codeURL={EXAMPLE_ANDROID_CODE_URL + exampleKey} />
             </Sidebar.Tabs>
           </Sidebar>
-          <VideoPlayer videoSrc="/assets/videos/examples/android-todomvc.mp4" />
+          <VideoPlayer
+            videoSrc="/assets/videos/examples/android-todomvc.mp4"
+            title={exampleTitle}
+            description="Two Android clients edit the same todo list side by side."
+            codeURL={EXAMPLE_ANDROID_CODE_URL + exampleKey}
+          />
         </>
       )}
     </ExampleLayout>
