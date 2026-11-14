@@ -14,6 +14,7 @@ export const PopoverTarget = ({ children, ...others }: PopoverTargetProps) => {
   const ctx = usePopoverContext();
   return cloneElement(children, {
     ...others,
+    'aria-expanded': ctx.opened,
     onClick: () => {
       ctx.onToggle();
     },

@@ -98,5 +98,9 @@ const svgMap = {
 type SVGType = keyof typeof svgMap;
 
 export function Icon({ type, color, className }: { type: SVGType; color?: string; className?: string }) {
-  return <span className={classNames('icon', className, color)}>{svgMap[type]}</span>;
+  return (
+    <span className={classNames('icon', className, color)} aria-hidden="true">
+      {svgMap[type]}
+    </span>
+  );
 }

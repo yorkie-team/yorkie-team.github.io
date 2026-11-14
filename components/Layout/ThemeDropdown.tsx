@@ -38,17 +38,29 @@ export function ThemeDropdown() {
             }}
           >
             <li className="dropdown_item" data-option="system">
-              <button className={classNames('dropdown_menu', { is_active: themeOption === 'system' })}>
+              <button
+                type="button"
+                className={classNames('dropdown_menu', { is_active: themeOption === 'system' })}
+                aria-pressed={themeOption === 'system'}
+              >
                 <span className="dropdown_text">System</span>
               </button>
             </li>
             <li className="dropdown_item" data-option="light">
-              <button className={classNames('dropdown_menu', { is_active: themeOption === 'light' })}>
+              <button
+                type="button"
+                className={classNames('dropdown_menu', { is_active: themeOption === 'light' })}
+                aria-pressed={themeOption === 'light'}
+              >
                 <span className="dropdown_text">Light</span>
               </button>
             </li>
             <li className="dropdown_item" data-option="dark">
-              <button className={classNames('dropdown_menu', { is_active: themeOption === 'dark' })}>
+              <button
+                type="button"
+                className={classNames('dropdown_menu', { is_active: themeOption === 'dark' })}
+                aria-pressed={themeOption === 'dark'}
+              >
                 <span className="dropdown_text">Dark</span>
               </button>
             </li>

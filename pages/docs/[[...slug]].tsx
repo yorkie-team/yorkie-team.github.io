@@ -57,6 +57,7 @@ const components: MDXComponents = {
 
 export default function DocsPage({
   source,
+  meta,
   navList,
 }: {
   source: MDXRemoteSerializeResult<Record<string, unknown>>;
@@ -118,7 +119,7 @@ export default function DocsPage({
   return (
     <Layout className="documentation_page">
       <Head>
-        <title>Documentation · Yorkie</title>
+        <title>{meta?.title ? `${meta.title} · Yorkie Docs` : 'Documentation · Yorkie'}</title>
       </Head>
       <div className="content">
         <Navigator navList={navList} />

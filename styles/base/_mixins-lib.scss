@@ -117,7 +117,7 @@ $root-em: 10;
   display: -webkit-box;
   -webkit-line-clamp: $line;
   -webkit-box-orient: vertical;
-  word-break: break-all;
+  overflow-wrap: anywhere;
 }
 
 @mixin fixedFull {

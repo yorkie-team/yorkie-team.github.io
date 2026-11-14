@@ -77,13 +77,15 @@ const Examples: NextPage = () => {
             <ul className="navigator_list">
               {CATEGORY_CONFIG.map(({ id, label, icon }) => (
                 <li key={id} className="navigator_group">
-                  <a
+                  <button
+                    type="button"
                     className={`navigator_item add_icon ${id === currentCategory ? 'is_active' : ''}`}
+                    aria-pressed={id === currentCategory}
                     onClick={() => handleCategoryChange(id)}
                   >
                     <Icon type={icon} />
                     {label}
-                  </a>
+                  </button>
                 </li>
               ))}
             </ul>
@@ -104,8 +106,10 @@ const Examples: NextPage = () => {
                       <ul className="dropdown_list">
                         {CATEGORY_CONFIG.map(({ id, label }) => (
                           <li key={id} className="dropdown_item">
-                            <a
+                            <button
+                              type="button"
                               className="dropdown_menu"
+                              aria-pressed={id === currentCategory}
                               onClick={() => {
                                 handleCategoryChange(id);
                                 setMobileFilterOpened(false);
@@ -115,7 +119,7 @@ const Examples: NextPage = () => {
                                 {id === currentCategory && <Icon type="check" />}
                               </span>
                               <span className="dropdown_text">{label}</span>
-                            </a>
+                            </button>
                           </li>
                         ))}
                       </ul>
