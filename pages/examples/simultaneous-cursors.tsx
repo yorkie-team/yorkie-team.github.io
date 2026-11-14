@@ -32,20 +32,13 @@ const SimultaneousExampleView: NextPage = () => {
               <Sidebar.TabsPanel value="code">
                 <Sidebar.GuideTitle>{exampleTitle}</Sidebar.GuideTitle>
                 <Sidebar.GuideDescription>
-                  This demo shows the real-time collaborative version of simple drawing, cursor animation with{' '}
-                  <a href="https://yorkie.dev/" className="link" target="_blank" rel="noreferrer">
-                    Yorkie
-                  </a>{' '}
-                  and{' '}
-                  <a
-                    href="https://react.dev"
-                    className="link"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
+                  Each client shares its cursor position and tool through Presence, so moving the mouse in one pane
+                  moves a cursor in the other. Send heart or thumbs-up reactions, or draw with the pen: each peer draws the
+                  trail from that Presence, so the ink is ephemeral and never saved in the Document. Built with{' '}
+                  <a href="https://react.dev" className="link" target="_blank" rel="noreferrer">
                     React
-                  </a>
-                  .
+                  </a>{' '}
+                  and <code>@yorkie-js/react</code>.
                 </Sidebar.GuideDescription>
                 <ProjectCodes files={FILE_INFO} activeFile="/src/App.jsx" ignoreFiles={COMMON_IGNORE_FILES} />
               </Sidebar.TabsPanel>

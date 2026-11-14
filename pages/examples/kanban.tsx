@@ -36,8 +36,12 @@ const KanbanExampleView: NextPage = () => {
               <Sidebar.TabsPanel value="code">
                 <Sidebar.GuideTitle>{exampleTitle}</Sidebar.GuideTitle>
                 <Sidebar.GuideDescription>
-                  Kanban Board is a tool for managing tasks and workflow. It is a visual way to manage tasks and
-                  workflow.
+                  A{' '}
+                  <a href="https://vuejs.org" className="link" target="_blank" rel="noreferrer">
+                    Vue
+                  </a>{' '}
+                  board whose lists and cards are Yorkie Arrays. Add, move and delete cards in one pane and watch the
+                  same Array operations arrive in the other.
                 </Sidebar.GuideDescription>
                 <ProjectCodes files={FILE_INFO} activeFile="/src/App.vue" ignoreFiles={COMMON_IGNORE_FILES} />
               </Sidebar.TabsPanel>
