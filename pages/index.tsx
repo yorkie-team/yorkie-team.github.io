@@ -366,9 +366,7 @@ const Home: NextPage = () => {
                   Can I use Yorkie for free?
                 </Accordion.Control>
                 <Accordion.Panel>
-                  Yes, Yorkie is free to use. <br />
-                  <br />
-                  You can access it at no cost.
+                  Yes, Yorkie is free to use. You can access it at no cost.
                 </Accordion.Panel>
               </Accordion.Item>
               <Accordion.Item value="faq2">
