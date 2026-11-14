@@ -187,15 +187,16 @@ html {
     // Break only strings that cannot fit, not ordinary words in the middle.
     overflow-wrap: break-word;
 
-    // Prose reads best at about 75 characters; code, tables and diagrams keep the full width.
-    > p,
-    > ul,
-    > ol,
-    > blockquote {
-      max-width: 760px;
-    }
     flex: 1 1 100%;
     order: 1;
+
+    // Prose reads best at about 75 characters; code, tables and diagrams keep the full width.
+    // Markdown quotes render as alerts.
+    > p,
+    > ul,
+    > ol {
+      max-width: 760px;
+    }
 
     @media screen and (min-width: 1600px) {
       padding-right: 48px;
@@ -345,6 +346,8 @@ html {
 
       td,
       th {
+        // Let long identifiers break inside a cell instead of widening the table.
+        overflow-wrap: anywhere;
         min-width: 143px;
         padding: 4px variables.$spacing_8;
         border-right: 1px solid var(--gray-400);
@@ -484,7 +487,8 @@ html {
 
     .alert {
       width: fit-content;
-      max-width: 100%;
+      // Same measure as the prose around it.
+      max-width: min(100%, 760px);
       display: inline-block;
       align-items: center;
       position: relative;
