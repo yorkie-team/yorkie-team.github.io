@@ -1,6 +1,8 @@
 import { useState, useEffect, useId } from 'react';
+import Link from 'next/link';
 import classNames from 'classnames';
 import { Icon } from '@/components';
+import { getExampleGuide, useCurrentExample } from '../currentExample';
 import { SidebarContextProvider, useSidebarContext } from './Sidebar.context';
 import { SidebarTabs, SidebarTabsList, SidebarTabsTab, SidebarTabsPanel } from './SidebarTabs';
 
@@ -68,12 +70,18 @@ function SidebarBottom({
   children?: React.ReactNode;
 }) {
   const ctx = useSidebarContext();
+  const guide = getExampleGuide(useCurrentExample());
   return (
     <div className="sidebar_bottom">
       <div className={classNames('btn_box', { full_width: !ctx.wide })}>
-        <a href={codeURL} className="btn gray700" target="_blank" rel="noreferrer">
+        <a href={codeURL} className="btn btn_line" target="_blank" rel="noreferrer">
           View code on GitHub
         </a>
+        {!shareButton && (
+          <Link href={guide.href} className="btn btn_line">
+            {guide.label}
+          </Link>
+        )}
         {shareButton && (
           <a href="#" className="btn gray900 btn_share">
             Share to invite other

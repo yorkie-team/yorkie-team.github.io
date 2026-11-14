@@ -309,10 +309,20 @@
       .btn_box {
         position: relative;
         z-index: 20;
+        gap: variables.$spacing_8;
         margin-top: variables.$spacing_16;
 
         @include mixins-lib.tabletStart() {
           flex-wrap: wrap;
+        }
+
+        // The gap spaces the buttons, so a wrapped button starts flush left.
+        .btn {
+          margin-left: 0;
+
+          @include mixins-lib.tabletStart() {
+            flex: 1 1 auto;
+          }
         }
 
         @include mixins-lib.mobileStart() {
@@ -327,14 +337,6 @@
 
         @include mixins-lib.tabletStart() {
           flex-basis: 100%;
-          margin-top: variables.$spacing_8;
-          margin-left: 0;
-        }
-
-        &:only-child {
-          @include mixins-lib.tabletStart() {
-            margin-top: 0;
-          }
         }
       }
 
