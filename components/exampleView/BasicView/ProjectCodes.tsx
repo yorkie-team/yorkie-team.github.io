@@ -87,11 +87,22 @@ export function ProjectCodes({
     if (!revealActiveRef.current || !list) return;
     const active = list.querySelector<HTMLElement>('.folder_item.is_active');
     if (!active) return;
-    revealActiveRef.current = false;
-    const top = active.offsetTop;
-    if (top < list.scrollTop || top + active.offsetHeight > list.scrollTop + list.clientHeight) {
-      list.scrollTop = Math.max(0, top - (list.clientHeight - active.offsetHeight) / 2);
-    }
+    const reveal = () => {
+      // The viewer is hidden on mobile, so the list may have no layout yet. Keep the request until it does.
+      if (list.clientHeight === 0) return false;
+      revealActiveRef.current = false;
+      const top = active.offsetTop;
+      if (top < list.scrollTop || top + active.offsetHeight > list.scrollTop + list.clientHeight) {
+        list.scrollTop = Math.max(0, top - (list.clientHeight - active.offsetHeight) / 2);
+      }
+      return true;
+    };
+    if (reveal() || typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(() => {
+      if (reveal()) observer.disconnect();
+    });
+    observer.observe(list);
+    return () => observer.disconnect();
   }, [fileInfo, openFolders]);
 
   return (
@@ -164,13 +175,7 @@ function FileTree({
                 }
               }}
             >
-              {child.isFile ? (
-                <Icon type="file" />
-              ) : isOpen ? (
-                <Icon type="folderOpen" />
-              ) : (
-                <Icon type="folderClose" />
-              )}
+              {child.isFile ? <Icon type="file" /> : isOpen ? <Icon type="folderOpen" /> : <Icon type="folderClose" />}
               <span className="name">{child.name}</span>
             </button>
             {!child.isFile && isOpen && (
