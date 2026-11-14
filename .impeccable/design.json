@@ -1,0 +1,152 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-14T00:00:00Z",
+  "title": "Design System: Yorkie Homepage",
+  "extensions": {
+    "colorMeta": {
+      "orange-0": {
+        "role": "primary",
+        "displayName": "Yorkie Orange",
+        "canonical": "#fc8539",
+        "tonalRamp": ["oklch(22% 0.06 50)", "oklch(35% 0.10 50)", "oklch(48% 0.14 50)", "oklch(60% 0.17 50)", "#f27b2f", "#fc8539", "#fda36a", "oklch(95% 0.03 50)"]
+      },
+      "orange-dark": { "role": "primary", "displayName": "Yorkie Orange, pressed", "canonical": "#f27b2f" },
+      "orange-light": { "role": "primary", "displayName": "Yorkie Orange, tint", "canonical": "#fda36a" },
+      "yellow-0": {
+        "role": "secondary",
+        "displayName": "Peer Yellow",
+        "canonical": "#fdc433",
+        "tonalRamp": ["oklch(25% 0.05 85)", "oklch(40% 0.09 85)", "oklch(55% 0.12 85)", "oklch(68% 0.15 85)", "#f5b103", "#fdc433", "#fed366", "oklch(96% 0.04 85)"]
+      },
+      "green-0": {
+        "role": "secondary",
+        "displayName": "Peer Green",
+        "canonical": "#23c176",
+        "tonalRamp": ["oklch(20% 0.05 155)", "oklch(32% 0.09 155)", "oklch(45% 0.13 155)", "oklch(56% 0.15 155)", "#10b266", "#23c176", "#5ad198", "oklch(95% 0.04 155)"]
+      },
+      "blue-0": {
+        "role": "secondary",
+        "displayName": "Peer Blue",
+        "canonical": "#3c9af1",
+        "tonalRamp": ["oklch(20% 0.06 250)", "oklch(32% 0.10 250)", "oklch(44% 0.14 250)", "oklch(54% 0.16 250)", "#208aed", "#3c9af1", "#6db4f5", "oklch(95% 0.03 250)"]
+      },
+      "red-0": {
+        "role": "secondary",
+        "displayName": "Peer Red",
+        "canonical": "#f44954",
+        "tonalRamp": ["oklch(20% 0.07 20)", "oklch(32% 0.12 20)", "oklch(44% 0.17 20)", "oklch(54% 0.20 20)", "#e93d47", "#f44954", "#f7777e", "oklch(95% 0.03 20)"]
+      },
+      "purple-0": {
+        "role": "secondary",
+        "displayName": "Peer Purple",
+        "canonical": "#855cf9",
+        "tonalRamp": ["oklch(20% 0.08 290)", "oklch(30% 0.13 290)", "oklch(40% 0.18 290)", "oklch(48% 0.21 290)", "#764af3", "#855cf9", "#a385fb", "oklch(95% 0.03 290)"]
+      },
+      "gray-900": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#332e2b",
+        "tonalRamp": ["#332e2b", "#514c49", "#6e6966", "#807b78", "#a6a19e", "#c2bdba", "#e2dedb", "#f5f3f1"]
+      },
+      "gray-600": { "role": "neutral", "displayName": "Quiet Ink", "canonical": "#807b78" },
+      "gray-400": { "role": "neutral", "displayName": "Hairline", "canonical": "#c2bdba" },
+      "gray-100": { "role": "neutral", "displayName": "Soft Paper", "canonical": "#f5f3f1" },
+      "gray-000": { "role": "neutral", "displayName": "Paper", "canonical": "#fefdfb" }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "The hero headline only." },
+      "headline": { "displayName": "Headline", "purpose": "Section headlines (46px and 38px steps)." },
+      "title": { "displayName": "Title", "purpose": "Card and subsection titles (30px, 24px, 20px steps)." },
+      "body": { "displayName": "Body", "purpose": "Marketing copy and docs prose." },
+      "label": { "displayName": "Label", "purpose": "Buttons, navigation, captions." },
+      "code": { "displayName": "Code", "purpose": "Code samples and inline code." }
+    },
+    "shadows": [
+      { "name": "shadow_xs", "value": "0 8px 4px -8px rgb(0 0 0 / 20%)", "purpose": "Smallest floating layer." },
+      { "name": "shadow_s", "value": "0 8px 8px -8px rgb(0 0 0 / 20%)", "purpose": "Dropdowns." },
+      { "name": "shadow_m", "value": "0 8px 16px -8px rgb(0 0 0 / 20%)", "purpose": "Popovers." },
+      { "name": "shadow_l", "value": "0 20px 24px -12px rgb(0 0 0 / 20%)", "purpose": "Modals." }
+    ],
+    "motion": [
+      { "name": "state", "value": "background-color 0.2s", "purpose": "Button and link state changes." },
+      { "name": "reveal", "value": "all 0.4s ease-out", "purpose": "Expanding cards and accordions." },
+      { "name": "hero-gradient", "value": "10s linear infinite", "purpose": "Cycling peer-hue gradients in the hero." }
+    ],
+    "breakpoints": [
+      { "name": "mobileXS", "value": "359px" },
+      { "name": "mobile", "value": "639px" },
+      { "name": "tablet", "value": "1023px" },
+      { "name": "pc", "value": "1024px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The main call to action, such as Start for free.",
+      "html": "<button class=\"ds-btn ds-btn-primary\">Start for free</button>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; justify-content: center; padding: 8px 16px; font: 14px/22px Pretendard, sans-serif; border: 1px solid transparent; border-radius: 4px; cursor: pointer; transition: background-color 0.2s; } .ds-btn-primary { background: var(--orange-0, #fc8539); color: var(--gray-000, #fefdfb); } .ds-btn-primary:hover { background: var(--orange-dark, #f27b2f); } .ds-btn-primary:focus-visible { outline: 2px solid var(--orange-dark, #f27b2f); outline-offset: 2px; }"
+    },
+    {
+      "name": "Default Button",
+      "kind": "button",
+      "refersTo": "button",
+      "description": "Secondary actions and toolbar controls.",
+      "html": "<button class=\"ds-btn2\">Read documentation</button>",
+      "css": ".ds-btn2 { display: inline-flex; align-items: center; padding: 8px 16px; font: 14px/22px Pretendard, sans-serif; border: 1px solid transparent; border-radius: 4px; background: var(--gray-000, #fefdfb); color: var(--gray-600, #807b78); cursor: pointer; transition: background-color 0.2s; } .ds-btn2:hover { background: var(--gray-100, #f5f3f1); } .ds-btn2:focus-visible { outline: 2px solid var(--gray-600, #807b78); outline-offset: 2px; }"
+    },
+    {
+      "name": "Line Button",
+      "kind": "button",
+      "refersTo": "button",
+      "description": "Outlined hue variant with an alpha tint fill.",
+      "html": "<button class=\"ds-btn-line\">View all examples</button>",
+      "css": ".ds-btn-line { display: inline-flex; align-items: center; padding: 8px 16px; font: 14px/22px Pretendard, sans-serif; border: 1px solid var(--orange-0, #fc8539); border-radius: 4px; background: var(--orange-alpha-light, rgb(253 163 106 / 24%)); color: var(--orange-dark, #f27b2f); cursor: pointer; transition: background-color 0.2s; } .ds-btn-line:hover { background: var(--orange-alpha-0, rgb(252 133 57 / 32%)); } .ds-btn-line:focus-visible { outline: 2px solid var(--orange-dark, #f27b2f); outline-offset: 2px; }"
+    },
+    {
+      "name": "Feature Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Bordered, flat card for a collaboration feature.",
+      "html": "<div class=\"ds-card\"><strong class=\"ds-card-title\">Multi-Cursor</strong><p class=\"ds-card-desc\">Shows the cursor of every user on the same canvas in real time.</p></div>",
+      "css": ".ds-card { padding: 24px; border: 1px solid var(--gray-400, #c2bdba); border-radius: 16px; background: var(--gray-000, #fefdfb); font-family: Pretendard, sans-serif; } .ds-card-title { display: block; margin-bottom: 8px; font-size: 20px; line-height: 28px; color: var(--gray-900, #332e2b); } .ds-card-desc { margin: 0; font-size: 14px; line-height: 22px; color: var(--gray-600, #807b78); }"
+    },
+    {
+      "name": "Code Block",
+      "kind": "custom",
+      "description": "Code sample on a Paper surface with highlighted lines.",
+      "html": "<pre class=\"ds-code\"><code>doc.update((root) =&gt; {\n<span class=\"ds-code-add\">  root.todos.push('buy milk');</span>\n});</code></pre>",
+      "css": ".ds-code { margin: 0; padding: 16px; border: 1px solid var(--gray-400, #c2bdba); border-radius: 4px; background: var(--gray-000, #fefdfb); color: var(--gray-800, #514c49); font: 14px/22px RobotoMono, Consolas, monospace; } .ds-code-add { display: block; background: var(--green-alpha-light, rgb(90 209 152 / 24%)); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Shared Canvas",
+    "overview": "The page is a quiet sheet of warm paper, and the people on it are the color. Neutrals are brown-tinted grays, never pure black or white, so the surface reads as a calm working canvas. Against it, six saturated peer hues (orange, yellow, green, blue, red, purple) stand for the collaborators themselves: cursors, profile stacks, selections, live edits. Color means \"someone is here\", which is exactly what the product makes possible.\n\nOrange is the one hue that also belongs to the brand. It carries the logo, the primary call to action, and emphasis in headlines. The other five hues appear together, as a group of peers, not as individual decoration.\n\nThe system is flat and precise: hairline borders instead of shadows, small 4px corners on controls, generous vertical spacing between sections. It supports light and dark themes by inverting the gray scale. The site must not read as a generic SaaS template; its identity comes from showing real collaboration on the canvas, not from stock hero patterns.",
+    "keyCharacteristics": [
+      "Warm, brown-tinted neutral scale in both themes",
+      "One brand accent (orange); five further peer hues reserved for presence",
+      "Flat surfaces separated by 1px borders",
+      "Pretendard for everything, Roboto Mono for code",
+      "Live examples and code are the primary imagery"
+    ],
+    "rules": [
+      { "name": "The Peers Rule", "body": "The five non-orange hues mean \"a collaborator\". Do not use a single one of them as a decorative accent or a status color on marketing surfaces.", "section": "colors" },
+      { "name": "The Warm Neutral Rule", "body": "No pure #000 or cool grays. Every neutral comes from the --gray-* scale. The only literal white is text on a saturated fill.", "section": "colors" },
+      { "name": "The One Family Rule", "body": "Do not add a second display typeface. Emphasis in a headline is made with weight or the orange accent.", "section": "typography" },
+      { "name": "The Flat Canvas Rule", "body": "Cards and sections at rest have a border and no shadow. Shadows belong to layers that float above the page.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do use var(--gray-*) and var(--{hue}-*) custom properties so light and dark themes both work.",
+      "Do keep orange for brand and primary actions, and show the other hues together as peers.",
+      "Do let live examples, cursors, and real code carry the page.",
+      "Do separate surfaces with 1px borders and spacing from the 8px scale."
+    ],
+    "donts": [
+      "Don't make the site look like a generic SaaS template: no stock purple-blue gradient heroes, no repeated three-card feature rows as the default section pattern, no interchangeable hero with a screenshot under a centered headline.",
+      "Don't add shadows to cards at rest.",
+      "Don't introduce a second display typeface or cool gray neutrals.",
+      "Don't run npm run fetch:ui; it overwrites styles/ from a legacy source."
+    ]
+  }
+}
