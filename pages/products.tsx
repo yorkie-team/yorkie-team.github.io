@@ -177,7 +177,7 @@ const Products: NextPage = () => {
                 <CodeBlock code={PRESENCE_CODE[presenceType]} language="javascript" withLineNumbers />
               </CodeBlock.Wrapper>
               <div className="img_box">
-                <PresenceMotion />
+                <PresenceMotion type={presenceType} />
               </div>
             </div>
           </div>

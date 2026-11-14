@@ -1,0 +1,119 @@
+@use '../base/mixins-lib';
+@use '../base/variables';
+
+// Presence illustration on /products, sitting next to its code block.
+.illust_presence {
+  box-sizing: border-box;
+  width: 336px;
+  max-width: 100%;
+  aspect-ratio: 336 / 280;
+  overflow: hidden;
+  border: 1px solid var(--gray-400);
+  border-radius: 8px;
+  background: var(--gray-000);
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  text {
+    font-size: 12px;
+    white-space: pre;
+    fill: var(--gray-900);
+  }
+
+  .illust_presence_mono {
+    font-family: RobotoMono, Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+    fill: var(--gray-800);
+  }
+
+  .illust_presence_note {
+    fill: var(--gray-700);
+  }
+
+  .illust_presence_label {
+    font-weight: 500;
+    fill: var(--gray-900);
+  }
+
+  .illust_presence_tag {
+    font-weight: 600;
+    fill: var(--gray-900);
+  }
+
+  .illust_presence_key {
+    fill: var(--gray-700);
+  }
+
+  .illust_presence_str,
+  .illust_presence_value {
+    fill: var(--gray-900);
+  }
+
+  .illust_presence_comment {
+    fill: var(--gray-700);
+  }
+
+  // A value that just changed flashes in the brand color, then settles.
+  .illust_presence_tick {
+    font-weight: 600;
+    fill: var(--gray-900);
+    animation: illust_presence_tick 1.1s ease-out;
+  }
+
+  .illust_presence_sync {
+    animation: illust_presence_sync 1.1s ease-out 0.1s;
+  }
+
+  .illust_presence_arrive {
+    opacity: 0;
+    fill: var(--blue-alpha-0);
+    animation: illust_presence_arrive 1.2s ease-out;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .illust_presence_arrive {
+      display: none;
+    }
+
+    .illust_presence_tick,
+    .illust_presence_sync {
+      animation: none;
+    }
+  }
+}
+
+@keyframes illust_presence_tick {
+  0%,
+  35% {
+    fill: var(--blue-dark);
+  }
+
+  100% {
+    fill: var(--gray-900);
+  }
+}
+
+@keyframes illust_presence_sync {
+  0%,
+  40% {
+    stroke: var(--blue-0);
+  }
+
+  100% {
+    stroke: var(--gray-500);
+  }
+}
+
+@keyframes illust_presence_arrive {
+  0%,
+  30% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
