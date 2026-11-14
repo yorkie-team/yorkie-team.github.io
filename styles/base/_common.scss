@@ -126,6 +126,11 @@ a {
   }
 }
 
+// The skip link moves focus to <main>; it is not a control, so it shows no ring.
+main:focus {
+  outline: none;
+}
+
 // Keyboard users jump past the header; visible only while focused.
 .skip_link {
   position: absolute;
