@@ -65,7 +65,7 @@
 
       .text {
         display: block;
-        background: linear-gradient(180deg, #212121 0%, #616161 100%);
+        background: linear-gradient(180deg, var(--gray-900) 0%, var(--gray-700) 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
@@ -334,10 +334,6 @@
       color: var(--gray-800);
       text-align: center;
 
-      @include mixins-lib.tabletStart() {
-        @include mixins-lib.rfonts(14, 22);
-      }
-
       @include mixins-lib.mobileStart() {
         margin-top: variables.$spacing_24;
       }
@@ -347,7 +343,7 @@
   .section {
     max-width: 1368px;
     margin: 0 auto;
-    padding: 240px variables.$spacing_40 0;
+    padding: 160px variables.$spacing_40 0;
     box-sizing: border-box;
 
     @include mixins-lib.tabletStart() {
@@ -357,14 +353,14 @@
     }
 
     @include mixins-lib.mobileStart() {
-      padding: 160px variables.$spacing_16 0;
+      padding: 112px variables.$spacing_16 0;
     }
 
     &:last-child {
-      padding-bottom: 240px;
+      padding-bottom: 160px;
 
       @include mixins-lib.mobileStart() {
-        padding-bottom: 160px;
+        padding-bottom: 112px;
       }
     }
 
@@ -380,14 +376,12 @@
     }
 
     &_desc {
-      margin-top: variables.$spacing_32;
+      max-width: 560px;
+      margin: variables.$spacing_32 auto 0;
       color: var(--gray-800);
       @include mixins-lib.rfonts(16, 24, 500);
       text-align: center;
-
-      @include mixins-lib.tabletStart() {
-        @include mixins-lib.rfonts(14, 22);
-      }
+      text-wrap: balance;
     }
 
     &_content {
@@ -458,7 +452,7 @@
 
     .align_box {
       border: 1px solid var(--gray-400);
-      border-radius: 23px;
+      border-radius: variables.$spacing_16;
 
       @include mixins-lib.tabletStart() {
         border: 0;
