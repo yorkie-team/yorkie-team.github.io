@@ -2,9 +2,6 @@ import { useCallback, useEffect, useId, useState } from 'react';
 import { Icon } from '@/components';
 import UserContent from './UserContent';
 
-// Peer hue for each user number (User 1 is yellow, User 2 green, ...). See DESIGN.md "Peer hues".
-export const UserColors = ['red', 'yellow', 'green', 'orange', 'blue', 'purple'];
-
 const CLIENT_COUNT_WORDS = ['No clients', 'One client', 'Two clients', 'Three clients', 'Four clients'];
 
 const describeClients = (count: number) => {
@@ -46,7 +43,7 @@ export function BasicExampleView({ iframeURL, userMaxCount = 4 }: { iframeURL: s
     setUserList((prev) => (prev.length > 1 ? prev.filter((userNumber) => userNumber !== userId) : prev));
   }, []);
 
-  // Reuse the lowest free user number so each user keeps its label and color.
+  // Reuse the lowest free user number so each user keeps its label.
   const addUser = useCallback(() => {
     setUserList((prev) => {
       if (prev.length >= userMaxCount) return prev;

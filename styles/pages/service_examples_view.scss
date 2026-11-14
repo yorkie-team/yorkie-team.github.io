@@ -1420,12 +1420,6 @@
     border-radius: 8px;
     background: var(--gray-000);
 
-    @each $hue in red, yellow, green, orange, blue, purple {
-      &.peer_#{$hue} {
-        --peer: var(--#{$hue}-0);
-      }
-    }
-
     @include mixins-lib.mobileStart() {
       height: min(72vh, 600px);
 
@@ -1446,18 +1440,8 @@
     }
 
     &_user {
-      display: inline-flex;
-      align-items: center;
-      gap: variables.$spacing_8;
       @include mixins-lib.rfonts(12, 16, 600);
       color: var(--gray-800);
-    }
-
-    &_dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: var(--peer, var(--gray-500));
     }
 
     &_body {

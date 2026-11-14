@@ -1,6 +1,5 @@
 import React from 'react';
 import { Icon } from '@/components';
-import { UserColors } from './BasicExampleView';
 
 function UserContent({
   userNumber,
@@ -14,13 +13,12 @@ function UserContent({
   onRemove: (userNumber: number) => void;
 }) {
   const label = `User ${userNumber}`;
+  // The label stays neutral on purpose: each app picks its own color for this client, so a peer hue here
+  // would name a color the app does not show (see DESIGN.md "The Peers Rule").
   return (
-    <li className={`preview_pane peer_${UserColors[userNumber % UserColors.length]}`}>
+    <li className="preview_pane">
       <div className="preview_pane_top">
-        <span className="preview_pane_user">
-          <span className="preview_pane_dot" aria-hidden="true" />
-          {label}
-        </span>
+        <span className="preview_pane_user">{label}</span>
         <button
           type="button"
           className="btn_remove"
