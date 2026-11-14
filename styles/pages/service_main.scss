@@ -330,27 +330,8 @@
       justify-content: center;
       margin-top: variables.$spacing_32;
 
-      &.draw {
-        padding: 0 60px;
-
-        @include mixins-lib.tabletStart() {
-          padding: 0;
-        }
-      }
-
-      .draw_box {
-        width: 640px;
-        height: 374px;
-        border-radius: 20px;
-        background-color: pink;
-
-        @include mixins-lib.tabletStart() {
-          display: none;
-        }
-
-        & + .draw_box {
-          margin-left: variables.$spacing_16;
-        }
+      @include mixins-lib.tabletStart() {
+        flex-wrap: wrap;
       }
     }
 
@@ -519,8 +500,10 @@
     margin-right: 36px;
 
     @include mixins-lib.tabletStart() {
+      width: 100%;
       margin-right: 0;
       padding: 0 74px;
+      box-sizing: border-box;
     }
 
     @include mixins-lib.mobileStart() {
@@ -536,28 +519,63 @@
     }
   }
 
-  .grid {
-    &_list {
-      display: none;
+  // Featured examples: two wide thumbnails on desktop and tablet, one column on mobile.
+  .grid_list {
+    gap: variables.$spacing_16;
+    width: 100%;
+    max-width: 1000px;
+    margin-left: 0;
 
-      @include mixins-lib.tabletStart() {
-        display: flex;
+    @include mixins-lib.tabletStart() {
+      max-width: none;
+      padding: 0 74px;
+      box-sizing: border-box;
+    }
+
+    @include mixins-lib.mobileStart() {
+      padding: 0;
+    }
+
+    .grid_item {
+      flex-basis: calc(50% - 8px);
+      min-width: 0;
+      margin: 0;
+
+      @include mixins-lib.mobileStart() {
+        flex-basis: 100%;
       }
     }
 
-    &_item {
-      @include mixins-lib.tabletStart() {
-        margin-bottom: 0;
+    .grid_card {
+      height: 100%;
+    }
+
+    // Source thumbnails differ slightly in ratio; crop them to one frame.
+    .grid_thumbnail {
+      aspect-ratio: 16 / 10;
+
+      img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: top left;
+      }
+    }
+
+    .grid_card_info {
+      padding: variables.$spacing_16 20px 20px;
+
+      .title {
+        @include mixins-lib.rfonts(20, 28, 600);
       }
 
-      @include mixins-lib.tabletStart() {
-        margin-bottom: variables.$spacing_32;
-      }
-
-      &:last-child {
-        @include mixins-lib.tabletStart() {
-          margin-bottom: 0;
-        }
+      .desc {
+        display: block;
+        min-height: 0;
+        @include mixins-lib.rfonts(14, 22, 400);
+        word-break: normal;
+        -webkit-line-clamp: initial;
       }
     }
   }
@@ -605,8 +623,17 @@
     width: 854px;
     height: 513px;
 
+    // Below the desktop breakpoint the code sits under the cards at full width.
     @include mixins-lib.tabletStart() {
-      display: none;
+      width: 100%;
+      height: auto;
+      margin-top: variables.$spacing_24;
+      padding: 0 74px;
+      box-sizing: border-box;
+    }
+
+    @include mixins-lib.mobileStart() {
+      padding: 0;
     }
 
     .btn_item {
@@ -629,6 +656,10 @@
       height: 100%;
       border-radius: 0 0 variables.$spacing_16 variables.$spacing_16;
       border-top: 0;
+
+      @include mixins-lib.tabletStart() {
+        height: 360px;
+      }
 
       &_header {
         padding: variables.$spacing_16;
