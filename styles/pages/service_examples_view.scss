@@ -1568,3 +1568,56 @@
     }
   }
 }
+
+// Recorded preview of a mobile example (VideoPlayer): the iOS and Android examples cannot run in
+// the page, so a screen recording stands in for the live preview. Media sits at the top of the
+// pane, as in the web live preview, framed by a hairline instead of a shadow.
+.examples_view_page .video_preview_view {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - variables.$spacing_64);
+  max-height: none;
+  padding: 0;
+  overflow: hidden;
+
+  .video_preview_media {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: flex-start;
+    justify-content: center;
+    min-height: 0;
+    padding: variables.$spacing_24;
+  }
+
+  .video_preview_video {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    border: 1px solid var(--gray-300);
+    border-radius: 8px;
+    background-color: var(--gray-100);
+  }
+
+  .video_preview_fallback {
+    @include mixins-lib.rfonts(14, 22, 500);
+    color: var(--gray-800);
+  }
+
+  @include mixins-lib.mobileStart() {
+    height: auto;
+    overflow: visible;
+    border-top: 1px solid var(--gray-400);
+
+    .video_preview_media {
+      padding: 0 variables.$spacing_16 variables.$spacing_24;
+    }
+
+    .video_preview_video {
+      width: 100%;
+      max-height: 80vh;
+      object-fit: contain;
+    }
+  }
+}
