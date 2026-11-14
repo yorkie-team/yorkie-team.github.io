@@ -35,12 +35,6 @@ html {
       }
 
       &_group {
-        &:hover {
-          & > #{$nav}_item {
-            color: var(--gray-900);
-          }
-        }
-
         #{$nav}_list {
           display: none;
           padding-right: 0;
@@ -175,9 +169,14 @@ html {
       color: var(--gray-700);
       word-break: break-all;
 
+      // An underline marks the current section: a weight change would re-wrap entries while scrolling,
+      // and the two grays are nearly identical on the dark theme.
       &.is_active {
         color: var(--gray-900);
-        font-weight: 600;
+        text-decoration: underline;
+        text-decoration-color: var(--orange-0);
+        text-decoration-thickness: 2px;
+        text-underline-offset: 3px;
       }
 
       .toc-item {
@@ -594,7 +593,7 @@ html {
     blockquote {
       margin: 0;
       padding: variables.$spacing_16 variables.$spacing_24;
-      background-color: var(--gray-050);
+      background-color: var(--gray-50);
       border-left: 4px solid var(--orange-dark);
       @include mixins-lib.rfonts(14, 22);
       color: var(--gray-800);
@@ -605,7 +604,7 @@ html {
         text-decoration-color: var(--orange-0);
 
         &:hover {
-          color: var(--orange-darker);
+          text-decoration-thickness: 2px;
         }
       }
     }
