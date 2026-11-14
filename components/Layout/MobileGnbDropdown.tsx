@@ -19,19 +19,6 @@ export function MobileGnbDropdown({ isLoggedIn }: { isLoggedIn: boolean }) {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  useEffect(() => {
-    if (!gnbOpened) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key !== 'Escape') return;
-      setGnbOpened(false);
-      // Popover owns the button's ref, so look the button up to return focus to it.
-      document.querySelector<HTMLButtonElement>('.header_service .btn_menu')?.focus();
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [gnbOpened]);
-
   return (
     <Popover opened={gnbOpened} onChange={setGnbOpened}>
       <Popover.Target>
