@@ -4,7 +4,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 import classNames from 'classnames';
 import { Button, Icon, Layout, CodeBlock, CodeBlockHeader } from '@/components';
-import { StateSharingDetailMotion, FlexibleDocumentMotion, PresenceMotion } from '@/components/motions';
+import { StateSharingDetailMotion, FlexibleDocumentMotion, PresenceMotion, ChannelMotion } from '@/components/motions';
 import ProductBannerSVG from '@/public/assets/images/banner/img_product_banner.svg';
 import ProductPCSVG from '@/public/assets/images/banner/img_product_pc.svg';
 import ProductMobileSVG from '@/public/assets/images/banner/img_product_mobile.svg';
@@ -193,36 +193,41 @@ const Products: NextPage = () => {
               users, broadcasting messages, and handling ephemeral real-time data like chat messages or live
               notifications.
             </p>
-            <CodeBlock.Wrapper>
-              <CodeBlockHeader>
-                <CodeBlockHeader.LeftBox>
-                  <button
-                    type="button"
-                    className={classNames('btn_item', { is_active: channelType === 'presence' })}
-                    aria-pressed={channelType === 'presence'}
-                    onClick={() => {
-                      setChannelType('presence');
-                    }}
-                  >
-                    Presence
-                  </button>
-                  <button
-                    type="button"
-                    className={classNames('btn_item', { is_active: channelType === 'broadcast' })}
-                    aria-pressed={channelType === 'broadcast'}
-                    onClick={() => {
-                      setChannelType('broadcast');
-                    }}
-                  >
-                    Broadcast
-                  </button>
-                </CodeBlockHeader.LeftBox>
-                <CodeBlockHeader.RightBox>
-                  <CodeBlockHeader.CopyButton value={CHANNEL_CODE[channelType]} />
-                </CodeBlockHeader.RightBox>
-              </CodeBlockHeader>
-              <CodeBlock code={CHANNEL_CODE[channelType]} language="javascript" withLineNumbers />
-            </CodeBlock.Wrapper>
+            <div className="db_content">
+              <CodeBlock.Wrapper>
+                <CodeBlockHeader>
+                  <CodeBlockHeader.LeftBox>
+                    <button
+                      type="button"
+                      className={classNames('btn_item', { is_active: channelType === 'presence' })}
+                      aria-pressed={channelType === 'presence'}
+                      onClick={() => {
+                        setChannelType('presence');
+                      }}
+                    >
+                      Presence
+                    </button>
+                    <button
+                      type="button"
+                      className={classNames('btn_item', { is_active: channelType === 'broadcast' })}
+                      aria-pressed={channelType === 'broadcast'}
+                      onClick={() => {
+                        setChannelType('broadcast');
+                      }}
+                    >
+                      Broadcast
+                    </button>
+                  </CodeBlockHeader.LeftBox>
+                  <CodeBlockHeader.RightBox>
+                    <CodeBlockHeader.CopyButton value={CHANNEL_CODE[channelType]} />
+                  </CodeBlockHeader.RightBox>
+                </CodeBlockHeader>
+                <CodeBlock code={CHANNEL_CODE[channelType]} language="javascript" withLineNumbers />
+              </CodeBlock.Wrapper>
+              <div className="img_box">
+                <ChannelMotion type={channelType} />
+              </div>
+            </div>
           </div>
           <div className="section_content">
             <strong className="sub_title" id="more-features">
