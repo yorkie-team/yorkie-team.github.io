@@ -59,7 +59,7 @@ export const EXAMPLES: Example[] = [
   {
     id: 'kanban',
     title: 'Kanban Board',
-    desc: 'A Vue board whose lists and cards are Yorkie Arrays. Add, move and delete cards together in real time.',
+    desc: 'A Vue board whose lists and cards are Yorkie Arrays. Add and delete lists and cards together in real time.',
     thumbnail: 'vuejs-kanban.jpg',
     platform: 'web',
     thumbnailLayout: { position: 'left top' },

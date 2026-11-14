@@ -40,8 +40,8 @@ const KanbanExampleView: NextPage = () => {
                   <a href="https://vuejs.org" className="link" target="_blank" rel="noreferrer">
                     Vue
                   </a>{' '}
-                  board whose lists and cards are Yorkie Arrays. Add, move and delete cards in one pane and watch the
-                  same Array operations arrive in the other.
+                  board whose lists and cards are Yorkie Arrays. Add and delete cards in one pane and watch the same
+                  Array operations arrive in the other.
                 </Sidebar.GuideDescription>
                 <ProjectCodes files={FILE_INFO} activeFile="/src/App.vue" ignoreFiles={COMMON_IGNORE_FILES} />
               </Sidebar.TabsPanel>
