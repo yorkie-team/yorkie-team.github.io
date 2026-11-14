@@ -101,7 +101,10 @@ const STEPS = ['Alice and York edit at the same time', 'Changes sync through the
 export const StateSharingDetailMotion = () => {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { amount: 0.4 });
-  const reduceMotion = useReducedMotion();
+  // Read the preference only after hydration so the server and first client render match.
+  const prefersReducedMotion = useReducedMotion();
+  const [reduceMotion, setReduceMotion] = useState(false);
+  useEffect(() => setReduceMotion(!!prefersReducedMotion), [prefersReducedMotion]);
   const [step, setStep] = useState(0);
 
   useEffect(() => {
