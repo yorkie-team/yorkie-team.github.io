@@ -274,6 +274,20 @@ and cursors only. Borders are 1px solid.
   and yellow. Code samples are primary content on this site and
   get as much care as imagery.
 
+### Shared Document Hero
+
+- The landing hero is an app window (16px radius, 1px `gray-400` border, a
+  56px title bar with three peer avatars) whose body is a dotted document
+  holding the headline, pitch, and actions.
+- Three scripted collaborators arrive once, in sequence: one drags a dashed
+  selection across the orange word, one leaves a text caret at the end of the
+  headline, and one points at the primary button. Each has a name tag in its
+  peer color. The sequence does not loop, and under reduced motion everything
+  rests in its final place.
+- Peers use dark steps of blue, purple, and green with white tags on the
+  light theme, and light steps with dark tags on the dark theme. The colors
+  are scoped to the hero in `styles/pages/service_main_hero.scss`.
+
 ## Do's and Don'ts
 
 ### Do:
