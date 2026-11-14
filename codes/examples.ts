@@ -42,7 +42,7 @@ export const EXAMPLES: Example[] = [
   {
     id: 'simultaneous-cursors',
     title: 'Simultaneous Cursors',
-    desc: 'Live cursors driven by Presence, with reactions and an ephemeral pen trail, built with Yorkie React.',
+    desc: 'Live cursors and reactions through Presence, and a shared pen whose ink is saved to the Document, built with Yorkie React.',
     thumbnail: 'simultaneous-cursors.jpg',
     platform: 'web',
     category: [CATEGORIES.PRESENCE, CATEGORIES.REACT],
