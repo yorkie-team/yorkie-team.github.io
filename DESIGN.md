@@ -192,9 +192,10 @@ from size and weight, not from font contrast. Code is the second voice.
 
 The scale is fixed in `styles/base/_font.scss`:
 
-- **Hero** (96px / 108px, weight 800; scales down to 76px in narrow
-  two-column windows, 64px on tablet, 40px on mobile): the landing hero
-  headline only.
+- **Hero** (96px / 108px, weight 800): the landing hero headline only. It
+  scales down to 76px in narrow two-column windows and steps to 80px when
+  stacked on a small laptop, 64px on tablet, 40px on mobile, and 36px below
+  360px.
 - **Display** (56px / 64px): page titles on the other pages.
 - **Headline** (46px / 54px and 38px / 46px): section headlines.
 - **Title** (30px / 38px, 24px / 32px, 20px / 28px): card and subsection

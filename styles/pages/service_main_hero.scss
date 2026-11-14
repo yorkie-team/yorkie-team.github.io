@@ -184,6 +184,9 @@
         right: variables.$spacing_8;
         bottom: 100%;
         margin: 0;
+        // Hanging left, the tag would be cut by the window while the pointer waits at the word's left edge,
+        // so it appears once the drag is nearly done.
+        animation: hero-fade-in 0.3s ease-out 1.8s both;
       }
     }
   }
@@ -372,7 +375,8 @@
     .hero_peer,
     .peer_selection,
     .peer_cursor,
-    .peer_caret {
+    .peer_caret,
+    .peer_tag {
       animation: none !important;
     }
   }
