@@ -35,7 +35,7 @@ type Example = {
   thumbnail: string;
   category: CategoryType[];
 };
-const EXAMPLES: Example[] = [
+export const EXAMPLES: Example[] = [
   {
     id: 'profile-stack',
     title: 'Profile Stack',

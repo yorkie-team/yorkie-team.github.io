@@ -2,7 +2,10 @@ import { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import type { NextPage } from 'next';
 import Head from 'next/head';
+import Link from 'next/link';
 import { Layout, Button, Icon, CodeBlock, CodeBlockHeader, Accordion } from '@/components';
+import { ExampleThumbnailImage } from '@/components/exampleView';
+import { EXAMPLES } from '@/pages/examples';
 import { ChartMotion, StateSharingMotion, ServerMotion, MainBannerMotion } from '@/components/motions';
 import UserGroupSVG from '@/public/assets/icons/icon_service_main_users_group.svg';
 import CollaboProfileSVG from '@/public/assets/icons/icon_collaborate_profile.svg';
@@ -12,6 +15,8 @@ import CollaboEditingSVG from '@/public/assets/icons/icon_collaborate_editing.sv
 import { FEATURES_CODE } from '@/codes/features';
 
 type FeatureType = keyof typeof FEATURES_CODE;
+const FEATURED_EXAMPLE_IDS = ['simultaneous-cursors', 'codemirror'];
+const FEATURED_EXAMPLES = EXAMPLES.filter(({ id }) => FEATURED_EXAMPLE_IDS.includes(id));
 const Home: NextPage = () => {
   const [bannerActive, setBannerActive] = useState(false);
   const [activeFeatureCard, setActiveFeatureCard] = useState<FeatureType>('profile');
@@ -164,45 +169,41 @@ const Home: NextPage = () => {
                   </span>
                 </button>
               </li>
-              {process.env.NODE_ENV === 'development' && (
-                <>
-                  <li className={classNames('service_card_item', { is_active: activeFeatureCard === 'selection' })}>
-                    <button
-                  type="button"
-                  className="service_card_menu"
-                  data-item="selection"
-                  aria-pressed={activeFeatureCard === 'selection'}
-                >
-                      <span className="img_box">
-                        <CollaboSelectionSVG />
-                      </span>
-                      <strong className="service_card_title">Live Selection</strong>
-                      <span className="service_card_desc">
-                        Live Selection displays the object selected by each user who accesses the same canvas. Users can
-                        see what each other is doing in real-time.
-                      </span>
-                    </button>
-                  </li>
-                  <li className={classNames('service_card_item', { is_active: activeFeatureCard === 'editing' })}>
-                    <button
-                  type="button"
-                  className="service_card_menu"
-                  data-item="editing"
-                  aria-pressed={activeFeatureCard === 'editing'}
-                >
-                      <span className="img_box">
-                        <CollaboEditingSVG />
-                      </span>
-                      <strong className="service_card_title">Multiplayer Editing</strong>
-                      <span className="service_card_desc">
-                        Interact in real-time with the presence of others and edit material together. Any real-time
-                        interaction, such as texting, drawing, commenting, or expressing emotion, could be shared with
-                        Yorkie.
-                      </span>
-                    </button>
-                  </li>
-                </>
-              )}
+              <li className={classNames('service_card_item', { is_active: activeFeatureCard === 'selection' })}>
+                <button
+              type="button"
+              className="service_card_menu"
+              data-item="selection"
+              aria-pressed={activeFeatureCard === 'selection'}
+            >
+                  <span className="img_box">
+                    <CollaboSelectionSVG />
+                  </span>
+                  <strong className="service_card_title">Live Selection</strong>
+                  <span className="service_card_desc">
+                    Live Selection displays the object selected by each user who accesses the same canvas. Users can
+                    see what each other is doing in real-time.
+                  </span>
+                </button>
+              </li>
+              <li className={classNames('service_card_item', { is_active: activeFeatureCard === 'editing' })}>
+                <button
+              type="button"
+              className="service_card_menu"
+              data-item="editing"
+              aria-pressed={activeFeatureCard === 'editing'}
+            >
+                  <span className="img_box">
+                    <CollaboEditingSVG />
+                  </span>
+                  <strong className="service_card_title">Multiplayer Editing</strong>
+                  <span className="service_card_desc">
+                    Interact in real-time with the presence of others and edit material together. Any real-time
+                    interaction, such as texting, drawing, commenting, or expressing emotion, could be shared with
+                    Yorkie.
+                  </span>
+                </button>
+              </li>
             </ul>
             <CodeBlock.Wrapper>
               <CodeBlockHeader>
@@ -236,25 +237,38 @@ const Home: NextPage = () => {
             </CodeBlock.Wrapper>
           </div>
         </section>
-        {process.env.NODE_ENV === 'development' && (
-          <section className="section">
-            <h2 className="section_title">
-              What experiences <br />
-              can you create
-              <br className="br_mo_xs" /> with Yorkie?
-            </h2>
-            <p className="section_desc">Test our examples to add diverse collaborative features to your product.</p>
-            <div className="section_content draw">
-              <div className="draw_box"></div>
-              <div className="draw_box"></div>
-            </div>
-            <Button.Box>
-              <Button as="link" href="/examples" className="orange_0" icon={<Icon type="bulb" />}>
-                View all examples
-              </Button>
-            </Button.Box>
-          </section>
-        )}
+        <section className="section">
+          <h2 className="section_title">
+            What experiences <br />
+            can you create
+            <br className="br_mo_xs" /> with Yorkie?
+          </h2>
+          <p className="section_desc">
+            Open an example in two tabs and watch the changes sync. Each one comes with its source code.
+          </p>
+          <div className="section_content">
+            <ul className="grid_list">
+              {FEATURED_EXAMPLES.map(({ id, title, desc, thumbnail }) => (
+                <li key={id} className="grid_item">
+                  <Link href={`/examples/${id}`} className="grid_card">
+                    <div className="grid_thumbnail">
+                      <ExampleThumbnailImage fileName={thumbnail} alt="" />
+                    </div>
+                    <div className="grid_card_info">
+                      <strong className="title">{title}</strong>
+                      <p className="desc">{desc}</p>
+                    </div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <Button.Box>
+            <Button as="link" href="/examples" className="orange_0" icon={<Icon type="bulb" />}>
+              View all examples
+            </Button>
+          </Button.Box>
+        </section>
         <section className="section">
           <h2 className="section_title">
             Stable.
