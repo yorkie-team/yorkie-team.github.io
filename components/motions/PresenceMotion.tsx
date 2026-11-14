@@ -25,8 +25,11 @@ export const PresenceMotion = () => {
     <div
       style={{
         position: 'relative',
-        width: '336px',
-        height: '280px',
+        // Same outer size as before (336x280 plus the border), but able to shrink on narrow screens.
+        boxSizing: 'border-box',
+        width: '338px',
+        maxWidth: '100%',
+        aspectRatio: '338 / 282',
         display: 'flex',
         border: '1px solid #C2BDBA',
         borderRadius: '3px',
