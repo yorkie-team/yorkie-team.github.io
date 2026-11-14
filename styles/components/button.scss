@@ -106,7 +106,7 @@ $line: '.btn_line';
         ($name == 'gray50') or
         ($name == 'white')
     ) {
-      color: var(--gray-600);
+      color: var(--gray-700);
     }
   }
 
@@ -238,7 +238,7 @@ $line: '.btn_line';
   border: 1px solid transparent;
   border-radius: 4px;
   background-color: var(--gray-000);
-  color: var(--gray-600);
+  color: var(--gray-700);
   vertical-align: top;
   cursor: pointer;
   transition: background-color 0.2s;
