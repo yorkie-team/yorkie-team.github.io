@@ -1,0 +1,346 @@
+@use '../base/mixins-lib';
+@use '../base/variables';
+
+// Self-hosted architecture diagram on /products (components/illustrations/ArchitectureDiagram.tsx).
+.illust_architecture {
+  overflow: hidden;
+  border: 1px solid var(--gray-300);
+  border-radius: 16px;
+  background: var(--gray-50);
+
+  // `div` raises specificity above `.product_page .img_box svg` in service_product.scss.
+  @at-root div#{&} svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  @at-root div#{&} svg.ia_wide {
+    padding: 8px 0;
+  }
+
+  @at-root div#{&} svg.ia_stack {
+    display: none;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 12px 0;
+  }
+
+  @include mixins-lib.tabletStart() {
+    @at-root div#{&} svg.ia_wide {
+      display: none;
+    }
+
+    @at-root div#{&} svg.ia_stack {
+      display: block;
+    }
+  }
+
+  // Surfaces
+  .ia_card,
+  .ia_node {
+    fill: var(--gray-000);
+    stroke: var(--gray-400);
+    stroke-width: 1;
+  }
+
+  .ia_server {
+    fill: var(--gray-000);
+    stroke: var(--orange-0);
+    stroke-width: 1.5;
+  }
+
+  .ia_project {
+    fill: var(--gray-100);
+  }
+
+  .ia_db {
+    fill: var(--gray-000);
+    stroke: var(--gray-500);
+    stroke-width: 1.5;
+  }
+
+  .ia_tag {
+    fill: var(--gray-100);
+    stroke: var(--gray-400);
+  }
+
+  .ia_boundary {
+    fill: none;
+    stroke: var(--gray-500);
+    stroke-width: 1;
+    stroke-dasharray: 6 5;
+  }
+
+  .ia_rule {
+    stroke: var(--gray-300);
+    stroke-width: 1;
+  }
+
+  .ia_brand {
+    fill: var(--orange-0);
+  }
+
+  // Peer hues: one per client
+  @each $hue in 'blue', 'green', 'purple' {
+    .ia_bar.ia_hue_#{$hue} {
+      fill: var(--#{$hue}-alpha-light);
+    }
+
+    .ia_avatar.ia_hue_#{$hue},
+    .ia_dot.ia_hue_#{$hue} {
+      fill: var(--#{$hue}-0);
+    }
+  }
+
+  .ia_avatar {
+    stroke: var(--gray-000);
+    stroke-width: 1.5;
+  }
+
+  // Arrows
+  .ia_arrow {
+    polyline {
+      fill: none;
+      stroke: var(--gray-600);
+      stroke-width: 1.5;
+    }
+
+    path {
+      fill: var(--gray-600);
+    }
+  }
+
+  // Text
+  text {
+    fill: var(--gray-800);
+    font-size: 13px;
+  }
+
+  .ia_zone {
+    fill: var(--gray-900);
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .ia_title {
+    fill: var(--gray-900);
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .ia_text {
+    font-size: 13px;
+  }
+
+  .ia_small {
+    font-size: 12px;
+  }
+
+  .ia_label {
+    fill: var(--gray-800);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .ia_strong {
+    fill: var(--gray-900);
+    font-weight: 600;
+  }
+
+  .ia_muted {
+    fill: var(--gray-700);
+    font-weight: 400;
+  }
+
+  .ia_code {
+    white-space: pre;
+    fill: var(--gray-800);
+    font-family: RobotoMono, Consolas, Monaco, monospace;
+    font-size: 13px;
+  }
+
+  .ia_code.ia_small {
+    font-size: 12px;
+  }
+
+  // Change flow: Alice's change goes up to the Server, then on to the database and
+  // the other replicas. Dots stay hidden unless the diagram is on screen.
+  .ia_dot {
+    opacity: 0;
+    animation: 6s cubic-bezier(0.22, 1, 0.36, 1) infinite paused;
+  }
+
+  &.is_playing .ia_dot {
+    animation-play-state: running;
+  }
+
+  .ia_w_up {
+    animation-name: ia-w-up;
+  }
+
+  .ia_w_db {
+    animation-name: ia-w-db;
+  }
+
+  .ia_w_down {
+    animation-name: ia-w-down;
+  }
+
+  .ia_s_up {
+    animation-name: ia-s-up;
+  }
+
+  .ia_s_db {
+    animation-name: ia-s-db;
+  }
+
+  .ia_s_down {
+    animation-name: ia-s-down;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ia_dot {
+      display: none;
+      animation: none;
+    }
+  }
+}
+
+// Wide layout: client edge -> server is 144 units, server -> database is 112.
+@keyframes ia-w-up {
+  0% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+
+  4% {
+    opacity: 1;
+  }
+
+  24% {
+    opacity: 1;
+    transform: translateX(136px);
+  }
+
+  28%,
+  100% {
+    opacity: 0;
+    transform: translateX(136px);
+  }
+}
+
+@keyframes ia-w-db {
+  0%,
+  30% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+
+  33% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 1;
+    transform: translateX(104px);
+  }
+
+  54%,
+  100% {
+    opacity: 0;
+    transform: translateX(104px);
+  }
+}
+
+@keyframes ia-w-down {
+  0%,
+  30% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+
+  33% {
+    opacity: 1;
+  }
+
+  52% {
+    opacity: 1;
+    transform: translateX(-136px);
+  }
+
+  56%,
+  100% {
+    opacity: 0;
+    transform: translateX(-136px);
+  }
+}
+
+// Stacked layout: clients -> server is 64 units, server -> database is 68.
+@keyframes ia-s-up {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+
+  4% {
+    opacity: 1;
+  }
+
+  24% {
+    opacity: 1;
+    transform: translateY(56px);
+  }
+
+  28%,
+  100% {
+    opacity: 0;
+    transform: translateY(56px);
+  }
+}
+
+@keyframes ia-s-db {
+  0%,
+  30% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+
+  33% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 1;
+    transform: translateY(60px);
+  }
+
+  54%,
+  100% {
+    opacity: 0;
+    transform: translateY(60px);
+  }
+}
+
+@keyframes ia-s-down {
+  0%,
+  30% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+
+  33% {
+    opacity: 1;
+  }
+
+  52% {
+    opacity: 1;
+    transform: translateY(-56px);
+  }
+
+  56%,
+  100% {
+    opacity: 0;
+    transform: translateY(-56px);
+  }
+}

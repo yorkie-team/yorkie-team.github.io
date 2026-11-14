@@ -5,9 +5,8 @@ import Link from 'next/link';
 import classNames from 'classnames';
 import { Button, Icon, Layout, CodeBlock, CodeBlockHeader } from '@/components';
 import { StateSharingDetailMotion, FlexibleDocumentMotion, PresenceMotion, ChannelMotion } from '@/components/motions';
-import { DashboardShowcase } from '@/components/illustrations';
+import { ArchitectureDiagram, DashboardShowcase } from '@/components/illustrations';
 import ProductBannerSVG from '@/public/assets/images/banner/img_product_banner.svg';
-import ProductPackageSVG from '@/public/assets/images/banner/img_product_package.svg';
 import { DOCUMENT_CODE, PRESENCE_CODE, CHANNEL_CODE } from '@/codes/document';
 
 const Products: NextPage = () => {
@@ -331,7 +330,7 @@ const Products: NextPage = () => {
               co-editing feature.
             </p>
             <div className="img_box">
-              <ProductPackageSVG />
+              <ArchitectureDiagram />
             </div>
           </div>
         </section>
