@@ -152,7 +152,6 @@
       word-break: keep-all;
 
       @include mixins-lib.tabletStart() {
-        @include mixins-lib.rfonts(14, 22px);
         text-align: left;
       }
     }

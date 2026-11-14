@@ -74,12 +74,13 @@ const Home: NextPage = () => {
                 <Icon type="star" />
                 <span className="text">Start for free</span>
               </a>
-              <Button as="link" href="/docs/getting-started" outline className="btn_docs" icon={<Icon type="book" />}>
+              <Button as="link" href="/docs" outline className="btn_docs" icon={<Icon type="book" />}>
                 Read the docs
               </Button>
             </Button.Box>
             <p className="desc">
-              Unlock the full potential of real-time collaboration with open-source SDKs and API package.
+              Open-source SDKs, a server, and a dashboard for building real-time collaborative apps. Use the managed
+              cloud service or host it yourself.
             </p>
             <a
               href="https://github.com/yorkie-team/yorkie"
@@ -107,15 +108,12 @@ const Home: NextPage = () => {
                 <span className="point">collaborative</span> in a flash!
               </strong>
               <p className="section_desc">
-                Easily add collaboration to your apps with our API-based services. <br /> Sign up now and start building
-                powerful, high-performance collaborative features in no time.
+                Yorkie handles synchronization, conflict resolution, and persistence, so you can focus on your
+                product&apos;s features.
               </p>
               <Button.Box>
                 <Button as="link" href="/docs/getting-started" className="orange_0" icon={<Icon type="book" />}>
                   Getting Started
-                </Button>
-                <Button as="link" href="/docs" outline icon={<Icon type="book" />}>
-                  Read documentation
                 </Button>
               </Button.Box>
             </div>
@@ -126,12 +124,7 @@ const Home: NextPage = () => {
             Variety of <br className="br_mo" /> collaboration features <br /> for your app
           </h2>
           <p className="section_desc">
-            Easily add stable and diverse collaborative features <br className="br_mo" />
-            to your product with Yorkie. <br />
-            Transform your local-based product into a <br className="br_mo" /> collaborative online experience with our
-            powerful tools. <br />
-            Sign up now and start providing your users <br className="br_mo" /> with a completely new real-time
-            experience.
+            Start from a working pattern. Each feature below comes with the code that builds it.
           </p>
           <div className="section_content">
             <ul
@@ -196,7 +189,7 @@ const Home: NextPage = () => {
                   <strong className="service_card_title">Live Selection</strong>
                   <span className="service_card_desc">
                     Live Selection shows what each user has selected, such as a range of text or an object on a
-                    canvas, so everyone can see what the others are working on in real-time.
+                    canvas, so everyone can see what the others are working on in real time.
                   </span>
                 </button>
               </li>
@@ -300,10 +293,9 @@ const Home: NextPage = () => {
                 <div className="text_box">
                   <strong className="title">Document and Presence</strong>
                   <p className="desc">
-                    Document is stored using conflict-free replicated data types(CRDTs), which ensures that multiple
-                    users can edit the same data concurrently without encountering conflicts. Presence represents a
-                    peer&apos;s awareness of the data being edited. It is used to track which users are currently
-                    editing the document.
+                    Documents are stored as conflict-free replicated data types (CRDTs), so multiple users can edit
+                    the same data at the same time without conflicts. Presence shares each user&apos;s state, such as
+                    their cursor position and selection, so you can show who is online.
                   </p>
                   <Button
                     as="link"
@@ -320,11 +312,10 @@ const Home: NextPage = () => {
                   <ChartMotion />
                 </div>
                 <div className="text_box">
-                  <strong className="title">Data Warehouse with Dashboard</strong>
+                  <strong className="title">Document Management with Dashboard</strong>
                   <p className="desc">
-                    Dashboard allows users to easily browse stored documents and monitor the data warehouse in
-                    real-time. With Dashboard, users can quickly and easily supervise the data warehouse and ensure that
-                    it is functioning properly.
+                    Dashboard lets project members browse the documents stored in a project and monitor them in real
+                    time.
                   </p>
                   <Button as="link" href="/products#dashboard" className="gray800" icon={<Icon type="book" />}>
                     Learn more about Dashboard
@@ -338,9 +329,8 @@ const Home: NextPage = () => {
                 <div className="text_box">
                   <strong className="title">Cloud or Self-Hosted Server</strong>
                   <p className="desc">
-                    Yorkie offers flexible deployment options, allowing user to use a cloud or host the server on your
-                    own premises. Whether you want the convenience of cloud or the control of a self-hosted server,
-                    Yorkie has you covered.
+                    Start on the managed cloud service without setting up any infrastructure, or run the open-source
+                    server on your own machines when you need control over your data.
                   </p>
                   <Button as="link" href="/products#self-hosted-server" className="gray800" icon={<Icon type="book" />}>
                     Learn more about Self-Hosted Server
@@ -357,7 +347,7 @@ const Home: NextPage = () => {
               <Accordion.Item value="faq1">
                 <Accordion.Control>
                   <Icon type="messageSquare" />
-                  Can we use the Yorkie for free?
+                  Can I use Yorkie for free?
                 </Accordion.Control>
                 <Accordion.Panel>
                   Yes, Yorkie is free to use. <br />
@@ -370,7 +360,7 @@ const Home: NextPage = () => {
               <Accordion.Item value="faq2">
                 <Accordion.Control>
                   <Icon type="messageSquare" />
-                  Is the Yorkie production ready?
+                  Is Yorkie production ready?
                 </Accordion.Control>
                 <Accordion.Panel>
                   Yes, Yorkie is ready to use in production. <br />
@@ -412,7 +402,7 @@ const Home: NextPage = () => {
               target="_blank"
               rel="noreferrer"
             >
-              Contact
+              Ask on Discord
             </Button>
             <Button
               as="a"
