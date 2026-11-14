@@ -58,3 +58,33 @@
     }
   }
 }
+
+// FAQ rows show a chevron on the right so they read as expandable.
+.section_faq .accordion_btn {
+  > .icon:last-child {
+    flex-shrink: 0;
+    margin: 0 0 0 auto;
+    padding-left: variables.$spacing_16;
+    box-sizing: content-box;
+
+    svg {
+      width: 100%;
+      height: 100%;
+      transition: transform 0.2s ease-out;
+    }
+
+    path {
+      fill: currentColor;
+    }
+  }
+
+  &.is_active > .icon:last-child svg {
+    transform: rotate(180deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section_faq .accordion_btn > .icon:last-child svg {
+    transition: none;
+  }
+}

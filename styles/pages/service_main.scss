@@ -12,7 +12,7 @@
     height: calc(100vh - 64px);
 
     @media screen and (max-width: 1023px) and (orientation: landscape) {
-      height: calc(100vh - -70px);
+      height: calc(100vh - 70px);
     }
 
     .kv_bg {
@@ -620,7 +620,7 @@
 
       &.is_active {
         background: var(--orange-0);
-        color: var(--gray-000);
+        color: var(--ink-on-accent);
       }
     }
 

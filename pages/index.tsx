@@ -38,20 +38,20 @@ const Home: NextPage = () => {
   return (
     <Layout className="main_page">
       <Head>
-        <title>Yorkie</title>
+        <title>Yorkie · Open-source document store for real-time collaboration</title>
       </Head>
       <div className="content">
         <section className="key_visual">
-          <div className="kv_bg">
+          <div className="kv_bg" aria-hidden="true">
             <MainBannerMotion bannerActive={bannerActive} />
           </div>
           <div className="inner">
             <h2 className="title">
-              <span className="text">Bring</span>
+              <span className="text">Bring</span>{' '}
               <span className={classNames('point', { is_hover: bannerActive })}>
                 collaboration
                 <span className="bg"></span>
-              </span>
+              </span>{' '}
               <span className="text">to your app</span>
             </h2>
             <Button.Box>
@@ -60,6 +60,8 @@ const Home: NextPage = () => {
                 className="btn orange_0 btn_start"
                 onPointerOver={() => setBannerActive(true)}
                 onPointerOut={() => setBannerActive(false)}
+                onFocus={() => setBannerActive(true)}
+                onBlur={() => setBannerActive(false)}
               >
                 <span className="bg"></span>
                 <Icon type="star" />
@@ -129,7 +131,12 @@ const Home: NextPage = () => {
               }}
             >
               <li className={classNames('service_card_item', { is_active: activeFeatureCard === 'profile' })}>
-                <button type="button" className="service_card_menu" data-item="profile">
+                <button
+                  type="button"
+                  className="service_card_menu"
+                  data-item="profile"
+                  aria-pressed={activeFeatureCard === 'profile'}
+                >
                   <span className="img_box">
                     <CollaboProfileSVG />
                   </span>
@@ -141,7 +148,12 @@ const Home: NextPage = () => {
                 </button>
               </li>
               <li className={classNames('service_card_item', { is_active: activeFeatureCard === 'cursor' })}>
-                <button type="button" className="service_card_menu" data-item="cursor">
+                <button
+                  type="button"
+                  className="service_card_menu"
+                  data-item="cursor"
+                  aria-pressed={activeFeatureCard === 'cursor'}
+                >
                   <span className="img_box">
                     <CollaboCursorSVG />
                   </span>
@@ -155,7 +167,12 @@ const Home: NextPage = () => {
               {process.env.NODE_ENV === 'development' && (
                 <>
                   <li className={classNames('service_card_item', { is_active: activeFeatureCard === 'selection' })}>
-                    <button type="button" className="service_card_menu" data-item="selection">
+                    <button
+                  type="button"
+                  className="service_card_menu"
+                  data-item="selection"
+                  aria-pressed={activeFeatureCard === 'selection'}
+                >
                       <span className="img_box">
                         <CollaboSelectionSVG />
                       </span>
@@ -167,7 +184,12 @@ const Home: NextPage = () => {
                     </button>
                   </li>
                   <li className={classNames('service_card_item', { is_active: activeFeatureCard === 'editing' })}>
-                    <button type="button" className="service_card_menu" data-item="editing">
+                    <button
+                  type="button"
+                  className="service_card_menu"
+                  data-item="editing"
+                  aria-pressed={activeFeatureCard === 'editing'}
+                >
                       <span className="img_box">
                         <CollaboEditingSVG />
                       </span>
@@ -190,6 +212,7 @@ const Home: NextPage = () => {
                       type="button"
                       key={codeType}
                       className={classNames('btn_item', { is_active: activeFeatureCode.type === codeType })}
+                      aria-pressed={activeFeatureCode.type === codeType}
                       onClick={() =>
                         setActiveFeatureCode({
                           type: codeType,
@@ -302,7 +325,7 @@ const Home: NextPage = () => {
         <section className="section section_faq">
           <h2 className="section_title">FAQ</h2>
           <div className="section_content">
-            <Accordion defaultValue={[]} multiple icon={null}>
+            <Accordion defaultValue={[]} multiple>
               <Accordion.Item value="faq1">
                 <Accordion.Control>
                   <Icon type="messageSquare" />
