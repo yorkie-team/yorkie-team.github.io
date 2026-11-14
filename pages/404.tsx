@@ -10,7 +10,7 @@ const Custom404: NextPage = () => {
         <title>Page not found · Yorkie</title>
       </Head>
       <div className="content error_404">
-        <h2 className="blind">404 : not found</h2>
+        <h1 className="blind">404 : not found</h1>
         <div className="img_box">
           <Error404SVG />
         </div>

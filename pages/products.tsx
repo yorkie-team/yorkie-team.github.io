@@ -23,11 +23,11 @@ const Products: NextPage = () => {
       <div className="top_banner">
         <div className="top_banner_inner">
           <div className="title_group">
-            <h2 className="title">
+            <h1 className="title">
               Ship faster,
               <br />
               Stay in control
-            </h2>
+            </h1>
             <p className="desc">
               Yorkie provides synchronization primitives: a JSON-like Document, <br className="br_pc" />
               Presence, and Channel. Dashboard lets you manage the documents <br className="br_pc" />

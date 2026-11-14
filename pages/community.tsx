@@ -13,7 +13,7 @@ const Community: NextPage = () => {
         <div className="img_box">
           <CommunitySVG />
         </div>
-        <h2 className="title">Join our community</h2>
+        <h1 className="title">Join our community</h1>
         <p className="desc">
           If you have any questions along the way,
           <br className="br_mo" /> please don’t hesitate to ask us

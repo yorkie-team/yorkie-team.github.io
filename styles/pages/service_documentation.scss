@@ -184,7 +184,16 @@ html {
     overflow-x: auto;
     box-sizing: border-box;
     color: var(--gray-800);
-    word-break: break-all;
+    // Break only strings that cannot fit, not ordinary words in the middle.
+    overflow-wrap: break-word;
+
+    // Prose reads best at about 75 characters; code, tables and diagrams keep the full width.
+    > p,
+    > ul,
+    > ol,
+    > blockquote {
+      max-width: 760px;
+    }
     flex: 1 1 100%;
     order: 1;
 
@@ -194,7 +203,8 @@ html {
       min-width: 0;
     }
 
-    h2 {
+    h2,
+    .docs_title {
       margin-bottom: variables.$spacing_16;
       @include mixins-lib.rfonts(46, 54, 600);
 

@@ -33,13 +33,13 @@ export function Header(): ReactElement {
   return (
     <header className="header_service">
       <div className="header_inner">
-        <h1 className="logo">
+        <div className="logo">
           <Link href="/">
             <LogoSVG />
             <LogoGnbSVG />
             <span className="blind">Yorkie</span>
           </Link>
-        </h1>
+        </div>
         <nav className="nav">
           <ul className="gnb">
             <li className={`gnb_item ${pathname == '/products' ? 'is_active' : ''}`}>
