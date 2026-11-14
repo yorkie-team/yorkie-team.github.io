@@ -1,4 +1,5 @@
 import fs from 'fs';
+import os from 'os';
 import path from 'path';
 import dotenv from 'dotenv';
 import type { DirectoryInfo, FileInfo } from '../utils/exampleFileUtils';
@@ -132,7 +133,8 @@ const getDirectoryInfo = (dirPath: string, basePath?: string): DirectoryInfo => 
   return directoryInfo;
 };
 
-const EXAMPLES_PATH = path.join(process.cwd(), 'temp/examples');
+// Cloned by fetch-js-examples.sh outside this repository; see the note there.
+const EXAMPLES_PATH = path.join(os.tmpdir(), 'yorkie-js-sdk', 'examples');
 const EXAMPLES_OUTPUT_PATH = path.join(process.cwd(), 'examples');
 
 // Remove example directories owned by this script that the SDK no longer

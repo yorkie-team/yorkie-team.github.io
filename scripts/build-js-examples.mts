@@ -1,4 +1,5 @@
 import fs from 'fs';
+import os from 'os';
 import path from 'path';
 import { execSync } from 'child_process';
 import dotenv from 'dotenv';
@@ -18,7 +19,8 @@ if (nodeEnv === 'production') {
 // Load base .env file last (lower priority)
 dotenv.config({ path: '.env', override: false });
 
-const YORKIE_SDK_PATH = path.join(process.cwd(), 'temp');
+// Cloned by fetch-js-examples.sh outside this repository; see the note there.
+const YORKIE_SDK_PATH = path.join(os.tmpdir(), 'yorkie-js-sdk');
 const EXAMPLES_OUTPUT_PATH = path.join(process.cwd(), 'public/apps');
 
 // Run a pinned pnpm through npx so the build matches the SDK's lockfile no matter
