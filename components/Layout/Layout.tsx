@@ -14,8 +14,13 @@ export function Layout({
 }): ReactElement {
   return (
     <div className={classNames('wrap', className)}>
+      <a href="#content" className="skip_link">
+        Skip to content
+      </a>
       <Header />
-      <main className="container">{children}</main>
+      <main id="content" className="container" tabIndex={-1}>
+        {children}
+      </main>
       <Footer shortFooter={shortFooter} />
     </div>
   );

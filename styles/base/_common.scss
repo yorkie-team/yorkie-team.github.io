@@ -121,7 +121,27 @@ button {
 button,
 a {
   &:focus-visible {
-    outline: 1px solid var(--orange-0);
+    outline: 2px solid var(--gray-900);
+    outline-offset: 2px;
+  }
+}
+
+// Keyboard users jump past the header; visible only while focused.
+.skip_link {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 1000;
+  padding: 8px 16px;
+  border-radius: 4px;
+  background-color: var(--gray-900);
+  color: var(--gray-000);
+  font-size: 14px;
+  line-height: 22px;
+  transform: translateY(-200%);
+
+  &:focus-visible {
+    transform: none;
   }
 }
 

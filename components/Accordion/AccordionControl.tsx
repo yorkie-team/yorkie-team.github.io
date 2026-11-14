@@ -24,6 +24,7 @@ export const AccordionControl = forwardRef<HTMLButtonElement, AccordionControlPr
         }}
         type="button"
         data-active={isActive || undefined}
+        aria-expanded={isActive}
       >
         {iconPosition === 'left' && icon}
         {children}
