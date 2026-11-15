@@ -58,6 +58,26 @@ const components: MDXComponents = {
   Mermaid,
 };
 
+/**
+ * Scrolls the table of contents, not the window, so the entry for the current
+ * section stays visible when the list is taller than its panel. The jump is
+ * instant: a smooth scroll still running for an earlier section would carry
+ * the list past a newer one that the check below found already visible.
+ */
+function keepTOCItemInView(item: Element | null) {
+  const list = document.querySelector<HTMLElement>('.pagination .toc-level-1');
+  if (!item || !list || list.scrollHeight <= list.clientHeight) return;
+
+  // An entry with subsections wraps their list too; measure its own link.
+  const target = item.querySelector(':scope > a') ?? item;
+  const listRect = list.getBoundingClientRect();
+  const rect = target.getBoundingClientRect();
+  const margin = 32;
+  if (rect.top >= listRect.top + margin && rect.bottom <= listRect.bottom - margin) return;
+
+  list.scrollTop += rect.top - listRect.top - list.clientHeight / 3;
+}
+
 export default function DocsPage({
   source,
   meta,
@@ -68,6 +88,7 @@ export default function DocsPage({
   navList: DocsOrderList;
 }) {
   const [activeId, setActiveId] = useState<string>('');
+  const [isTOCOpen, setTOCOpen] = useState(false);
   const [headings, setHeadings] = useState<Array<Element>>([]);
   const [headingTops, setHeadingTops] = useState<Array<{ id: string; top: number }>>([]);
 
@@ -116,8 +137,50 @@ export default function DocsPage({
   useEffect(() => {
     updateHeadingPositions();
     document.querySelector(`.toc-item.is_active`)?.classList.remove('is_active');
-    document.querySelector(`[data-heading="${activeId}"]`)?.classList.add('is_active');
+    const activeItem = document.querySelector(`[data-heading="${activeId}"]`);
+    activeItem?.classList.add('is_active');
+    keepTOCItemInView(activeItem);
+
+    const current = document.querySelector('.pagination_toggle_current');
+    if (current) current.textContent = activeItem?.querySelector(':scope > a')?.textContent ?? '';
   }, [activeId, updateHeadingPositions]);
+
+  // Below 1440px the table of contents is a dropdown. A link, Escape or a
+  // click elsewhere closes it, and so does moving to another page.
+  useEffect(() => {
+    setTOCOpen(false);
+    const panel = document.querySelector('.pagination');
+    const toggle = panel?.querySelector<HTMLButtonElement>('.pagination_toggle');
+    if (!panel || !toggle) return;
+
+    const onClick = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (toggle.contains(target)) {
+        setTOCOpen((open) => !open);
+      } else if (!panel.contains(target) || target.closest('a')) {
+        setTOCOpen(false);
+      }
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape' || !panel.hasAttribute('data-open')) return;
+      setTOCOpen(false);
+      toggle.focus();
+    };
+
+    document.addEventListener('click', onClick);
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('click', onClick);
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [source]);
+
+  useEffect(() => {
+    const panel = document.querySelector('.pagination');
+    panel?.toggleAttribute('data-open', isTOCOpen);
+    panel?.querySelector('.pagination_toggle')?.setAttribute('aria-expanded', String(isTOCOpen));
+    if (isTOCOpen) keepTOCItemInView(document.querySelector('.toc-item.is_active'));
+  }, [isTOCOpen, source]);
 
   return (
     <Layout className="documentation_page">
@@ -176,8 +239,15 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
               const contents = (children[0] as any)?.children?.length;
               if (!contents) return false;
 
-              toc.tagName = 'div';
               toc.properties.className = 'pagination';
+              toc.properties.ariaLabel = 'On this page';
+              (children[0] as HtmlElementNode).properties.id = 'toc-list';
+              const span = (className: string, value?: string) => ({
+                type: 'element',
+                tagName: 'span',
+                properties: { className },
+                children: value ? [{ type: 'text', value }] : [],
+              });
               const wrapper = {
                 type: 'element',
                 tagName: 'div',
@@ -188,6 +258,25 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
                     tagName: 'strong',
                     properties: { className: 'pagination_title' },
                     children: [{ type: 'text', value: 'On this page' }],
+                  },
+                  // Below 1440px the title becomes this toggle, which also names the current section.
+                  {
+                    type: 'element',
+                    tagName: 'button',
+                    properties: {
+                      className: 'pagination_toggle',
+                      type: 'button',
+                      ariaExpanded: 'false',
+                      ariaControls: 'toc-list',
+                    },
+                    children: [
+                      span('pagination_toggle_label', 'On this page'),
+                      span('pagination_toggle_current'),
+                      {
+                        ...span('pagination_toggle_icon'),
+                        properties: { className: 'pagination_toggle_icon', ariaHidden: 'true' },
+                      },
+                    ],
                   },
                   ...children,
                 ],
