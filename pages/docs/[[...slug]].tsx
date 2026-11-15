@@ -60,9 +60,11 @@ const components: MDXComponents = {
 
 /**
  * Scrolls the table of contents, not the window, so the entry for the current
- * section stays visible when the list is taller than its panel.
+ * section stays visible when the list is taller than its panel. The jump is
+ * instant: a smooth scroll still running for an earlier section would carry
+ * the list past a newer one that the check below found already visible.
  */
-function keepTOCItemInView(item: Element | null, behavior?: ScrollBehavior) {
+function keepTOCItemInView(item: Element | null) {
   const list = document.querySelector<HTMLElement>('.pagination .toc-level-1');
   if (!item || !list || list.scrollHeight <= list.clientHeight) return;
 
@@ -73,11 +75,7 @@ function keepTOCItemInView(item: Element | null, behavior?: ScrollBehavior) {
   const margin = 32;
   if (rect.top >= listRect.top + margin && rect.bottom <= listRect.bottom - margin) return;
 
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  list.scrollTo({
-    top: list.scrollTop + rect.top - listRect.top - list.clientHeight / 3,
-    behavior: behavior ?? (reduceMotion ? 'auto' : 'smooth'),
-  });
+  list.scrollTop += rect.top - listRect.top - list.clientHeight / 3;
 }
 
 export default function DocsPage({
@@ -181,7 +179,7 @@ export default function DocsPage({
     const panel = document.querySelector('.pagination');
     panel?.toggleAttribute('data-open', isTOCOpen);
     panel?.querySelector('.pagination_toggle')?.setAttribute('aria-expanded', String(isTOCOpen));
-    if (isTOCOpen) keepTOCItemInView(document.querySelector('.toc-item.is_active'), 'auto');
+    if (isTOCOpen) keepTOCItemInView(document.querySelector('.toc-item.is_active'));
   }, [isTOCOpen, source]);
 
   return (
