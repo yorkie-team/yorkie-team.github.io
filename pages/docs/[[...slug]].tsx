@@ -58,6 +58,28 @@ const components: MDXComponents = {
   Mermaid,
 };
 
+/**
+ * Scrolls the table of contents, not the window, so the entry for the current
+ * section stays visible when the list is taller than its panel.
+ */
+function keepTOCItemInView(item: Element | null) {
+  const list = document.querySelector<HTMLElement>('.pagination .toc-level-1');
+  if (!item || !list || list.scrollHeight <= list.clientHeight) return;
+
+  // An entry with subsections wraps their list too; measure its own link.
+  const target = item.querySelector(':scope > a') ?? item;
+  const listRect = list.getBoundingClientRect();
+  const rect = target.getBoundingClientRect();
+  const margin = 32;
+  if (rect.top >= listRect.top + margin && rect.bottom <= listRect.bottom - margin) return;
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  list.scrollTo({
+    top: list.scrollTop + rect.top - listRect.top - list.clientHeight / 3,
+    behavior: reduceMotion ? 'auto' : 'smooth',
+  });
+}
+
 export default function DocsPage({
   source,
   meta,
@@ -116,7 +138,9 @@ export default function DocsPage({
   useEffect(() => {
     updateHeadingPositions();
     document.querySelector(`.toc-item.is_active`)?.classList.remove('is_active');
-    document.querySelector(`[data-heading="${activeId}"]`)?.classList.add('is_active');
+    const activeItem = document.querySelector(`[data-heading="${activeId}"]`);
+    activeItem?.classList.add('is_active');
+    keepTOCItemInView(activeItem);
   }, [activeId, updateHeadingPositions]);
 
   return (

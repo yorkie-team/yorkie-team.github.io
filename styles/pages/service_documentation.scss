@@ -30,6 +30,14 @@ html {
       border-right: 1px solid var(--gray-400);
       box-sizing: border-box;
 
+      // Below 1600px the navigator gives its spare right gutter to the content
+      // (the 244px list still fits), so code blocks keep more width next to
+      // the table of contents.
+      @media screen and (max-width: 1599px) {
+        min-width: 284px;
+        padding-right: variables.$spacing_16;
+      }
+
       @include mixins-lib.tabletStart() {
         display: none;
       }
@@ -53,10 +61,21 @@ html {
         }
       }
 
+      // Sticks below the 64px header and scrolls on its own when the open
+      // group is taller than the window. The navigator's top padding keeps the
+      // resting position where it was.
+      padding-top: 64px;
+
       & > #{$nav}_list {
         position: sticky;
-        top: 0;
-        padding-top: 76px;
+        top: 64px;
+        max-height: calc(100vh - 64px);
+        padding-top: 12px;
+        padding-bottom: variables.$spacing_24;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        scrollbar-width: thin;
+        scrollbar-color: var(--gray-400) transparent;
 
         & > #{$nav}_group {
           & > #{$nav}_item:only-child {
@@ -133,41 +152,70 @@ html {
     }
   }
 
+  // The table of contents. It shows from 1440px, the narrowest default
+  // MacBook width; below that the content column is too narrow to share.
+  // It never grows past the window: the SDK references list 40 to 50
+  // headings, so the list scrolls inside the panel and keeps the current
+  // section in view.
   .pagination {
     display: none;
     flex: none;
+    flex-direction: column;
     order: 2;
     position: sticky;
-    top: 152px;
+    top: 88px;
     right: 0;
     z-index: 1;
     width: 220px;
+    max-height: calc(100vh - 88px - #{variables.$spacing_24});
+    overflow: hidden;
     border: 1px solid var(--gray-400);
     border-radius: 16px;
+    background: var(--gray-000);
     box-sizing: border-box;
 
-    @media screen and (min-width: 1600px) {
-      display: block;
+    @media screen and (min-width: 1440px) {
+      display: flex;
     }
 
     &_inner {
-      padding: variables.$spacing_24;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      padding-top: variables.$spacing_24;
     }
 
     &_title {
+      flex: none;
+      padding: 0 variables.$spacing_24 variables.$spacing_8;
       color: var(--gray-800);
       @include mixins-lib.rfonts(14, 22, 600);
     }
 
+    // A hairline marks each edge the list continues past. Paper strips that
+    // scroll with the content cover the lines once an end is reached (macOS
+    // hides the scrollbar until the list moves, so the edge has to say it).
     .toc-level-1 {
-      padding-top: variables.$spacing_8;
+      min-height: 0;
+      padding: 0 variables.$spacing_24 variables.$spacing_24;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+      scrollbar-color: var(--gray-400) transparent;
+      background:
+        linear-gradient(var(--gray-000), var(--gray-000)) top / 100% 4px no-repeat local,
+        linear-gradient(var(--gray-000), var(--gray-000)) bottom / 100% 4px no-repeat local,
+        linear-gradient(var(--gray-400), var(--gray-400)) top / 100% 1px no-repeat scroll,
+        linear-gradient(var(--gray-400), var(--gray-400)) bottom / 100% 1px no-repeat scroll;
+      background-color: var(--gray-000);
     }
 
     .toc-item {
       padding-top: 10px;
       @include mixins-lib.rfonts(12, 16, 500);
       color: var(--gray-700);
-      word-break: break-all;
+      // Break long words only; whole words wrap normally.
+      overflow-wrap: anywhere;
 
       // An underline marks the current section: a weight change would re-wrap entries while scrolling,
       // and the two grays are nearly identical on the dark theme.
@@ -203,10 +251,15 @@ html {
       max-width: 760px;
     }
 
-    @media screen and (min-width: 1600px) {
-      padding-right: 48px;
+    // Leave room for the table of contents (see .pagination).
+    @media screen and (min-width: 1440px) {
+      padding-right: variables.$spacing_32;
       flex: 1 1 0;
       min-width: 0;
+    }
+
+    @media screen and (min-width: 1600px) {
+      padding-right: variables.$spacing_48;
     }
 
     .docs_title {
