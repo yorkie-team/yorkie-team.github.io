@@ -6,6 +6,14 @@
 
 html {
   scroll-padding-top: 70px;
+
+  // Below 1440px the table of contents bar sticks under the header too, so
+  // anchored headings land below it.
+  &:has(.documentation_page .pagination) {
+    @media screen and (max-width: 1439px) {
+      scroll-padding-top: 136px;
+    }
+  }
 }
 
 .documentation_page {
@@ -152,54 +160,121 @@ html {
     }
   }
 
-  // The table of contents. It shows from 1440px, the narrowest default
-  // MacBook width; below that the content column is too narrow to share.
-  // It never grows past the window: the SDK references list 40 to 50
-  // headings, so the list scrolls inside the panel and keeps the current
-  // section in view.
+  // The table of contents takes two forms.
+  //
+  // Below 1440px it is a bar above the article that stays under the header,
+  // names the current section and opens the list as a dropdown, so a long
+  // page can be crossed from anywhere in it.
+  //
+  // From 1440px, the narrowest default MacBook width, it is a sidebar. It
+  // never grows past the window: the SDK references list 40 to 50 headings,
+  // so the list scrolls inside the panel and keeps the current section in
+  // view.
   .pagination {
-    display: none;
-    flex: none;
-    flex-direction: column;
-    order: 2;
+    flex: 1 1 100%;
+    order: 0;
     position: sticky;
-    top: 88px;
-    right: 0;
-    z-index: 1;
-    width: 220px;
-    max-height: calc(100vh - 88px - #{variables.$spacing_24});
-    overflow: hidden;
-    border: 1px solid var(--gray-400);
-    border-radius: 16px;
+    top: variables.$pcHeader;
+    z-index: variables.$z_dropdown;
+    // A paper strip as wide as the content fills the gap above the bar and
+    // beside it, so text scrolling underneath does not show around the bar.
+    margin: calc(-1 * #{variables.$spacing_8}) 0 variables.$spacing_32;
+    padding-top: variables.$spacing_8;
     background: var(--gray-000);
     box-sizing: border-box;
 
-    @media screen and (min-width: 1440px) {
-      display: flex;
+    @include mixins-lib.mobileStart() {
+      margin-bottom: variables.$spacing_24;
     }
 
     &_inner {
-      display: flex;
-      flex-direction: column;
-      min-height: 0;
-      padding-top: variables.$spacing_24;
+      position: relative;
+      // Same measure as the prose, so the bar does not outweigh the title.
+      max-width: 760px;
+      border: 1px solid var(--gray-400);
+      border-radius: 8px;
+      background: var(--gray-000);
     }
 
     &_title {
-      flex: none;
-      padding: 0 variables.$spacing_24 variables.$spacing_8;
+      display: none;
+    }
+
+    &_toggle {
+      display: flex;
+      align-items: center;
+      gap: variables.$spacing_8;
+      width: 100%;
+      min-height: 44px;
+      padding: 0 variables.$spacing_16;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
       color: var(--gray-800);
-      @include mixins-lib.rfonts(14, 22, 600);
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+
+      &:focus-visible {
+        outline-offset: -2px;
+      }
+
+      &_label {
+        flex: none;
+        @include mixins-lib.rfonts(14, 22, 600);
+      }
+
+      &_current {
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow: hidden;
+        color: var(--gray-700);
+        @include mixins-lib.rfonts(14, 22, 400);
+        text-overflow: ellipsis;
+        white-space: nowrap;
+
+        &:not(:empty) {
+          padding-left: variables.$spacing_8;
+          border-left: 1px solid var(--gray-400);
+        }
+      }
+
+      &_icon {
+        flex: none;
+        width: 16px;
+        height: 16px;
+        margin-left: auto;
+        background-color: currentColor;
+        mask: url('/assets/icons/icon_arrow.svg') center / 12px no-repeat;
+        transition: transform 0.2s;
+
+        @media (prefers-reduced-motion: reduce) {
+          transition: none;
+        }
+      }
+    }
+
+    &[data-open] .pagination_toggle_icon {
+      transform: rotate(180deg);
     }
 
     // A hairline marks each edge the list continues past. Paper strips that
     // scroll with the content cover the lines once an end is reached (macOS
     // hides the scrollbar until the list moves, so the edge has to say it).
     .toc-level-1 {
-      min-height: 0;
-      padding: 0 variables.$spacing_24 variables.$spacing_24;
+      display: none;
+      position: absolute;
+      top: calc(100% + #{variables.$spacing_8});
+      right: -1px;
+      left: -1px;
+      max-height: min(60vh, 480px);
+      padding: variables.$spacing_8 variables.$spacing_16 variables.$spacing_16;
       overflow-y: auto;
       overscroll-behavior: contain;
+      border: 1px solid var(--gray-400);
+      border-radius: 8px;
+      box-shadow: variables.$shadow_m;
+      box-sizing: border-box;
       scrollbar-width: thin;
       scrollbar-color: var(--gray-400) transparent;
       background:
@@ -210,9 +285,13 @@ html {
       background-color: var(--gray-000);
     }
 
+    &[data-open] .toc-level-1 {
+      display: block;
+    }
+
     .toc-item {
-      padding-top: 10px;
-      @include mixins-lib.rfonts(12, 16, 500);
+      padding-top: variables.$spacing_8;
+      @include mixins-lib.rfonts(14, 22, 500);
       color: var(--gray-700);
       // Break long words only; whole words wrap normally.
       overflow-wrap: anywhere;
@@ -228,7 +307,66 @@ html {
       }
 
       .toc-item {
-        padding-left: 10px;
+        padding-left: variables.$spacing_16;
+      }
+    }
+
+    @media screen and (min-width: 1440px) {
+      display: flex;
+      flex: none;
+      flex-direction: column;
+      order: 2;
+      top: 88px;
+      z-index: 1;
+      width: 220px;
+      max-height: calc(100vh - 88px - #{variables.$spacing_24});
+      margin: 0;
+      padding-top: 0;
+      overflow: hidden;
+      border: 1px solid var(--gray-400);
+      border-radius: 16px;
+
+      &_inner {
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        max-width: none;
+        padding-top: variables.$spacing_24;
+        border: 0;
+        border-radius: 0;
+      }
+
+      &_title {
+        display: block;
+        flex: none;
+        padding: 0 variables.$spacing_24 variables.$spacing_8;
+        color: var(--gray-800);
+        @include mixins-lib.rfonts(14, 22, 600);
+      }
+
+      &_toggle {
+        display: none;
+      }
+
+      .toc-level-1,
+      &[data-open] .toc-level-1 {
+        display: block;
+        position: static;
+        min-height: 0;
+        max-height: none;
+        padding: 0 variables.$spacing_24 variables.$spacing_24;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      .toc-item {
+        padding-top: 10px;
+        @include mixins-lib.rfonts(12, 16, 500);
+
+        .toc-item {
+          padding-left: 10px;
+        }
       }
     }
   }
