@@ -27,6 +27,30 @@ export function VideoPlayer({ videoSrc, title, description, codeURL }: VideoPlay
   // to load or decode is replaced by the same links.
   const [failed, setFailed] = useState(false);
 
+  // The static page starts loading the recording before React hydrates, so an error may already have
+  // happened by now. Listen natively instead of relying on onError props, then check what already
+  // happened. This runs before the autoplay effect below because `load()` aborts a pending `play()`.
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    const source = video.querySelector('source');
+    const fail = () => setFailed(true);
+    video.addEventListener('error', fail);
+    source?.addEventListener('error', fail);
+    if (video.error) {
+      fail();
+    } else if (video.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) {
+      // Either every source failed before hydration, or the element was just inserted by a
+      // client-side navigation and has not started loading yet; both report NETWORK_NO_SOURCE.
+      // Restart source selection so a real failure fires `error` on the listeners above.
+      video.load();
+    }
+    return () => {
+      video.removeEventListener('error', fail);
+      source?.removeEventListener('error', fail);
+    };
+  }, []);
+
   useEffect(() => {
     const video = videoRef.current;
     if (!video || typeof window.matchMedia !== 'function') return;
@@ -48,25 +72,6 @@ export function VideoPlayer({ videoSrc, title, description, codeURL }: VideoPlay
     sync();
     query.addEventListener('change', sync);
     return () => query.removeEventListener('change', sync);
-  }, []);
-
-  // The static page starts loading the recording before React hydrates, so an error may already have
-  // happened by now. Check the element's state and listen natively instead of relying on onError props.
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    const source = video.querySelector('source');
-    const fail = () => setFailed(true);
-    if (video.error || video.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) {
-      fail();
-      return;
-    }
-    video.addEventListener('error', fail);
-    source?.addEventListener('error', fail);
-    return () => {
-      video.removeEventListener('error', fail);
-      source?.removeEventListener('error', fail);
-    };
   }, []);
 
   const fallback = (
