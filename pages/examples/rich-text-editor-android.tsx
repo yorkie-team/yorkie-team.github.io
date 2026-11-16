@@ -38,7 +38,7 @@ const RichTextEditorAndroidExampleView: NextPage = () => {
                 </Sidebar.GuideDescription>
                 <ProjectCodes
                   files={FILE_INFO}
-                  activeFile="/src/main/java/com/example/richtexteditor/MainActivity.kt"
+                  activeFile="/src/main/java/dev/yorkie/example/richtexteditor/MainActivity.kt"
                 />
               </Sidebar.TabsPanel>
               <Sidebar.Bottom codeURL={EXAMPLE_ANDROID_CODE_URL + exampleKey} />

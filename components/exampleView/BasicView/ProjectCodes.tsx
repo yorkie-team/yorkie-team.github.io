@@ -28,7 +28,13 @@ type TreeState = {
 
 function buildTreeState(files: DirectoryInfo, activeFile?: string, ignoreFiles?: string[]): TreeState {
   const filtered = ignoreFiles ? filterIgnoreFiles(files, ignoreFiles) : files;
-  const [fileInfo, activeFileInfo] = activeFile ? setFileOpen(filtered, activeFile) : setFirstFileOpen(filtered);
+  let [fileInfo, activeFileInfo] = activeFile ? setFileOpen(filtered, activeFile) : setFirstFileOpen(filtered);
+  // A stale `activeFile` (the SDK moved its sources) would leave the viewer
+  // empty with every folder closed. Open the first file instead.
+  if (!activeFileInfo) {
+    if (activeFile) console.warn(`ProjectCodes: activeFile "${activeFile}" is not in the example files.`);
+    [fileInfo, activeFileInfo] = setFirstFileOpen(filtered);
+  }
   // Open only the folders on the way to the active file. Opening everything
   // buries the source under build metadata in the iOS and Android examples.
   const ancestors = activeFileInfo ? getAncestorFolderPaths(fileInfo, activeFileInfo.path) : null;

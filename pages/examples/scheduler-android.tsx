@@ -40,7 +40,7 @@ const SchedulerAndroidExampleView: NextPage = () => {
                   </a>
                   .
                 </Sidebar.GuideDescription>
-                <ProjectCodes files={FILE_INFO} activeFile="/src/main/java/com/example/scheduler/MainActivity.kt" />
+                <ProjectCodes files={FILE_INFO} activeFile="/src/main/java/dev/yorkie/example/scheduler/MainActivity.kt" />
               </Sidebar.TabsPanel>
               <Sidebar.Bottom codeURL={EXAMPLE_ANDROID_CODE_URL + exampleKey} />
             </Sidebar.Tabs>
