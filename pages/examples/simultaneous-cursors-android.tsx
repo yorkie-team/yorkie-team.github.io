@@ -38,7 +38,7 @@ const SimultaneousCursorsAndroidExampleView: NextPage = () => {
                 </Sidebar.GuideDescription>
                 <ProjectCodes
                   files={FILE_INFO}
-                  activeFile="/src/main/java/com/example/simultaneouscursors/MainActivity.kt"
+                  activeFile="/src/main/java/dev/yorkie/example/simultaneouscursors/MainActivity.kt"
                 />
               </Sidebar.TabsPanel>
               <Sidebar.Bottom codeURL={EXAMPLE_ANDROID_CODE_URL + exampleKey} />

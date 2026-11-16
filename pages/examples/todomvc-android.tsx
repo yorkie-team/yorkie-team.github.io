@@ -45,7 +45,7 @@ const TodoMVCAndroidExampleView: NextPage = () => {
                   </a>
                   .
                 </Sidebar.GuideDescription>
-                <ProjectCodes files={FILE_INFO} activeFile="/src/main/java/com/example/todomvc/MainActivity.kt" />
+                <ProjectCodes files={FILE_INFO} activeFile="/src/main/java/dev/yorkie/example/todomvc/MainActivity.kt" />
               </Sidebar.TabsPanel>
               <Sidebar.Bottom codeURL={EXAMPLE_ANDROID_CODE_URL + exampleKey} />
             </Sidebar.Tabs>
