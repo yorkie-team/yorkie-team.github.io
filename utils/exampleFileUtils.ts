@@ -79,7 +79,8 @@ const _setFirstFileOpen = (
       const [childInfo, childHasOpenFile, openedFileInfo] = _setFirstFileOpen(child, _hasOpenFile);
       cloneDirectoryInfo.children[i] = childInfo;
       _hasOpenFile = childHasOpenFile;
-      _openedFileInfo = openedFileInfo;
+      // A later sibling folder returns null; keep the file already found.
+      _openedFileInfo = openedFileInfo ?? _openedFileInfo;
     }
   });
   return [cloneDirectoryInfo, _hasOpenFile, _openedFileInfo];
