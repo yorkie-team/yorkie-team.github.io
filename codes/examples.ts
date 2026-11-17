@@ -66,6 +66,14 @@ export const EXAMPLES: Example[] = [
     category: [CATEGORIES.PRODUCTIVITY],
   },
   {
+    id: 'chat',
+    title: 'Chat',
+    desc: 'A Slack-like chat with channels, reactions and threads. Presence shows who is in each channel and who is typing.',
+    thumbnail: 'react-chat.jpg',
+    platform: 'web',
+    category: [CATEGORIES.PRESENCE, CATEGORIES.REACT],
+  },
+  {
     id: 'todomvc',
     title: 'TodoMVC',
     desc: 'This is an example of real-time collaborative TodoMVC using Yorkie React.',
