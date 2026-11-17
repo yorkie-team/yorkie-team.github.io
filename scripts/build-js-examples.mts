@@ -35,6 +35,7 @@ const STATIC_EXAMPLES = [
   'simultaneous-cursors',
   'vuejs-kanban',
   'react-todomvc',
+  'react-chat',
   'react-flow',
   'vanilla-codemirror6',
   'react-tldraw',
